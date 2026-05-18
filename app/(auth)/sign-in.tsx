@@ -1,39 +1,14 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Colors, Fonts } from "@/constants/theme";
+import { Colors } from "@/constants/theme";
 
 export default function SignInScreen() {
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>SIGN IN</Text>
-        <Text style={styles.subtitle}>Coming soon</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }}>
+      <View className="flex-1 justify-center items-center">
+        <Text className="font-heading text-[48px] text-primary tracking-[4px]">SIGN IN</Text>
+        <Text className="font-sans text-[15px] text-secondary mt-2">Coming soon</Text>
       </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.base,
-    paddingHorizontal: 16,
-  },
-  content: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontFamily: Fonts.display,
-    fontSize: 48,
-    color: Colors.primary,
-    letterSpacing: 4,
-  },
-  subtitle: {
-    fontFamily: Fonts.body,
-    fontSize: 15,
-    color: Colors.secondary,
-    marginTop: 8,
-  },
-});

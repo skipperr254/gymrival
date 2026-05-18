@@ -13,6 +13,7 @@
   /* ── Accent ── */
   --color-accent: #e63030;
   --color-accent-dark: #b01010;
+  --color-accent-ring: rgba(230, 48, 48, 0.15);
 
   /* ── Text ── */
   --color-primary: #ffffff;

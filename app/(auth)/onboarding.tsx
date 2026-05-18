@@ -4,7 +4,6 @@ import {
   Text,
   ScrollView,
   Pressable,
-  StyleSheet,
   NativeSyntheticEvent,
   NativeScrollEvent,
   useWindowDimensions,
@@ -12,7 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Colors, Fonts } from "@/constants/theme";
+import { Colors } from "@/constants/theme";
 import { Routes } from "@/constants/routes";
 
 type IoniconName = React.ComponentProps<typeof Ionicons>["name"];
@@ -71,12 +70,12 @@ export default function OnboardingScreen() {
   const skip = () => router.replace(Routes.signIn);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }}>
       {/* Top bar */}
-      <View style={styles.topBar}>
+      <View className="h-[52px] px-5 items-end justify-center">
         {!isLast && (
-          <Pressable onPress={skip} hitSlop={12} style={styles.skipBtn}>
-            <Text style={styles.skipText}>Skip</Text>
+          <Pressable onPress={skip} hitSlop={12}>
+            <Text className="font-sans-medium text-[15px] text-secondary">Skip</Text>
           </Pressable>
         )}
       </View>
@@ -89,51 +88,57 @@ export default function OnboardingScreen() {
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={handleScroll}
         scrollEventThrottle={32}
-        style={styles.scrollView}
+        className="flex-1"
       >
         {SLIDES.map((slide, i) => (
-          <View key={i} style={[styles.slide, { width }]}>
+          // width must be inline — dynamic value from useWindowDimensions
+          <View key={i} style={{ width }} className="flex-1 items-center justify-center px-8">
             {/* Icon illustration */}
-            <View style={styles.iconRing}>
-              <View style={styles.iconCircle}>
+            <View className="w-[220px] h-[220px] rounded-[110px] border border-accent-ring items-center justify-center mb-11">
+              <View className="w-[174px] h-[174px] rounded-[87px] bg-surface items-center justify-center">
                 <Ionicons name={slide.icon} size={76} color={Colors.accent} />
               </View>
             </View>
 
             {/* Text */}
-            <View style={styles.textContent}>
-              <Text style={styles.tag}>{slide.tag}</Text>
-              <Text style={styles.title}>{slide.title}</Text>
-              <Text style={styles.body}>{slide.body}</Text>
+            <View className="items-center">
+              <Text className="font-sans-semibold text-xs text-accent tracking-[3px] mb-3">
+                {slide.tag}
+              </Text>
+              <Text className="font-heading text-[52px] text-primary text-center leading-[56px] mb-4">
+                {slide.title}
+              </Text>
+              <Text className="font-sans text-[15px] text-secondary text-center leading-[23px]">
+                {slide.body}
+              </Text>
             </View>
           </View>
         ))}
       </ScrollView>
 
       {/* Footer */}
-      <View style={styles.footer}>
+      <View className="px-4 pb-5 gap-5">
         {/* Pagination dots */}
-        <View style={styles.dots}>
+        <View className="flex-row justify-center items-center gap-2">
           {SLIDES.map((_, i) => (
             <View
               key={i}
-              style={[
-                styles.dot,
-                i === activeIndex ? styles.dotActive : styles.dotInactive,
-              ]}
+              className={`h-[6px] rounded-[3px] ${
+                i === activeIndex ? "w-6 bg-accent" : "w-[6px] bg-elevated"
+              }`}
             />
           ))}
         </View>
 
         {/* CTA button */}
         <Pressable
-          style={({ pressed }) => [
-            styles.button,
-            pressed && styles.buttonPressed,
-          ]}
+          className="bg-accent rounded-2xl h-14 items-center justify-center"
+          style={({ pressed }) =>
+            pressed ? { backgroundColor: Colors.accentDark } : undefined
+          }
           onPress={goNext}
         >
-          <Text style={styles.buttonText}>
+          <Text className="font-heading text-xl text-primary tracking-[3px]">
             {isLast ? "GET STARTED" : "NEXT"}
           </Text>
         </Pressable>
@@ -141,115 +146,3 @@ export default function OnboardingScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.base,
-  },
-  topBar: {
-    height: 52,
-    paddingHorizontal: 20,
-    alignItems: "flex-end",
-    justifyContent: "center",
-  },
-  skipBtn: {
-    paddingHorizontal: 4,
-  },
-  skipText: {
-    fontFamily: Fonts.bodyMedium,
-    fontSize: 15,
-    color: Colors.secondary,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  slide: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 32,
-  },
-  iconRing: {
-    width: 220,
-    height: 220,
-    borderRadius: 110,
-    borderWidth: 1,
-    borderColor: "rgba(230, 48, 48, 0.18)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 44,
-  },
-  iconCircle: {
-    width: 174,
-    height: 174,
-    borderRadius: 87,
-    backgroundColor: Colors.surface,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  textContent: {
-    alignItems: "center",
-  },
-  tag: {
-    fontFamily: Fonts.bodySemiBold,
-    fontSize: 12,
-    color: Colors.accent,
-    letterSpacing: 3,
-    marginBottom: 12,
-  },
-  title: {
-    fontFamily: Fonts.display,
-    fontSize: 52,
-    color: Colors.primary,
-    textAlign: "center",
-    lineHeight: 56,
-    marginBottom: 16,
-  },
-  body: {
-    fontFamily: Fonts.body,
-    fontSize: 15,
-    color: Colors.secondary,
-    textAlign: "center",
-    lineHeight: 23,
-  },
-  footer: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
-    gap: 20,
-  },
-  dots: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 8,
-  },
-  dot: {
-    height: 6,
-    borderRadius: 3,
-  },
-  dotActive: {
-    width: 24,
-    backgroundColor: Colors.accent,
-  },
-  dotInactive: {
-    width: 6,
-    backgroundColor: Colors.elevated,
-  },
-  button: {
-    backgroundColor: Colors.accent,
-    borderRadius: 16,
-    height: 56,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonPressed: {
-    backgroundColor: Colors.accentDark,
-  },
-  buttonText: {
-    fontFamily: Fonts.display,
-    fontSize: 20,
-    color: Colors.primary,
-    letterSpacing: 3,
-  },
-});
