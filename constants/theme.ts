@@ -1,53 +1,67 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Single source of truth for all design tokens.
+ * Use these in StyleSheet contexts where NativeWind classes cannot be applied.
+ * Never hardcode hex values in components — always import from here.
  */
 
-import { Platform } from 'react-native';
-
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
-
 export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-  },
-};
+  // Backgrounds
+  base: "#141414",
+  surface: "#1e1e1e",
+  elevated: "#2a2a2a",
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+  // Accent
+  accent: "#e63030",
+  accentDark: "#b01010",
+
+  // Text
+  primary: "#ffffff",
+  secondary: "#b0b0b0",
+  muted: "#555555",
+  hint: "#404040",
+
+  // Borders
+  borderDefault: "#2a2a2a",
+  borderSubtle: "#1e1e1e",
+
+  // Semantic
+  success: "#00cc44",
+  warning: "#ffaa00",
+  danger: "#e63030",
+} as const;
+
+export const Fonts = {
+  display: "BebasNeue_400Regular",
+  body: "DMSans_400Regular",
+  bodyMedium: "DMSans_500Medium",
+  bodySemiBold: "DMSans_600SemiBold",
+  bodyBold: "DMSans_700Bold",
+} as const;
+
+export const Radius = {
+  card: 16,
+  button: 16,
+  pill: 9999,
+  input: 12,
+} as const;
+
+export const Spacing = {
+  screenPadding: 16,
+  cardPadding: 16,
+  cardGap: 12,
+  sectionGap: 24,
+  tabBarHeight: 80,
+} as const;
+
+export const FontSizes = {
+  xs: 12,
+  sm: 14,
+  base: 16,
+  lg: 18,
+  xl: 20,
+  "2xl": 24,
+  "3xl": 30,
+  "4xl": 36,
+  "5xl": 48,
+  "6xl": 60,
+} as const;

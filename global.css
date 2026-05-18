@@ -1,0 +1,87 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+
+@import "nativewind/theme";
+
+@theme {
+  /* ── Backgrounds ── */
+  --color-base: #141414;
+  --color-surface: #1e1e1e;
+  --color-elevated: #2a2a2a;
+
+  /* ── Accent ── */
+  --color-accent: #e63030;
+  --color-accent-dark: #b01010;
+
+  /* ── Text ── */
+  --color-primary: #ffffff;
+  --color-secondary: #b0b0b0;
+  --color-muted: #555555;
+  --color-hint: #404040;
+
+  /* ── Borders (use border-default / border-subtle) ── */
+  --color-default: #2a2a2a;
+  --color-subtle: #1e1e1e;
+
+  /* ── Semantic ── */
+  --color-success: #00cc44;
+  --color-warning: #ffaa00;
+  --color-danger: #e63030;
+
+  /* ── Fonts ── */
+  --font-display: "BebasNeue_400Regular";
+  --font-body: "DMSans_400Regular";
+  --font-body-medium: "DMSans_500Medium";
+  --font-body-semibold: "DMSans_600SemiBold";
+  --font-body-bold: "DMSans_700Bold";
+}
+
+@layer utilities {
+  /* Screen root container */
+  .screen-container {
+    @apply flex-1 bg-base px-4;
+  }
+
+  /* Dark card surface */
+  .card {
+    @apply bg-surface rounded-2xl p-4;
+  }
+
+  /* Elevated input / secondary surface */
+  .card-elevated {
+    @apply bg-elevated rounded-2xl p-4;
+  }
+
+  /* Bebas Neue display text */
+  .font-heading {
+    font-family: "BebasNeue_400Regular";
+  }
+
+  /* DM Sans variants */
+  .font-sans {
+    font-family: "DMSans_400Regular";
+  }
+
+  .font-sans-medium {
+    font-family: "DMSans_500Medium";
+  }
+
+  .font-sans-semibold {
+    font-family: "DMSans_600SemiBold";
+  }
+
+  .font-sans-bold {
+    font-family: "DMSans_700Bold";
+  }
+
+  /* Accent gradient pill / badge */
+  .badge-accent {
+    @apply bg-accent rounded-full px-3 py-1;
+  }
+
+  /* Bottom spacer for scrollable screens — clears tab bar */
+  .bottom-spacer {
+    @apply pb-24;
+  }
+}
