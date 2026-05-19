@@ -13,6 +13,7 @@ export const Colors = {
   // Accent
   accent: "#e63030",
   accentDark: "#b01010",
+  accentRing: "rgba(230, 48, 48, 0.15)",
 
   // Text
   primary: "#ffffff",

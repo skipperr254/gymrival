@@ -1,115 +1,49 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { router } from "expo-router";
-import { Colors, Fonts } from "@/constants/theme";
 import { Routes } from "@/constants/routes";
+import { Colors } from "@/constants/theme";
+import { router } from "expo-router";
+import { Pressable, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.logoArea}>
-          <Text style={styles.logoWhite}>GYM</Text>
-          <Text style={styles.logoRed}>RIVAL</Text>
-          <View style={styles.divider} />
-          <Text style={styles.tagline}>Your fitness. Your rivals. Your wins.</Text>
-        </View>
-      </View>
-
-      <View style={styles.footer}>
-        <Pressable
-          style={({ pressed }) => [
-            styles.primaryButton,
-            pressed && styles.primaryButtonPressed,
-          ]}
-          onPress={() => router.push(Routes.onboarding)}
-        >
-          <Text style={styles.primaryButtonText}>GET STARTED</Text>
-        </Pressable>
-
-        <Pressable onPress={() => router.push(Routes.signIn)} hitSlop={12}>
-          <Text style={styles.signInText}>
-            Already have an account?{" "}
-            <Text style={styles.signInAccent}>Sign In</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }}>
+      <View className="flex-1 px-4">
+        {/* Logo */}
+        <View className="flex-1 justify-center items-center">
+          <Text className="font-heading text-[88px] text-primary leading-[88px] tracking-[10px]">
+            GYM
           </Text>
-        </Pressable>
+          <Text className="font-heading text-[88px] text-accent leading-[88px] tracking-[10px]">
+            RIVAL
+          </Text>
+          <View className="w-10 h-0.75 bg-accent rounded-sm mt-4 mb-4" />
+          <Text className="font-sans text-[15px] text-secondary text-center">
+            Your fitness. Your rivals. Your wins.
+          </Text>
+        </View>
+
+        {/* Footer */}
+        <View className="pb-5 gap-4 items-center">
+          <Pressable
+            className="bg-accent rounded-2xl h-14 w-full items-center justify-center"
+            style={({ pressed }) =>
+              pressed ? { backgroundColor: Colors.accentDark } : undefined
+            }
+            onPress={() => router.push(Routes.onboarding)}
+          >
+            <Text className="font-heading text-xl text-primary tracking-[3px]">
+              GET STARTED
+            </Text>
+          </Pressable>
+
+          <Pressable onPress={() => router.push(Routes.signIn)} hitSlop={12}>
+            <Text className="font-sans text-sm text-secondary">
+              Already have an account?{" "}
+              <Text className="font-sans-semibold text-accent">Sign In</Text>
+            </Text>
+          </Pressable>
+        </View>
       </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.base,
-    paddingHorizontal: 16,
-  },
-  content: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  logoArea: {
-    alignItems: "center",
-  },
-  logoWhite: {
-    fontFamily: Fonts.display,
-    fontSize: 88,
-    color: Colors.primary,
-    letterSpacing: 10,
-    lineHeight: 88,
-  },
-  logoRed: {
-    fontFamily: Fonts.display,
-    fontSize: 88,
-    color: Colors.accent,
-    letterSpacing: 10,
-    lineHeight: 88,
-  },
-  divider: {
-    width: 40,
-    height: 3,
-    backgroundColor: Colors.accent,
-    borderRadius: 2,
-    marginTop: 16,
-    marginBottom: 16,
-  },
-  tagline: {
-    fontFamily: Fonts.body,
-    fontSize: 15,
-    color: Colors.secondary,
-    textAlign: "center",
-    letterSpacing: 0.3,
-  },
-  footer: {
-    paddingBottom: 20,
-    gap: 16,
-    alignItems: "center",
-  },
-  primaryButton: {
-    backgroundColor: Colors.accent,
-    borderRadius: 16,
-    height: 56,
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  primaryButtonPressed: {
-    backgroundColor: Colors.accentDark,
-  },
-  primaryButtonText: {
-    fontFamily: Fonts.display,
-    fontSize: 20,
-    color: Colors.primary,
-    letterSpacing: 3,
-  },
-  signInText: {
-    fontFamily: Fonts.body,
-    fontSize: 14,
-    color: Colors.secondary,
-  },
-  signInAccent: {
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.accent,
-  },
-});
