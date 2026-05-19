@@ -1,55 +1,53 @@
-import { Routes } from "@/constants/routes";
-import { Colors } from "@/constants/theme";
-import { useAuthStore } from "@/store/useAuthStore";
-import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import { useRef, useState } from "react";
 import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
+  View,
   Text,
   TextInput,
-  View,
+  Pressable,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { Colors } from "@/constants/theme";
+import { Routes } from "@/constants/routes";
+import { useAuthStore } from "@/store/useAuthStore";
 
-export default function SignInScreen() {
-  const [email, setEmail] = useState("");
+export default function ResetPasswordScreen() {
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const passwordRef = useRef<TextInput>(null);
+  const confirmRef = useRef<TextInput>(null);
 
-  const { signIn } = useAuthStore();
+  const { updatePassword, setPendingPasswordReset } = useAuthStore();
 
-  const canSubmit = !loading && email.trim().length > 0 && password.length >= 8;
+  const canSubmit =
+    !loading && password.length >= 8 && confirmPassword.length >= 8;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
+    if (password !== confirmPassword) {
+      setError("Passwords don't match.");
+      return;
+    }
     setError(null);
     setLoading(true);
-    const { error, emailNotConfirmed } = await signIn(
-      email.trim(),
-      password
-    );
+    const { error } = await updatePassword(password);
     setLoading(false);
     if (error) {
-      if (emailNotConfirmed) {
-        // Navigate to verify so the user can confirm their email
-        router.push(
-          `${Routes.verify}?email=${encodeURIComponent(email.trim())}&type=signup`
-        );
-        return;
-      }
       setError(error);
+      return;
     }
-    // On success the auth gate in _layout.tsx handles navigation
+    setPendingPasswordReset(false);
+    router.replace(Routes.compete);
   };
 
   return (
@@ -73,69 +71,35 @@ export default function SignInScreen() {
           {/* Header */}
           <View className="mb-8">
             <Text className="font-heading text-[46px] text-primary tracking-[2px] leading-12.5">
-              WELCOME{"\n"}BACK
+              NEW{"\n"}PASSWORD
             </Text>
             <Text className="font-sans text-[15px] text-secondary mt-3 leading-5.75">
-              Sign in to continue your grind.
+              Choose a strong password for your account.
             </Text>
           </View>
 
           {/* Form */}
           <View className="gap-4">
-            {/* Email */}
+            {/* New Password */}
             <View>
               <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-                Email
+                New Password
               </Text>
               <View
                 className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
                 style={styles.inputBorder}
               >
                 <TextInput
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="you@example.com"
-                  placeholderTextColor={Colors.hint}
-                  selectionColor={Colors.accent}
-                  style={styles.input}
-                  autoCapitalize="none"
-                  keyboardType="email-address"
-                  returnKeyType="next"
-                  onSubmitEditing={() => passwordRef.current?.focus()}
-                />
-              </View>
-            </View>
-
-            {/* Password */}
-            <View>
-              <View className="flex-row justify-between items-center mb-2">
-                <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] uppercase">
-                  Password
-                </Text>
-                <Pressable
-                  hitSlop={8}
-                  onPress={() => router.push(Routes.forgotPassword)}
-                >
-                  <Text className="font-sans-medium text-[12px] text-accent">
-                    Forgot password?
-                  </Text>
-                </Pressable>
-              </View>
-              <View
-                className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
-                style={styles.inputBorder}
-              >
-                <TextInput
-                  ref={passwordRef}
                   value={password}
                   onChangeText={setPassword}
-                  placeholder="Your password"
+                  placeholder="Min. 8 characters"
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
                   style={[styles.input, { flex: 1 }]}
                   secureTextEntry={!showPassword}
-                  returnKeyType="done"
-                  onSubmitEditing={handleSubmit}
+                  returnKeyType="next"
+                  onSubmitEditing={() => confirmRef.current?.focus()}
+                  autoFocus
                 />
                 <Pressable
                   onPress={() => setShowPassword((v) => !v)}
@@ -143,6 +107,43 @@ export default function SignInScreen() {
                 >
                   <Ionicons
                     name={showPassword ? "eye-off-outline" : "eye-outline"}
+                    size={20}
+                    color={Colors.secondary}
+                  />
+                </Pressable>
+              </View>
+              <Text className="font-sans text-[12px] text-muted mt-1.5 ml-1">
+                Use 8 or more characters.
+              </Text>
+            </View>
+
+            {/* Confirm Password */}
+            <View>
+              <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
+                Confirm Password
+              </Text>
+              <View
+                className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
+                style={styles.inputBorder}
+              >
+                <TextInput
+                  ref={confirmRef}
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  placeholder="Repeat your password"
+                  placeholderTextColor={Colors.hint}
+                  selectionColor={Colors.accent}
+                  style={[styles.input, { flex: 1 }]}
+                  secureTextEntry={!showConfirm}
+                  returnKeyType="done"
+                  onSubmitEditing={handleSubmit}
+                />
+                <Pressable
+                  onPress={() => setShowConfirm((v) => !v)}
+                  hitSlop={10}
+                >
+                  <Ionicons
+                    name={showConfirm ? "eye-off-outline" : "eye-outline"}
                     size={20}
                     color={Colors.secondary}
                   />
@@ -171,26 +172,10 @@ export default function SignInScreen() {
               <ActivityIndicator color={Colors.primary} />
             ) : (
               <Text className="font-heading text-xl text-primary tracking-[3px]">
-                SIGN IN
+                UPDATE PASSWORD
               </Text>
             )}
           </Pressable>
-
-          {/* Sign up link */}
-          <View className="flex-row justify-center items-center mt-8 gap-1">
-            <Text className="font-sans text-[14px] text-secondary">
-              {"Don't have an account?"}
-            </Text>
-            <Pressable
-              onPress={() => router.replace(Routes.signUp)}
-              hitSlop={8}
-            >
-              <Text className="font-sans-semibold text-[14px] text-accent">
-                {" "}
-                Sign Up
-              </Text>
-            </Pressable>
-          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
