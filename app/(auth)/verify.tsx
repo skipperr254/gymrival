@@ -84,6 +84,7 @@ export default function VerifyScreen() {
   };
 
   // Auto-submit when code is complete
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (code.length === CODE_LENGTH) {
       handleVerify(code);
@@ -184,7 +185,7 @@ export default function VerifyScreen() {
           {/* Resend */}
           <View className="flex-row justify-center items-center gap-1 mt-8">
             <Text className="font-sans text-[14px] text-secondary">
-              Didn't get a code?
+              {"Didn't get a code?"}
             </Text>
             <Pressable
               hitSlop={8}

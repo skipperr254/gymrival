@@ -8,11 +8,15 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
-const NAV_ITEMS: { label: string; sub: string; icon: IoniconName; route: string }[] = [
+const BASE_NAV_ITEMS: { label: string; sub: string; icon: IoniconName; route: string }[] = [
   { label: 'Edit Profile', sub: 'Update your info', icon: 'pencil', route: Routes.profileEdit },
   { label: 'PR History', sub: 'All your personal records', icon: 'trophy', route: Routes.profilePRHistory },
   { label: 'Badges', sub: '6 earned · 4 locked', icon: 'ribbon', route: Routes.profileBadges },
 ];
+
+const NAV_ITEMS = __DEV__
+  ? [...BASE_NAV_ITEMS, { label: 'Component Gallery', sub: 'Dev: UI component test screen', icon: 'grid-outline' as IoniconName, route: Routes.gallery }]
+  : BASE_NAV_ITEMS;
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuthStore();

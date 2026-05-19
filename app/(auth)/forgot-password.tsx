@@ -67,7 +67,7 @@ export default function ForgotPasswordScreen() {
               FORGOT{"\n"}PASSWORD?
             </Text>
             <Text className="font-sans text-[15px] text-secondary mt-3 leading-5.75">
-              Enter your email and we'll send you a code to reset your password.
+              {"Enter your email and we'll send you a code to reset your password."}
             </Text>
           </View>
 

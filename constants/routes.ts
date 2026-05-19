@@ -38,4 +38,7 @@ export const Routes = {
   profileEdit: '/(tabs)/profile/edit',
   profilePRHistory: '/(tabs)/profile/pr-history',
   profileBadges: '/(tabs)/profile/badges',
+
+  // Dev
+  gallery: '/gallery',
 } as const;

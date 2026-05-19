@@ -210,7 +210,7 @@ export default function SetupScreen() {
                 className="font-heading text-xl text-primary tracking-[3px]"
                 style={!canSubmit ? { opacity: 0.4 } : undefined}
               >
-                LET'S GO
+                {"LET'S GO"}
               </Text>
             )}
           </Pressable>

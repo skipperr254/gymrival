@@ -486,6 +486,24 @@ npx tsc --noEmit
 
 Fix all errors and warnings before considering a feature complete.
 
+### JSX apostrophe rule
+
+Never use a bare `'` inside JSX text content — the linter flags it as an unescaped entity. Use one of these instead:
+
+```tsx
+// Wrong
+<Text>Don't stop</Text>
+<Text>You're next</Text>
+
+// Correct — string expression
+<Text>{"Don't stop"}</Text>
+
+// Correct — HTML entity
+<Text>You&apos;re next</Text>
+```
+
+Apply this rule as you write JSX, not as a cleanup pass at the end.
+
 ---
 
 ## Communication Style

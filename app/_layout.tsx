@@ -32,7 +32,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     initialize();
-  }, []);
+  }, [initialize]);
 
   // Hide splash once fonts AND auth state are ready
   useEffect(() => {
@@ -53,7 +53,7 @@ export default function RootLayout() {
     } else if (!session && inTabsGroup) {
       router.replace(Routes.onboarding);
     }
-  }, [session, initialized, segments, pendingPasswordReset, pendingProfileSetup, fontsLoaded, fontError]);
+  }, [session, initialized, segments, pendingPasswordReset, pendingProfileSetup, fontsLoaded, fontError, router]);
 
   if ((!fontsLoaded && !fontError) || !initialized) return null;
 
