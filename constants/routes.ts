@@ -4,6 +4,7 @@ export const Routes = {
   signIn: "/(auth)/sign-in",
   signUp: "/(auth)/sign-up",
   verify: "/(auth)/verify",
+  setup: "/(auth)/setup",
   forgotPassword: "/(auth)/forgot-password",
   resetPassword: "/(auth)/reset-password",
   compete: "/(tabs)/compete",

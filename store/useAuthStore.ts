@@ -7,6 +7,7 @@ interface AuthState {
   user: User | null;
   initialized: boolean;
   pendingPasswordReset: boolean;
+  pendingProfileSetup: boolean;
 
   initialize: () => void;
   signUp: (
@@ -34,6 +35,7 @@ interface AuthState {
     password: string
   ) => Promise<{ error: string | null }>;
   setPendingPasswordReset: (value: boolean) => void;
+  setPendingProfileSetup: (value: boolean) => void;
   signOut: () => Promise<void>;
 }
 
@@ -42,6 +44,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   initialized: false,
   pendingPasswordReset: false,
+  pendingProfileSetup: false,
 
   initialize: () => {
     if (get().initialized) return;
@@ -59,7 +62,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { display_name: name } },
+      options: { data: { full_name: name } },
     });
     return { error: error?.message ?? null };
   },
@@ -107,6 +110,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   setPendingPasswordReset: (value) => set({ pendingPasswordReset: value }),
+  setPendingProfileSetup: (value) => set({ pendingProfileSetup: value }),
 
   signOut: async () => {
     await supabase.auth.signOut();

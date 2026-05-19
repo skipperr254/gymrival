@@ -32,7 +32,7 @@ export default function VerifyScreen() {
 
   const inputRef = useRef<TextInput>(null);
 
-  const { verifyOtp, resendOtp, setPendingPasswordReset } = useAuthStore();
+  const { verifyOtp, resendOtp, setPendingPasswordReset, setPendingProfileSetup } = useAuthStore();
 
   const { width: screenWidth } = useWindowDimensions();
   // 40px side padding (20 each side) + gaps between boxes
@@ -77,8 +77,10 @@ export default function VerifyScreen() {
     if (type === "recovery") {
       setPendingPasswordReset(true);
       router.replace(Routes.resetPassword);
+    } else {
+      setPendingProfileSetup(true);
+      router.replace(Routes.setup);
     }
-    // For "signup" type, onAuthStateChange fires → auth gate redirects to (tabs)
   };
 
   // Auto-submit when code is complete

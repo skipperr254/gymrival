@@ -21,7 +21,7 @@ export default function CompeteScreen() {
         <Text className="font-sans text-[15px] text-secondary text-center">
           Welcome back,{" "}
           <Text className="font-sans-semibold text-primary">
-            {user?.user_metadata?.display_name ?? user?.email}
+            {user?.user_metadata?.full_name ?? user?.email}
           </Text>
           !{"\n"}The compete tab is coming soon.
         </Text>

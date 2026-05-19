@@ -81,10 +81,10 @@ export default function SignUpScreen() {
 
           {/* Form */}
           <View className="gap-4">
-            {/* Display Name */}
+            {/* Full Name */}
             <View>
               <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-                Display Name
+                Full Name
               </Text>
               <View
                 className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
