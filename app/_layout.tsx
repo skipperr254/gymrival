@@ -51,7 +51,7 @@ export default function RootLayout() {
     if (session && inAuthGroup && !pendingPasswordReset && !pendingProfileSetup) {
       router.replace(Routes.compete);
     } else if (!session && inTabsGroup) {
-      router.replace(Routes.onboarding);
+      router.replace(Routes.splash as any);
     }
   }, [session, initialized, segments, pendingPasswordReset, pendingProfileSetup, fontsLoaded, fontError, router]);
 

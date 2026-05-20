@@ -12,6 +12,9 @@ export interface Profile {
   quote: string | null;
   xp: number;
   level: number;
+  is_pro: boolean;
+  streak: number;
+  friends_count: number;
   created_at: string;
   updated_at: string;
 }

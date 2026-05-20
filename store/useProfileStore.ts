@@ -1,0 +1,68 @@
+import { create } from "zustand";
+import type { Profile } from "@/types/user";
+import type { PersonalRecordWithExercise } from "@/types/pr";
+import { fetchProfile, fetchBestPRs, togglePro as toggleProApi, updateProfile as updateProfileApi } from "@/lib/api";
+
+type ProfileUpdate = Partial<
+  Pick<Profile, "username" | "full_name" | "height_cm" | "weight_kg" | "gym" | "goal" | "bio" | "quote">
+>;
+
+interface ProfileState {
+  profile: Profile | null;
+  bestPRs: PersonalRecordWithExercise[];
+  prCount: number;
+  loading: boolean;
+  saving: boolean;
+  error: string | null;
+
+  loadProfile: (userId: string) => Promise<void>;
+  loadBestPRs: (userId: string) => Promise<void>;
+  setProStatus: (userId: string, isPro: boolean) => Promise<void>;
+  updateProfile: (userId: string, data: ProfileUpdate) => Promise<{ error: string | null }>;
+  reset: () => void;
+}
+
+export const useProfileStore = create<ProfileState>((set) => ({
+  profile: null,
+  bestPRs: [],
+  prCount: 0,
+  loading: false,
+  saving: false,
+  error: null,
+
+  loadProfile: async (userId) => {
+    set({ loading: true, error: null });
+    const { data, error } = await fetchProfile(userId);
+    set({ profile: data, loading: false, error });
+  },
+
+  loadBestPRs: async (userId) => {
+    const { data, count } = await fetchBestPRs(userId, 5);
+    set({ bestPRs: data, prCount: count });
+  },
+
+  setProStatus: async (userId, isPro) => {
+    const { error } = await toggleProApi(userId, isPro);
+    if (!error) {
+      set((state) => ({
+        profile: state.profile ? { ...state.profile, is_pro: isPro } : null,
+      }));
+    }
+  },
+
+  updateProfile: async (userId, data) => {
+    set({ saving: true });
+    const { error } = await updateProfileApi(userId, data);
+    if (!error) {
+      set((state) => ({
+        profile: state.profile ? { ...state.profile, ...data } : null,
+        saving: false,
+      }));
+    } else {
+      set({ saving: false });
+    }
+    return { error };
+  },
+
+  reset: () => set({ profile: null, bestPRs: [], prCount: 0, loading: false, saving: false, error: null }),
+}));
