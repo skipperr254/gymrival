@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
@@ -9,7 +9,6 @@ import {
   Dumbbell,
   Activity,
   Target,
-  BarChart2,
   TrendingUp,
   Trophy,
   Search,
@@ -22,35 +21,8 @@ import {
   ArrowLeft,
 } from 'lucide-react-native';
 import { Colors, Fonts } from '@/constants/theme';
-
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-
-const USERS = [
-  { id: 1, name: 'You', isMe: true },
-  { id: 2, name: 'Daan' },
-  { id: 3, name: 'Sara' },
-  { id: 4, name: 'Mike' },
-  { id: 5, name: 'Lisa' },
-];
-
-const PRS: Record<number, Record<string, number>> = {
-  1: { bench: 100, squat: 140, deadlift: 160, pullups: 15, overhead: 70, rdl: 120, incline: 85, row: 90 },
-  2: { bench: 90,  squat: 130, deadlift: 150, pullups: 12, overhead: 60, rdl: 110, incline: 75, row: 80 },
-  3: { bench: 105, squat: 115, deadlift: 135, pullups: 18, overhead: 55, rdl: 100, incline: 60, row: 70 },
-  4: { bench: 80,  squat: 120, deadlift: 140, pullups: 10, overhead: 50, rdl: 100, incline: 65, row: 75 },
-  5: { bench: 75,  squat: 115, deadlift: 135, pullups: 14, overhead: 52, rdl: 105, incline: 62, row: 72 },
-};
-
-const EXERCISES = [
-  { key: 'bench',    label: 'Bench Press',    Icon: Dumbbell,   unit: 'KG' },
-  { key: 'squat',    label: 'Squat',          Icon: Activity,   unit: 'KG' },
-  { key: 'deadlift', label: 'Deadlift',       Icon: Target,     unit: 'KG' },
-  { key: 'pullups',  label: 'Pull-ups',       Icon: BarChart2,  unit: 'REPS' },
-  { key: 'overhead', label: 'Overhead Press', Icon: TrendingUp, unit: 'KG' },
-  { key: 'rdl',      label: 'Romanian DL',    Icon: Activity,   unit: 'KG' },
-  { key: 'incline',  label: 'Incline Bench',  Icon: Dumbbell,   unit: 'KG' },
-  { key: 'row',      label: 'Barbell Row',    Icon: BarChart2,  unit: 'KG' },
-] as const;
+import { useAuthStore } from '@/store/useAuthStore';
+import { useCompeteStore } from '@/store/useCompeteStore';
 
 const GLOBAL_ATHLETES = [
   { id: 10, name: 'ThijsLifts',   username: '@thijslifts',   bench: 180, squat: 240, deadlift: 280, country: 'NL' as const, level: 28 },
@@ -149,8 +121,15 @@ const MEDAL_COLORS   = ['#d4a017', '#909090', '#a0522d'];
 
 // ─── Leaderboard Avatar ───────────────────────────────────────────────────────
 
-function LeaderboardAvatar({ id, name, size = 42 }: { id: number; name: string; size?: number }) {
-  const color    = AVATAR_PALETTE[id % AVATAR_PALETTE.length];
+function avatarColorIndex(id: string | number): number {
+  if (typeof id === 'number') return Math.abs(id);
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+function LeaderboardAvatar({ id, name, size = 42 }: { id: string | number; name: string; size?: number }) {
+  const color    = AVATAR_PALETTE[avatarColorIndex(id) % AVATAR_PALETTE.length];
   const initials = name === 'You' ? 'YOU' : name.slice(0, 2).toUpperCase();
   const fontSize = Math.round(size * 0.3);
 
@@ -180,13 +159,27 @@ function LeaderboardAvatar({ id, name, size = 42 }: { id: number; name: string; 
 // ─── Rivals Content ───────────────────────────────────────────────────────────
 
 function RivalsContent() {
-  const [selectedExercise, setSelectedExercise] = useState<string>('bench');
+  const { user } = useAuthStore();
+  const {
+    exercises,
+    selectedExercise,
+    rivals,
+    loadingExercises,
+    loadingRivals,
+    loadExercises,
+    loadRivals,
+    setSelectedExercise,
+  } = useCompeteStore();
 
-  const ex     = EXERCISES.find(e => e.key === selectedExercise)!;
-  const ranked = [...USERS].sort(
-    (a, b) => (PRS[b.id]?.[selectedExercise] ?? 0) - (PRS[a.id]?.[selectedExercise] ?? 0),
-  );
-  const maxPR = PRS[ranked[0].id]?.[selectedExercise] ?? 1;
+  useEffect(() => {
+    if (!user?.id) return;
+    loadExercises();
+    loadRivals(user.id);
+  }, [user?.id, loadExercises, loadRivals]);
+
+  const maxPR = rivals[0]?.bestPR ?? 1;
+  const selectedEx = exercises.find(e => e.key === selectedExercise);
+  const isLoading = loadingExercises || loadingRivals;
 
   return (
     <>
@@ -195,16 +188,15 @@ function RivalsContent() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.chipsRow}
       >
-        {EXERCISES.map(exercise => {
-          const active  = selectedExercise === exercise.key;
-          const ExIcon  = exercise.Icon;
+        {exercises.map(exercise => {
+          const active = selectedExercise === exercise.key;
           return (
             <Pressable
               key={exercise.key}
-              onPress={() => setSelectedExercise(exercise.key)}
+              onPress={() => user?.id && setSelectedExercise(exercise.key, user.id)}
               style={[styles.chip, active && styles.chipActive]}
             >
-              <ExIcon size={12} strokeWidth={2} color={active ? '#000' : '#555'} />
+              <Dumbbell size={12} strokeWidth={2} color={active ? '#000' : '#555'} />
               <Text style={[styles.chipLabel, active && styles.chipLabelActive]}>
                 {exercise.label.toUpperCase()}
               </Text>
@@ -215,17 +207,32 @@ function RivalsContent() {
 
       <View style={{ height: 16 }} />
 
-      {ranked.map((user, index) => {
-        const pr      = PRS[user.id]?.[selectedExercise] ?? 0;
-        const isMe    = user.isMe ?? false;
+      {isLoading && (
+        <View style={rivalsStyles.loadingBox}>
+          <ActivityIndicator color={Colors.accent} size="small" />
+        </View>
+      )}
+
+      {!isLoading && rivals.length === 0 && (
+        <View style={rivalsStyles.emptyBox}>
+          <Trophy size={32} strokeWidth={1.4} color="#333" />
+          <Text style={rivalsStyles.emptyTitle}>NO RIVALS YET</Text>
+          <Text style={rivalsStyles.emptySub}>
+            {"Add friends to compete on the leaderboard"}
+          </Text>
+        </View>
+      )}
+
+      {!isLoading && rivals.map((rival, index) => {
         const isFirst = index === 0;
-        const prColor = isFirst ? (isMe ? '#000' : Colors.accent) : isMe ? '#333' : '#fff';
-        const pct     = `${Math.round((pr / maxPR) * 100)}%` as `${number}%`;
+        const prColor = isFirst ? (rival.isMe ? '#000' : Colors.accent) : rival.isMe ? '#333' : '#fff';
+        const pct = `${Math.round((rival.bestPR / maxPR) * 100)}%` as `${number}%`;
+        const displayName = rival.fullName || rival.username || 'Unknown';
 
         return (
           <View
-            key={user.id}
-            style={[styles.row, isMe ? styles.rowMe : styles.rowOther]}
+            key={rival.userId}
+            style={[styles.row, rival.isMe ? styles.rowMe : styles.rowOther]}
           >
             <View style={styles.rankBox}>
               {index < 3 ? (
@@ -234,16 +241,16 @@ function RivalsContent() {
                 <Text style={styles.rankNum}>#{index + 1}</Text>
               )}
             </View>
-            <LeaderboardAvatar id={user.id} name={user.name} size={42} />
+            <LeaderboardAvatar id={rival.userId} name={displayName} size={42} />
             <View style={styles.rowCenter}>
               <View style={styles.nameRow}>
-                <Text style={[styles.userName, isMe && styles.userNameMe]}>
-                  {user.name.toUpperCase()}
+                <Text style={[styles.userName, rival.isMe && styles.userNameMe]}>
+                  {displayName.toUpperCase()}
                 </Text>
-                {isMe && <Text style={styles.youTag}>YOU</Text>}
+                {rival.isMe && <Text style={styles.youTag}>YOU</Text>}
               </View>
-              <View style={[styles.barTrack, isMe && styles.barTrackMe]}>
-                {isMe ? (
+              <View style={[styles.barTrack, rival.isMe && styles.barTrackMe]}>
+                {rival.isMe ? (
                   <View style={[styles.barFillMe, { width: pct }]} />
                 ) : (
                   <LinearGradient
@@ -256,17 +263,48 @@ function RivalsContent() {
               </View>
             </View>
             <View style={styles.prBox}>
-              <Text style={[styles.prValue, { color: prColor }]}>{pr}</Text>
-              <Text style={[styles.prUnit, isMe && styles.prUnitMe]}>{ex.unit}</Text>
+              <Text style={[styles.prValue, { color: prColor }]}>{rival.bestPR}</Text>
+              <Text style={[styles.prUnit, rival.isMe && styles.prUnitMe]}>
+                {(selectedEx?.unit ?? rival.unit).toUpperCase()}
+              </Text>
             </View>
           </View>
         );
       })}
 
-      <Text style={styles.footerNote}>BASED ON PERSONAL RECORDS</Text>
+      {!isLoading && rivals.length > 0 && (
+        <Text style={styles.footerNote}>BASED ON PERSONAL RECORDS</Text>
+      )}
     </>
   );
 }
+
+const rivalsStyles = StyleSheet.create({
+  loadingBox: {
+    alignItems: 'center',
+    paddingVertical: 48,
+  },
+  emptyBox: {
+    alignItems: 'center',
+    backgroundColor: '#1e1e1e',
+    borderRadius: 18,
+    paddingVertical: 48,
+    paddingHorizontal: 20,
+    gap: 8,
+  },
+  emptyTitle: {
+    fontFamily: Fonts.display,
+    fontSize: 18,
+    letterSpacing: 2,
+    color: '#fff',
+  },
+  emptySub: {
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    color: '#555',
+    textAlign: 'center',
+  },
+});
 
 // ─── Challenge Card ───────────────────────────────────────────────────────────
 
