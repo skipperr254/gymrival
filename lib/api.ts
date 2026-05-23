@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import type { Profile } from "@/types/user";
-import type { PersonalRecordWithExercise, ExerciseType, ExerciseUnit } from "@/types/pr";
+import type { PersonalRecordWithExercise, ExerciseType, ExerciseUnit, PRHistoryGroup, PRHistoryEntry } from "@/types/pr";
 import type { FriendProfile, FriendshipStatus } from "@/types/social";
 import type { RivalEntry } from "@/types/compete";
 
@@ -178,6 +178,51 @@ export async function logPersonalRecord(
     .from("personal_records")
     .insert({ user_id: userId, exercise_key: exerciseKey, value, unit });
   return { error: error?.message ?? null };
+}
+
+export async function fetchPRHistory(
+  userId: string
+): Promise<{ data: PRHistoryGroup[]; error: string | null }> {
+  const [prsResult, exercisesResult] = await Promise.all([
+    supabase
+      .from("personal_records")
+      .select("id, exercise_key, value, unit, created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("exercise_types")
+      .select("key, label, icon, unit"),
+  ]);
+
+  if (prsResult.error) return { data: [], error: prsResult.error.message };
+
+  const exerciseMap = new Map<string, ExerciseType>(
+    (exercisesResult.data ?? []).map((e) => [e.key, e as ExerciseType])
+  );
+
+  const groupMap = new Map<string, PRHistoryGroup>();
+
+  for (const row of prsResult.data ?? []) {
+    const exercise = exerciseMap.get(row.exercise_key);
+    if (!exercise) continue;
+
+    const entry: PRHistoryEntry = {
+      id: row.id,
+      value: Number(row.value),
+      unit: row.unit as ExerciseUnit,
+      created_at: row.created_at,
+    };
+
+    if (!groupMap.has(row.exercise_key)) {
+      groupMap.set(row.exercise_key, { exercise, best: entry.value, entries: [] });
+    }
+
+    const group = groupMap.get(row.exercise_key)!;
+    group.entries.push(entry);
+    if (entry.value > group.best) group.best = entry.value;
+  }
+
+  return { data: Array.from(groupMap.values()), error: null };
 }
 
 // ─── Rivals Leaderboard ────────────────────────────────────────────────────────

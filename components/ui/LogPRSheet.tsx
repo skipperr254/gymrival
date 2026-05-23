@@ -25,7 +25,6 @@ import {
   Timer,
   Trophy,
   Video,
-  Upload,
   CheckCircle,
   AlertTriangle,
   Zap,
@@ -37,6 +36,7 @@ import {
 import { Colors, Fonts } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCompeteStore } from '@/store/useCompeteStore';
+import { useProfileStore } from '@/store/useProfileStore';
 import { logPersonalRecord, fetchBestPRs } from '@/lib/api';
 import type { ExerciseType } from '@/types/pr';
 
@@ -77,7 +77,8 @@ interface Props {
 export function LogPRSheet({ visible, onClose }: Props) {
   const insets = useSafeAreaInsets();
   const { user } = useAuthStore();
-  const { exercises, loadExercises } = useCompeteStore();
+  const { exercises, loadExercises, loadRivals } = useCompeteStore();
+  const { loadBestPRs, loadProfile, loadPRHistory } = useProfileStore();
 
   const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -160,8 +161,13 @@ export function LogPRSheet({ visible, onClose }: Props) {
     if (!error) {
       setSavedValue(numValue);
       setStep(3);
+      // Refresh stores in background so all screens reflect the new PR
+      loadRivals(user.id);
+      loadBestPRs(user.id);
+      loadPRHistory(user.id);
+      loadProfile(user.id);
     }
-  }, [user?.id, selectedExKey, selectedEx, isValidValue, numValue]);
+  }, [user?.id, selectedExKey, selectedEx, isValidValue, numValue, loadRivals, loadBestPRs, loadPRHistory, loadProfile]);
 
   // Drag-to-dismiss on the handle
   const panResponder = useRef(

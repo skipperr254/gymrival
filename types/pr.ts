@@ -19,3 +19,16 @@ export interface PersonalRecord {
 export interface PersonalRecordWithExercise extends PersonalRecord {
   exercise: ExerciseType;
 }
+
+export interface PRHistoryEntry {
+  id: string;
+  value: number;
+  unit: ExerciseUnit;
+  created_at: string;
+}
+
+export interface PRHistoryGroup {
+  exercise: ExerciseType;
+  best: number;
+  entries: PRHistoryEntry[];
+}

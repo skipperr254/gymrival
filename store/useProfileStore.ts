@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { Profile } from "@/types/user";
-import type { PersonalRecordWithExercise } from "@/types/pr";
-import { fetchProfile, fetchBestPRs, togglePro as toggleProApi, updateProfile as updateProfileApi } from "@/lib/api";
+import type { PersonalRecordWithExercise, PRHistoryGroup } from "@/types/pr";
+import { fetchProfile, fetchBestPRs, fetchPRHistory, togglePro as toggleProApi, updateProfile as updateProfileApi } from "@/lib/api";
 
 type ProfileUpdate = Partial<
   Pick<Profile, "username" | "full_name" | "height_cm" | "weight_kg" | "gym" | "goal" | "bio" | "quote">
@@ -11,12 +11,14 @@ interface ProfileState {
   profile: Profile | null;
   bestPRs: PersonalRecordWithExercise[];
   prCount: number;
+  prHistory: PRHistoryGroup[];
   loading: boolean;
   saving: boolean;
   error: string | null;
 
   loadProfile: (userId: string) => Promise<void>;
   loadBestPRs: (userId: string) => Promise<void>;
+  loadPRHistory: (userId: string) => Promise<void>;
   setProStatus: (userId: string, isPro: boolean) => Promise<void>;
   updateProfile: (userId: string, data: ProfileUpdate) => Promise<{ error: string | null }>;
   reset: () => void;
@@ -26,6 +28,7 @@ export const useProfileStore = create<ProfileState>((set) => ({
   profile: null,
   bestPRs: [],
   prCount: 0,
+  prHistory: [],
   loading: false,
   saving: false,
   error: null,
@@ -39,6 +42,11 @@ export const useProfileStore = create<ProfileState>((set) => ({
   loadBestPRs: async (userId) => {
     const { data, count } = await fetchBestPRs(userId, 5);
     set({ bestPRs: data, prCount: count });
+  },
+
+  loadPRHistory: async (userId) => {
+    const { data } = await fetchPRHistory(userId);
+    set({ prHistory: data });
   },
 
   setProStatus: async (userId, isPro) => {
@@ -64,5 +72,5 @@ export const useProfileStore = create<ProfileState>((set) => ({
     return { error };
   },
 
-  reset: () => set({ profile: null, bestPRs: [], prCount: 0, loading: false, saving: false, error: null }),
+  reset: () => set({ profile: null, bestPRs: [], prCount: 0, prHistory: [], loading: false, saving: false, error: null }),
 }));
