@@ -1,16 +1,19 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Tabs } from 'expo-router';
 import { CustomTabBar } from '@/components/ui/CustomTabBar';
-import { LogSheet } from '@/components/ui/LogSheet';
+import { LogPRSheet } from '@/components/ui/LogPRSheet';
 
 export default function TabsLayout() {
-  const [logSheetVisible, setLogSheetVisible] = useState(false);
+  const [logPRSheetVisible, setLogPRSheetVisible] = useState(false);
+
+  const openLogPR = useCallback(() => setLogPRSheetVisible(true), []);
+  const closeLogPR = useCallback(() => setLogPRSheetVisible(false), []);
 
   return (
     <>
       <Tabs
         tabBar={(props) => (
-          <CustomTabBar {...props} onLogPress={() => setLogSheetVisible(true)} />
+          <CustomTabBar {...props} onLogPress={openLogPR} />
         )}
         screenOptions={{ headerShown: false }}
       >
@@ -19,7 +22,7 @@ export default function TabsLayout() {
         <Tabs.Screen name="train" options={{ title: 'Train' }} />
         <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
       </Tabs>
-      <LogSheet visible={logSheetVisible} onClose={() => setLogSheetVisible(false)} />
+      <LogPRSheet visible={logPRSheetVisible} onClose={closeLogPR} />
     </>
   );
 }

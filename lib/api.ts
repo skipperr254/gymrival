@@ -166,6 +166,20 @@ export async function removeFriend(
   return { error: error?.message ?? null };
 }
 
+// ─── Personal Records ─────────────────────────────────────────────────────────
+
+export async function logPersonalRecord(
+  userId: string,
+  exerciseKey: string,
+  value: number,
+  unit: ExerciseUnit
+): Promise<{ error: string | null }> {
+  const { error } = await supabase
+    .from("personal_records")
+    .insert({ user_id: userId, exercise_key: exerciseKey, value, unit });
+  return { error: error?.message ?? null };
+}
+
 // ─── Rivals Leaderboard ────────────────────────────────────────────────────────
 
 export async function fetchRivalsLeaderboard(

@@ -6,6 +6,7 @@ import { Colors, Fonts } from '@/constants/theme';
 interface Props {
   visible: boolean;
   onClose: () => void;
+  onLogPR?: () => void;
 }
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -17,7 +18,7 @@ const ACTIONS: { id: string; icon: IoniconName; label: string; sub: string }[] =
   { id: 'checkin', icon: 'location', label: 'Gym Check-in', sub: 'Check in to your gym' },
 ];
 
-export function LogSheet({ visible, onClose }: Props) {
+export function LogSheet({ visible, onClose, onLogPR }: Props) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -34,7 +35,14 @@ export function LogSheet({ visible, onClose }: Props) {
             <Pressable
               key={action.id}
               style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
-              onPress={onClose}
+              onPress={() => {
+                if (action.id === 'pr' && onLogPR) {
+                  onClose();
+                  onLogPR();
+                } else {
+                  onClose();
+                }
+              }}
             >
               <View style={styles.iconBox}>
                 <Ionicons name={action.icon} size={24} color={Colors.primary} />
