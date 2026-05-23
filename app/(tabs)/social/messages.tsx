@@ -1,76 +1,93 @@
-import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { MessageCircle, ArrowLeft } from 'lucide-react-native';
 import { Colors, Fonts } from '@/constants/theme';
-import { Routes } from '@/constants/routes';
-
-const CONVERSATIONS = [
-  { id: 2, name: 'Daan', lastMsg: 'When are you training next?', time: '10:35', unread: 1 },
-  { id: 3, name: 'Sara', lastMsg: 'Yes!! 18 pull-ups is insane 🔥', time: 'Yesterday', unread: 0 },
-  { id: 4, name: 'Mike', lastMsg: 'Push/pull/legs, 3x per week', time: 'Mon', unread: 0 },
-  { id: 5, name: 'Lisa', lastMsg: 'Thanks! Still a long way to go', time: 'Sun', unread: 0 },
-];
 
 export default function MessagesScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <View style={styles.header}>
-        <Pressable
-          onPress={() => router.back()}
-          style={({ pressed }) => [styles.back, pressed && { opacity: 0.5 }]}
-        >
-          <Ionicons name="arrow-back" size={22} color={Colors.accent} />
-        </Pressable>
-        <Text style={styles.heading}>MESSAGES</Text>
-        <View style={styles.spacer} />
-      </View>
+      <Pressable onPress={() => router.back()} style={styles.back}>
+        <ArrowLeft size={20} strokeWidth={2} color={Colors.accent} />
+        <Text style={styles.backText}>SOCIAL</Text>
+      </Pressable>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {CONVERSATIONS.map((conv) => (
-          <Pressable
-            key={conv.id}
-            style={({ pressed }) => [styles.row, pressed && { opacity: 0.7 }]}
-            onPress={() => router.push(Routes.chat(String(conv.id)) as never)}
-          >
-            <View style={[styles.avatar, conv.unread > 0 && styles.avatarUnread]}>
-              <Text style={styles.avatarText}>{conv.name.slice(0, 2).toUpperCase()}</Text>
-            </View>
-            <View style={styles.info}>
-              <Text style={styles.name}>{conv.name}</Text>
-              <Text style={styles.lastMsg} numberOfLines={1}>{conv.lastMsg}</Text>
-            </View>
-            <View style={styles.right}>
-              <Text style={styles.time}>{conv.time}</Text>
-              {conv.unread > 0 && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{conv.unread}</Text>
-                </View>
-              )}
-            </View>
-          </Pressable>
-        ))}
-      </ScrollView>
+      <View style={styles.center}>
+        <View style={styles.iconWrap}>
+          <MessageCircle size={32} strokeWidth={1.4} color="#333" />
+        </View>
+        <Text style={styles.title}>MESSAGES</Text>
+        <Text style={styles.subtitle}>Chat with your training partners</Text>
+        <View style={styles.pill}>
+          <Text style={styles.pillText}>COMING SOON</Text>
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.base },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 },
-  back: { padding: 4, marginRight: 8 },
-  heading: { fontFamily: Fonts.display, fontSize: 24, color: Colors.primary, letterSpacing: 3, flex: 1 },
-  spacer: { width: 30 },
-  content: { paddingHorizontal: 16, paddingBottom: 96 },
-  row: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.surface, borderRadius: 16, padding: 14, paddingHorizontal: 16, marginBottom: 8, gap: 12 },
-  avatar: { width: 46, height: 46, borderRadius: 23, backgroundColor: Colors.elevated, alignItems: 'center', justifyContent: 'center' },
-  avatarUnread: { backgroundColor: Colors.accentDark },
-  avatarText: { fontFamily: Fonts.display, fontSize: 13, color: Colors.primary },
-  info: { flex: 1 },
-  name: { fontFamily: Fonts.bodySemiBold, fontSize: 14, color: Colors.primary },
-  lastMsg: { fontFamily: Fonts.body, fontSize: 12, color: Colors.muted, marginTop: 2 },
-  right: { alignItems: 'flex-end', gap: 6 },
-  time: { fontFamily: Fonts.body, fontSize: 11, color: Colors.hint },
-  badge: { width: 18, height: 18, borderRadius: 9, backgroundColor: Colors.accent, alignItems: 'center', justifyContent: 'center' },
-  badgeText: { fontFamily: Fonts.display, fontSize: 10, color: Colors.primary },
+  safe: {
+    flex: 1,
+    backgroundColor: Colors.base,
+  },
+  back: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  backText: {
+    fontFamily: Fonts.display,
+    fontSize: 13,
+    color: Colors.accent,
+    letterSpacing: 1,
+  },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+    marginTop: -60,
+  },
+  iconWrap: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#1e1e1e',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+  },
+  title: {
+    fontFamily: Fonts.display,
+    fontSize: 20,
+    letterSpacing: 3,
+    color: '#fff',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    color: '#555',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  pill: {
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+    backgroundColor: '#1e1e1e',
+  },
+  pillText: {
+    fontFamily: Fonts.display,
+    fontSize: 10,
+    color: '#404040',
+    letterSpacing: 2,
+  },
 });
