@@ -9,13 +9,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import {
   Flame,
   Heart,
   MapPin,
   Video,
   Users,
-  MessageCircle,
   Search,
   X,
   Clock,
@@ -25,6 +25,7 @@ import {
   UserX,
 } from 'lucide-react-native';
 import { Colors, Fonts } from '@/constants/theme';
+import { Routes } from '@/constants/routes';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -123,6 +124,23 @@ const INIT_REQUESTS: FriendRequest[] = [
   { userId: 6, status: 'incoming' },
   { userId: 7, status: 'outgoing' },
 ];
+
+// ─── Messages Mock Data ───────────────────────────────────────────────────────
+
+const ONLINE_IDS = [3, 5];
+
+type ConvPreview = {
+  lastText: string;
+  lastTime: string;
+  fromMe: boolean;
+};
+
+const CONV_PREVIEWS: Record<number, ConvPreview> = {
+  2: { lastText: 'Nice! When are you training next?', lastTime: '10:35', fromMe: false },
+  3: { lastText: "Haha thanks! You're almost at my level on squat", lastTime: 'Yesterday', fromMe: false },
+  4: { lastText: 'Push/pull/legs, 3x per week', lastTime: 'Mon', fromMe: true },
+  5: { lastText: 'Thanks! Still a long way to go', lastTime: 'Sun', fromMe: true },
+};
 
 // ─── Avatar ───────────────────────────────────────────────────────────────────
 
@@ -635,28 +653,75 @@ function FriendsContent() {
   );
 }
 
-// ─── Coming Soon ──────────────────────────────────────────────────────────────
+// ─── Messages Content ─────────────────────────────────────────────────────────
 
-function ComingSoon({
-  icon: Icon,
-  title,
-  subtitle,
-}: {
-  icon: typeof Users;
-  title: string;
-  subtitle: string;
-}) {
+function MessagesContent() {
   return (
-    <View style={csStyles.wrap}>
-      <View style={csStyles.iconWrap}>
-        <Icon size={32} strokeWidth={1.4} color="#333" />
+    <>
+      {/* All Messages */}
+      <Text style={msgStyles.sectionLabel}>ALL MESSAGES</Text>
+      <View style={msgStyles.convList}>
+        {INIT_FRIENDS.map(id => {
+          const u = ALL_USERS.find(x => x.id === id);
+          const conv = CONV_PREVIEWS[id];
+          if (!u) return null;
+          return (
+            <Pressable
+              key={id}
+              onPress={() => router.push(Routes.chat(id.toString()) as never)}
+              style={({ pressed }) => [msgStyles.convRow, pressed && msgStyles.convRowPressed]}
+            >
+              <FriendAvatar id={u.id} name={u.name} size={50} online={ONLINE_IDS.includes(id)} />
+              <View style={msgStyles.convInfo}>
+                <View style={msgStyles.convHeader}>
+                  <Text style={msgStyles.convName}>{u.name}</Text>
+                  <Text style={msgStyles.convTime}>{conv?.lastTime}</Text>
+                </View>
+                <Text style={msgStyles.convPreview} numberOfLines={1}>
+                  {conv?.fromMe && <Text style={msgStyles.convYou}>{'You: '}</Text>}
+                  {conv?.lastText}
+                </Text>
+              </View>
+            </Pressable>
+          );
+        })}
       </View>
-      <Text style={csStyles.title}>{title}</Text>
-      <Text style={csStyles.subtitle}>{subtitle}</Text>
-      <View style={csStyles.pill}>
-        <Text style={csStyles.pillText}>COMING SOON</Text>
-      </View>
-    </View>
+
+      {/*
+        CHALLENGE A FRIEND card — commented out for now.
+
+        The idea: surface a quick-action card at the bottom of the inbox so users
+        can fire off a head-to-head challenge directly from Messages without having
+        to navigate to the Compete tab. Each friend row would have a CHALLENGE button
+        that opens the same challenge-creation flow used in the Compete tab.
+
+        Revisit once the Compete > Challenges flow is fully built so the two can
+        share the same challenge-creation logic and data model.
+
+        <View style={msgStyles.challengeCard}>
+          <View style={msgStyles.challengeHeader}>
+            <Trophy size={15} strokeWidth={1.5} color={Colors.accent} />
+            <Text style={msgStyles.challengeTitle}>CHALLENGE A FRIEND</Text>
+          </View>
+          <View style={msgStyles.challengeList}>
+            {INIT_FRIENDS.map(id => {
+              const u = ALL_USERS.find(x => x.id === id);
+              if (!u) return null;
+              return (
+                <View key={id} style={msgStyles.challengeRow}>
+                  <FriendAvatar id={u.id} name={u.name} size={34} />
+                  <Text style={msgStyles.challengeUserName}>{u.name}</Text>
+                  <Pressable style={msgStyles.challengeBtn}>
+                    <Dumbbell size={12} strokeWidth={2} color={Colors.accent} />
+                    <Text style={msgStyles.challengeBtnText}>CHALLENGE</Text>
+                  </Pressable>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+      */}
+    </>
   );
 }
 
@@ -703,13 +768,7 @@ export default function SocialScreen() {
       >
         {activeTab === 'feed' && <FeedContent />}
         {activeTab === 'friends' && <FriendsContent />}
-        {activeTab === 'messages' && (
-          <ComingSoon
-            icon={MessageCircle}
-            title="MESSAGES"
-            subtitle="Chat with your training partners"
-          />
-        )}
+        {activeTab === 'messages' && <MessagesContent />}
       </ScrollView>
     </SafeAreaView>
   );
@@ -898,55 +957,6 @@ const feedStyles = StyleSheet.create({
     fontFamily: Fonts.display,
     fontSize: 10,
     color: '#383838',
-    letterSpacing: 2,
-  },
-});
-
-// ─── Coming Soon Styles ───────────────────────────────────────────────────────
-
-const csStyles = StyleSheet.create({
-  wrap: {
-    alignItems: 'center',
-    paddingTop: 80,
-    paddingHorizontal: 32,
-  },
-  iconWrap: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#1e1e1e',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
-  },
-  title: {
-    fontFamily: Fonts.display,
-    fontSize: 20,
-    letterSpacing: 3,
-    color: '#fff',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontFamily: Fonts.body,
-    fontSize: 13,
-    color: '#555',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  pill: {
-    paddingVertical: 6,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
-    backgroundColor: '#1e1e1e',
-  },
-  pillText: {
-    fontFamily: Fonts.display,
-    fontSize: 10,
-    color: '#404040',
     letterSpacing: 2,
   },
 });
@@ -1315,5 +1325,136 @@ const friendsStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 4,
+  },
+});
+
+// ─── Messages Styles ──────────────────────────────────────────────────────────
+
+const msgStyles = StyleSheet.create({
+  section: {
+    marginBottom: 16,
+  },
+  sectionLabel: {
+    fontFamily: Fonts.display,
+    fontSize: 10,
+    color: '#484848',
+    letterSpacing: 2,
+    marginBottom: 12,
+  },
+  onlineRow: {
+    flexDirection: 'row',
+    gap: 18,
+  },
+  onlineItem: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  onlineName: {
+    fontFamily: Fonts.body,
+    fontSize: 11,
+    color: '#707070',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#1e1e1e',
+    marginBottom: 18,
+  },
+  convList: {
+    marginBottom: 24,
+  },
+  convRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 13,
+    paddingVertical: 13,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+  },
+  convRowPressed: {
+    backgroundColor: '#1c1c1c',
+  },
+  convInfo: {
+    flex: 1,
+    minWidth: 0,
+  },
+  convHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    marginBottom: 3,
+  },
+  convName: {
+    fontFamily: Fonts.bodyMedium,
+    fontSize: 15,
+    color: '#fff',
+  },
+  convTime: {
+    fontFamily: Fonts.body,
+    fontSize: 11,
+    color: '#454545',
+  },
+  convPreview: {
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    color: '#505050',
+  },
+  convYou: {
+    color: '#484848',
+  },
+  challengeCard: {
+    backgroundColor: '#1c1c1c',
+    borderWidth: 1,
+    borderColor: '#242424',
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  challengeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#1a0505',
+    borderBottomWidth: 1,
+    borderBottomColor: '#242424',
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+  },
+  challengeTitle: {
+    fontFamily: Fonts.display,
+    fontSize: 12,
+    letterSpacing: 2,
+    color: '#fff',
+  },
+  challengeList: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 10,
+  },
+  challengeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  challengeUserName: {
+    flex: 1,
+    fontFamily: Fonts.bodyMedium,
+    fontSize: 14,
+    color: '#ccc',
+  },
+  challengeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 7,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(230,48,48,0.3)',
+    backgroundColor: 'rgba(230,48,48,0.06)',
+  },
+  challengeBtnText: {
+    fontFamily: Fonts.display,
+    fontSize: 10,
+    color: Colors.accent,
+    letterSpacing: 1,
   },
 });
