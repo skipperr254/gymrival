@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,10 @@ import {
   Pressable,
   StyleSheet,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useSocialStore } from '@/store/useSocialStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -91,39 +94,18 @@ const INIT_FEED: FeedItem[] = [
   },
 ];
 
-// ─── Types (Friends) ─────────────────────────────────────────────────────────
+// ─── Mock Data (Friends — kept for MessagesContent placeholder) ──────────────
 
-type FriendUser = {
-  id: number;
-  name: string;
-  username: string;
-  level: number;
-  points: number;
-};
+type MockUser = { id: number; name: string; username: string; level: number; points: number };
 
-type FriendRequest = {
-  userId: number;
-  status: 'incoming' | 'outgoing';
-};
-
-// ─── Mock Data (Friends) ─────────────────────────────────────────────────────
-
-const ALL_USERS: FriendUser[] = [
+const ALL_USERS: MockUser[] = [
   { id: 2, name: 'Daan',  username: '@daanfit',     level: 10, points: 2890 },
   { id: 3, name: 'Sara',  username: '@sara_lifts',  level: 14, points: 3800 },
   { id: 4, name: 'Mike',  username: '@mike_gains',  level: 8,  points: 2100 },
   { id: 5, name: 'Lisa',  username: '@lisastrong',  level: 11, points: 3050 },
-  { id: 6, name: 'Kevin', username: '@kevin_pr',    level: 9,  points: 2600 },
-  { id: 7, name: 'Emma',  username: '@emma_gym',    level: 7,  points: 1900 },
-  { id: 8, name: 'Bram',  username: '@bram_beast',  level: 13, points: 3100 },
 ];
 
 const INIT_FRIENDS: number[] = [2, 3, 4, 5];
-
-const INIT_REQUESTS: FriendRequest[] = [
-  { userId: 6, status: 'incoming' },
-  { userId: 7, status: 'outgoing' },
-];
 
 // ─── Messages Mock Data ───────────────────────────────────────────────────────
 
@@ -181,12 +163,17 @@ function FriendAvatar({
   size = 44,
   online = false,
 }: {
-  id: number;
+  id: string;
   name: string;
   size?: number;
   online?: boolean;
 }) {
-  const color = AVATAR_PALETTE[Math.abs(id) % AVATAR_PALETTE.length];
+  // Deterministic color from first 8 hex chars of the UUID
+  const charSum = [...id.replace(/-/g, '').slice(0, 8)].reduce(
+    (s, c) => s + c.charCodeAt(0),
+    0
+  );
+  const color = AVATAR_PALETTE[charSum % AVATAR_PALETTE.length];
   const initials = name === 'You' ? 'YOU' : name.slice(0, 2).toUpperCase();
   const fontSize = Math.round(size * 0.3);
   return (
@@ -355,25 +342,60 @@ function FeedContent() {
 type FriendsSubTab = 'list' | 'search' | 'requests';
 
 function FriendsContent() {
+  const userId = useAuthStore((s) => s.user?.id ?? '');
+  const {
+    friends,
+    incomingRequests,
+    outgoingRequests,
+    searchResults,
+    friendsLoading,
+    requestsLoading,
+    searchLoading,
+    loadFriends,
+    loadRequests,
+    search,
+    sendRequest,
+    acceptRequest,
+    declineRequest,
+    cancelRequest,
+    unfriend,
+    subscribeToFriendEvents,
+  } = useSocialStore();
+
   const [subTab, setSubTab] = useState<FriendsSubTab>('list');
   const [query, setQuery] = useState('');
-  const [friends, setFriends] = useState<number[]>(INIT_FRIENDS);
-  const [requests, setRequests] = useState<FriendRequest[]>(INIT_REQUESTS);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const friendUsers = friends
-    .map(id => ALL_USERS.find(u => u.id === id))
-    .filter(Boolean) as FriendUser[];
+  // Initial data load + Realtime subscription
+  useEffect(() => {
+    if (!userId) return;
+    loadFriends(userId);
+    loadRequests(userId);
+    const unsubscribe = subscribeToFriendEvents(userId);
+    return unsubscribe;
+  }, [userId]);
 
-  const incomingCount = requests.filter(r => r.status === 'incoming').length;
+  // Refresh data whenever the user switches subtabs
+  useEffect(() => {
+    if (!userId) return;
+    if (subTab === 'search') search(userId, query);
+    else if (subTab === 'list') loadFriends(userId);
+    else if (subTab === 'requests') loadRequests(userId);
+  }, [subTab]);
 
-  const filteredUsers =
-    query.length > 0
-      ? ALL_USERS.filter(
-          u =>
-            u.name.toLowerCase().includes(query.toLowerCase()) ||
-            u.username.toLowerCase().includes(query.toLowerCase()),
-        )
-      : ALL_USERS.filter(u => !friends.includes(u.id));
+  // Debounced live search (300 ms)
+  useEffect(() => {
+    if (subTab !== 'search' || !userId) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      search(userId, query);
+    }, 300);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [query]);
+
+  const incomingCount = incomingRequests.length;
 
   const subTabs: { key: FriendsSubTab; label: string }[] = [
     { key: 'list', label: 'FRIENDS' },
@@ -388,7 +410,7 @@ function FriendsContent() {
     <>
       {/* Sub-tab segmented control */}
       <View style={friendsStyles.subTabBar}>
-        {subTabs.map(t => (
+        {subTabs.map((t) => (
           <Pressable
             key={t.key}
             onPress={() => setSubTab(t.key)}
@@ -420,7 +442,11 @@ function FriendsContent() {
             </View>
           </View>
 
-          {friendUsers.length === 0 ? (
+          {friendsLoading ? (
+            <View style={friendsStyles.emptyCard}>
+              <ActivityIndicator color="#404040" />
+            </View>
+          ) : friends.length === 0 ? (
             <View style={friendsStyles.emptyCard}>
               <View style={friendsStyles.emptyIconWrap}>
                 <Users size={24} strokeWidth={1.5} color="#404040" />
@@ -434,25 +460,31 @@ function FriendsContent() {
               </Pressable>
             </View>
           ) : (
-            friendUsers.map(u => (
-              <View key={u.id} style={friendsStyles.userCard}>
-                <FriendAvatar id={u.id} name={u.name} size={46} />
+            friends.map((friend) => (
+              <View key={friend.id} style={friendsStyles.userCard}>
+                <FriendAvatar
+                  id={friend.id}
+                  name={friend.full_name ?? friend.username ?? '?'}
+                  size={46}
+                />
                 <View style={{ flex: 1 }}>
-                  <Text style={friendsStyles.userName}>{u.name}</Text>
-                  <Text style={friendsStyles.userHandle}>{u.username}</Text>
+                  <Text style={friendsStyles.userName}>
+                    {friend.full_name ?? friend.username ?? 'Unknown'}
+                  </Text>
+                  <Text style={friendsStyles.userHandle}>{friend.username ?? ''}</Text>
                   <View style={friendsStyles.badgeRow}>
                     <View style={friendsStyles.badge}>
-                      <Text style={friendsStyles.badgeText}>LVL {u.level}</Text>
+                      <Text style={friendsStyles.badgeText}>LVL {friend.level}</Text>
                     </View>
                     <View style={friendsStyles.badge}>
                       <Text style={friendsStyles.badgeText}>
-                        {u.points.toLocaleString()} XP
+                        {friend.xp.toLocaleString()} XP
                       </Text>
                     </View>
                   </View>
                 </View>
                 <Pressable
-                  onPress={() => setFriends(p => p.filter(x => x !== u.id))}
+                  onPress={() => unfriend(friend.friendship_id)}
                   style={friendsStyles.unfriendBtn}
                 >
                   <UserX size={15} strokeWidth={2} color="#505050" />
@@ -484,95 +516,110 @@ function FriendsContent() {
 
           {!query && <Text style={friendsStyles.sectionLabel}>SUGGESTED</Text>}
 
-          {filteredUsers.map(u => {
-            const isFriend = friends.includes(u.id);
-            const isPending = requests.some(
-              r => r.userId === u.id && r.status === 'outgoing',
-            );
-            const hasIncoming = requests.some(
-              r => r.userId === u.id && r.status === 'incoming',
-            );
-            return (
-              <View key={u.id} style={friendsStyles.userCard}>
-                <FriendAvatar id={u.id} name={u.name} size={44} />
-                <View style={{ flex: 1 }}>
-                  <Text style={friendsStyles.userName}>{u.name}</Text>
-                  <Text style={[friendsStyles.userHandle, { marginBottom: 0 }]}>
-                    {u.username}
-                  </Text>
-                </View>
-                {isFriend && (
-                  <View style={friendsStyles.statusPill}>
-                    <UserCheck size={13} strokeWidth={2} color="#505050" />
-                    <Text style={friendsStyles.statusPillText}>FRIENDS</Text>
-                  </View>
-                )}
-                {isPending && !isFriend && (
-                  <View style={friendsStyles.statusPill}>
-                    <Clock size={13} strokeWidth={2} color="#505050" />
-                    <Text style={friendsStyles.statusPillText}>SENT</Text>
-                  </View>
-                )}
-                {hasIncoming && !isFriend && (
-                  <Pressable
-                    onPress={() => {
-                      setFriends(p => [...p, u.id]);
-                      setRequests(p => p.filter(r => r.userId !== u.id));
-                    }}
-                    style={friendsStyles.acceptBtn}
-                  >
-                    <UserCheck size={13} strokeWidth={2} color={Colors.accent} />
-                    <Text style={friendsStyles.acceptBtnText}>ACCEPT</Text>
-                  </Pressable>
-                )}
-                {!isFriend && !isPending && !hasIncoming && (
-                  <Pressable
-                    onPress={() =>
-                      setRequests(p => [
-                        ...p,
-                        { userId: u.id, status: 'outgoing' },
-                      ])
-                    }
-                    style={friendsStyles.addBtn}
-                  >
-                    <UserPlus size={13} strokeWidth={2} color="#808080" />
-                    <Text style={friendsStyles.addBtnText}>ADD</Text>
-                  </Pressable>
-                )}
+          {searchLoading ? (
+            <ActivityIndicator color="#404040" style={{ marginTop: 16 }} />
+          ) : searchResults.length === 0 && query.length > 0 ? (
+            <View style={friendsStyles.emptyCard}>
+              <View style={friendsStyles.emptyIconWrap}>
+                <Search size={22} strokeWidth={1.5} color="#383838" />
               </View>
-            );
-          })}
+              <Text style={friendsStyles.emptyTitle}>NO RESULTS</Text>
+              <Text style={[friendsStyles.emptySubtitle, { marginBottom: 0 }]}>
+                Try a different name or @username
+              </Text>
+            </View>
+          ) : (
+            searchResults.map((u) => {
+              const isFriend = u.friendship_status === 'accepted';
+              const isSent = u.friendship_status === 'pending' && u.is_requester === true;
+              const hasIncoming =
+                u.friendship_status === 'pending' && u.is_requester === false;
+              return (
+                <View key={u.id} style={friendsStyles.userCard}>
+                  <FriendAvatar
+                    id={u.id}
+                    name={u.full_name ?? u.username ?? '?'}
+                    size={44}
+                  />
+                  <View style={{ flex: 1 }}>
+                    <Text style={friendsStyles.userName}>
+                      {u.full_name ?? u.username ?? 'Unknown'}
+                    </Text>
+                    <Text style={[friendsStyles.userHandle, { marginBottom: 0 }]}>
+                      {u.username ?? ''}
+                    </Text>
+                  </View>
+                  {isFriend && (
+                    <View style={friendsStyles.statusPill}>
+                      <UserCheck size={13} strokeWidth={2} color="#505050" />
+                      <Text style={friendsStyles.statusPillText}>FRIENDS</Text>
+                    </View>
+                  )}
+                  {isSent && (
+                    <View style={friendsStyles.statusPill}>
+                      <Clock size={13} strokeWidth={2} color="#505050" />
+                      <Text style={friendsStyles.statusPillText}>SENT</Text>
+                    </View>
+                  )}
+                  {hasIncoming && (
+                    <Pressable
+                      onPress={() =>
+                        u.friendship_id && acceptRequest(u.friendship_id)
+                      }
+                      style={friendsStyles.acceptBtn}
+                    >
+                      <UserCheck size={13} strokeWidth={2} color={Colors.accent} />
+                      <Text style={friendsStyles.acceptBtnText}>ACCEPT</Text>
+                    </Pressable>
+                  )}
+                  {!isFriend && !isSent && !hasIncoming && (
+                    <Pressable
+                      onPress={() => sendRequest(userId, u.id)}
+                      style={friendsStyles.addBtn}
+                    >
+                      <UserPlus size={13} strokeWidth={2} color="#808080" />
+                      <Text style={friendsStyles.addBtnText}>ADD</Text>
+                    </Pressable>
+                  )}
+                </View>
+              );
+            })
+          )}
         </>
       )}
 
       {/* ── REQUESTS ── */}
       {subTab === 'requests' && (
         <>
-          {requests.filter(r => r.status === 'incoming').length > 0 && (
+          {requestsLoading ? (
+            <View style={friendsStyles.emptyCard}>
+              <ActivityIndicator color="#404040" />
+            </View>
+          ) : (
             <>
-              <Text style={friendsStyles.sectionLabel}>INCOMING</Text>
-              {requests
-                .filter(r => r.status === 'incoming')
-                .map(req => {
-                  const u = ALL_USERS.find(x => x.id === req.userId);
-                  if (!u) return null;
-                  return (
-                    <View key={req.userId} style={friendsStyles.requestCard}>
+              {incomingRequests.length > 0 && (
+                <>
+                  <Text style={friendsStyles.sectionLabel}>INCOMING</Text>
+                  {incomingRequests.map((req) => (
+                    <View key={req.friendship_id} style={friendsStyles.requestCard}>
                       <View style={friendsStyles.requestUser}>
-                        <FriendAvatar id={u.id} name={u.name} size={46} />
+                        <FriendAvatar
+                          id={req.user.id}
+                          name={req.user.full_name ?? req.user.username ?? '?'}
+                          size={46}
+                        />
                         <View>
-                          <Text style={friendsStyles.userName}>{u.name}</Text>
+                          <Text style={friendsStyles.userName}>
+                            {req.user.full_name ?? req.user.username ?? 'Unknown'}
+                          </Text>
                           <Text style={[friendsStyles.userHandle, { marginBottom: 0 }]}>
-                            {u.username} · LVL {u.level}
+                            {req.user.username ?? ''} · LVL {req.user.level}
                           </Text>
                         </View>
                       </View>
                       <View style={friendsStyles.requestActions}>
                         <Pressable
-                          onPress={() => {
-                            setFriends(p => [...p, u.id]);
-                            setRequests(p => p.filter(r => r.userId !== u.id));
-                          }}
+                          onPress={() => acceptRequest(req.friendship_id)}
                           style={{ flex: 1 }}
                         >
                           <LinearGradient
@@ -586,9 +633,7 @@ function FriendsContent() {
                           </LinearGradient>
                         </Pressable>
                         <Pressable
-                          onPress={() =>
-                            setRequests(p => p.filter(r => r.userId !== u.id))
-                          }
+                          onPress={() => declineRequest(req.friendship_id)}
                           style={[friendsStyles.declineBtn, { flex: 1 }]}
                         >
                           <X size={14} strokeWidth={2} color="#606060" />
@@ -596,56 +641,62 @@ function FriendsContent() {
                         </Pressable>
                       </View>
                     </View>
-                  );
-                })}
-            </>
-          )}
+                  ))}
+                </>
+              )}
 
-          {requests.filter(r => r.status === 'outgoing').length > 0 && (
-            <>
-              <Text style={[friendsStyles.sectionLabel, { marginTop: 8 }]}>SENT</Text>
-              {requests
-                .filter(r => r.status === 'outgoing')
-                .map(req => {
-                  const u = ALL_USERS.find(x => x.id === req.userId);
-                  if (!u) return null;
-                  return (
-                    <View key={req.userId} style={friendsStyles.userCard}>
-                      <FriendAvatar id={u.id} name={u.name} size={44} />
+              {outgoingRequests.length > 0 && (
+                <>
+                  <Text
+                    style={[
+                      friendsStyles.sectionLabel,
+                      incomingRequests.length > 0 && { marginTop: 8 },
+                    ]}
+                  >
+                    SENT
+                  </Text>
+                  {outgoingRequests.map((req) => (
+                    <View key={req.friendship_id} style={friendsStyles.userCard}>
+                      <FriendAvatar
+                        id={req.user.id}
+                        name={req.user.full_name ?? req.user.username ?? '?'}
+                        size={44}
+                      />
                       <View style={{ flex: 1 }}>
-                        <Text style={friendsStyles.userName}>{u.name}</Text>
+                        <Text style={friendsStyles.userName}>
+                          {req.user.full_name ?? req.user.username ?? 'Unknown'}
+                        </Text>
                         <Text style={[friendsStyles.userHandle, { marginBottom: 0 }]}>
-                          {u.username}
+                          {req.user.username ?? ''}
                         </Text>
                       </View>
                       <View style={friendsStyles.pendingRow}>
                         <Clock size={12} strokeWidth={2} color="#484848" />
                         <Text style={friendsStyles.pendingText}>PENDING</Text>
                         <Pressable
-                          onPress={() =>
-                            setRequests(p => p.filter(r => r.userId !== u.id))
-                          }
+                          onPress={() => cancelRequest(req.friendship_id)}
                           style={friendsStyles.cancelBtn}
                         >
                           <X size={13} strokeWidth={2.5} color="#505050" />
                         </Pressable>
                       </View>
                     </View>
-                  );
-                })}
-            </>
-          )}
+                  ))}
+                </>
+              )}
 
-          {requests.length === 0 && (
-            <View style={friendsStyles.emptyCard}>
-              <View style={friendsStyles.emptyIconWrap}>
-                <Bell size={22} strokeWidth={1.5} color="#383838" />
-              </View>
-              <Text style={friendsStyles.emptyTitle}>ALL CLEAR</Text>
-              <Text style={[friendsStyles.emptySubtitle, { marginBottom: 0 }]}>
-                No pending requests
-              </Text>
-            </View>
+              {incomingRequests.length === 0 && outgoingRequests.length === 0 && (
+                <View style={friendsStyles.emptyCard}>
+                  <View style={friendsStyles.emptyIconWrap}>
+                    <Bell size={22} strokeWidth={1.5} color="#383838" />
+                  </View>
+                  <Text style={friendsStyles.emptyTitle}>ALL CLEAR</Text>
+                  <Text style={[friendsStyles.emptySubtitle, { marginBottom: 0 }]}>
+                    No pending requests
+                  </Text>
+                </View>
+              )}
+            </>
           )}
         </>
       )}
@@ -671,7 +722,7 @@ function MessagesContent() {
               onPress={() => router.push(Routes.chat(id.toString()) as never)}
               style={({ pressed }) => [msgStyles.convRow, pressed && msgStyles.convRowPressed]}
             >
-              <FriendAvatar id={u.id} name={u.name} size={50} online={ONLINE_IDS.includes(id)} />
+              <FriendAvatar id={u.id.toString()} name={u.name} size={50} online={ONLINE_IDS.includes(id)} />
               <View style={msgStyles.convInfo}>
                 <View style={msgStyles.convHeader}>
                   <Text style={msgStyles.convName}>{u.name}</Text>
