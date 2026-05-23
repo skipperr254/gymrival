@@ -9,14 +9,21 @@ import {
   sendFriendRequest,
   acceptFriendRequest,
   removeFriend,
+  fetchFeed,
+  fetchSingleFeedPost,
+  likePR,
+  unlikePR,
 } from "@/lib/api";
-import type { FriendProfile, FriendRequest, UserSearchResult } from "@/types/social";
+import type { FriendProfile, FriendRequest, UserSearchResult, FeedPost } from "@/types/social";
 
-// Module-level ref so we can clean up and never double-subscribe
+// Module-level refs so we can clean up and never double-subscribe
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let _realtimeChannel: any = null;
+let _friendChannel: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _feedChannel: any = null;
 
 interface SocialState {
+  // ── Friends ──────────────────────────────────────────────────────────────────
   friends: FriendProfile[];
   incomingRequests: FriendRequest[];
   outgoingRequests: FriendRequest[];
@@ -26,43 +33,51 @@ interface SocialState {
   requestsLoading: boolean;
   searchLoading: boolean;
 
-  // Data loaders
   loadFriends: (userId: string) => Promise<void>;
   loadRequests: (userId: string) => Promise<void>;
   search: (userId: string, query: string) => Promise<void>;
   clearSearch: () => void;
 
-  // Mutations — all use optimistic updates with local reverts on error
-  sendRequest: (
-    requesterId: string,
-    addresseeId: string
-  ) => Promise<{ error: string | null }>;
-  acceptRequest: (
-    friendshipId: string
-  ) => Promise<{ error: string | null }>;
-  declineRequest: (
-    friendshipId: string
-  ) => Promise<{ error: string | null }>;
-  cancelRequest: (
-    friendshipId: string
-  ) => Promise<{ error: string | null }>;
-  unfriend: (
-    friendshipId: string
-  ) => Promise<{ error: string | null }>;
+  sendRequest: (requesterId: string, addresseeId: string) => Promise<{ error: string | null }>;
+  acceptRequest: (friendshipId: string) => Promise<{ error: string | null }>;
+  declineRequest: (friendshipId: string) => Promise<{ error: string | null }>;
+  cancelRequest: (friendshipId: string) => Promise<{ error: string | null }>;
+  unfriend: (friendshipId: string) => Promise<{ error: string | null }>;
+
+  subscribeToFriendEvents: (userId: string) => () => void;
+
+  // ── Feed ─────────────────────────────────────────────────────────────────────
+  feed: FeedPost[];
+  feedLoading: boolean;
+  /** IDs of users whose PRs appear in the feed (current user + accepted friends) */
+  feedParticipantIds: string[];
 
   /**
-   * Opens a Supabase Realtime channel for the current user's friendships.
-   * Returns an unsubscribe function — call it in the useEffect cleanup.
-   *
-   * Events handled:
-   *   INSERT  — someone sent me a request → add to incomingRequests
-   *   UPDATE  — my outgoing request was accepted → move to friends
-   *   DELETE  — any friendship row removed → clean up all lists
+   * Loads the feed: fetches accepted friend IDs, then fetches the combined
+   * personal_records feed with like counts. Stores participantIds for the
+   * realtime subscription to use.
    */
-  subscribeToFriendEvents: (userId: string) => () => void;
+  loadFeed: (userId: string) => Promise<void>;
+
+  /**
+   * Optimistically toggles a like on a feed post and syncs to the database.
+   * Reverts the optimistic update if the API call fails.
+   */
+  toggleLike: (userId: string, prId: string) => Promise<void>;
+
+  /**
+   * Opens Supabase Realtime channels for:
+   *   - pr_likes INSERT/DELETE  → live like count + has_liked updates
+   *   - personal_records INSERT → prepend new posts from friends (and self)
+   *
+   * Returns an unsubscribe function for useEffect cleanup.
+   * Tears down any previous subscription automatically (StrictMode safe).
+   */
+  subscribeToFeedEvents: (userId: string, participantIds: string[]) => () => void;
 }
 
 export const useSocialStore = create<SocialState>((set, get) => ({
+  // ── Friends initial state ────────────────────────────────────────────────────
   friends: [],
   incomingRequests: [],
   outgoingRequests: [],
@@ -71,6 +86,11 @@ export const useSocialStore = create<SocialState>((set, get) => ({
   friendsLoading: false,
   requestsLoading: false,
   searchLoading: false,
+
+  // ── Feed initial state ───────────────────────────────────────────────────────
+  feed: [],
+  feedLoading: false,
+  feedParticipantIds: [],
 
   // ─── Loaders ───────────────────────────────────────────────────────────────
 
@@ -271,16 +291,154 @@ export const useSocialStore = create<SocialState>((set, get) => ({
     return { error };
   },
 
-  // ─── Realtime ───────────────────────────────────────────────────────────────
+  // ─── Feed actions ───────────────────────────────────────────────────────────
+
+  loadFeed: async (userId) => {
+    set({ feedLoading: true });
+
+    // 1. Get accepted friend IDs so we can include them in the feed query
+    const { data: friends, error: friendErr } = await fetchFriends(userId);
+    if (friendErr) {
+      set({ feedLoading: false });
+      return;
+    }
+
+    const friendIds = friends.map((f) => f.id);
+    const participantIds = [userId, ...friendIds];
+    set({ feedParticipantIds: participantIds });
+
+    // 2. Fetch the feed posts
+    const { data, error } = await fetchFeed(userId, participantIds);
+    if (!error) set({ feed: data });
+    set({ feedLoading: false });
+  },
+
+  toggleLike: async (userId, prId) => {
+    const post = get().feed.find((p) => p.id === prId);
+    if (!post) return;
+
+    const wasLiked = post.has_liked;
+
+    // Optimistic update
+    set((s) => ({
+      feed: s.feed.map((p) =>
+        p.id !== prId
+          ? p
+          : {
+              ...p,
+              has_liked: !wasLiked,
+              likes_count: wasLiked ? p.likes_count - 1 : p.likes_count + 1,
+            }
+      ),
+    }));
+
+    const { error } = wasLiked
+      ? await unlikePR(userId, prId)
+      : await likePR(userId, prId);
+
+    if (error) {
+      // Revert on failure
+      set((s) => ({
+        feed: s.feed.map((p) =>
+          p.id !== prId
+            ? p
+            : {
+                ...p,
+                has_liked: wasLiked,
+                likes_count: wasLiked ? p.likes_count + 1 : p.likes_count - 1,
+              }
+        ),
+      }));
+    }
+  },
+
+  subscribeToFeedEvents: (userId, participantIds) => {
+    if (_feedChannel) {
+      supabase.removeChannel(_feedChannel);
+      _feedChannel = null;
+    }
+
+    _feedChannel = supabase
+      .channel(`feed-events-${userId}`)
+
+      // ── Like added ──────────────────────────────────────────────────────────
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "pr_likes" },
+        (payload) => {
+          const { pr_id, user_id } = payload.new as { pr_id: string; user_id: string };
+          // Skip own likes — the optimistic update in toggleLike() already
+          // incremented the count. Applying it again here would double-count.
+          if (user_id === userId) return;
+          set((s) => ({
+            feed: s.feed.map((p) =>
+              p.id !== pr_id
+                ? p
+                : { ...p, likes_count: p.likes_count + 1 }
+            ),
+          }));
+        }
+      )
+
+      // ── Like removed ────────────────────────────────────────────────────────
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "pr_likes" },
+        (payload) => {
+          // REPLICA IDENTITY FULL guarantees old row has pr_id + user_id
+          const old = payload.old as { pr_id?: string; user_id?: string };
+          if (!old.pr_id) return;
+          // Skip own unlikes — optimistic update already decremented the count.
+          if (old.user_id === userId) return;
+          set((s) => ({
+            feed: s.feed.map((p) =>
+              p.id !== old.pr_id
+                ? p
+                : { ...p, likes_count: Math.max(0, p.likes_count - 1) }
+            ),
+          }));
+        }
+      )
+
+      // ── New PR posted by a participant ──────────────────────────────────────
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "personal_records" },
+        async (payload) => {
+          const row = payload.new as { id: string; user_id: string };
+          if (!participantIds.includes(row.user_id)) return;
+
+          const { data: post } = await fetchSingleFeedPost(userId, row.id);
+          if (!post) return;
+
+          set((s) => ({
+            // Prepend, de-duplicating in case the current user already sees it
+            // via an optimistic local state update elsewhere
+            feed: [post, ...s.feed.filter((p) => p.id !== post.id)],
+          }));
+        }
+      )
+
+      .subscribe();
+
+    return () => {
+      if (_feedChannel) {
+        supabase.removeChannel(_feedChannel);
+        _feedChannel = null;
+      }
+    };
+  },
+
+  // ─── Friends realtime ───────────────────────────────────────────────────────
 
   subscribeToFriendEvents: (userId) => {
     // Tear down any existing subscription first (handles StrictMode double-mount)
-    if (_realtimeChannel) {
-      supabase.removeChannel(_realtimeChannel);
-      _realtimeChannel = null;
+    if (_friendChannel) {
+      supabase.removeChannel(_friendChannel);
+      _friendChannel = null;
     }
 
-    _realtimeChannel = supabase
+    _friendChannel = supabase
       .channel(`friend-events-${userId}`)
 
       // ── Someone sent ME a request ──────────────────────────────────────────
@@ -444,9 +602,9 @@ export const useSocialStore = create<SocialState>((set, get) => ({
       .subscribe();
 
     return () => {
-      if (_realtimeChannel) {
-        supabase.removeChannel(_realtimeChannel);
-        _realtimeChannel = null;
+      if (_friendChannel) {
+        supabase.removeChannel(_friendChannel);
+        _friendChannel = null;
       }
     };
   },

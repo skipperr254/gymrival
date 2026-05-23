@@ -56,3 +56,29 @@ export interface FriendRequest {
     xp: number;
   };
 }
+
+/**
+ * A social feed post — a personal_record enriched with its author's profile,
+ * exercise label, and aggregated like data for the current viewer.
+ */
+export interface FeedPost {
+  /** personal_records.id */
+  id: string;
+  user_id: string;
+  exercise_key: string;
+  exercise_label: string;
+  value: number;
+  unit: string;
+  created_at: string;
+  /** Author profile */
+  author_name: string | null;
+  author_username: string | null;
+  author_avatar_url: string | null;
+  author_level: number;
+  /** Gym name used as location display (from profiles.gym) */
+  author_gym: string | null;
+  /** Total number of likes this post has received */
+  likes_count: number;
+  /** Whether the currently authenticated user has liked this post */
+  has_liked: boolean;
+}

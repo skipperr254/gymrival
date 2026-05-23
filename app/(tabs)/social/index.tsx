@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
   ScrollView,
   Pressable,
+  RefreshControl,
   StyleSheet,
   TextInput,
   ActivityIndicator,
@@ -26,73 +27,26 @@ import {
   UserCheck,
   UserPlus,
   UserX,
+  Dumbbell,
 } from 'lucide-react-native';
 import { Colors, Fonts } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Feed helpers ─────────────────────────────────────────────────────────────
 
-type FeedItem = {
-  id: number;
-  userId: number;
-  exercise: string;
-  value: number;
-  unit: string;
-  timestamp: string;
-  location: string;
-  likes: number;
-  verified: boolean;
-  myLike: boolean;
-};
-
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-
-const FEED_USERS = [
-  { id: 1, name: 'You', isMe: true },
-  { id: 2, name: 'Daan' },
-  { id: 3, name: 'Sara' },
-  { id: 4, name: 'Mike' },
-  { id: 5, name: 'Lisa' },
-] as const;
-
-const INIT_FEED: FeedItem[] = [
-  {
-    id: 1,
-    userId: 2,
-    exercise: 'Bench Press',
-    value: 90,
-    unit: 'kg',
-    timestamp: '2 hours ago',
-    location: 'Basic-Fit Amsterdam',
-    likes: 8,
-    verified: true,
-    myLike: false,
-  },
-  {
-    id: 2,
-    userId: 3,
-    exercise: 'Pull-ups',
-    value: 18,
-    unit: 'reps',
-    timestamp: '5 hours ago',
-    location: 'Sportschool Rotterdam',
-    likes: 12,
-    verified: true,
-    myLike: false,
-  },
-  {
-    id: 3,
-    userId: 4,
-    exercise: 'Deadlift',
-    value: 140,
-    unit: 'kg',
-    timestamp: 'Yesterday',
-    location: 'Unknown',
-    likes: 3,
-    verified: false,
-    myLike: false,
-  },
-];
+function formatRelativeTime(dateStr: string): string {
+  const date = new Date(dateStr);
+  const diffMs = Date.now() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60_000);
+  const diffHours = Math.floor(diffMs / 3_600_000);
+  const diffDays = Math.floor(diffMs / 86_400_000);
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
 
 // ─── Mock Data (Friends — kept for MessagesContent placeholder) ──────────────
 
@@ -124,36 +78,9 @@ const CONV_PREVIEWS: Record<number, ConvPreview> = {
   5: { lastText: 'Thanks! Still a long way to go', lastTime: 'Sun', fromMe: true },
 };
 
-// ─── Avatar ───────────────────────────────────────────────────────────────────
+// ─── Shared Avatar (UUID-based deterministic color) ──────────────────────────
 
 const AVATAR_PALETTE = ['#e63030', '#c0392b', '#922b21', '#7b241c', '#641e16'];
-
-function FeedAvatar({ id, name, size = 42 }: { id: number; name: string; size?: number }) {
-  const color = AVATAR_PALETTE[Math.abs(id) % AVATAR_PALETTE.length];
-  const initials = name === 'You' ? 'YOU' : name.slice(0, 2).toUpperCase();
-  const fontSize = Math.round(size * 0.3);
-  return (
-    <LinearGradient
-      colors={[color, '#1a1a1a']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={{
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        borderWidth: 2,
-        borderColor: color + '55',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0,
-      }}
-    >
-      <Text style={{ fontFamily: Fonts.display, fontSize, color: '#fff', letterSpacing: 1 }}>
-        {initials}
-      </Text>
-    </LinearGradient>
-  );
-}
 
 // ─── Friend Avatar ────────────────────────────────────────────────────────────
 
@@ -225,36 +152,90 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]['key'];
 
+// ─── Feed skeleton card ───────────────────────────────────────────────────────
+
+function FeedSkeleton() {
+  return (
+    <View style={feedStyles.card}>
+      <View style={[feedStyles.videoArea, { backgroundColor: '#1a1a1a' }]} />
+      <View style={feedStyles.cardBody}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#2a2a2a' }} />
+          <View style={{ flex: 1, gap: 6 }}>
+            <View style={{ height: 12, width: '50%', borderRadius: 6, backgroundColor: '#2a2a2a' }} />
+            <View style={{ height: 10, width: '70%', borderRadius: 5, backgroundColor: '#232323' }} />
+          </View>
+        </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View style={{ height: 14, width: 80, borderRadius: 6, backgroundColor: '#2a2a2a' }} />
+          <View style={{ height: 34, width: 80, borderRadius: 12, backgroundColor: '#242424' }} />
+        </View>
+      </View>
+    </View>
+  );
+}
+
 // ─── Feed Content ─────────────────────────────────────────────────────────────
 
 function FeedContent() {
-  const [feed, setFeed] = useState<FeedItem[]>(INIT_FEED);
+  const userId = useAuthStore((s) => s.user?.id ?? '');
+  const {
+    feed,
+    feedLoading,
+    feedParticipantIds,
+    loadFeed,
+    toggleLike,
+    subscribeToFeedEvents,
+  } = useSocialStore();
 
-  const likePost = (id: number) => {
-    setFeed(prev =>
-      prev.map(item =>
-        item.id !== id || item.myLike
-          ? item
-          : { ...item, likes: item.likes + 1, myLike: true },
-      ),
+  // Initial load
+  useEffect(() => {
+    if (!userId) return;
+    loadFeed(userId);
+  }, [userId, loadFeed]);
+
+  // Realtime subscription — set up once participant IDs are known
+  useEffect(() => {
+    if (!userId || feedParticipantIds.length === 0) return;
+    return subscribeToFeedEvents(userId, feedParticipantIds);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, feedParticipantIds.join(',')]);
+
+  if (feedLoading && feed.length === 0) {
+    return (
+      <>
+        <FeedSkeleton />
+        <FeedSkeleton />
+        <FeedSkeleton />
+      </>
     );
-  };
+  }
+
+  if (!feedLoading && feed.length === 0) {
+    return (
+      <View style={feedStyles.emptyWrap}>
+        <View style={feedStyles.emptyIconWrap}>
+          <Dumbbell size={28} strokeWidth={1.4} color="#404040" />
+        </View>
+        <Text style={feedStyles.emptyTitle}>NO ACTIVITY YET</Text>
+        <Text style={feedStyles.emptySubtitle}>
+          Add friends and start logging PRs to see the feed come alive.
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <>
-      {feed.map(item => {
-        const user = FEED_USERS.find(u => u.id === item.userId);
-        const isMe = item.userId === 1;
-        if (!user) return null;
+      {feed.map(post => {
+        const isMe = post.user_id === userId;
+        const displayName = post.author_name ?? post.author_username ?? 'Athlete';
+        const location = post.author_gym ?? 'Unknown gym';
+        const timestamp = formatRelativeTime(post.created_at);
+
         return (
-          <View
-            key={item.id}
-            style={[
-              feedStyles.card,
-              item.verified ? feedStyles.cardVerified : feedStyles.cardDefault,
-            ]}
-          >
-            {/* Video Proof Area */}
+          <View key={post.id} style={[feedStyles.card, feedStyles.cardDefault]}>
+            {/* Video / PR visual area */}
             <View style={feedStyles.videoArea}>
               <View style={feedStyles.videoPlaceholder}>
                 <View style={feedStyles.videoIconWrap}>
@@ -269,31 +250,25 @@ function FeedContent() {
                 <View style={feedStyles.prOverlay}>
                   <View>
                     <View style={feedStyles.prValueRow}>
-                      <Text style={feedStyles.prValue}>{item.value}</Text>
-                      <Text style={feedStyles.prUnit}>{item.unit.toUpperCase()}</Text>
+                      <Text style={feedStyles.prValue}>{post.value}</Text>
+                      <Text style={feedStyles.prUnit}>{post.unit.toUpperCase()}</Text>
                     </View>
-                    <Text style={feedStyles.prExercise}>{item.exercise.toUpperCase()}</Text>
+                    <Text style={feedStyles.prExercise}>{post.exercise_label.toUpperCase()}</Text>
                   </View>
-                  {item.verified && (
-                    <View style={feedStyles.trendingBadge}>
-                      <Flame size={11} strokeWidth={2} color="#fff" />
-                      <Text style={feedStyles.trendingText}>TRENDING</Text>
-                    </View>
-                  )}
                 </View>
               </LinearGradient>
             </View>
 
-            {/* Card Body */}
+            {/* Card body */}
             <View style={feedStyles.cardBody}>
               <View style={feedStyles.userRow}>
-                <FeedAvatar id={user.id} name={user.name} size={36} />
+                <FriendAvatar id={post.user_id} name={displayName} size={36} />
                 <View style={{ flex: 1 }}>
-                  <Text style={feedStyles.userName}>{user.name}</Text>
+                  <Text style={feedStyles.userName}>{displayName}</Text>
                   <View style={feedStyles.metaRow}>
                     <MapPin size={10} strokeWidth={2} color="#555" />
                     <Text style={feedStyles.metaText}>
-                      {item.location} {'·'} {item.timestamp}
+                      {location} {'·'} {timestamp}
                     </Text>
                   </View>
                 </View>
@@ -302,26 +277,30 @@ function FeedContent() {
               <View style={feedStyles.actionRow}>
                 <View style={feedStyles.likesDisplay}>
                   <Flame size={16} strokeWidth={2} color={Colors.accent} />
-                  <Text style={feedStyles.likesCount}>{item.likes}</Text>
+                  <Text style={feedStyles.likesCount}>{post.likes_count}</Text>
                   <Text style={feedStyles.likesLabel}>LIKES</Text>
                 </View>
                 {!isMe ? (
                   <Pressable
-                    onPress={() => likePost(item.id)}
-                    disabled={item.myLike}
+                    onPress={() => toggleLike(userId, post.id)}
                     style={[
                       feedStyles.likeBtn,
-                      item.myLike ? feedStyles.likeBtnActive : feedStyles.likeBtnDefault,
+                      post.has_liked ? feedStyles.likeBtnActive : feedStyles.likeBtnDefault,
                     ]}
                   >
                     <Heart
                       size={13}
                       strokeWidth={2}
-                      fill={item.myLike ? Colors.accent : 'none'}
-                      color={item.myLike ? Colors.accent : '#707070'}
+                      fill={post.has_liked ? Colors.accent : 'none'}
+                      color={post.has_liked ? Colors.accent : '#707070'}
                     />
-                    <Text style={[feedStyles.likeBtnText, item.myLike && feedStyles.likeBtnTextActive]}>
-                      {item.myLike ? 'LIKED' : 'LIKE'}
+                    <Text
+                      style={[
+                        feedStyles.likeBtnText,
+                        post.has_liked && feedStyles.likeBtnTextActive,
+                      ]}
+                    >
+                      {post.has_liked ? 'LIKED' : 'LIKE'}
                     </Text>
                   </Pressable>
                 ) : (
@@ -780,10 +759,21 @@ function MessagesContent() {
 
 export default function SocialScreen() {
   const [activeTab, setActiveTab] = useState<TabKey>('feed');
+  const [refreshing, setRefreshing] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   const currentTab = TABS.find(t => t.key === activeTab)!;
 
+  const userId = useAuthStore((s) => s.user?.id ?? '');
+  const loadFeed = useSocialStore((s) => s.loadFeed);
+
   const scrollToTop = () => scrollRef.current?.scrollTo({ y: 0, animated: false });
+
+  const onRefresh = useCallback(async () => {
+    if (!userId) return;
+    setRefreshing(true);
+    if (activeTab === 'feed') await loadFeed(userId);
+    setRefreshing(false);
+  }, [userId, activeTab, loadFeed]);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -816,6 +806,14 @@ export default function SocialScreen() {
         ref={scrollRef}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={Colors.accent}
+            colors={[Colors.accent]}
+          />
+        }
       >
         {activeTab === 'feed' && <FeedContent />}
         {activeTab === 'friends' && <FriendsContent />}
@@ -1009,6 +1007,36 @@ const feedStyles = StyleSheet.create({
     fontSize: 10,
     color: '#383838',
     letterSpacing: 2,
+  },
+  emptyWrap: {
+    alignItems: 'center',
+    paddingVertical: 64,
+    paddingHorizontal: 32,
+  },
+  emptyIconWrap: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#1e1e1e',
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  emptyTitle: {
+    fontFamily: Fonts.display,
+    fontSize: 18,
+    letterSpacing: 2,
+    color: '#fff',
+    marginBottom: 8,
+  },
+  emptySubtitle: {
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    color: '#555',
+    textAlign: 'center',
+    lineHeight: 20,
   },
 });
 
