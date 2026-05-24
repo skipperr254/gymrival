@@ -84,11 +84,13 @@ export default function VerifyScreen() {
   };
 
   // Auto-submit when code is complete
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (code.length === CODE_LENGTH) {
       handleVerify(code);
     }
+    // handleVerify is recreated each render but calling it with stale values is fine
+    // here since `code` is the only thing that matters and drives this effect
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code]);
 
   const handleResend = async () => {

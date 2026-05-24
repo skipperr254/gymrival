@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSocialStore } from '@/store/useSocialStore';
+import { useChatStore } from '@/store/useChatStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -28,6 +29,7 @@ import {
   UserPlus,
   UserX,
   Dumbbell,
+  MessageCircle,
 } from 'lucide-react-native';
 import { Colors, Fonts } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
@@ -48,35 +50,6 @@ function formatRelativeTime(dateStr: string): string {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-// ─── Mock Data (Friends — kept for MessagesContent placeholder) ──────────────
-
-type MockUser = { id: number; name: string; username: string; level: number; points: number };
-
-const ALL_USERS: MockUser[] = [
-  { id: 2, name: 'Daan',  username: '@daanfit',     level: 10, points: 2890 },
-  { id: 3, name: 'Sara',  username: '@sara_lifts',  level: 14, points: 3800 },
-  { id: 4, name: 'Mike',  username: '@mike_gains',  level: 8,  points: 2100 },
-  { id: 5, name: 'Lisa',  username: '@lisastrong',  level: 11, points: 3050 },
-];
-
-const INIT_FRIENDS: number[] = [2, 3, 4, 5];
-
-// ─── Messages Mock Data ───────────────────────────────────────────────────────
-
-const ONLINE_IDS = [3, 5];
-
-type ConvPreview = {
-  lastText: string;
-  lastTime: string;
-  fromMe: boolean;
-};
-
-const CONV_PREVIEWS: Record<number, ConvPreview> = {
-  2: { lastText: 'Nice! When are you training next?', lastTime: '10:35', fromMe: false },
-  3: { lastText: "Haha thanks! You're almost at my level on squat", lastTime: 'Yesterday', fromMe: false },
-  4: { lastText: 'Push/pull/legs, 3x per week', lastTime: 'Mon', fromMe: true },
-  5: { lastText: 'Thanks! Still a long way to go', lastTime: 'Sun', fromMe: true },
-};
 
 // ─── Shared Avatar (UUID-based deterministic color) ──────────────────────────
 
@@ -151,6 +124,18 @@ const TABS = [
 ] as const;
 
 type TabKey = (typeof TABS)[number]['key'];
+
+function formatConvTime(iso: string | null): string {
+  if (!iso) return '';
+  const date = new Date(iso);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / 86_400_000);
+  if (diffDays === 0) return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return date.toLocaleDateString('en-US', { weekday: 'short' });
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
 
 // ─── Feed skeleton card ───────────────────────────────────────────────────────
 
@@ -352,6 +337,8 @@ function FriendsContent() {
     loadRequests(userId);
     const unsubscribe = subscribeToFriendEvents(userId);
     return unsubscribe;
+    // Store actions are stable Zustand functions
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   // Refresh data whenever the user switches subtabs
@@ -360,7 +347,9 @@ function FriendsContent() {
     if (subTab === 'search') search(userId, query);
     else if (subTab === 'list') loadFriends(userId);
     else if (subTab === 'requests') loadRequests(userId);
-  }, [subTab]);
+    // Store actions are stable; query intentionally excluded (handled by debounce effect)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subTab, userId]);
 
   // Debounced live search (300 ms)
   useEffect(() => {
@@ -372,7 +361,9 @@ function FriendsContent() {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [query]);
+    // search is a stable Zustand action
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, subTab, userId]);
 
   const incomingCount = incomingRequests.length;
 
@@ -462,12 +453,20 @@ function FriendsContent() {
                     </View>
                   </View>
                 </View>
-                <Pressable
-                  onPress={() => unfriend(friend.friendship_id)}
-                  style={friendsStyles.unfriendBtn}
-                >
-                  <UserX size={15} strokeWidth={2} color="#505050" />
-                </Pressable>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <Pressable
+                    onPress={() => router.push(Routes.chat(friend.id) as never)}
+                    style={friendsStyles.actionBtn}
+                  >
+                    <MessageCircle size={15} strokeWidth={2} color="#505050" />
+                  </Pressable>
+                  <Pressable
+                    onPress={() => unfriend(friend.friendship_id)}
+                    style={friendsStyles.actionBtn}
+                  >
+                    <UserX size={15} strokeWidth={2} color="#505050" />
+                  </Pressable>
+                </View>
               </View>
             ))
           )}
@@ -686,71 +685,104 @@ function FriendsContent() {
 // ─── Messages Content ─────────────────────────────────────────────────────────
 
 function MessagesContent() {
+  const userId = useAuthStore((s) => s.user?.id ?? '');
+  const {
+    conversations,
+    conversationsLoading,
+    loadConversations,
+    subscribeToInbox,
+    startPresenceHeartbeat,
+    isOnline,
+    unreadCount,
+  } = useChatStore();
+
+  useEffect(() => {
+    if (!userId) return;
+    loadConversations(userId);
+    const unsubInbox = subscribeToInbox(userId);
+    const stopHeartbeat = startPresenceHeartbeat(userId);
+    return () => {
+      unsubInbox();
+      stopHeartbeat();
+    };
+    // Store actions are stable Zustand functions
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
+
+  if (conversationsLoading && conversations.length === 0) {
+    return (
+      <View style={msgStyles.emptyCard}>
+        <ActivityIndicator color="#404040" />
+      </View>
+    );
+  }
+
+  if (!conversationsLoading && conversations.length === 0) {
+    return (
+      <View style={msgStyles.emptyCard}>
+        <View style={msgStyles.emptyIconWrap}>
+          <MessageCircle size={24} strokeWidth={1.5} color="#404040" />
+        </View>
+        <Text style={msgStyles.emptyTitle}>NO MESSAGES YET</Text>
+        <Text style={msgStyles.emptySubtitle}>
+          Add friends and tap the message icon to start chatting
+        </Text>
+      </View>
+    );
+  }
+
+  const total = unreadCount(userId);
+
   return (
     <>
-      {/* All Messages */}
+      {total > 0 && (
+        <View style={msgStyles.unreadBanner}>
+          <Text style={msgStyles.unreadBannerText}>{total} UNREAD</Text>
+        </View>
+      )}
+
       <Text style={msgStyles.sectionLabel}>ALL MESSAGES</Text>
       <View style={msgStyles.convList}>
-        {INIT_FRIENDS.map(id => {
-          const u = ALL_USERS.find(x => x.id === id);
-          const conv = CONV_PREVIEWS[id];
-          if (!u) return null;
+        {conversations.map((conv) => {
+          const name = conv.other_user.full_name ?? conv.other_user.username ?? 'Athlete';
+          const online = isOnline(conv.other_user.id);
+          const isFromMe = conv.last_message_sender_id === userId;
+          const hasUnread =
+            !isFromMe &&
+            conv.last_message_content !== null &&
+            conv.last_message_read_at === null;
+
           return (
             <Pressable
-              key={id}
-              onPress={() => router.push(Routes.chat(id.toString()) as never)}
+              key={conv.id}
+              onPress={() => router.push(Routes.chat(conv.other_user.id) as never)}
               style={({ pressed }) => [msgStyles.convRow, pressed && msgStyles.convRowPressed]}
             >
-              <FriendAvatar id={u.id.toString()} name={u.name} size={50} online={ONLINE_IDS.includes(id)} />
+              <FriendAvatar id={conv.other_user.id} name={name} size={50} online={online} />
               <View style={msgStyles.convInfo}>
                 <View style={msgStyles.convHeader}>
-                  <Text style={msgStyles.convName}>{u.name}</Text>
-                  <Text style={msgStyles.convTime}>{conv?.lastTime}</Text>
+                  <Text style={[msgStyles.convName, hasUnread && msgStyles.convNameUnread]}>
+                    {name}
+                  </Text>
+                  <Text style={[msgStyles.convTime, hasUnread && msgStyles.convTimeUnread]}>
+                    {formatConvTime(conv.last_message_at)}
+                  </Text>
                 </View>
-                <Text style={msgStyles.convPreview} numberOfLines={1}>
-                  {conv?.fromMe && <Text style={msgStyles.convYou}>{'You: '}</Text>}
-                  {conv?.lastText}
-                </Text>
+                <View style={msgStyles.convPreviewRow}>
+                  <Text style={[msgStyles.convPreview, hasUnread && msgStyles.convPreviewUnread]} numberOfLines={1}>
+                    {conv.last_message_content
+                      ? isFromMe
+                        ? `You: ${conv.last_message_content}`
+                        : conv.last_message_content
+                      : 'Start the conversation'}
+                  </Text>
+                  {hasUnread && <View style={msgStyles.unreadDot} />}
+                </View>
               </View>
             </Pressable>
           );
         })}
       </View>
-
-      {/*
-        CHALLENGE A FRIEND card — commented out for now.
-
-        The idea: surface a quick-action card at the bottom of the inbox so users
-        can fire off a head-to-head challenge directly from Messages without having
-        to navigate to the Compete tab. Each friend row would have a CHALLENGE button
-        that opens the same challenge-creation flow used in the Compete tab.
-
-        Revisit once the Compete > Challenges flow is fully built so the two can
-        share the same challenge-creation logic and data model.
-
-        <View style={msgStyles.challengeCard}>
-          <View style={msgStyles.challengeHeader}>
-            <Trophy size={15} strokeWidth={1.5} color={Colors.accent} />
-            <Text style={msgStyles.challengeTitle}>CHALLENGE A FRIEND</Text>
-          </View>
-          <View style={msgStyles.challengeList}>
-            {INIT_FRIENDS.map(id => {
-              const u = ALL_USERS.find(x => x.id === id);
-              if (!u) return null;
-              return (
-                <View key={id} style={msgStyles.challengeRow}>
-                  <FriendAvatar id={u.id} name={u.name} size={34} />
-                  <Text style={msgStyles.challengeUserName}>{u.name}</Text>
-                  <Pressable style={msgStyles.challengeBtn}>
-                    <Dumbbell size={12} strokeWidth={2} color={Colors.accent} />
-                    <Text style={msgStyles.challengeBtnText}>CHALLENGE</Text>
-                  </Pressable>
-                </View>
-              );
-            })}
-          </View>
-        </View>
-      */}
     </>
   );
 }
@@ -765,6 +797,8 @@ export default function SocialScreen() {
 
   const userId = useAuthStore((s) => s.user?.id ?? '');
   const loadFeed = useSocialStore((s) => s.loadFeed);
+  const { loadConversations, unreadCount } = useChatStore();
+  const msgUnread = unreadCount(userId);
 
   const scrollToTop = () => scrollRef.current?.scrollTo({ y: 0, animated: false });
 
@@ -772,8 +806,9 @@ export default function SocialScreen() {
     if (!userId) return;
     setRefreshing(true);
     if (activeTab === 'feed') await loadFeed(userId);
+    if (activeTab === 'messages') await loadConversations(userId);
     setRefreshing(false);
-  }, [userId, activeTab, loadFeed]);
+  }, [userId, activeTab, loadFeed, loadConversations]);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -784,6 +819,7 @@ export default function SocialScreen() {
         <View style={styles.segmented}>
           {TABS.map(tab => {
             const isActive = activeTab === tab.key;
+            const showBadge = tab.key === 'messages' && msgUnread > 0;
             return (
               <Pressable
                 key={tab.key}
@@ -793,9 +829,16 @@ export default function SocialScreen() {
                 }}
                 style={[styles.segTab, isActive && styles.segTabActive]}
               >
-                <Text style={[styles.segLabel, isActive && styles.segLabelActive]}>
-                  {tab.label.toUpperCase()}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <Text style={[styles.segLabel, isActive && styles.segLabelActive]}>
+                    {tab.label.toUpperCase()}
+                  </Text>
+                  {showBadge && (
+                    <View style={styles.tabBadge}>
+                      <Text style={styles.tabBadgeText}>{msgUnread}</Text>
+                    </View>
+                  )}
+                </View>
               </Pressable>
             );
           })}
@@ -1097,6 +1140,21 @@ const styles = StyleSheet.create({
   segLabelActive: {
     color: '#000',
   },
+  tabBadge: {
+    backgroundColor: Colors.accent,
+    borderRadius: 8,
+    minWidth: 16,
+    height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  tabBadgeText: {
+    fontFamily: Fonts.display,
+    fontSize: 9,
+    color: '#fff',
+    lineHeight: 14,
+  },
   scrollContent: {
     paddingHorizontal: 16,
     paddingTop: 12,
@@ -1243,6 +1301,16 @@ const friendsStyles = StyleSheet.create({
     letterSpacing: 1,
   },
   unfriendBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+    backgroundColor: '#1a1a1a',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionBtn: {
     width: 34,
     height: 34,
     borderRadius: 17,
@@ -1410,8 +1478,52 @@ const friendsStyles = StyleSheet.create({
 // ─── Messages Styles ──────────────────────────────────────────────────────────
 
 const msgStyles = StyleSheet.create({
-  section: {
-    marginBottom: 16,
+  emptyCard: {
+    alignItems: 'center',
+    paddingVertical: 48,
+    paddingHorizontal: 24,
+    backgroundColor: '#1c1c1c',
+    borderWidth: 1,
+    borderColor: '#242424',
+    borderRadius: 20,
+  },
+  emptyIconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#242424',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+  },
+  emptyTitle: {
+    fontFamily: Fonts.display,
+    fontSize: 17,
+    letterSpacing: 2,
+    color: '#fff',
+    marginBottom: 6,
+  },
+  emptySubtitle: {
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    color: '#555',
+    textAlign: 'center',
+  },
+  unreadBanner: {
+    backgroundColor: 'rgba(230,48,48,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(230,48,48,0.25)',
+    borderRadius: 10,
+    paddingVertical: 7,
+    paddingHorizontal: 14,
+    alignSelf: 'flex-start',
+    marginBottom: 14,
+  },
+  unreadBannerText: {
+    fontFamily: Fonts.display,
+    fontSize: 10,
+    color: Colors.accent,
+    letterSpacing: 2,
   },
   sectionLabel: {
     fontFamily: Fonts.display,
@@ -1419,24 +1531,6 @@ const msgStyles = StyleSheet.create({
     color: '#484848',
     letterSpacing: 2,
     marginBottom: 12,
-  },
-  onlineRow: {
-    flexDirection: 'row',
-    gap: 18,
-  },
-  onlineItem: {
-    alignItems: 'center',
-    gap: 6,
-  },
-  onlineName: {
-    fontFamily: Fonts.body,
-    fontSize: 11,
-    color: '#707070',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#1e1e1e',
-    marginBottom: 18,
   },
   convList: {
     marginBottom: 24,
@@ -1465,6 +1559,10 @@ const msgStyles = StyleSheet.create({
   convName: {
     fontFamily: Fonts.bodyMedium,
     fontSize: 15,
+    color: '#ccc',
+  },
+  convNameUnread: {
+    fontFamily: Fonts.bodySemiBold,
     color: '#fff',
   },
   convTime: {
@@ -1472,68 +1570,29 @@ const msgStyles = StyleSheet.create({
     fontSize: 11,
     color: '#454545',
   },
+  convTimeUnread: {
+    color: Colors.accent,
+  },
+  convPreviewRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flex: 1,
+  },
   convPreview: {
     fontFamily: Fonts.body,
     fontSize: 13,
     color: '#505050',
-  },
-  convYou: {
-    color: '#484848',
-  },
-  challengeCard: {
-    backgroundColor: '#1c1c1c',
-    borderWidth: 1,
-    borderColor: '#242424',
-    borderRadius: 20,
-    overflow: 'hidden',
-  },
-  challengeHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    backgroundColor: '#1a0505',
-    borderBottomWidth: 1,
-    borderBottomColor: '#242424',
-    paddingHorizontal: 18,
-    paddingVertical: 14,
-  },
-  challengeTitle: {
-    fontFamily: Fonts.display,
-    fontSize: 12,
-    letterSpacing: 2,
-    color: '#fff',
-  },
-  challengeList: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 10,
-  },
-  challengeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  challengeUserName: {
     flex: 1,
-    fontFamily: Fonts.bodyMedium,
-    fontSize: 14,
-    color: '#ccc',
   },
-  challengeBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 7,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(230,48,48,0.3)',
-    backgroundColor: 'rgba(230,48,48,0.06)',
+  convPreviewUnread: {
+    color: '#888',
   },
-  challengeBtnText: {
-    fontFamily: Fonts.display,
-    fontSize: 10,
-    color: Colors.accent,
-    letterSpacing: 1,
+  unreadDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Colors.accent,
+    flexShrink: 0,
   },
 });

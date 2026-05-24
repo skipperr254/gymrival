@@ -1,5 +1,44 @@
 export type FriendshipStatus = 'pending' | 'accepted' | 'blocked';
 
+// ─── Chat ─────────────────────────────────────────────────────────────────────
+
+export type MessageType = 'text' | 'challenge_invite' | 'system';
+
+export interface Message {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  message_type: MessageType;
+  read_at: string | null;
+  created_at: string;
+}
+
+export interface ConversationPreview {
+  id: string;
+  participant_a: string;
+  participant_b: string;
+  last_message_at: string | null;
+  created_at: string;
+  /** The other participant (not the current user) */
+  other_user: {
+    id: string;
+    full_name: string | null;
+    username: string | null;
+    avatar_url: string | null;
+    level: number;
+  };
+  last_message_content: string | null;
+  last_message_sender_id: string | null;
+  /** null = unread (sent by other user and not yet read) */
+  last_message_read_at: string | null;
+}
+
+export interface UserPresence {
+  user_id: string;
+  last_seen_at: string;
+}
+
 export interface Friendship {
   id: string;
   requester_id: string;

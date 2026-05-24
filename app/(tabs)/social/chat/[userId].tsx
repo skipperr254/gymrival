@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,66 +8,20 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
-import {
-  ChevronLeft,
-  Phone,
-  MoreHorizontal,
-  ImagePlus,
-  ArrowUp,
-} from 'lucide-react-native';
+import { ChevronLeft, ArrowUp, MessageCircle } from 'lucide-react-native';
 import { Colors, Fonts } from '@/constants/theme';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type Message = {
-  id: number;
-  from: 'me' | 'other';
-  text: string;
-  time: string;
-};
-
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-
-const USER_DATA: Record<string, { name: string; level: number }> = {
-  '2': { name: 'Daan', level: 10 },
-  '3': { name: 'Sara', level: 14 },
-  '4': { name: 'Mike', level: 8 },
-  '5': { name: 'Lisa', level: 11 },
-};
-
-const ONLINE_IDS = ['3', '5'];
-
-const INIT_MESSAGES: Record<string, Message[]> = {
-  '2': [
-    { id: 1, from: 'other', text: 'Bro, have you tried bench press with close grip?', time: '10:32' },
-    { id: 2, from: 'me', text: 'Yeah man! Felt the triceps way more. You should try it', time: '10:34' },
-    { id: 3, from: 'other', text: 'Nice! When are you training next?', time: '10:35' },
-    { id: 4, from: 'me', text: 'Tonight, leg day', time: '10:36' },
-  ],
-  '3': [
-    { id: 1, from: 'other', text: 'Hey! Have you seen my PR video yet?', time: 'Yesterday' },
-    { id: 2, from: 'me', text: 'Yes!! 18 pull-ups is insane', time: 'Yesterday' },
-    { id: 3, from: 'other', text: "Haha thanks! You're almost at my level on squat", time: 'Yesterday' },
-  ],
-  '4': [
-    { id: 1, from: 'other', text: 'What program are you following right now?', time: 'Mon' },
-    { id: 2, from: 'me', text: 'Push/pull/legs, 3x per week', time: 'Mon' },
-  ],
-  '5': [
-    { id: 1, from: 'other', text: 'Great job with your deadlift PR! 160kg', time: 'Sun' },
-    { id: 2, from: 'me', text: 'Thanks! Still a long way to go', time: 'Sun' },
-  ],
-};
-
-const QUICK_REPLIES = ['Great lift!', "Let's train!", "What's your PR?", 'Respect'];
-
-const AVATAR_PALETTE = ['#e63030', '#c0392b', '#922b21', '#7b241c', '#641e16'];
+import { useAuthStore } from '@/store/useAuthStore';
+import { useChatStore } from '@/store/useChatStore';
+import { fetchProfile } from '@/lib/api';
 
 // ─── Avatar ───────────────────────────────────────────────────────────────────
+
+const AVATAR_PALETTE = ['#e63030', '#c0392b', '#922b21', '#7b241c', '#641e16'];
 
 function ChatAvatar({
   userId,
@@ -80,10 +34,14 @@ function ChatAvatar({
   size?: number;
   online?: boolean;
 }) {
-  const id = parseInt(userId, 10);
-  const color = AVATAR_PALETTE[Math.abs(id) % AVATAR_PALETTE.length];
+  const charSum = [...userId.replace(/-/g, '').slice(0, 8)].reduce(
+    (s, c) => s + c.charCodeAt(0),
+    0
+  );
+  const color = AVATAR_PALETTE[charSum % AVATAR_PALETTE.length];
   const initials = name.slice(0, 2).toUpperCase();
   const fontSize = Math.round(size * 0.3);
+
   return (
     <View style={{ position: 'relative', flexShrink: 0 }}>
       <LinearGradient
@@ -123,38 +81,212 @@ function ChatAvatar({
   );
 }
 
+// ─── Date divider label ───────────────────────────────────────────────────────
+
+function formatDateLabel(iso: string): string {
+  const date = new Date(iso);
+  const now = new Date();
+  const diffDays = Math.floor((now.getTime() - date.getTime()) / 86_400_000);
+  if (diffDays === 0) return 'TODAY';
+  if (diffDays === 1) return 'YESTERDAY';
+  if (diffDays < 7) return date.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
+}
+
+function formatMessageTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+}
+
+const QUICK_REPLIES = ["Great lift!", "Let's train!", "What's your PR?", "Respect"];
+
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function ChatScreen() {
-  const { userId } = useLocalSearchParams<{ userId: string }>();
-  const id = userId ?? '2';
-  const user = USER_DATA[id] ?? { name: 'User', level: 1 };
-  const isOnline = ONLINE_IDS.includes(id);
+  const { userId: otherUserId } = useLocalSearchParams<{ userId: string }>();
+  const currentUserId = useAuthStore((s) => s.user?.id ?? '');
+  const { bottom: bottomInset } = useSafeAreaInsets();
 
-  const [messages, setMessages] = useState<Message[]>(INIT_MESSAGES[id] ?? []);
+  const {
+    messages,
+    messagesLoading,
+    loadingOlderMessages,
+    hasMoreMessages,
+    conversations,
+    loadMessages,
+    loadOlderMessages,
+    sendMessage,
+    subscribeToChat,
+    fetchFriendsPresence,
+    isOnline,
+    getOrOpenChat,
+    startPresenceHeartbeat,
+  } = useChatStore();
+
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [initError, setInitError] = useState(false);
+  const [otherUser, setOtherUser] = useState<{
+    id: string;
+    full_name: string | null;
+    username: string | null;
+    level: number;
+  } | null>(null);
   const [input, setInput] = useState('');
+  const [isAtBottom, setIsAtBottom] = useState(true);
+
   const scrollRef = useRef<ScrollView>(null);
   const inputRef = useRef<TextInput>(null);
 
+  // ── Resolve other user's profile ──────────────────────────────────────────
+
   useEffect(() => {
+    if (!otherUserId) return;
+
+    // Fast path: profile already in the conversations list
+    const existing = conversations.find((c) => c.other_user.id === otherUserId);
+    if (existing) {
+      setOtherUser(existing.other_user);
+      return;
+    }
+
+    // Slow path: fetch from the API
+    fetchProfile(otherUserId).then(({ data }) => {
+      if (data) {
+        setOtherUser({
+          id: data.id,
+          full_name: data.full_name,
+          username: data.username,
+          level: data.level ?? 1,
+        });
+      }
+    });
+  }, [otherUserId, conversations]);
+
+  // ── Initialise conversation ───────────────────────────────────────────────
+
+  useEffect(() => {
+    if (!currentUserId || !otherUserId) return;
+
+    getOrOpenChat(currentUserId, otherUserId).then((convId) => {
+      if (!convId) {
+        setInitError(true);
+        return;
+      }
+      setConversationId(convId);
+      loadMessages(convId, currentUserId);
+    });
+    // getOrOpenChat and loadMessages are stable Zustand actions
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUserId, otherUserId]);
+
+  // ── Realtime subscription ─────────────────────────────────────────────────
+
+  useEffect(() => {
+    if (!conversationId || !currentUserId) return;
+    return subscribeToChat(conversationId, currentUserId);
+    // subscribeToChat is a stable Zustand action
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId, currentUserId]);
+
+  // ── Presence ─────────────────────────────────────────────────────────────
+
+  useEffect(() => {
+    if (!otherUserId || !currentUserId) return;
+    fetchFriendsPresence([otherUserId]);
+    const stopHeartbeat = startPresenceHeartbeat(currentUserId);
+    return stopHeartbeat;
+    // fetchFriendsPresence and startPresenceHeartbeat are stable Zustand actions
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [otherUserId, currentUserId]);
+
+  // ── Scroll to bottom on new messages ─────────────────────────────────────
+
+  useEffect(() => {
+    if (!isAtBottom) return;
     const timer = setTimeout(() => {
       scrollRef.current?.scrollToEnd({ animated: true });
     }, 50);
     return () => clearTimeout(timer);
-  }, [messages]);
+  }, [messages.length, isAtBottom]);
 
-  const sendMessage = (text?: string) => {
-    const msg = (text ?? input).trim();
-    if (!msg) return;
-    const now = new Date();
-    const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    setMessages(prev => [
-      ...prev,
-      { id: Date.now(), from: 'me', text: msg, time },
-    ]);
-    setInput('');
-    inputRef.current?.focus();
-  };
+  // ── Send ──────────────────────────────────────────────────────────────────
+
+  const handleSend = useCallback(
+    (text?: string) => {
+      const msg = (text ?? input).trim();
+      if (!msg || !conversationId) return;
+      sendMessage(conversationId, currentUserId, msg);
+      setInput('');
+      inputRef.current?.focus();
+    },
+    [input, conversationId, currentUserId, sendMessage]
+  );
+
+  // ── Scroll tracking for "load more" ──────────────────────────────────────
+
+  const handleScroll = useCallback(
+    (event: { nativeEvent: { contentOffset: { y: number }; layoutMeasurement: { height: number }; contentSize: { height: number } } }) => {
+      const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
+      const atBottom = contentOffset.y + layoutMeasurement.height >= contentSize.height - 40;
+      setIsAtBottom(atBottom);
+
+      // Load older messages when scrolled to top
+      if (contentOffset.y < 60 && conversationId) {
+        loadOlderMessages(conversationId);
+      }
+    },
+    [conversationId, loadOlderMessages]
+  );
+
+  // ── Derived ───────────────────────────────────────────────────────────────
+
+  const displayName = otherUser?.full_name ?? otherUser?.username ?? 'Athlete';
+  const online = otherUserId ? isOnline(otherUserId) : false;
+
+  // ── Group messages by date ────────────────────────────────────────────────
+
+  type DateGroup = { label: string; msgs: typeof messages };
+  const groups: DateGroup[] = [];
+  for (const msg of messages) {
+    const label = formatDateLabel(msg.created_at);
+    const last = groups[groups.length - 1];
+    if (!last || last.label !== label) {
+      groups.push({ label, msgs: [msg] });
+    } else {
+      last.msgs.push(msg);
+    }
+  }
+
+  // ── Error state ───────────────────────────────────────────────────────────
+
+  if (initError) {
+    return (
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <View style={styles.header}>
+          <Pressable
+            onPress={() => router.back()}
+            style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.6 }]}
+          >
+            <ChevronLeft size={18} strokeWidth={2} color="#888" />
+          </Pressable>
+        </View>
+        <View style={styles.errorWrap}>
+          <MessageCircle size={32} strokeWidth={1.4} color="#333" />
+          <Text style={styles.errorTitle}>{"CAN'T OPEN CHAT"}</Text>
+          <Text style={styles.errorSub}>Something went wrong. Try again later.</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // bottom padding for the input bar: safe area on devices with home indicator,
+  // fallback to 16 on devices without one
+  const inputBottomPad = bottomInset > 0 ? bottomInset + 4 : 16;
+
+  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -167,73 +299,128 @@ export default function ChatScreen() {
           <ChevronLeft size={18} strokeWidth={2} color="#888" />
         </Pressable>
 
-        <ChatAvatar userId={id} name={user.name} size={40} online={isOnline} />
+        {otherUserId ? (
+          <ChatAvatar userId={otherUserId} name={displayName} size={40} online={online} />
+        ) : (
+          <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#242424' }} />
+        )}
 
         <View style={styles.headerInfo}>
-          <Text style={styles.headerName}>{user.name}</Text>
-          <Text style={[styles.headerStatus, isOnline && styles.headerStatusOnline]}>
-            {isOnline ? 'Online' : 'Offline'}{' · LVL '}{user.level}
+          <Text style={styles.headerName} numberOfLines={1}>
+            {displayName}
           </Text>
-        </View>
-
-        <View style={styles.headerActions}>
-          {[Phone, MoreHorizontal].map((Icon, i) => (
-            <Pressable
-              key={i}
-              style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.6 }]}
-            >
-              <Icon size={16} strokeWidth={2} color="#606060" />
-            </Pressable>
-          ))}
+          <Text style={[styles.headerStatus, online && styles.headerStatusOnline]}>
+            {online ? 'Online' : 'Offline'}
+            {otherUser ? `  ·  LVL ${otherUser.level}` : ''}
+          </Text>
         </View>
       </View>
 
-      {/* Messages */}
+      {/* KeyboardAvoidingView wraps messages + input so the scroll area
+          compresses correctly when the keyboard opens */}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+
+      {/* Messages area */}
       <ScrollView
         ref={scrollRef}
         style={styles.messageArea}
         contentContainerStyle={styles.messageContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        onScroll={handleScroll}
+        scrollEventThrottle={100}
       >
-        {/* Date divider */}
-        <View style={styles.dateDivider}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>TODAY</Text>
-          <View style={styles.dividerLine} />
-        </View>
+        {/* Older messages loader */}
+        {loadingOlderMessages && (
+          <ActivityIndicator color="#404040" style={{ marginBottom: 12 }} />
+        )}
 
-        {messages.map((msg, i) => {
-          const isMe = msg.from === 'me';
-          const showAvatar = !isMe && (i === 0 || messages[i - 1]?.from !== 'other');
-          const isLastInGroup = i === messages.length - 1 || messages[i + 1]?.from !== msg.from;
-          return (
-            <View
-              key={msg.id}
-              style={[styles.messageRow, isMe ? styles.messageRowMe : styles.messageRowOther]}
-            >
-              {!isMe && (
-                showAvatar ? (
-                  <ChatAvatar userId={id} name={user.name} size={28} />
-                ) : (
-                  <View style={{ width: 28, flexShrink: 0 }} />
-                )
-              )}
-              <View style={[styles.bubbleGroup, isMe ? styles.bubbleGroupMe : styles.bubbleGroupOther]}>
-                <View style={[styles.bubble, isMe ? styles.bubbleMe : styles.bubbleOther]}>
-                  <Text style={[styles.bubbleText, isMe && styles.bubbleTextMe]}>
-                    {msg.text}
-                  </Text>
-                </View>
-                {isLastInGroup && (
-                  <Text style={[styles.bubbleTime, isMe && styles.bubbleTimeMe]}>
-                    {msg.time}
-                  </Text>
-                )}
-              </View>
+        {/* "All caught up" hint when no more history */}
+        {!hasMoreMessages && messages.length > 0 && (
+          <View style={styles.historyEnd}>
+            <Text style={styles.historyEndText}>START OF CONVERSATION</Text>
+          </View>
+        )}
+
+        {/* Initial loading */}
+        {messagesLoading && (
+          <View style={styles.loadingWrap}>
+            <ActivityIndicator color="#404040" />
+          </View>
+        )}
+
+        {/* Empty conversation */}
+        {!messagesLoading && messages.length === 0 && (
+          <View style={styles.emptyWrap}>
+            <Text style={styles.emptyText}>
+              {`Say hello to ${displayName}!`}
+            </Text>
+          </View>
+        )}
+
+        {/* Message groups */}
+        {groups.map((group) => (
+          <View key={group.label}>
+            {/* Date divider */}
+            <View style={styles.dateDivider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>{group.label}</Text>
+              <View style={styles.dividerLine} />
             </View>
-          );
-        })}
+
+            {group.msgs.map((msg, i) => {
+              const isMe = msg.sender_id === currentUserId;
+              const prev = group.msgs[i - 1];
+              const next = group.msgs[i + 1];
+              const showAvatar = !isMe && prev?.sender_id !== msg.sender_id;
+              const isLastInGroup = !next || next.sender_id !== msg.sender_id;
+
+              return (
+                <View
+                  key={msg.id}
+                  style={[
+                    styles.messageRow,
+                    isMe ? styles.messageRowMe : styles.messageRowOther,
+                    { marginBottom: isLastInGroup ? 8 : 2 },
+                  ]}
+                >
+                  {!isMe && (
+                    showAvatar ? (
+                      <ChatAvatar userId={otherUserId ?? ''} name={displayName} size={28} />
+                    ) : (
+                      <View style={{ width: 28, flexShrink: 0 }} />
+                    )
+                  )}
+
+                  <View style={[styles.bubbleGroup, isMe ? styles.bubbleGroupMe : styles.bubbleGroupOther]}>
+                    <View style={[
+                      styles.bubble,
+                      isMe ? styles.bubbleMe : styles.bubbleOther,
+                      msg.id.startsWith('temp-') && styles.bubbleSending,
+                    ]}>
+                      <Text style={[styles.bubbleText, isMe && styles.bubbleTextMe]}>
+                        {msg.content}
+                      </Text>
+                    </View>
+                    {isLastInGroup && (
+                      <View style={[styles.metaRow, isMe && styles.metaRowMe]}>
+                        <Text style={styles.bubbleTime}>{formatMessageTime(msg.created_at)}</Text>
+                        {isMe && (
+                          <Text style={styles.readStatus}>
+                            {msg.read_at ? 'Read' : 'Sent'}
+                          </Text>
+                        )}
+                      </View>
+                    )}
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        ))}
       </ScrollView>
 
       {/* Quick Replies */}
@@ -246,7 +433,7 @@ export default function ChatScreen() {
         {QUICK_REPLIES.map((q, i) => (
           <Pressable
             key={i}
-            onPress={() => sendMessage(q)}
+            onPress={() => handleSend(q)}
             style={({ pressed }) => [styles.quickBtn, pressed && { opacity: 0.7 }]}
           >
             <Text style={styles.quickBtnText}>{q}</Text>
@@ -254,34 +441,31 @@ export default function ChatScreen() {
         ))}
       </ScrollView>
 
-      {/* Input */}
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={styles.inputRow}>
-          <Pressable style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.6 }]}>
-            <ImagePlus size={16} strokeWidth={2} color="#505050" />
+      {/* Input bar */}
+      <View style={[styles.inputRow, { paddingBottom: inputBottomPad }]}>
+        <View style={styles.inputWrap}>
+          <TextInput
+            ref={inputRef}
+            value={input}
+            onChangeText={setInput}
+            onSubmitEditing={() => handleSend()}
+            placeholder={otherUser ? `Message ${displayName}...` : 'Message...'}
+            placeholderTextColor={Colors.hint}
+            style={styles.input}
+            returnKeyType="send"
+            blurOnSubmit={false}
+            multiline
+          />
+          <Pressable
+            onPress={() => handleSend()}
+            disabled={!input.trim() || !conversationId}
+            style={[styles.sendBtn, input.trim() && conversationId ? styles.sendBtnActive : styles.sendBtnInactive]}
+          >
+            <ArrowUp size={16} strokeWidth={2.5} color={input.trim() && conversationId ? '#fff' : '#404040'} />
           </Pressable>
-
-          <View style={styles.inputWrap}>
-            <TextInput
-              ref={inputRef}
-              value={input}
-              onChangeText={setInput}
-              onSubmitEditing={() => sendMessage()}
-              placeholder={`Message ${user.name}...`}
-              placeholderTextColor={Colors.hint}
-              style={styles.input}
-              returnKeyType="send"
-              blurOnSubmit={false}
-            />
-            <Pressable
-              onPress={() => sendMessage()}
-              disabled={!input.trim()}
-              style={[styles.sendBtn, input.trim() ? styles.sendBtnActive : styles.sendBtnInactive]}
-            >
-              <ArrowUp size={16} strokeWidth={2.5} color={input.trim() ? '#fff' : '#404040'} />
-            </Pressable>
-          </View>
         </View>
+      </View>
+
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -332,35 +516,80 @@ const styles = StyleSheet.create({
   headerStatusOnline: {
     color: Colors.success,
   },
-  headerActions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
   messageArea: {
     flex: 1,
   },
   messageContent: {
     paddingHorizontal: 16,
-    paddingVertical: 14,
-    gap: 6,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  loadingWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+  },
+  emptyWrap: {
+    alignItems: 'center',
+    paddingVertical: 64,
+    paddingHorizontal: 32,
+  },
+  emptyText: {
+    fontFamily: Fonts.body,
+    fontSize: 14,
+    color: '#484848',
+    textAlign: 'center',
+  },
+  errorWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    paddingHorizontal: 32,
+    marginTop: -60,
+  },
+  errorTitle: {
+    fontFamily: Fonts.display,
+    fontSize: 18,
+    letterSpacing: 2,
+    color: '#fff',
+  },
+  errorSub: {
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    color: '#555',
+    textAlign: 'center',
+  },
+  historyEnd: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
+  historyEndText: {
+    fontFamily: Fonts.display,
+    fontSize: 9,
+    color: '#333',
+    letterSpacing: 2,
   },
   dateDivider: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    marginBottom: 4,
-    marginTop: 4,
+    marginBottom: 6,
+    marginTop: 6,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#222',
+    backgroundColor: '#1e1e1e',
   },
   dividerText: {
     fontFamily: Fonts.display,
-    fontSize: 10,
+    fontSize: 9,
     color: '#404040',
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
   messageRow: {
     flexDirection: 'row',
@@ -397,6 +626,9 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderBottomLeftRadius: 4,
   },
+  bubbleSending: {
+    opacity: 0.6,
+  },
   bubbleText: {
     fontFamily: Fonts.body,
     fontSize: 14,
@@ -406,14 +638,24 @@ const styles = StyleSheet.create({
   bubbleTextMe: {
     color: '#fff',
   },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 2,
+  },
+  metaRowMe: {
+    justifyContent: 'flex-end',
+  },
   bubbleTime: {
     fontFamily: Fonts.body,
     fontSize: 10,
     color: '#404040',
-    marginTop: 1,
   },
-  bubbleTimeMe: {
-    alignSelf: 'flex-end',
+  readStatus: {
+    fontFamily: Fonts.body,
+    fontSize: 10,
+    color: '#404040',
   },
   quickScroll: {
     flexGrow: 0,
@@ -421,7 +663,7 @@ const styles = StyleSheet.create({
   },
   quickContent: {
     paddingHorizontal: 16,
-    paddingTop: 0,
+    paddingTop: 4,
     gap: 7,
   },
   quickBtn: {
@@ -439,29 +681,31 @@ const styles = StyleSheet.create({
   },
   inputRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     gap: 8,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    paddingBottom: 16,
+    paddingTop: 10,
+    // paddingBottom applied dynamically via useSafeAreaInsets
   },
   inputWrap: {
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     backgroundColor: '#1c1c1c',
     borderWidth: 1.5,
     borderColor: '#2a2a2a',
     borderRadius: 22,
     paddingLeft: 16,
     paddingRight: 4,
+    paddingVertical: 4,
   },
   input: {
     flex: 1,
     fontFamily: Fonts.body,
     fontSize: 14,
     color: '#fff',
-    paddingVertical: 11,
+    paddingVertical: 9,
+    maxHeight: 120,
   },
   sendBtn: {
     width: 34,
@@ -470,6 +714,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
+    marginBottom: 2,
   },
   sendBtnActive: {
     backgroundColor: Colors.accent,

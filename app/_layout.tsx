@@ -12,6 +12,7 @@ import {
   DMSans_700Bold,
 } from "@expo-google-fonts/dm-sans";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useChatStore } from "@/store/useChatStore";
 import { Routes } from "@/constants/routes";
 
 SplashScreen.preventAutoHideAsync();
@@ -29,10 +30,17 @@ export default function RootLayout() {
     useAuthStore();
   const segments = useSegments();
   const router = useRouter();
+  const startPresenceHeartbeat = useChatStore((s) => s.startPresenceHeartbeat);
 
   useEffect(() => {
     initialize();
   }, [initialize]);
+
+  // Keep presence alive for the entire authenticated session
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    return startPresenceHeartbeat(session.user.id);
+  }, [session?.user?.id, startPresenceHeartbeat]);
 
   // Hide splash once fonts AND auth state are ready
   useEffect(() => {
