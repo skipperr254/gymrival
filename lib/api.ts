@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabase";
 import type { Profile } from "@/types/user";
 import type { PersonalRecordWithExercise, ExerciseType, ExerciseUnit, PRHistoryGroup, PRHistoryEntry } from "@/types/pr";
 import type { FriendProfile, FriendRequest, FriendshipStatus, UserSearchResult, FeedPost, Message, ConversationPreview, UserPresence } from "@/types/social";
-import type { RivalEntry } from "@/types/compete";
+import type { RivalEntry, GlobalLeaderboardEntry } from "@/types/compete";
 
 type ProfileUpdate = Partial<
   Pick<Profile, "username" | "full_name" | "height_cm" | "weight_kg" | "gym" | "goal" | "bio" | "quote">
@@ -660,6 +660,65 @@ export async function fetchPresence(
 
   if (error) return { data: [], error: error.message };
   return { data: (data ?? []) as UserPresence[], error: null };
+}
+
+// ─── Global Leaderboard ───────────────────────────────────────────────────────
+
+const PAGE_SIZE = 50;
+
+function mapGlobalRow(row: any): GlobalLeaderboardEntry {
+  return {
+    user_id:      row.user_id,
+    full_name:    row.full_name   ?? null,
+    username:     row.username    ?? null,
+    avatar_url:   row.avatar_url  ?? null,
+    level:        row.level       ?? 1,
+    country_code: row.country_code ?? null,
+    bench_pr:     Number(row.bench_pr),
+    squat_pr:     Number(row.squat_pr),
+    deadlift_pr:  Number(row.deadlift_pr),
+    total_kg:     Number(row.total_kg),
+    rank:         Number(row.rank),
+    is_me:        Boolean(row.is_me),
+  };
+}
+
+/**
+ * Fetch the global leaderboard (ranked by combined bench+squat+deadlift).
+ * Pass p_search to filter by username / full_name while keeping global ranks.
+ * Supports cursor-based pagination via p_offset.
+ */
+export async function fetchGlobalLeaderboard(
+  viewerId: string,
+  search: string | null,
+  limit = PAGE_SIZE,
+  offset = 0,
+): Promise<{ data: GlobalLeaderboardEntry[]; error: string | null }> {
+  const { data, error } = await supabase.rpc("global_leaderboard", {
+    p_viewer_id: viewerId,
+    p_search:    search || null,
+    p_limit:     limit,
+    p_offset:    offset,
+  });
+
+  if (error) return { data: [], error: error.message };
+  return { data: ((data as any[]) ?? []).map(mapGlobalRow), error: null };
+}
+
+/**
+ * Fetch the current user's global rank and big-3 stats.
+ * Returns null when the user has not logged any bench, squat, or deadlift PR.
+ */
+export async function fetchMyGlobalRank(
+  userId: string,
+): Promise<{ data: GlobalLeaderboardEntry | null; error: string | null }> {
+  const { data, error } = await supabase.rpc("my_global_rank", {
+    p_user_id: userId,
+  });
+
+  if (error) return { data: null, error: error.message };
+  const rows = (data as any[]) ?? [];
+  return { data: rows.length > 0 ? mapGlobalRow(rows[0]) : null, error: null };
 }
 
 // ─── Rivals Leaderboard ────────────────────────────────────────────────────────

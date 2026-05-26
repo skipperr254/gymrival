@@ -19,24 +19,23 @@ import {
   Swords,
   Users,
   ArrowLeft,
+  RefreshCw,
+  AlertCircle,
 } from 'lucide-react-native';
 import { Colors, Fonts } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCompeteStore } from '@/store/useCompeteStore';
+import type { GlobalLeaderboardEntry } from '@/types/compete';
 
-const GLOBAL_ATHLETES = [
-  { id: 10, name: 'ThijsLifts',   username: '@thijslifts',   bench: 180, squat: 240, deadlift: 280, country: 'NL' as const, level: 28 },
-  { id: 11, name: 'PowerPiet',    username: '@powerpiet',    bench: 165, squat: 220, deadlift: 260, country: 'NL' as const, level: 24 },
-  { id: 12, name: 'IronJan',      username: '@ironjan',      bench: 155, squat: 200, deadlift: 250, country: 'BE' as const, level: 22 },
-  { id: 1,  name: 'You',          username: '@you',          bench: 100, squat: 140, deadlift: 160, country: 'NL' as const, level: 12, isMe: true },
-  { id: 13, name: 'StrengthSven', username: '@strengthsven', bench: 95,  squat: 135, deadlift: 155, country: 'DE' as const, level: 11 },
-];
-
-const COUNTRY_COLORS: Record<string, string> = {
-  NL: '#1a6bbf',
-  BE: '#cc2200',
-  DE: '#888888',
-};
+/** Converts an ISO 3166-1 alpha-2 code (e.g. 'NL') to its Unicode flag emoji. */
+function toFlagEmoji(code: string | null | undefined): string {
+  if (!code || code.length !== 2) return '';
+  const base = 0x1F1E6 - 65; // 🇦 = 0x1F1E6, 'A' = 65
+  return String.fromCodePoint(
+    code.toUpperCase().charCodeAt(0) + base,
+    code.toUpperCase().charCodeAt(1) + base,
+  );
+}
 
 // ─── Challenge Data ───────────────────────────────────────────────────────────
 
@@ -603,113 +602,279 @@ function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) 
 // ─── Global Leaderboard Content ───────────────────────────────────────────────
 
 const GLOBAL_STAT_BOXES = [
-  { key: 'bench' as const,    label: 'BENCH', Icon: Dumbbell },
-  { key: 'squat' as const,    label: 'SQUAT', Icon: Activity },
-  { key: 'deadlift' as const, label: 'DEAD',  Icon: Target   },
+  { key: 'bench_pr'    as const, label: 'BENCH', Icon: Dumbbell },
+  { key: 'squat_pr'    as const, label: 'SQUAT', Icon: Activity },
+  { key: 'deadlift_pr' as const, label: 'DEAD',  Icon: Target   },
 ] as const;
 
-function GlobalContent() {
-  const [search, setSearch] = useState('');
-
-  const filtered = GLOBAL_ATHLETES.filter(u =>
-    !search ||
-    u.name.toLowerCase().includes(search.toLowerCase()) ||
-    u.username.toLowerCase().includes(search.toLowerCase()),
+/** Skeleton placeholder rendered while the first page is loading. */
+function GlobalEntrySkeleton() {
+  return (
+    <View style={[gStyles.card, gStyles.cardOther, gStyles.skeletonCard]}>
+      <View style={gStyles.topRow}>
+        <View style={[gStyles.skeletonBlock, { width: 28, height: 18 }]} />
+        <View style={[gStyles.skeletonBlock, { width: 42, height: 42, borderRadius: 21 }]} />
+        <View style={{ flex: 1, gap: 6 }}>
+          <View style={[gStyles.skeletonBlock, { height: 13, width: '60%' }]} />
+          <View style={[gStyles.skeletonBlock, { height: 10, width: '40%' }]} />
+        </View>
+        <View style={[gStyles.skeletonBlock, { width: 48, height: 26 }]} />
+      </View>
+      <View style={gStyles.statsRow}>
+        {[0, 1, 2].map(i => (
+          <View key={i} style={[gStyles.statBox, gStyles.skeletonBlock, { height: 50 }]} />
+        ))}
+      </View>
+    </View>
   );
+}
 
-  const maxTotal =
-    GLOBAL_ATHLETES[0].bench + GLOBAL_ATHLETES[0].squat + GLOBAL_ATHLETES[0].deadlift;
+/** A single global leaderboard card. */
+function GlobalEntryCard({
+  entry,
+  maxTotal,
+}: {
+  entry: GlobalLeaderboardEntry;
+  maxTotal: number;
+}) {
+  const { is_me: isMe, rank } = entry;
+  const displayName = entry.full_name ?? entry.username ?? 'Unknown';
+  const total       = entry.total_kg;
+  const safeDenom   = maxTotal > 0 ? maxTotal : 1;
+  const pct         = `${Math.round((total / safeDenom) * 100)}%` as `${number}%`;
+  const rankIndex   = rank - 1; // 0-based for medal color
+  const totalColor  = rankIndex === 0 ? (isMe ? '#000' : Colors.accent) : isMe ? '#333' : '#fff';
+  const flag        = toFlagEmoji(entry.country_code);
+
+  return (
+    <View style={[gStyles.card, isMe ? gStyles.cardMe : gStyles.cardOther]}>
+      <View style={gStyles.topRow}>
+        <View style={gStyles.rankBox}>
+          {rankIndex < 3 ? (
+            <Trophy size={16} strokeWidth={1.8} color={MEDAL_COLORS[rankIndex]} />
+          ) : (
+            <Text style={gStyles.rankNum}>#{rank}</Text>
+          )}
+        </View>
+
+        <LeaderboardAvatar id={entry.user_id} name={displayName} size={42} />
+
+        <View style={gStyles.infoCol}>
+          <View style={gStyles.nameRow}>
+            <Text style={[gStyles.name, isMe && gStyles.nameMe]} numberOfLines={1}>
+              {displayName.toUpperCase()}
+            </Text>
+            {!!flag && <Text style={gStyles.flagText}>{flag}</Text>}
+            {isMe && <Text style={gStyles.youTag}>YOU</Text>}
+          </View>
+          <Text style={[gStyles.sub, isMe && gStyles.subMe]} numberOfLines={1}>
+            {entry.username ? `${entry.username} · ` : ''}LVL {entry.level}
+          </Text>
+        </View>
+
+        <View style={gStyles.totalBox}>
+          <Text style={[gStyles.totalVal, { color: totalColor }]}>{total}</Text>
+          <Text style={[gStyles.totalLabel, isMe && gStyles.totalLabelMe]}>TOTAL KG</Text>
+        </View>
+      </View>
+
+      <View style={gStyles.statsRow}>
+        {GLOBAL_STAT_BOXES.map(s => {
+          const StatIcon = s.Icon;
+          return (
+            <View key={s.key} style={[gStyles.statBox, isMe && gStyles.statBoxMe]}>
+              <StatIcon size={12} strokeWidth={1.8} color={isMe ? '#888' : '#555'} />
+              <Text style={[gStyles.statVal, isMe && gStyles.statValMe]}>
+                {entry[s.key] > 0 ? entry[s.key] : '–'}
+              </Text>
+              <Text style={[gStyles.statLabel, isMe && gStyles.statLabelMe]}>{s.label}</Text>
+            </View>
+          );
+        })}
+      </View>
+
+      <View style={[gStyles.barTrack, isMe && gStyles.barTrackMe]}>
+        {isMe ? (
+          <View style={[gStyles.barFillMe, { width: pct }]} />
+        ) : (
+          <LinearGradient
+            colors={['#e63030', '#ff6b6b']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={[gStyles.barFillOther, { width: pct }]}
+          />
+        )}
+      </View>
+    </View>
+  );
+}
+
+function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: () => void }) {
+  const { user } = useAuthStore();
+  const {
+    globalEntries,
+    myGlobalRank,
+    loadingGlobal,
+    loadingMyRank,
+    globalHasMore,
+    globalError,
+    loadGlobalLeaderboard,
+    loadMoreGlobal,
+    loadMyGlobalRank,
+  } = useCompeteStore();
+
+  const [search, setSearch] = useState('');
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const isFirstLoad = globalEntries.length === 0 && loadingGlobal;
+
+  // Initial load
+  useEffect(() => {
+    if (!user?.id) return;
+    loadGlobalLeaderboard(user.id, '');
+    loadMyGlobalRank(user.id);
+  }, [user?.id, loadGlobalLeaderboard, loadMyGlobalRank]);
+
+  // Debounced search — new search resets to page 0
+  const handleSearch = (text: string) => {
+    setSearch(text);
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      if (user?.id) loadGlobalLeaderboard(user.id, text);
+    }, 400);
+  };
+
+  const handleRefresh = () => {
+    if (!user?.id) return;
+    loadGlobalLeaderboard(user.id, search);
+    loadMyGlobalRank(user.id);
+    onRefreshScrollView?.();
+  };
+
+  const handleLoadMore = () => {
+    if (user?.id && globalHasMore && !loadingGlobal) {
+      loadMoreGlobal(user.id, search);
+    }
+  };
+
+  // Determine whether the pinned "Your Rank" card should show.
+  // Show it when:
+  //   • user has big-3 PRs (myGlobalRank is not null)
+  //   • user is not already visible in the current result set
+  //   • we're not actively searching (searching for others shouldn't show a pin)
+  const myEntryVisible = globalEntries.some(e => e.is_me);
+  const showPinnedRank = !!myGlobalRank && !myEntryVisible && !search;
+
+  // The reference total for progress bars is always the #1 athlete's total.
+  // Fall back to myGlobalRank when entries are empty (e.g. user is alone).
+  const maxTotal = globalEntries.length > 0
+    ? globalEntries[0].total_kg
+    : (myGlobalRank?.total_kg ?? 1);
 
   return (
     <>
+      {/* Search bar */}
       <View style={gStyles.searchWrap}>
         <Search size={16} strokeWidth={1.8} color="#555" style={gStyles.searchIcon} />
         <TextInput
           value={search}
-          onChangeText={setSearch}
+          onChangeText={handleSearch}
           placeholder="Search by name or @username..."
           placeholderTextColor="#555"
           style={gStyles.searchInput}
+          returnKeyType="search"
+          autoCapitalize="none"
+          autoCorrect={false}
         />
+        {loadingGlobal && !isFirstLoad && (
+          <ActivityIndicator
+            size="small"
+            color={Colors.accent}
+            style={gStyles.searchSpinner}
+          />
+        )}
       </View>
 
-      {filtered.map(u => {
-        const total      = u.bench + u.squat + u.deadlift;
-        const rank       = GLOBAL_ATHLETES.indexOf(u);
-        const isMe       = u.isMe ?? false;
-        const pct        = `${Math.round((total / maxTotal) * 100)}%` as `${number}%`;
-        const totalColor = rank === 0 ? (isMe ? '#000' : Colors.accent) : isMe ? '#333' : '#fff';
-
-        return (
-          <View
-            key={u.id}
-            style={[gStyles.card, isMe ? gStyles.cardMe : gStyles.cardOther]}
-          >
-            <View style={gStyles.topRow}>
-              <View style={gStyles.rankBox}>
-                {rank < 3 ? (
-                  <Trophy size={16} strokeWidth={1.8} color={MEDAL_COLORS[rank]} />
-                ) : (
-                  <Text style={gStyles.rankNum}>#{rank + 1}</Text>
-                )}
-              </View>
-              <LeaderboardAvatar id={u.id} name={u.name} size={42} />
-              <View style={gStyles.infoCol}>
-                <View style={gStyles.nameRow}>
-                  <Text style={[gStyles.name, isMe && gStyles.nameMe]}>
-                    {u.name.toUpperCase()}
-                  </Text>
-                  <Flag size={13} strokeWidth={1.8} color={COUNTRY_COLORS[u.country] ?? '#555'} />
-                  {isMe && <Text style={gStyles.youTag}>YOU</Text>}
-                </View>
-                <Text style={[gStyles.sub, isMe && gStyles.subMe]}>
-                  {u.username} {'·'} LVL {u.level}
-                </Text>
-              </View>
-              <View style={gStyles.totalBox}>
-                <Text style={[gStyles.totalVal, { color: totalColor }]}>{total}</Text>
-                <Text style={[gStyles.totalLabel, isMe && gStyles.totalLabelMe]}>TOTAL KG</Text>
-              </View>
-            </View>
-
-            <View style={gStyles.statsRow}>
-              {GLOBAL_STAT_BOXES.map(s => {
-                const StatIcon = s.Icon;
-                return (
-                  <View key={s.key} style={[gStyles.statBox, isMe && gStyles.statBoxMe]}>
-                    <StatIcon size={12} strokeWidth={1.8} color={isMe ? '#888' : '#555'} />
-                    <Text style={[gStyles.statVal, isMe && gStyles.statValMe]}>{u[s.key]}</Text>
-                    <Text style={[gStyles.statLabel, isMe && gStyles.statLabelMe]}>{s.label}</Text>
-                  </View>
-                );
-              })}
-            </View>
-
-            <View style={[gStyles.barTrack, isMe && gStyles.barTrackMe]}>
-              {isMe ? (
-                <View style={[gStyles.barFillMe, { width: pct }]} />
-              ) : (
-                <LinearGradient
-                  colors={['#e63030', '#ff6b6b']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={[gStyles.barFillOther, { width: pct }]}
-                />
-              )}
-            </View>
-          </View>
-        );
-      })}
-
-      {filtered.length === 0 && (
-        <View style={gStyles.emptyCard}>
-          <Search size={32} strokeWidth={1.4} color="#555" />
-          <Text style={gStyles.emptyTitle}>NO RESULTS</Text>
-          <Text style={gStyles.emptySub}>Try a different name or username</Text>
+      {/* Error state */}
+      {!!globalError && !loadingGlobal && (
+        <View style={gStyles.errorCard}>
+          <AlertCircle size={22} strokeWidth={1.6} color="#e63030" />
+          <Text style={gStyles.errorText}>{"Could not load leaderboard"}</Text>
+          <Pressable onPress={handleRefresh} style={gStyles.retryBtn}>
+            <RefreshCw size={13} strokeWidth={2} color="#fff" />
+            <Text style={gStyles.retryText}>RETRY</Text>
+          </Pressable>
         </View>
       )}
 
-      <Text style={gStyles.footerNote}>BASED ON COMBINED BENCH {'·'} SQUAT {'·'} DEADLIFT</Text>
+      {/* Skeleton while first page loads */}
+      {isFirstLoad && (
+        <>
+          {[0, 1, 2, 3, 4].map(i => <GlobalEntrySkeleton key={i} />)}
+        </>
+      )}
+
+      {/* Pinned "Your Rank" card — shown when user is outside the visible page */}
+      {!isFirstLoad && showPinnedRank && (
+        <View style={gStyles.pinnedWrap}>
+          <Text style={gStyles.pinnedLabel}>YOUR GLOBAL RANK</Text>
+          <GlobalEntryCard entry={myGlobalRank!} maxTotal={maxTotal} />
+        </View>
+      )}
+
+      {/* Unranked call-to-action when user has no big-3 PRs */}
+      {!isFirstLoad && !myGlobalRank && !loadingMyRank && !search && (
+        <View style={gStyles.unrankedCard}>
+          <Trophy size={26} strokeWidth={1.4} color="#333" />
+          <Text style={gStyles.unrankedTitle}>{"YOU'RE UNRANKED"}</Text>
+          <Text style={gStyles.unrankedSub}>
+            {"Log a Bench, Squat, and Deadlift PR to join the global leaderboard"}
+          </Text>
+        </View>
+      )}
+
+      {/* Leaderboard entries */}
+      {!isFirstLoad && !globalError && globalEntries.map(entry => (
+        <GlobalEntryCard key={entry.user_id} entry={entry} maxTotal={maxTotal} />
+      ))}
+
+      {/* No search results */}
+      {!isFirstLoad && !loadingGlobal && !globalError && globalEntries.length === 0 && !!search && (
+        <View style={gStyles.emptyCard}>
+          <Search size={32} strokeWidth={1.4} color="#555" />
+          <Text style={gStyles.emptyTitle}>NO RESULTS</Text>
+          <Text style={gStyles.emptySub}>{"Try a different name or username"}</Text>
+        </View>
+      )}
+
+      {/* Empty leaderboard (no users have big-3 PRs yet) */}
+      {!isFirstLoad && !loadingGlobal && !globalError && globalEntries.length === 0 && !search && (
+        <View style={gStyles.emptyCard}>
+          <Trophy size={32} strokeWidth={1.4} color="#555" />
+          <Text style={gStyles.emptyTitle}>NO ATHLETES YET</Text>
+          <Text style={gStyles.emptySub}>{"Be the first to log a Bench, Squat, and Deadlift PR!"}</Text>
+        </View>
+      )}
+
+      {/* Load more */}
+      {!isFirstLoad && globalHasMore && globalEntries.length > 0 && (
+        <Pressable onPress={handleLoadMore} style={gStyles.loadMoreBtn} disabled={loadingGlobal}>
+          {loadingGlobal ? (
+            <ActivityIndicator size="small" color={Colors.accent} />
+          ) : (
+            <Text style={gStyles.loadMoreText}>LOAD MORE</Text>
+          )}
+        </Pressable>
+      )}
+
+      {/* Refresh button (shown at bottom when fully loaded) */}
+      {!isFirstLoad && !globalHasMore && globalEntries.length > 0 && (
+        <Pressable onPress={handleRefresh} style={gStyles.refreshBtn} disabled={loadingGlobal}>
+          <RefreshCw size={13} strokeWidth={2} color="#383838" />
+          <Text style={gStyles.refreshText}>REFRESH</Text>
+        </Pressable>
+      )}
+
+      <Text style={gStyles.footerNote}>{'BASED ON COMBINED BENCH · SQUAT · DEADLIFT'}</Text>
     </>
   );
 }
@@ -760,7 +925,7 @@ export default function CompeteScreen() {
       >
         {activeTab === 'rivals'     && <RivalsContent />}
         {activeTab === 'challenges' && <ChallengesContent onDetailChange={scrollToTop} />}
-        {activeTab === 'global'     && <GlobalContent />}
+        {activeTab === 'global'     && <GlobalContent onRefreshScrollView={scrollToTop} />}
       </ScrollView>
     </SafeAreaView>
   );
@@ -1303,6 +1468,133 @@ const gStyles = StyleSheet.create({
     fontSize: 10,
     color: '#383838',
     letterSpacing: 2,
+  },
+
+  // ── search extras ──────────────────────────────────────────────────────────
+  searchSpinner: {
+    position: 'absolute',
+    right: 14,
+  },
+
+  flagText: {
+    fontSize: 14,
+  },
+
+  // ── skeleton ───────────────────────────────────────────────────────────────
+  skeletonCard: {
+    opacity: 0.45,
+  },
+  skeletonBlock: {
+    backgroundColor: '#2a2a2a',
+    borderRadius: 6,
+  },
+
+  // ── pinned "Your Rank" card ────────────────────────────────────────────────
+  pinnedWrap: {
+    marginBottom: 4,
+  },
+  pinnedLabel: {
+    fontFamily: Fonts.display,
+    fontSize: 10,
+    letterSpacing: 3,
+    color: Colors.accent,
+    marginBottom: 4,
+    marginTop: 16,
+  },
+
+  // ── unranked CTA ───────────────────────────────────────────────────────────
+  unrankedCard: {
+    alignItems: 'center',
+    backgroundColor: '#1e1e1e',
+    borderRadius: 18,
+    paddingVertical: 32,
+    paddingHorizontal: 20,
+    gap: 8,
+    marginTop: 16,
+    marginBottom: 4,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+  },
+  unrankedTitle: {
+    fontFamily: Fonts.display,
+    fontSize: 18,
+    letterSpacing: 2,
+    color: '#fff',
+    marginTop: 4,
+  },
+  unrankedSub: {
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    color: '#555',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+
+  // ── error card ─────────────────────────────────────────────────────────────
+  errorCard: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(230,48,48,0.06)',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(230,48,48,0.2)',
+    paddingVertical: 28,
+    paddingHorizontal: 20,
+    gap: 8,
+    marginTop: 16,
+  },
+  errorText: {
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    color: '#b0b0b0',
+  },
+  retryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 4,
+    backgroundColor: Colors.accent,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+  },
+  retryText: {
+    fontFamily: Fonts.display,
+    fontSize: 12,
+    letterSpacing: 2,
+    color: '#fff',
+  },
+
+  // ── load more / refresh ────────────────────────────────────────────────────
+  loadMoreBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    marginVertical: 4,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#2a2a2a',
+    backgroundColor: '#1e1e1e',
+    minHeight: 46,
+  },
+  loadMoreText: {
+    fontFamily: Fonts.display,
+    fontSize: 12,
+    letterSpacing: 3,
+    color: '#fff',
+  },
+  refreshBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    marginTop: 4,
+  },
+  refreshText: {
+    fontFamily: Fonts.display,
+    fontSize: 10,
+    letterSpacing: 2,
+    color: '#383838',
   },
 });
 
