@@ -1,8 +1,15 @@
 import { supabase } from "@/lib/supabase";
 import type { Profile } from "@/types/user";
-import type { PersonalRecordWithExercise, ExerciseType, ExerciseUnit, PRHistoryGroup, PRHistoryEntry } from "@/types/pr";
+import type { PersonalRecordWithExercise, ExerciseType, ExerciseUnit, PRHistoryGroup, PRHistoryEntry, PRVideo, PRVideoStatus } from "@/types/pr";
 import type { FriendProfile, FriendRequest, FriendshipStatus, UserSearchResult, FeedPost, Message, ConversationPreview, UserPresence } from "@/types/social";
 import type { RivalEntry, GlobalLeaderboardEntry } from "@/types/compete";
+
+const PR_VIDEOS_BUCKET = 'pr-videos';
+
+/** Compute the public URL for a file path inside the pr-videos bucket. */
+export function getPRVideoPublicUrl(path: string): string {
+  return supabase.storage.from(PR_VIDEOS_BUCKET).getPublicUrl(path).data.publicUrl;
+}
 
 type ProfileUpdate = Partial<
   Pick<Profile, "username" | "full_name" | "height_cm" | "weight_kg" | "gym" | "goal" | "bio" | "quote">
@@ -325,11 +332,13 @@ export async function logPersonalRecord(
   exerciseKey: string,
   value: number,
   unit: ExerciseUnit
-): Promise<{ error: string | null }> {
-  const { error } = await supabase
+): Promise<{ data: { id: string } | null; error: string | null }> {
+  const { data, error } = await supabase
     .from("personal_records")
-    .insert({ user_id: userId, exercise_key: exerciseKey, value, unit });
-  return { error: error?.message ?? null };
+    .insert({ user_id: userId, exercise_key: exerciseKey, value, unit })
+    .select("id")
+    .single();
+  return { data: data ? { id: data.id } : null, error: error?.message ?? null };
 }
 
 export async function fetchPRHistory(
@@ -377,16 +386,141 @@ export async function fetchPRHistory(
   return { data: Array.from(groupMap.values()), error: null };
 }
 
+// ─── PR Videos ────────────────────────────────────────────────────────────────
+
+/**
+ * Upload a video (and optional thumbnail) to Storage, create the pr_videos row,
+ * and mark it ready on success.
+ *
+ * Returns the pr_videos row id on success.  The PR itself was already logged
+ * before this is called — this function only handles the video side.
+ */
+export async function uploadPRVideo(
+  userId: string,
+  prId: string,
+  videoUri: string,
+  thumbnailUri: string | null,
+  durationSec: number | null,
+  fileSizeBytes: number | null
+): Promise<{ prVideoId: string | null; error: string | null }> {
+  // Derive extension and MIME type from the local URI
+  const rawExt = videoUri.split('?')[0].split('.').pop()?.toLowerCase() ?? 'mp4';
+  const videoExt = rawExt === 'mov' ? 'mov' : 'mp4';
+  const videoMime = videoExt === 'mov' ? 'video/quicktime' : 'video/mp4';
+  const videoPath = `${userId}/${prId}.${videoExt}`;
+  const thumbnailPath = thumbnailUri ? `${userId}/${prId}_thumb.jpg` : null;
+
+  // 1 — insert the row immediately so the owner's feed shows an "uploading" state
+  const { data: inserted, error: insertErr } = await supabase
+    .from('pr_videos')
+    .insert({
+      pr_id: prId,
+      user_id: userId,
+      video_path: videoPath,
+      thumbnail_path: thumbnailPath,
+      duration_sec: durationSec,
+      file_size_bytes: fileSizeBytes,
+      status: 'uploading',
+    })
+    .select('id')
+    .single();
+
+  if (insertErr || !inserted) {
+    return { prVideoId: null, error: insertErr?.message ?? 'Failed to create video record' };
+  }
+
+  const prVideoId = inserted.id as string;
+
+  // 2 — upload thumbnail first (small, fast — failure is non-fatal)
+  if (thumbnailUri && thumbnailPath) {
+    try {
+      const thumbForm = new FormData();
+      thumbForm.append('file', { uri: thumbnailUri, type: 'image/jpeg', name: `${prId}_thumb.jpg` } as unknown as Blob);
+      await supabase.storage
+        .from(PR_VIDEOS_BUCKET)
+        .upload(thumbnailPath, thumbForm, { contentType: 'image/jpeg', upsert: false });
+    } catch {
+      // Thumbnail failure is non-fatal; continue with video upload
+    }
+  }
+
+  // 3 — upload video (FormData is required for local file URIs in React Native;
+  //     fetch().blob() produces a non-serialisable object that the JS client cannot upload)
+  let videoUploadError: string | null = null;
+  try {
+    const videoForm = new FormData();
+    videoForm.append('file', { uri: videoUri, type: videoMime, name: `${prId}.${videoExt}` } as unknown as Blob);
+    const { error: storageErr } = await supabase.storage
+      .from(PR_VIDEOS_BUCKET)
+      .upload(videoPath, videoForm, { contentType: videoMime, upsert: false });
+    if (storageErr) videoUploadError = storageErr.message;
+  } catch (e) {
+    videoUploadError = e instanceof Error ? e.message : 'Upload failed';
+  }
+
+  // 4 — mark ready or failed
+  const newStatus: PRVideoStatus = videoUploadError ? 'failed' : 'ready';
+  const { error: updateErr } = await supabase
+    .from('pr_videos')
+    .update({ status: newStatus })
+    .eq('id', prVideoId);
+
+  if (videoUploadError) {
+    return { prVideoId, error: videoUploadError };
+  }
+  if (updateErr) {
+    return { prVideoId, error: updateErr.message };
+  }
+  return { prVideoId, error: null };
+}
+
+/**
+ * Delete a PR's video — removes the pr_videos row and both Storage files.
+ * Called when a user removes their video or when the PR itself is deleted
+ * (the DB cascade handles the row; this cleans up Storage).
+ */
+export async function deletePRVideoFiles(
+  userId: string,
+  prId: string,
+  videoPath: string,
+  thumbnailPath: string | null
+): Promise<{ error: string | null }> {
+  const paths = [videoPath, ...(thumbnailPath ? [thumbnailPath] : [])];
+  const { error } = await supabase.storage.from(PR_VIDEOS_BUCKET).remove(paths);
+  // Also delete the DB row in case the caller doesn't cascade-delete the PR
+  await supabase.from('pr_videos').delete().eq('pr_id', prId).eq('user_id', userId);
+  return { error: error?.message ?? null };
+}
+
 // ─── Social Feed ──────────────────────────────────────────────────────────────
 
 const FEED_SELECT = `
   id, user_id, exercise_key, value, unit, created_at,
   profiles!personal_records_user_id_fkey(full_name, username, avatar_url, level, gym),
   exercise_types!personal_records_exercise_key_fkey(label, unit),
-  pr_likes(id, user_id)
+  pr_likes(id, user_id),
+  pr_videos(id, user_id, video_path, thumbnail_path, duration_sec, status, created_at)
 ` as const;
 
 function mapFeedRow(row: any, currentUserId: string): FeedPost {
+  // PostgREST returns an array for most reverse-FK joins, but returns a single object
+  // (or null) when it detects a UNIQUE constraint on the FK column. Handle both shapes.
+  const videoRow = Array.isArray(row.pr_videos) ? (row.pr_videos[0] ?? null) : (row.pr_videos ?? null);
+  const video: PRVideo | null = videoRow
+    ? {
+        id: videoRow.id,
+        pr_id: row.id,
+        user_id: videoRow.user_id,
+        video_url: getPRVideoPublicUrl(videoRow.video_path),
+        thumbnail_url: videoRow.thumbnail_path
+          ? getPRVideoPublicUrl(videoRow.thumbnail_path)
+          : null,
+        duration_sec: videoRow.duration_sec ?? null,
+        status: videoRow.status as PRVideoStatus,
+        created_at: videoRow.created_at,
+      }
+    : null;
+
   return {
     id: row.id,
     user_id: row.user_id,
@@ -406,6 +540,7 @@ function mapFeedRow(row: any, currentUserId: string): FeedPost {
     has_liked: Array.isArray(row.pr_likes)
       ? row.pr_likes.some((l: any) => l.user_id === currentUserId)
       : false,
+    video,
   };
 }
 

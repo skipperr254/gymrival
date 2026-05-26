@@ -24,7 +24,6 @@ import {
   Target,
   Timer,
   Trophy,
-  Video,
   CheckCircle,
   AlertTriangle,
   Zap,
@@ -32,13 +31,22 @@ import {
   BarChart2,
   Repeat,
   PersonStanding,
+  VideoOff,
 } from 'lucide-react-native';
 import { Colors, Fonts } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCompeteStore } from '@/store/useCompeteStore';
 import { useProfileStore } from '@/store/useProfileStore';
-import { logPersonalRecord, fetchBestPRs } from '@/lib/api';
+import { logPersonalRecord, fetchBestPRs, uploadPRVideo } from '@/lib/api';
 import type { ExerciseType } from '@/types/pr';
+import { VideoUploadZone } from '@/components/features/VideoUploadZone';
+
+interface VideoAsset {
+  uri: string;
+  thumbnailUri: string;
+  durationSec: number;
+  fileSizeBytes: number;
+}
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SHEET_HEIGHT = SCREEN_HEIGHT * 0.9;
@@ -88,8 +96,15 @@ export function LogPRSheet({ visible, onClose }: Props) {
   const [saving, setSaving] = useState(false);
   const [savedValue, setSavedValue] = useState(0);
 
+  // Video upload state
+  const [videoAsset, setVideoAsset] = useState<VideoAsset | null>(null);
+  const [videoUploading, setVideoUploading] = useState(false);
+  const [videoUploadDone, setVideoUploadDone] = useState(false);
+  const [videoUploadFailed, setVideoUploadFailed] = useState(false);
+
   const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
   const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const mountedRef = useRef(true);
 
   const selectedEx = exercises.find(e => e.key === selectedExKey);
   const numValue = parseInt(prValue, 10);
@@ -125,6 +140,12 @@ export function LogPRSheet({ visible, onClose }: Props) {
     }
   }, [visible, translateY]);
 
+  // Track mount state to avoid setState after unmount during async upload
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
+
   // Reset state and load data each time sheet opens
   useEffect(() => {
     if (!visible) {
@@ -135,6 +156,10 @@ export function LogPRSheet({ visible, onClose }: Props) {
     setSelectedExKey(null);
     setPrValue('');
     setSaving(false);
+    setVideoAsset(null);
+    setVideoUploading(false);
+    setVideoUploadDone(false);
+    setVideoUploadFailed(false);
     loadExercises();
     if (user?.id) {
       fetchBestPRs(user.id, 100).then(({ data }) => {
@@ -145,29 +170,72 @@ export function LogPRSheet({ visible, onClose }: Props) {
     }
   }, [visible, user?.id, loadExercises]);
 
-  // Auto-close 2.8 s after success
+  // Auto-close logic:
+  // • No video — close after 2.8 s (original behaviour)
+  // • Video uploading — wait; close 1.5 s after upload completes
+  // • Video failed — close after 3.5 s so user sees the error
+  // • Safety net — always close after 15 s maximum
   useEffect(() => {
-    if (step === 3) {
+    if (step !== 3) {
+      clearTimeout(closeTimer.current);
+      return;
+    }
+    if (!videoAsset) {
+      // No video: original 2.8 s close
       closeTimer.current = setTimeout(onClose, 2800);
+    } else if (videoUploadDone) {
+      closeTimer.current = setTimeout(onClose, 1500);
+    } else if (videoUploadFailed) {
+      closeTimer.current = setTimeout(onClose, 3500);
+    } else {
+      // Video is still uploading; set a 15 s safety-net close
+      closeTimer.current = setTimeout(onClose, 15000);
     }
     return () => clearTimeout(closeTimer.current);
-  }, [step, onClose]);
+  }, [step, onClose, videoAsset, videoUploadDone, videoUploadFailed]);
 
   const handleSave = useCallback(async () => {
     if (!user?.id || !selectedExKey || !selectedEx || !isValidValue) return;
     setSaving(true);
-    const { error } = await logPersonalRecord(user.id, selectedExKey, numValue, selectedEx.unit);
+    const { data: prData, error } = await logPersonalRecord(user.id, selectedExKey, numValue, selectedEx.unit);
     setSaving(false);
-    if (!error) {
-      setSavedValue(numValue);
-      setStep(3);
-      // Refresh stores in background so all screens reflect the new PR
-      loadRivals(user.id);
-      loadBestPRs(user.id);
-      loadPRHistory(user.id);
-      loadProfile(user.id);
+    if (error || !prData) return;
+
+    setSavedValue(numValue);
+    setStep(3);
+
+    // Refresh stores in background so all screens reflect the new PR
+    loadRivals(user.id);
+    loadBestPRs(user.id);
+    loadPRHistory(user.id);
+    loadProfile(user.id);
+
+    // If a video was attached, upload it now (continues even if sheet closes)
+    if (videoAsset && user.id && prData.id) {
+      const uid = user.id;
+      const pid = prData.id;
+      const asset = videoAsset;
+      if (mountedRef.current) setVideoUploading(true);
+
+      const { error: uploadError } = await uploadPRVideo(
+        uid,
+        pid,
+        asset.uri,
+        asset.thumbnailUri || null,
+        asset.durationSec,
+        asset.fileSizeBytes,
+      );
+
+      if (mountedRef.current) {
+        setVideoUploading(false);
+        if (uploadError) {
+          setVideoUploadFailed(true);
+        } else {
+          setVideoUploadDone(true);
+        }
+      }
     }
-  }, [user?.id, selectedExKey, selectedEx, isValidValue, numValue, loadRivals, loadBestPRs, loadPRHistory, loadProfile]);
+  }, [user?.id, selectedExKey, selectedEx, isValidValue, numValue, videoAsset, loadRivals, loadBestPRs, loadPRHistory, loadProfile]);
 
   // Drag-to-dismiss on the handle
   const panResponder = useRef(
@@ -264,6 +332,9 @@ export function LogPRSheet({ visible, onClose }: Props) {
                   prValue={prValue}
                   currentPR={currentPR}
                   saving={saving}
+                  videoAsset={videoAsset}
+                  onVideoSelected={setVideoAsset}
+                  onVideoRemoved={() => setVideoAsset(null)}
                   onSave={handleSave}
                   onBack={() => setStep(1)}
                 />
@@ -272,6 +343,10 @@ export function LogPRSheet({ visible, onClose }: Props) {
                 <Step3
                   exercise={selectedEx}
                   savedValue={savedValue}
+                  hasVideo={!!videoAsset}
+                  videoUploading={videoUploading}
+                  videoUploadDone={videoUploadDone}
+                  videoUploadFailed={videoUploadFailed}
                 />
               )}
             </ScrollView>
@@ -507,17 +582,34 @@ const s1 = StyleSheet.create({
 
 // ─── Step 2 ───────────────────────────────────────────────────────────────────
 
+interface VideoAssetShape {
+  uri: string;
+  thumbnailUri: string;
+  durationSec: number;
+  fileSizeBytes: number;
+}
+
 interface Step2Props {
   selectedEx: ExerciseType;
   prValue: string;
   currentPR: number | null;
   saving: boolean;
+  videoAsset: VideoAssetShape | null;
+  onVideoSelected: (asset: VideoAssetShape) => void;
+  onVideoRemoved: () => void;
   onSave: () => void;
   onBack: () => void;
 }
 
-function Step2({ selectedEx, prValue, currentPR, saving, onSave, onBack }: Step2Props) {
+function Step2({
+  selectedEx, prValue, currentPR, saving,
+  videoAsset, onVideoSelected, onVideoRemoved,
+  onSave,
+}: Step2Props) {
   const ExIcon = getIcon(selectedEx.key);
+  const hasVideo = !!videoAsset;
+  const xpLabel = hasVideo ? '+100 XP' : '+50 XP';
+
   return (
     <>
       {/* PR summary card */}
@@ -537,25 +629,26 @@ function Step2({ selectedEx, prValue, currentPR, saving, onSave, onBack }: Step2
         </View>
       </View>
 
-      {/* XP indicators */}
+      {/* XP indicators — active state follows video selection */}
       <View style={s2.xpRow}>
-        <View style={[s2.xpCard, s2.xpCardInactive]}>
-          <Text style={s2.xpAmount}>+100 XP</Text>
+        <View style={[s2.xpCard, hasVideo ? s2.xpCardActive : s2.xpCardInactive]}>
+          <Text style={[s2.xpAmount, hasVideo && { color: Colors.accent }]}>+100 XP</Text>
           <Text style={s2.xpLabel}>With video</Text>
         </View>
-        <View style={[s2.xpCard, s2.xpCardActive]}>
-          <Text style={[s2.xpAmount, { color: Colors.accent }]}>+50 XP</Text>
+        <View style={[s2.xpCard, !hasVideo ? s2.xpCardActive : s2.xpCardInactive]}>
+          <Text style={[s2.xpAmount, !hasVideo && { color: Colors.accent }]}>+50 XP</Text>
           <Text style={s2.xpLabel}>Without video</Text>
         </View>
       </View>
 
-      {/* Video upload zone (deferred feature) */}
-      <View style={s2.videoZone}>
-        <View style={s2.videoComingSoon}>
-          <Video size={28} strokeWidth={1.4} color="#444" />
-          <Text style={s2.videoComingSoonTitle}>VIDEO PROOF</Text>
-          <Text style={s2.videoComingSoonSub}>Coming in a future update</Text>
-        </View>
+      {/* Video upload zone */}
+      <View style={{ marginBottom: 16 }}>
+        <VideoUploadZone
+          asset={videoAsset}
+          onVideoSelected={onVideoSelected}
+          onVideoRemoved={onVideoRemoved}
+          disabled={saving}
+        />
       </View>
 
       {/* Primary save button */}
@@ -575,20 +668,21 @@ function Step2({ selectedEx, prValue, currentPR, saving, onSave, onBack }: Step2
           ) : (
             <>
               <CheckCircle size={16} strokeWidth={2} color="#fff" />
-              <Text style={s2.saveBtnText}>SAVE PR — +50 XP</Text>
+              <Text style={s2.saveBtnText}>{'SAVE PR — ' + xpLabel}</Text>
             </>
           )}
         </LinearGradient>
       </Pressable>
 
-      {/* Skip / save without video */}
-      <Pressable
-        onPress={onSave}
-        disabled={saving}
-        style={({ pressed }) => [s2.skipBtn, pressed && { opacity: 0.6 }]}
-      >
-        <Text style={s2.skipBtnText}>Skip video, save anyway</Text>
-      </Pressable>
+      {hasVideo && (
+        <Pressable
+          onPress={onVideoRemoved}
+          disabled={saving}
+          style={({ pressed }) => [s2.skipBtn, pressed && { opacity: 0.6 }]}
+        >
+          <Text style={s2.skipBtnText}>{'Remove video, save for +50 XP'}</Text>
+        </Pressable>
+      )}
     </>
   );
 }
@@ -666,33 +760,6 @@ const s2 = StyleSheet.create({
     fontSize: 10,
     color: '#555',
   },
-  videoZone: {
-    height: 130,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: '#252525',
-    borderStyle: 'dashed',
-    backgroundColor: '#161616',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    gap: 6,
-  },
-  videoComingSoon: {
-    alignItems: 'center',
-    gap: 6,
-  },
-  videoComingSoonTitle: {
-    fontFamily: Fonts.display,
-    fontSize: 11,
-    letterSpacing: 2,
-    color: '#3a3a3a',
-  },
-  videoComingSoonSub: {
-    fontFamily: Fonts.body,
-    fontSize: 10,
-    color: '#333',
-  },
   saveBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -724,24 +791,34 @@ const s2 = StyleSheet.create({
 interface Step3Props {
   exercise: ExerciseType;
   savedValue: number;
+  hasVideo: boolean;
+  videoUploading: boolean;
+  videoUploadDone: boolean;
+  videoUploadFailed: boolean;
 }
 
-function Step3({ exercise, savedValue }: Step3Props) {
+function Step3({ exercise, savedValue, hasVideo, videoUploading, videoUploadDone, videoUploadFailed }: Step3Props) {
   const ExIcon = getIcon(exercise.key);
+  const xpEarned = hasVideo && videoUploadDone ? '+100 XP EARNED' : '+50 XP EARNED';
+
   return (
     <View style={s3.container}>
-      {/* Trophy icon with glow ring */}
+      {/* Trophy icon with glow ring — shows spinner while video uploads */}
       <View style={s3.trophyRing}>
         <LinearGradient
           colors={[Colors.accent, Colors.accentDark]}
           style={s3.trophyBg}
         >
-          <Trophy size={36} strokeWidth={1.4} color="#fff" />
+          {videoUploading ? (
+            <ActivityIndicator size="large" color="#fff" />
+          ) : (
+            <Trophy size={36} strokeWidth={1.4} color="#fff" />
+          )}
         </LinearGradient>
       </View>
 
       <Text style={s3.heading}>PR SAVED!</Text>
-      <Text style={s3.xpLabel}>+50 XP EARNED</Text>
+      <Text style={s3.xpLabel}>{xpEarned}</Text>
 
       {/* PR card */}
       <View style={s3.prCard}>
@@ -755,6 +832,30 @@ function Step3({ exercise, savedValue }: Step3Props) {
           <Text style={s3.prCardUnit}>{exercise.unit}</Text>
         </View>
       </View>
+
+      {/* Video upload status row */}
+      {hasVideo && (
+        <View style={s3.videoStatusRow}>
+          {videoUploading && (
+            <>
+              <ActivityIndicator size="small" color="#555" />
+              <Text style={s3.videoStatusText}>Uploading video proof…</Text>
+            </>
+          )}
+          {videoUploadDone && (
+            <>
+              <Zap size={13} strokeWidth={2} color={Colors.success} />
+              <Text style={[s3.videoStatusText, { color: Colors.success }]}>Video proof saved</Text>
+            </>
+          )}
+          {videoUploadFailed && (
+            <>
+              <VideoOff size={13} strokeWidth={2} color="#555" />
+              <Text style={s3.videoStatusText}>Video upload failed — PR is still saved</Text>
+            </>
+          )}
+        </View>
+      )}
 
       <View style={s3.celebRow}>
         <Zap size={13} strokeWidth={2} color={Colors.accent} />
@@ -849,6 +950,17 @@ const s3 = StyleSheet.create({
     fontSize: 16,
     color: '#999',
     paddingBottom: 6,
+  },
+  videoStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    marginBottom: 14,
+  },
+  videoStatusText: {
+    fontFamily: Fonts.body,
+    fontSize: 11,
+    color: '#555',
   },
   celebRow: {
     flexDirection: 'row',

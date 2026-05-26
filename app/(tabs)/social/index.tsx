@@ -19,7 +19,6 @@ import {
   Flame,
   Heart,
   MapPin,
-  Video,
   Users,
   Search,
   X,
@@ -33,6 +32,7 @@ import {
 } from 'lucide-react-native';
 import { Colors, Fonts } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
+import { PRVideoPlayer } from '@/components/features/PRVideoPlayer';
 
 // ─── Feed helpers ─────────────────────────────────────────────────────────────
 
@@ -142,7 +142,7 @@ function formatConvTime(iso: string | null): string {
 function FeedSkeleton() {
   return (
     <View style={feedStyles.card}>
-      <View style={[feedStyles.videoArea, { backgroundColor: '#1a1a1a' }]} />
+      <View style={[feedStyles.videoAreaCompact, { backgroundColor: '#1a1a1a' }]} />
       <View style={feedStyles.cardBody}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 }}>
           <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#2a2a2a' }} />
@@ -221,28 +221,45 @@ function FeedContent() {
         return (
           <View key={post.id} style={[feedStyles.card, feedStyles.cardDefault]}>
             {/* Video / PR visual area */}
-            <View style={feedStyles.videoArea}>
-              <View style={feedStyles.videoPlaceholder}>
-                <View style={feedStyles.videoIconWrap}>
-                  <Video size={22} strokeWidth={1.5} color="#404040" />
-                </View>
-                <Text style={feedStyles.videoLabel}>VIDEO PROOF</Text>
-              </View>
-              <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.9)']}
-                style={feedStyles.videoGradient}
-              >
-                <View style={feedStyles.prOverlay}>
-                  <View>
-                    <View style={feedStyles.prValueRow}>
-                      <Text style={feedStyles.prValue}>{post.value}</Text>
-                      <Text style={feedStyles.prUnit}>{post.unit.toUpperCase()}</Text>
+            {(() => {
+              const hasReadyVideo = post.video?.status === 'ready';
+              const isUploading = post.video?.status === 'uploading' && isMe;
+              return (
+                <View style={hasReadyVideo ? feedStyles.videoArea : feedStyles.videoAreaCompact}>
+                  {hasReadyVideo && (
+                    <PRVideoPlayer
+                      videoUrl={post.video!.video_url}
+                      thumbnailUrl={post.video!.thumbnail_url}
+                      status={post.video!.status}
+                      isOwn={isMe}
+                      height={200}
+                    />
+                  )}
+                  {isUploading && (
+                    <View style={feedStyles.uploadingBadge}>
+                      <ActivityIndicator size="small" color="#555" style={{ transform: [{ scale: 0.7 }] }} />
+                      <Text style={feedStyles.uploadingBadgeText}>VIDEO UPLOADING…</Text>
                     </View>
-                    <Text style={feedStyles.prExercise}>{post.exercise_label.toUpperCase()}</Text>
-                  </View>
+                  )}
+                  {/* PR value overlay at the bottom of the visual area */}
+                  <LinearGradient
+                    colors={['transparent', 'rgba(0,0,0,0.9)']}
+                    style={feedStyles.videoGradient}
+                    pointerEvents="none"
+                  >
+                    <View style={feedStyles.prOverlay}>
+                      <View>
+                        <View style={feedStyles.prValueRow}>
+                          <Text style={feedStyles.prValue}>{post.value}</Text>
+                          <Text style={feedStyles.prUnit}>{post.unit.toUpperCase()}</Text>
+                        </View>
+                        <Text style={feedStyles.prExercise}>{post.exercise_label.toUpperCase()}</Text>
+                      </View>
+                    </View>
+                  </LinearGradient>
                 </View>
-              </LinearGradient>
-            </View>
+              );
+            })()}
 
             {/* Card body */}
             <View style={feedStyles.cardBody}>
@@ -886,30 +903,30 @@ const feedStyles = StyleSheet.create({
   videoArea: {
     height: 200,
     backgroundColor: '#0d0d0d',
+    overflow: 'hidden',
   },
-  videoPlaceholder: {
+  videoAreaCompact: {
+    height: 110,
+    backgroundColor: '#0d0d0d',
+    overflow: 'hidden',
+  },
+  uploadingBadge: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    top: 10,
+    left: 12,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
+    gap: 6,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 20,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
   },
-  videoIconWrap: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: '#1e1e1e',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  videoLabel: {
+  uploadingBadgeText: {
     fontFamily: Fonts.display,
-    fontSize: 10,
-    color: '#404040',
-    letterSpacing: 2,
+    fontSize: 9,
+    color: '#666',
+    letterSpacing: 1.5,
   },
   videoGradient: {
     position: 'absolute',

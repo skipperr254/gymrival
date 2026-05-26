@@ -1,5 +1,20 @@
 export type ExerciseUnit = 'kg' | 'reps' | 'sec';
 
+export type PRVideoStatus = 'uploading' | 'ready' | 'failed';
+
+export interface PRVideo {
+  id: string;
+  pr_id: string;
+  user_id: string;
+  /** Full public URL — computed in the API layer from storage path */
+  video_url: string;
+  /** Full public URL or null if thumbnail generation failed */
+  thumbnail_url: string | null;
+  duration_sec: number | null;
+  status: PRVideoStatus;
+  created_at: string;
+}
+
 export interface ExerciseType {
   key: string;
   label: string;

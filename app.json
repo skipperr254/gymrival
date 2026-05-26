@@ -38,6 +38,15 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      "expo-video",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow GymRival to access your photos to attach video proof to your PRs.",
+          "cameraPermission": "Allow GymRival to use your camera to record your lift.",
+          "microphonePermission": "Allow GymRival to use your microphone to record video with audio."
+        }
       ]
     ],
     "experiments": {

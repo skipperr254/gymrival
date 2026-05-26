@@ -13,8 +13,10 @@ import {
   fetchSingleFeedPost,
   likePR,
   unlikePR,
+  getPRVideoPublicUrl,
 } from "@/lib/api";
 import type { FriendProfile, FriendRequest, UserSearchResult, FeedPost } from "@/types/social";
+import type { PRVideo, PRVideoStatus } from "@/types/pr";
 
 // Module-level refs so we can clean up and never double-subscribe
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -415,6 +417,76 @@ export const useSocialStore = create<SocialState>((set, get) => ({
             // Prepend, de-duplicating in case the current user already sees it
             // via an optimistic local state update elsewhere
             feed: [post, ...s.feed.filter((p) => p.id !== post.id)],
+          }));
+        }
+      )
+
+      // ── Video proof added to a feed post ────────────────────────────────────
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "pr_videos" },
+        (payload) => {
+          const row = payload.new as {
+            id: string;
+            pr_id: string;
+            user_id: string;
+            video_path: string;
+            thumbnail_path: string | null;
+            duration_sec: number | null;
+            status: string;
+            created_at: string;
+          };
+          const video: PRVideo = {
+            id: row.id,
+            pr_id: row.pr_id,
+            user_id: row.user_id,
+            video_url: getPRVideoPublicUrl(row.video_path),
+            thumbnail_url: row.thumbnail_path
+              ? getPRVideoPublicUrl(row.thumbnail_path)
+              : null,
+            duration_sec: row.duration_sec,
+            status: row.status as PRVideoStatus,
+            created_at: row.created_at,
+          };
+          set((s) => ({
+            feed: s.feed.map((p) =>
+              p.id === row.pr_id ? { ...p, video } : p
+            ),
+          }));
+        }
+      )
+
+      // ── Video proof status changed (uploading → ready / failed) ─────────────
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "pr_videos" },
+        (payload) => {
+          const row = payload.new as {
+            id: string;
+            pr_id: string;
+            user_id: string;
+            video_path: string;
+            thumbnail_path: string | null;
+            duration_sec: number | null;
+            status: string;
+            created_at: string;
+          };
+          set((s) => ({
+            feed: s.feed.map((p) => {
+              if (p.id !== row.pr_id || !p.video) return p;
+              return {
+                ...p,
+                video: {
+                  ...p.video,
+                  status: row.status as PRVideoStatus,
+                  // Re-compute URLs in case paths changed (shouldn't happen but be safe)
+                  video_url: getPRVideoPublicUrl(row.video_path),
+                  thumbnail_url: row.thumbnail_path
+                    ? getPRVideoPublicUrl(row.thumbnail_path)
+                    : p.video.thumbnail_url,
+                },
+              };
+            }),
           }));
         }
       )

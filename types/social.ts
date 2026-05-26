@@ -98,7 +98,7 @@ export interface FriendRequest {
 
 /**
  * A social feed post — a personal_record enriched with its author's profile,
- * exercise label, and aggregated like data for the current viewer.
+ * exercise label, aggregated like data, and optional video proof.
  */
 export interface FeedPost {
   /** personal_records.id */
@@ -120,4 +120,6 @@ export interface FeedPost {
   likes_count: number;
   /** Whether the currently authenticated user has liked this post */
   has_liked: boolean;
+  /** Video proof attached to this PR, null if no video was uploaded */
+  video: import('@/types/pr').PRVideo | null;
 }
