@@ -25,76 +25,103 @@ export function PRVideoPlayer({
   isOwn,
   height = 200,
 }: Props) {
-  const [showThumbnail, setShowThumbnail] = useState(true);
+  // videoMounted guards whether the native VideoView surface exists.
+  // We defer mounting it until the user taps play — multiple mounted VideoViews
+  // cause Android SurfaceView to render all videos on a single shared hardware
+  // layer behind the UI, making cards appear as "windows" into the same surface.
+  const [videoMounted, setVideoMounted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const viewRef = useRef<VideoView>(null);
+  // Used to enter fullscreen as soon as VideoView mounts (on first-tap fullscreen)
+  const pendingFullscreenRef = useRef(false);
 
   const player = useVideoPlayer(status === 'ready' ? videoUrl : null, (p) => {
     p.muted = false;
     p.loop = false;
   });
 
-  // Reset thumbnail overlay when source changes (e.g. status flips to ready)
+  // Reset state when the video source changes (e.g. status flips to ready)
   useEffect(() => {
-    setShowThumbnail(true);
+    setVideoMounted(false);
     setIsPlaying(false);
+    pendingFullscreenRef.current = false;
     if (player && status !== 'ready') {
-      try { player.pause(); } catch { /* player may not be initialised */ }
+      try { player.pause(); } catch { /* player may not be initialised yet */ }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoUrl, status]);
 
+  // After VideoView mounts, start playback and handle any pending fullscreen request
+  useEffect(() => {
+    if (!videoMounted) return;
+    player.play();
+    if (pendingFullscreenRef.current) {
+      pendingFullscreenRef.current = false;
+      viewRef.current?.enterFullscreen();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [videoMounted]);
+
   const handleTogglePlay = useCallback(() => {
     if (status !== 'ready') return;
+    if (!videoMounted) {
+      // First tap: mount the native surface and start playing
+      setVideoMounted(true);
+      setIsPlaying(true);
+      return;
+    }
     if (isPlaying) {
       player.pause();
       setIsPlaying(false);
     } else {
       player.play();
       setIsPlaying(true);
-      setShowThumbnail(false);
     }
-  }, [isPlaying, player, status]);
+  }, [videoMounted, isPlaying, player, status]);
 
   const handleFullscreen = useCallback(() => {
     if (status !== 'ready') return;
-    // Ensure video is playing when entering fullscreen
+    if (!videoMounted) {
+      pendingFullscreenRef.current = true;
+      setVideoMounted(true);
+      setIsPlaying(true);
+      return;
+    }
     if (!isPlaying) {
       player.play();
       setIsPlaying(true);
-      setShowThumbnail(false);
     }
     viewRef.current?.enterFullscreen();
-  }, [isPlaying, player, status]);
+  }, [videoMounted, isPlaying, player, status]);
 
   if (status !== 'ready') return null;
 
-  // ── Ready — show video player ─────────────────────────────────────────────────
   return (
     <Pressable
       onPress={handleTogglePlay}
       style={[styles.container, { height }]}
     >
-      <VideoView
-        ref={viewRef}
-        player={player}
-        style={StyleSheet.absoluteFill}
-        contentFit="cover"
-        nativeControls={false}
-        allowsFullscreen
-      />
+      {/* Native VideoView surface — only mounted after first tap to avoid SurfaceView bleed */}
+      {videoMounted && (
+        <VideoView
+          ref={viewRef}
+          player={player}
+          style={StyleSheet.absoluteFill}
+          contentFit="cover"
+          nativeControls={false}
+          allowsFullscreen
+        />
+      )}
 
-      {/* Thumbnail shown until first play */}
-      {showThumbnail && thumbnailUrl && (
+      {/* Thumbnail / dark placeholder shown before first play */}
+      {!isPlaying && thumbnailUrl && (
         <Image
           source={{ uri: thumbnailUrl }}
           style={StyleSheet.absoluteFill}
           resizeMode="cover"
         />
       )}
-
-      {/* Dark fallback when no thumbnail and not yet playing */}
-      {showThumbnail && !thumbnailUrl && (
+      {!isPlaying && !thumbnailUrl && (
         <View style={[StyleSheet.absoluteFill, styles.placeholderBg]} />
       )}
 
@@ -124,10 +151,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: '#0d0d0d',
     overflow: 'hidden',
-    // Non-zero borderRadius forces Android to create a hardware compositing
-    // layer, which prevents the native VideoView surface from bleeding outside
-    // its bounds into adjacent cards in a ScrollView.
-    borderRadius: 0.001,
+    borderRadius: 1,
   },
   placeholderBg: {
     backgroundColor: '#0d0d0d',

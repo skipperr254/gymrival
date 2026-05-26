@@ -904,11 +904,13 @@ const feedStyles = StyleSheet.create({
     height: 200,
     backgroundColor: '#0d0d0d',
     overflow: 'hidden',
+    borderRadius: 1,
   },
   videoAreaCompact: {
     height: 110,
     backgroundColor: '#0d0d0d',
     overflow: 'hidden',
+    borderRadius: 1,
   },
   uploadingBadge: {
     position: 'absolute',
