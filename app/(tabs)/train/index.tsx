@@ -14,6 +14,8 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Fonts } from '@/constants/theme';
+import { SegmentedControl } from '@/components/ui/SegmentedControl';
+import { CheckInView } from '@/components/features/CheckInView';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const DAYS_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -66,6 +68,7 @@ const SEED: Schedule[] = [
 export default function TrainScreen() {
   const insets = useSafeAreaInsets();
 
+  const [activeTab, setActiveTab] = useState<0 | 1>(0);
   const [schedules, setSchedules] = useState<Schedule[]>(SEED);
   const [selected, setSelected] = useState<Schedule | null>(null);
   const [workoutStarted, setWorkoutStarted] = useState(false);
@@ -183,17 +186,32 @@ export default function TrainScreen() {
           ) : (
             <View>
               <Text style={styles.appTitle}>GYM RIVAL</Text>
-              <Text style={styles.pageLabel}>WORKOUT SCHEDULE</Text>
+              <Text style={styles.pageLabel}>
+                {activeTab === 0 ? 'WORKOUT SCHEDULE' : 'GYM CHECK-IN'}
+              </Text>
             </View>
           )}
         </View>
+
+        {/* Tab switcher — only visible at top level */}
+        {!selected && (
+          <View style={styles.tabSwitcher}>
+            <SegmentedControl
+              options={['SCHEDULE', 'CHECK IN']}
+              selectedIndex={activeTab}
+              onChange={(i) => setActiveTab(i as 0 | 1)}
+            />
+          </View>
+        )}
 
         <ScrollView
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {!selected ? (
+          {!selected && activeTab === 1 ? (
+            <CheckInView />
+          ) : !selected ? (
             <>
               {/* Weekly Calendar */}
               <View style={styles.calendarCard}>
@@ -579,6 +597,11 @@ const styles = StyleSheet.create({
   backBtn: { padding: 4 },
 
   content: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 100 },
+
+  tabSwitcher: {
+    paddingHorizontal: 16,
+    paddingBottom: 10,
+  },
 
   // Calendar
   calendarCard: {
