@@ -24,7 +24,7 @@ export const Routes = {
   // Train tab
   train: '/(tabs)/train',
   trainWod: '/(tabs)/train/wod',
-  trainSchemas: '/(tabs)/train/schema',
+trainSchemas: '/(tabs)/train/schema',
   schemaDetail: (id: string) => `/(tabs)/train/schema/${id}`,
   trainCoach: '/(tabs)/train/coach',
   trainCheckin: '/(tabs)/train/checkin',
