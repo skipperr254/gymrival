@@ -125,3 +125,58 @@ export interface CreateSessionInput {
   day_of_week: DayOfWeek | null;
   exercises: CreateSessionExerciseInput[];
 }
+
+// ─── Gym & Check-in types ─────────────────────────────────────────────────────
+
+export interface Gym {
+  id: string;
+  name: string;
+  address: string | null;
+  city: string | null;
+  country: string | null;
+  lat: number | null;
+  lng: number | null;
+  is_verified: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Gym row enriched with today's aggregate check-in count (from the RPC). */
+export interface GymWithCheckinCount extends Gym {
+  today_count: number;
+}
+
+export interface GymCheckin {
+  id: string;
+  user_id: string;
+  gym_id: string;
+  checked_in_at: string;
+  checked_out_at: string | null;
+  /** Set when the user starts a workout during this visit */
+  workout_log_id: string | null;
+  xp_awarded: boolean;
+  note: string | null;
+  created_at: string;
+}
+
+/** A friend's recent check-in, joined with their profile and gym name. */
+export interface FriendCheckin {
+  id: string;
+  user_id: string;
+  gym_id: string;
+  gym_name: string;
+  checked_in_at: string;
+  full_name: string | null;
+  username: string | null;
+  avatar_url: string | null;
+}
+
+/** One day slot in the weekly streak display (Mon–Sun). */
+export interface WeeklyStreakDay {
+  /** Short label: 'Mon', 'Tue', … 'Sun' */
+  day: string;
+  /** 0 = Monday … 6 = Sunday (ISO-aligned, matches DayOfWeek) */
+  dayIndex: number;
+  checked: boolean;
+}

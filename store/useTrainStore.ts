@@ -1,5 +1,12 @@
 import { create } from 'zustand';
-import type { TrainingSessionWithExercises, CreateSessionInput } from '@/types/train';
+import type {
+  TrainingSessionWithExercises,
+  CreateSessionInput,
+  GymWithCheckinCount,
+  GymCheckin,
+  FriendCheckin,
+  WeeklyStreakDay,
+} from '@/types/train';
 import {
   fetchSessions,
   createSession,
@@ -7,8 +14,17 @@ import {
   startWorkout as startWorkoutAPI,
   completeWorkout as completeWorkoutAPI,
 } from '@/lib/train';
+import {
+  fetchGymsWithTodayCount,
+  fetchActiveCheckin,
+  fetchWeeklyStreak,
+  fetchFriendsCheckedIn,
+  checkinToGym as checkinToGymAPI,
+  undoCheckin as undoCheckinAPI,
+} from '@/lib/checkin';
 
 interface TrainState {
+  // ─── Training sessions ──────────────────────────────────────────────────────
   sessions: TrainingSessionWithExercises[];
   loading: boolean;
   error: string | null;
@@ -18,7 +34,17 @@ interface TrainState {
   /** Date.now() snapshot from when the workout was started — used for duration. */
   workoutStartTime: number | null;
 
-  // ─── Actions ────────────────────────────────────────────────────────────────
+  // ─── Gym check-ins ──────────────────────────────────────────────────────────
+  gyms: GymWithCheckinCount[];
+  /** The current user's active check-in (null = not checked in). */
+  activeCheckin: GymCheckin | null;
+  weeklyStreak: WeeklyStreakDay[];
+  friendsCheckedIn: FriendCheckin[];
+  checkinLoading: boolean;
+  /** True when XP was awarded for the most recent check-in (shown in UI). */
+  lastCheckinXpAwarded: boolean;
+
+  // ─── Session actions ────────────────────────────────────────────────────────
 
   /** Load (or reload) all sessions for the given user. */
   loadSessions: (userId: string) => Promise<void>;
@@ -44,15 +70,45 @@ interface TrainState {
   /** Discard the active workout without recording a log entry. */
   cancelWorkout: () => void;
 
+  // ─── Check-in actions ───────────────────────────────────────────────────────
+
+  /**
+   * Load all check-in screen data in parallel: gym list (with today counts),
+   * the user's active check-in, this week's streak, and friends' check-ins.
+   * Pass `friendIds` from useSocialStore.friends.
+   */
+  loadCheckinData: (userId: string, friendIds: string[]) => Promise<void>;
+
+  /**
+   * Check in to a gym. Updates activeCheckin and weeklyStreak on success.
+   * Returns `{ xpAwarded }` so the caller can show the XP banner.
+   */
+  performCheckin: (userId: string, gymId: string) => Promise<{ xpAwarded: boolean }>;
+
+  /**
+   * Undo the active check-in. Clears activeCheckin and updates weeklyStreak
+   * (the checked day may no longer be marked if no other check-in exists for it).
+   */
+  performUndoCheckin: (userId: string) => Promise<void>;
+
   reset: () => void;
 }
 
 export const useTrainStore = create<TrainState>((set, get) => ({
+  // ─── Sessions initial state ─────────────────────────────────────────────────
   sessions: [],
   loading: false,
   error: null,
   activeWorkoutLogId: null,
   workoutStartTime: null,
+
+  // ─── Check-in initial state ─────────────────────────────────────────────────
+  gyms: [],
+  activeCheckin: null,
+  weeklyStreak: [],
+  friendsCheckedIn: [],
+  checkinLoading: false,
+  lastCheckinXpAwarded: false,
 
   // ─── Sessions ──────────────────────────────────────────────────────────────
 
@@ -107,6 +163,83 @@ export const useTrainStore = create<TrainState>((set, get) => ({
     set({ activeWorkoutLogId: null, workoutStartTime: null });
   },
 
+  // ─── Check-in actions ───────────────────────────────────────────────────────
+
+  loadCheckinData: async (userId, friendIds) => {
+    set({ checkinLoading: true });
+
+    const [gymsResult, activeResult, streakResult, friendsResult] =
+      await Promise.all([
+        fetchGymsWithTodayCount(),
+        fetchActiveCheckin(userId),
+        fetchWeeklyStreak(userId),
+        fetchFriendsCheckedIn(friendIds),
+      ]);
+
+    set({
+      gyms: gymsResult.data,
+      activeCheckin: activeResult.data,
+      weeklyStreak: streakResult.data,
+      friendsCheckedIn: friendsResult.data,
+      checkinLoading: false,
+    });
+  },
+
+  performCheckin: async (userId, gymId) => {
+    set({ checkinLoading: true });
+
+    const { data, xpAwarded, error } = await checkinToGymAPI(userId, gymId);
+
+    if (error || !data) {
+      set({ checkinLoading: false });
+      return { xpAwarded: false };
+    }
+
+    // Refresh streak (the checked-in day is now marked) and gym counts
+    const [streakResult, gymsResult] = await Promise.all([
+      fetchWeeklyStreak(userId),
+      fetchGymsWithTodayCount(),
+    ]);
+
+    set({
+      activeCheckin: data,
+      lastCheckinXpAwarded: xpAwarded,
+      weeklyStreak: streakResult.data,
+      gyms: gymsResult.data,
+      checkinLoading: false,
+    });
+
+    return { xpAwarded };
+  },
+
+  performUndoCheckin: async (userId) => {
+    const { activeCheckin } = get();
+    if (!activeCheckin) return;
+
+    set({ checkinLoading: true });
+
+    const { error } = await undoCheckinAPI(activeCheckin.id);
+
+    if (error) {
+      set({ checkinLoading: false });
+      return;
+    }
+
+    // Refresh streak (the day might no longer be checked) and gym counts
+    const [streakResult, gymsResult] = await Promise.all([
+      fetchWeeklyStreak(userId),
+      fetchGymsWithTodayCount(),
+    ]);
+
+    set({
+      activeCheckin: null,
+      lastCheckinXpAwarded: false,
+      weeklyStreak: streakResult.data,
+      gyms: gymsResult.data,
+      checkinLoading: false,
+    });
+  },
+
   // ─── Reset ─────────────────────────────────────────────────────────────────
 
   reset: () =>
@@ -116,5 +249,11 @@ export const useTrainStore = create<TrainState>((set, get) => ({
       error: null,
       activeWorkoutLogId: null,
       workoutStartTime: null,
+      gyms: [],
+      activeCheckin: null,
+      weeklyStreak: [],
+      friendsCheckedIn: [],
+      checkinLoading: false,
+      lastCheckinXpAwarded: false,
     }),
 }));

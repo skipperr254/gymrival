@@ -1,31 +1,49 @@
-import React, { useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Pressable, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from '@/components/ui/Avatar';
 import { Colors, Fonts } from '@/constants/theme';
+import { useTrainStore } from '@/store/useTrainStore';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useSocialStore } from '@/store/useSocialStore';
+import type { GymWithCheckinCount } from '@/types/train';
 
-const NEARBY_GYMS = [
-  { id: 1, name: 'Basic-Fit Downtown', distance: '0.3 km', checkedIn: 12 },
-  { id: 2, name: 'Olympus Gym', distance: '0.8 km', checkedIn: 5 },
-  { id: 3, name: 'Fit For Free', distance: '1.2 km', checkedIn: 8 },
-];
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const FRIENDS = [
-  { id: 1, name: 'Daan', username: '@daanfit', gym: 'Basic-Fit Downtown', time: '10 min' },
-  { id: 2, name: 'Sara', username: '@sara_lifts', gym: 'Olympus Gym', time: '1 hr' },
-  { id: 3, name: 'Mike', username: '@mike_gains', gym: 'Fit For Free', time: '2 hrs' },
-];
+function timeAgo(isoString: string): string {
+  const diff = Math.floor((Date.now() - new Date(isoString).getTime()) / 1000);
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  return `${Math.floor(diff / 3600)}h ago`;
+}
 
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+// ─── Component ───────────────────────────────────────────────────────────────
 
 export function CheckInView() {
-  const [checkins, setCheckins] = useState(
-    DAYS.map((d, i) => ({ day: d, checked: [0, 2, 4, 5].includes(i) }))
-  );
-  const [selectedGym, setSelectedGym] = useState<number | null>(null);
-  const [confirmed, setConfirmed] = useState(false);
+  const user = useAuthStore((s) => s.user);
+  const friends = useSocialStore((s) => s.friends);
 
-  const streak = checkins.filter((c) => c.checked).length;
+  const {
+    gyms,
+    activeCheckin,
+    weeklyStreak,
+    friendsCheckedIn,
+    checkinLoading,
+    lastCheckinXpAwarded,
+    loadCheckinData,
+    performCheckin,
+    performUndoCheckin,
+  } = useTrainStore();
+
+  const [selectedGymId, setSelectedGymId] = useState<string | null>(null);
+
+  // Load all check-in data on mount, and re-load when friends become available
+  useEffect(() => {
+    if (!user) return;
+    loadCheckinData(user.id, friends.map((f) => f.id));
+  }, [user?.id, friends.length, loadCheckinData]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const streak = weeklyStreak.filter((d) => d.checked).length;
   const pct = (streak / 7) * 100;
 
   const flameColor =
@@ -35,22 +53,18 @@ export function CheckInView() {
   const streakMotivationColor =
     streak >= 5 ? Colors.accent : streak >= 3 ? '#ff8c00' : '#555555';
 
-  const handleConfirm = () => {
-    if (selectedGym === null) return;
-    setConfirmed(true);
-    setCheckins((prev) => {
-      const today = new Date().getDay();
-      const idx = today === 0 ? 6 : today - 1;
-      return prev.map((c, i) => (i === idx ? { ...c, checked: true } : c));
-    });
+  const confirmedGym = gyms.find((g) => g.id === activeCheckin?.gym_id);
+
+  const handleConfirm = async () => {
+    if (!user || !selectedGymId) return;
+    await performCheckin(user.id, selectedGymId);
+    setSelectedGymId(null);
   };
 
-  const handleUndo = () => {
-    setConfirmed(false);
-    setSelectedGym(null);
+  const handleUndo = async () => {
+    if (!user) return;
+    await performUndoCheckin(user.id);
   };
-
-  const confirmedGymName = NEARBY_GYMS.find((g) => g.id === selectedGym)?.name ?? '';
 
   return (
     <View>
@@ -77,95 +91,115 @@ export function CheckInView() {
         </View>
 
         <View style={styles.daysRow}>
-          {checkins.map((c, i) => (
-            <Pressable
-              key={i}
-              onPress={() =>
-                setCheckins((prev) =>
-                  prev.map((x, j) => (j === i ? { ...x, checked: !x.checked } : x))
-                )
-              }
-              style={({ pressed }) => [styles.dayCol, pressed && { opacity: 0.7 }]}
-            >
-              <View style={[styles.dayDot, c.checked && styles.dayDotChecked]}>
-                {c.checked && <Ionicons name="checkmark" size={14} color="#fff" />}
+          {(weeklyStreak.length > 0
+            ? weeklyStreak
+            : [0, 1, 2, 3, 4, 5, 6].map((i) => ({ day: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i], dayIndex: i, checked: false }))
+          ).map((d) => (
+            <View key={d.dayIndex} style={styles.dayCol}>
+              <View style={[styles.dayDot, d.checked && styles.dayDotChecked]}>
+                {d.checked && <Ionicons name="checkmark" size={14} color="#fff" />}
               </View>
-              <Text style={[styles.dayText, c.checked && styles.dayTextChecked]}>
-                {c.day}
+              <Text style={[styles.dayText, d.checked && styles.dayTextChecked]}>
+                {d.day}
               </Text>
-            </Pressable>
+            </View>
           ))}
         </View>
       </View>
 
       {/* ── Check In Now / Confirmed ── */}
-      {!confirmed ? (
+      {checkinLoading && !activeCheckin ? (
+        <View style={styles.loadingCard}>
+          <ActivityIndicator color={Colors.accent} />
+        </View>
+      ) : !activeCheckin ? (
         <View style={styles.checkInCard}>
           <View style={styles.cardHeader}>
             <Ionicons name="location" size={16} color={Colors.accent} />
             <Text style={styles.cardTitle}>CHECK IN NOW</Text>
           </View>
 
-          {NEARBY_GYMS.map((gym) => {
-            const isSelected = selectedGym === gym.id;
-            return (
-              <Pressable
-                key={gym.id}
-                style={({ pressed }) => [
-                  styles.gymRow,
-                  isSelected && styles.gymRowSelected,
-                  pressed && { opacity: 0.8 },
-                ]}
-                onPress={() => setSelectedGym(isSelected ? null : gym.id)}
-              >
-                <View style={[styles.gymIcon, isSelected && styles.gymIconSelected]}>
-                  <Ionicons
-                    name="location"
-                    size={18}
-                    color={isSelected ? Colors.accent : '#555555'}
-                  />
-                </View>
-                <View style={styles.gymInfo}>
-                  <Text style={[styles.gymName, isSelected && styles.gymNameSelected]}>
-                    {gym.name}
-                  </Text>
-                  <View style={styles.gymMetaRow}>
-                    <Text style={styles.gymMetaText}>{gym.distance}</Text>
-                    <View style={styles.gymCheckedInRow}>
-                      <Ionicons name="people" size={11} color="#606060" />
-                      <Text style={styles.gymMetaText}>{`${gym.checkedIn} here now`}</Text>
+          {gyms.length === 0 && !checkinLoading ? (
+            <Text style={styles.emptyText}>No gyms available.</Text>
+          ) : (
+            <ScrollView
+              style={styles.gymList}
+              contentContainerStyle={styles.gymListContent}
+              showsVerticalScrollIndicator={false}
+              nestedScrollEnabled
+            >
+              {gyms.map((gym: GymWithCheckinCount) => {
+                const isSelected = selectedGymId === gym.id;
+                return (
+                  <Pressable
+                    key={gym.id}
+                    style={({ pressed }) => [
+                      styles.gymRow,
+                      isSelected && styles.gymRowSelected,
+                      pressed && { opacity: 0.8 },
+                    ]}
+                    onPress={() => setSelectedGymId(isSelected ? null : gym.id)}
+                  >
+                    <View style={[styles.gymIcon, isSelected && styles.gymIconSelected]}>
+                      <Ionicons
+                        name="location"
+                        size={18}
+                        color={isSelected ? Colors.accent : '#555555'}
+                      />
                     </View>
-                  </View>
-                </View>
-                {isSelected && (
-                  <Ionicons name="checkmark" size={18} color={Colors.accent} />
-                )}
-              </Pressable>
-            );
-          })}
+                    <View style={styles.gymInfo}>
+                      <Text style={[styles.gymName, isSelected && styles.gymNameSelected]}>
+                        {gym.name}
+                      </Text>
+                      <View style={styles.gymMetaRow}>
+                        {gym.city ? (
+                          <Text style={styles.gymMetaText}>{gym.city}</Text>
+                        ) : null}
+                        <View style={styles.gymCheckedInRow}>
+                          <Ionicons name="people" size={11} color="#606060" />
+                          <Text style={styles.gymMetaText}>
+                            {`${gym.today_count} here today`}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                    {isSelected && (
+                      <Ionicons name="checkmark" size={18} color={Colors.accent} />
+                    )}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          )}
 
           <Pressable
             style={({ pressed }) => [
               styles.confirmBtn,
-              selectedGym !== null && styles.confirmBtnActive,
-              pressed && selectedGym !== null && { opacity: 0.85 },
+              selectedGymId !== null && styles.confirmBtnActive,
+              pressed && selectedGymId !== null && { opacity: 0.85 },
             ]}
             onPress={handleConfirm}
-            disabled={selectedGym === null}
+            disabled={selectedGymId === null || checkinLoading}
           >
-            <Ionicons
-              name="checkmark-circle"
-              size={17}
-              color={selectedGym !== null ? '#fff' : '#444444'}
-            />
-            <Text
-              style={[
-                styles.confirmBtnText,
-                selectedGym !== null && styles.confirmBtnTextActive,
-              ]}
-            >
-              CONFIRM CHECK-IN
-            </Text>
+            {checkinLoading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <>
+                <Ionicons
+                  name="checkmark-circle"
+                  size={17}
+                  color={selectedGymId !== null ? '#fff' : '#444444'}
+                />
+                <Text
+                  style={[
+                    styles.confirmBtnText,
+                    selectedGymId !== null && styles.confirmBtnTextActive,
+                  ]}
+                >
+                  CONFIRM CHECK-IN
+                </Text>
+              </>
+            )}
           </Pressable>
         </View>
       ) : (
@@ -175,47 +209,66 @@ export function CheckInView() {
             <Ionicons name="checkmark-circle" size={32} color="#4caf50" />
           </View>
           <Text style={styles.confirmedTitle}>CHECKED IN!</Text>
-          <Text style={styles.confirmedGym}>{confirmedGymName}</Text>
-          <View style={styles.xpRow}>
-            <Ionicons name="flash" size={13} color="#4caf50" />
-            <Text style={styles.xpText}>+25 XP EARNED</Text>
-          </View>
+          <Text style={styles.confirmedGym}>
+            {confirmedGym?.name ?? 'Your gym'}
+          </Text>
+          {lastCheckinXpAwarded && (
+            <View style={styles.xpRow}>
+              <Ionicons name="flash" size={13} color="#4caf50" />
+              <Text style={styles.xpText}>+25 XP EARNED</Text>
+            </View>
+          )}
           <Pressable
             style={({ pressed }) => [styles.undoBtn, pressed && { opacity: 0.7 }]}
             onPress={handleUndo}
+            disabled={checkinLoading}
           >
-            <Text style={styles.undoBtnText}>UNDO CHECK-IN</Text>
+            {checkinLoading ? (
+              <ActivityIndicator size="small" color="#606060" />
+            ) : (
+              <Text style={styles.undoBtnText}>UNDO CHECK-IN</Text>
+            )}
           </Pressable>
         </View>
       )}
 
       {/* ── Friends Checked In ── */}
-      <View style={styles.friendsCard}>
-        <View style={styles.cardHeader}>
-          <Ionicons name="people" size={15} color={Colors.accent} />
-          <Text style={styles.cardTitle}>FRIENDS CHECKED IN</Text>
-        </View>
+      {friendsCheckedIn.length > 0 && (
+        <View style={styles.friendsCard}>
+          <View style={styles.cardHeader}>
+            <Ionicons name="people" size={15} color={Colors.accent} />
+            <Text style={styles.cardTitle}>FRIENDS CHECKED IN</Text>
+          </View>
 
-        {FRIENDS.map((friend, i) => (
-          <View
-            key={friend.id}
-            style={[styles.friendRow, i > 0 && styles.friendRowDivider]}
-          >
-            <Avatar name={friend.name} userId={String(friend.id)} size="md" />
-            <View style={styles.friendInfo}>
-              <Text style={styles.friendName}>{friend.name}</Text>
-              <View style={styles.friendMeta}>
-                <Ionicons name="location" size={11} color="#606060" />
-                <Text style={styles.friendMetaText}>{friend.gym}</Text>
+          {friendsCheckedIn.map((friend, i) => (
+            <View
+              key={friend.id}
+              style={[styles.friendRow, i > 0 && styles.friendRowDivider]}
+            >
+              <Avatar
+                name={friend.full_name ?? friend.username ?? '?'}
+                userId={friend.user_id}
+                size="md"
+              />
+              <View style={styles.friendInfo}>
+                <Text style={styles.friendName}>
+                  {friend.full_name ?? friend.username ?? 'Unknown'}
+                </Text>
+                <View style={styles.friendMeta}>
+                  <Ionicons name="location" size={11} color="#606060" />
+                  <Text style={styles.friendMetaText}>{friend.gym_name}</Text>
+                </View>
+              </View>
+              <View style={styles.friendTimeCol}>
+                <Ionicons name="time-outline" size={11} color="#505050" />
+                <Text style={styles.friendTimeText}>
+                  {timeAgo(friend.checked_in_at)}
+                </Text>
               </View>
             </View>
-            <View style={styles.friendTimeCol}>
-              <Ionicons name="time-outline" size={11} color="#505050" />
-              <Text style={styles.friendTimeText}>{`${friend.time} ago`}</Text>
-            </View>
-          </View>
-        ))}
-      </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -313,6 +366,27 @@ const styles = StyleSheet.create({
     color: Colors.accent,
   },
 
+  // ── Loading ──
+  loadingCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 20,
+    padding: 32,
+    marginBottom: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: Colors.borderDefault,
+  },
+
+  // ── Empty ──
+  emptyText: {
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    color: '#606060',
+    textAlign: 'center',
+    paddingVertical: 12,
+  },
+
   // ── Check In Card ──
   checkInCard: {
     backgroundColor: Colors.surface,
@@ -366,6 +440,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(230,48,48,0.12)',
     borderColor: 'rgba(230,48,48,0.3)',
   },
+  // ── Gym list scroll container ──
+  gymList: {
+    maxHeight: 232, // shows ~3 full rows + a sliver of a 4th to signal scrollability
+  },
+  gymListContent: {
+    paddingBottom: 2,
+  },
+
   gymInfo: { flex: 1 },
   gymName: {
     fontFamily: Fonts.bodyMedium,
@@ -466,6 +548,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 9,
     paddingHorizontal: 20,
+    minWidth: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   undoBtnText: {
     fontFamily: Fonts.display,
