@@ -10,16 +10,21 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Fonts } from '@/constants/theme';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { CheckInView } from '@/components/features/CheckInView';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useTrainStore } from '@/store/useTrainStore';
+import { DAY_NAMES, DAY_NAME_TO_INDEX, DAY_SHORT, type DayOfWeek } from '@/types/train';
+import type { TrainingSessionWithExercises } from '@/types/train';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-const DAYS_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const DAYS_FULL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const DAYS_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
+const DAYS_FULL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as const;
 
 const EXERCISE_FIELDS = [
   { key: 'sets' as const, label: 'SETS', ph: '3' },
@@ -27,58 +32,34 @@ const EXERCISE_FIELDS = [
   { key: 'weight' as const, label: 'KG', ph: '0' },
 ];
 
-type Exercise = { name: string; sets: number; reps: string; weight: number };
-type Schedule = { id: number; name: string; day: string; exercises: Exercise[] };
 type NewExercise = { name: string; sets: string; reps: string; weight: string };
-type NewWorkout = { name: string; day: string; exercises: Exercise[] };
-
-const SEED: Schedule[] = [
-  {
-    id: 1,
-    name: 'Push Day',
-    day: 'Monday',
-    exercises: [
-      { name: 'Bench Press', sets: 4, reps: '8-10', weight: 90 },
-      { name: 'Overhead Press', sets: 3, reps: '10-12', weight: 60 },
-      { name: 'Tricep Dips', sets: 3, reps: '12-15', weight: 0 },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Pull Day',
-    day: 'Wednesday',
-    exercises: [
-      { name: 'Deadlift', sets: 4, reps: '5-6', weight: 150 },
-      { name: 'Pull-ups', sets: 4, reps: '8-10', weight: 0 },
-      { name: 'Barbell Row', sets: 3, reps: '10-12', weight: 80 },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Leg Day',
-    day: 'Friday',
-    exercises: [
-      { name: 'Squat', sets: 5, reps: '5', weight: 130 },
-      { name: 'Leg Press', sets: 3, reps: '12-15', weight: 200 },
-      { name: 'Calf Raises', sets: 4, reps: '20', weight: 60 },
-    ],
-  },
-];
+type NewWorkout = { name: string; day: string; exercises: Array<{ name: string; sets: number; reps: string; weight: number }> };
 
 export default function TrainScreen() {
   const insets = useSafeAreaInsets();
+  const user = useAuthStore((s) => s.user);
+
+  const { sessions, loading, addSession, removeSession, beginWorkout, finishWorkout, cancelWorkout } =
+    useTrainStore();
+
+  const loadSessions = useTrainStore((s) => s.loadSessions);
 
   const [activeTab, setActiveTab] = useState<0 | 1>(0);
-  const [schedules, setSchedules] = useState<Schedule[]>(SEED);
-  const [selected, setSelected] = useState<Schedule | null>(null);
+  const [selected, setSelected] = useState<TrainingSessionWithExercises | null>(null);
   const [workoutStarted, setWorkoutStarted] = useState(false);
   const [completedSets, setCompletedSets] = useState<Record<string, boolean>>({});
   const [showModal, setShowModal] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [newWorkout, setNewWorkout] = useState<NewWorkout>({ name: '', day: 'Monday', exercises: [] });
   const [newEx, setNewEx] = useState<NewExercise>({ name: '', sets: '3', reps: '10', weight: '' });
 
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const backdropAnim = useRef(new Animated.Value(0)).current;
+
+  // Load sessions on mount
+  useEffect(() => {
+    if (user?.id) loadSessions(user.id);
+  }, [user?.id]);
 
   useEffect(() => {
     if (showModal) {
@@ -111,14 +92,23 @@ export default function TrainScreen() {
     }
   }, [showModal, slideAnim, backdropAnim]);
 
-  const dayHasWorkout = (i: number) => schedules.some((s) => s.day === DAYS_FULL[i]);
-  const workoutForDay = (i: number) => schedules.find((s) => s.day === DAYS_FULL[i]);
+  // Map day_of_week to full day name for display
+  const sessionDay = (s: TrainingSessionWithExercises): string => {
+    if (s.day_of_week == null) return 'Flexible';
+    return DAY_NAMES[s.day_of_week];
+  };
+
+  const dayHasWorkout = (i: number) =>
+    sessions.some((s) => s.day_of_week === i);
+
+  const workoutForDay = (i: number) =>
+    sessions.find((s) => s.day_of_week === i);
 
   const totalSets = selected?.exercises.reduce((a, e) => a + e.sets, 0) ?? 0;
   const doneSets = Object.values(completedSets).filter(Boolean).length;
   const allDone = workoutStarted && selected !== null && totalSets > 0 && doneSets >= totalSets;
 
-  const canSave = newWorkout.name.trim().length > 0 && newWorkout.exercises.length > 0;
+  const canSave = newWorkout.name.trim().length > 0 && newWorkout.exercises.length > 0 && !saving;
   const canAddEx = newEx.name.trim().length > 0;
 
   const toggleSet = (exIdx: number, setIdx: number) => {
@@ -143,20 +133,36 @@ export default function TrainScreen() {
     setNewEx({ name: '', sets: '3', reps: '10', weight: '' });
   };
 
-  const saveWorkout = () => {
-    if (!canSave) return;
-    setSchedules((p) => [...p, { ...newWorkout, name: newWorkout.name.trim(), id: Date.now() }]);
+  const saveWorkout = async () => {
+    if (!canSave || !user?.id) return;
+    setSaving(true);
+
+    const dayOfWeek = DAY_NAME_TO_INDEX[newWorkout.day] ?? null;
+
+    await addSession(user.id, {
+      name: newWorkout.name,
+      day_of_week: dayOfWeek as DayOfWeek | null,
+      exercises: newWorkout.exercises.map((ex) => ({
+        exercise_name: ex.name,
+        exercise_key: null,
+        sets: ex.sets,
+        reps: ex.reps,
+        target_weight: ex.weight > 0 ? ex.weight : null,
+      })),
+    });
+
+    setSaving(false);
     setShowModal(false);
     setNewWorkout({ name: '', day: 'Monday', exercises: [] });
     setNewEx({ name: '', sets: '3', reps: '10', weight: '' });
   };
 
-  const deleteSchedule = (id: number) => {
-    setSchedules((p) => p.filter((s) => s.id !== id));
+  const handleDeleteSession = async (id: string) => {
     if (selected?.id === id) goBack();
+    await removeSession(id);
   };
 
-  const openDetail = (s: Schedule) => {
+  const openDetail = (s: TrainingSessionWithExercises) => {
     setSelected(s);
     setWorkoutStarted(false);
     setCompletedSets({});
@@ -164,6 +170,24 @@ export default function TrainScreen() {
 
   const goBack = () => {
     setSelected(null);
+    setWorkoutStarted(false);
+    setCompletedSets({});
+    cancelWorkout();
+  };
+
+  const handleStartWorkout = async () => {
+    if (!user?.id || !selected) return;
+    await beginWorkout(user.id, selected);
+    setWorkoutStarted(true);
+  };
+
+  const handleFinishWorkout = async () => {
+    await finishWorkout(doneSets);
+    goBack();
+  };
+
+  const handleCancelWorkout = () => {
+    cancelWorkout();
     setWorkoutStarted(false);
     setCompletedSets({});
   };
@@ -213,6 +237,13 @@ export default function TrainScreen() {
             <CheckInView />
           ) : !selected ? (
             <>
+              {/* Loading skeleton */}
+              {loading && sessions.length === 0 && (
+                <View style={styles.loadingRow}>
+                  <ActivityIndicator size="small" color={Colors.accent} />
+                </View>
+              )}
+
               {/* Weekly Calendar */}
               <View style={styles.calendarCard}>
                 {DAYS_SHORT.map((day, i) => {
@@ -241,7 +272,7 @@ export default function TrainScreen() {
               {/* Section label + NEW button */}
               <View style={styles.sectionRow}>
                 <Text style={styles.sectionLabel}>
-                  {`${schedules.length} WORKOUT${schedules.length !== 1 ? 'S' : ''} PLANNED`}
+                  {`${sessions.length} WORKOUT${sessions.length !== 1 ? 'S' : ''} PLANNED`}
                 </Text>
                 <Pressable
                   style={({ pressed }) => [styles.newBtn, pressed && { opacity: 0.7 }]}
@@ -252,8 +283,8 @@ export default function TrainScreen() {
                 </Pressable>
               </View>
 
-              {/* Schedule list */}
-              {schedules.map((s) => (
+              {/* Session list */}
+              {sessions.map((s) => (
                 <Pressable
                   key={s.id}
                   style={({ pressed }) => [styles.workoutCard, pressed && { opacity: 0.75 }]}
@@ -264,11 +295,11 @@ export default function TrainScreen() {
                   </View>
                   <View style={styles.workoutInfo}>
                     <Text style={styles.workoutName}>{s.name.toUpperCase()}</Text>
-                    <Text style={styles.workoutMeta}>{`${s.day} · ${s.exercises.length} exercises`}</Text>
+                    <Text style={styles.workoutMeta}>{`${sessionDay(s)} · ${s.exercises.length} exercises`}</Text>
                   </View>
                   <Pressable
                     style={({ pressed }) => [styles.deleteBtn, { opacity: pressed ? 0.9 : 0.4 }]}
-                    onPress={() => deleteSchedule(s.id)}
+                    onPress={() => handleDeleteSession(s.id)}
                     hitSlop={8}
                   >
                     <Ionicons name="trash-outline" size={16} color="#ff6b6b" />
@@ -278,7 +309,7 @@ export default function TrainScreen() {
               ))}
 
               {/* Empty state */}
-              {schedules.length === 0 && (
+              {!loading && sessions.length === 0 && (
                 <View style={styles.emptyState}>
                   <Ionicons
                     name="barbell-outline"
@@ -305,7 +336,7 @@ export default function TrainScreen() {
                   <View style={{ flex: 1 }}>
                     <Text style={styles.detailName}>{selected.name.toUpperCase()}</Text>
                     <Text style={styles.detailMeta}>
-                      {`${selected.day.toUpperCase()} · ${selected.exercises.length} EXERCISES`}
+                      {`${sessionDay(selected).toUpperCase()} · ${selected.exercises.length} EXERCISES`}
                     </Text>
                   </View>
                 </View>
@@ -326,7 +357,7 @@ export default function TrainScreen() {
 
               {/* Exercise list */}
               {selected.exercises.map((ex, i) => (
-                <View key={i} style={styles.exCard}>
+                <View key={ex.id} style={styles.exCard}>
                   <View style={[styles.exCardTop, workoutStarted && { marginBottom: 12 }]}>
                     <View style={[styles.exIcon, workoutStarted && styles.exIconActive]}>
                       <Ionicons
@@ -336,9 +367,9 @@ export default function TrainScreen() {
                       />
                     </View>
                     <View style={styles.exInfo}>
-                      <Text style={styles.exName}>{ex.name}</Text>
+                      <Text style={styles.exName}>{ex.exercise_name}</Text>
                       <Text style={styles.exMeta}>
-                        {`${ex.sets} sets · ${ex.reps} reps${ex.weight > 0 ? ` · ${ex.weight}kg` : ''}`}
+                        {`${ex.sets} sets · ${ex.reps} reps${(ex.target_weight ?? 0) > 0 ? ` · ${ex.target_weight}kg` : ''}`}
                       </Text>
                     </View>
                     {!workoutStarted && (
@@ -379,7 +410,7 @@ export default function TrainScreen() {
               {!workoutStarted ? (
                 <Pressable
                   style={({ pressed }) => [styles.startBtn, pressed && { opacity: 0.85 }]}
-                  onPress={() => setWorkoutStarted(true)}
+                  onPress={handleStartWorkout}
                 >
                   <Ionicons name="flash" size={18} color={Colors.primary} />
                   <Text style={styles.startBtnText}>START WORKOUT</Text>
@@ -391,7 +422,7 @@ export default function TrainScreen() {
                   <Text style={styles.doneSub}>All sets completed. Great work!</Text>
                   <Pressable
                     style={({ pressed }) => [styles.doneBtn, pressed && { opacity: 0.8 }]}
-                    onPress={goBack}
+                    onPress={handleFinishWorkout}
                   >
                     <Text style={styles.doneBtnText}>BACK TO SCHEDULE</Text>
                   </Pressable>
@@ -399,10 +430,7 @@ export default function TrainScreen() {
               ) : (
                 <Pressable
                   style={({ pressed }) => [styles.cancelBtn, pressed && { opacity: 0.75 }]}
-                  onPress={() => {
-                    setWorkoutStarted(false);
-                    setCompletedSets({});
-                  }}
+                  onPress={handleCancelWorkout}
                 >
                   <Ionicons name="close" size={15} color={Colors.muted} />
                   <Text style={styles.cancelBtnText}>CANCEL WORKOUT</Text>
@@ -421,7 +449,7 @@ export default function TrainScreen() {
         <Pressable style={StyleSheet.absoluteFill} onPress={() => setShowModal(false)} />
       </Animated.View>
 
-      {/* Bottom sheet */}
+      {/* Create workout bottom sheet */}
       <Animated.View
         pointerEvents={showModal ? 'auto' : 'none'}
         style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}
@@ -551,16 +579,22 @@ export default function TrainScreen() {
             <Pressable
               style={({ pressed }) => [
                 styles.saveBtn,
-                !canSave && styles.saveBtnDisabled,
-                pressed && canSave ? { opacity: 0.8 } : undefined,
+                (!canSave || saving) && styles.saveBtnDisabled,
+                pressed && canSave && !saving ? { opacity: 0.8 } : undefined,
               ]}
               onPress={saveWorkout}
-              disabled={!canSave}
+              disabled={!canSave || saving}
             >
-              <Ionicons name="checkmark" size={17} color={canSave ? Colors.primary : Colors.muted} />
-              <Text style={[styles.saveBtnText, !canSave && { color: Colors.muted }]}>
-                SAVE SCHEDULE
-              </Text>
+              {saving ? (
+                <ActivityIndicator size="small" color={Colors.primary} />
+              ) : (
+                <>
+                  <Ionicons name="checkmark" size={17} color={canSave ? Colors.primary : Colors.muted} />
+                  <Text style={[styles.saveBtnText, !canSave && { color: Colors.muted }]}>
+                    SAVE SCHEDULE
+                  </Text>
+                </>
+              )}
             </Pressable>
           </ScrollView>
         </KeyboardAvoidingView>
@@ -601,6 +635,11 @@ const styles = StyleSheet.create({
   tabSwitcher: {
     paddingHorizontal: 16,
     paddingBottom: 10,
+  },
+
+  loadingRow: {
+    paddingVertical: 20,
+    alignItems: 'center',
   },
 
   // Calendar
