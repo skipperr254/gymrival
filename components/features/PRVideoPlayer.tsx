@@ -3,8 +3,8 @@ import {
   View,
   Pressable,
   StyleSheet,
-  Image,
 } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { Play, Maximize2 } from 'lucide-react-native';
 import type { PRVideoStatus } from '@/types/pr';
@@ -13,26 +13,25 @@ interface Props {
   videoUrl: string;
   thumbnailUrl: string | null;
   status: PRVideoStatus;
-  /** True when the post belongs to the current viewer — shows upload states */
   isOwn: boolean;
-  height?: number;
+  /** Controlled by the parent feed: when false the VideoView surface is unmounted,
+   *  preventing Android SurfaceView from bleeding into sibling cards. */
+  isActive: boolean;
+  /** Called when the user initiates playback — parent should set this card as the only active one */
+  onPlayStart: () => void;
 }
 
 export function PRVideoPlayer({
   videoUrl,
   thumbnailUrl,
   status,
-  isOwn,
-  height = 200,
+  isOwn: _isOwn,
+  isActive,
+  onPlayStart,
 }: Props) {
-  // videoMounted guards whether the native VideoView surface exists.
-  // We defer mounting it until the user taps play — multiple mounted VideoViews
-  // cause Android SurfaceView to render all videos on a single shared hardware
-  // layer behind the UI, making cards appear as "windows" into the same surface.
   const [videoMounted, setVideoMounted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const viewRef = useRef<VideoView>(null);
-  // Used to enter fullscreen as soon as VideoView mounts (on first-tap fullscreen)
   const pendingFullscreenRef = useRef(false);
 
   const player = useVideoPlayer(status === 'ready' ? videoUrl : null, (p) => {
@@ -40,7 +39,7 @@ export function PRVideoPlayer({
     p.loop = false;
   });
 
-  // Reset state when the video source changes (e.g. status flips to ready)
+  // Reset when the video source or status changes
   useEffect(() => {
     setVideoMounted(false);
     setIsPlaying(false);
@@ -51,7 +50,19 @@ export function PRVideoPlayer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoUrl, status]);
 
-  // After VideoView mounts, start playback and handle any pending fullscreen request
+  // When another card takes over, pause and unmount this VideoView surface.
+  // Keeping a single SurfaceView active at a time is the only reliable fix
+  // for Android's SurfaceView bleeding behind sibling React Native views.
+  useEffect(() => {
+    if (!isActive && videoMounted) {
+      try { player.pause(); } catch { /* ignore */ }
+      setVideoMounted(false);
+      setIsPlaying(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive]);
+
+  // Start playback after the VideoView surface mounts
   useEffect(() => {
     if (!videoMounted) return;
     player.play();
@@ -65,7 +76,8 @@ export function PRVideoPlayer({
   const handleTogglePlay = useCallback(() => {
     if (status !== 'ready') return;
     if (!videoMounted) {
-      // First tap: mount the native surface and start playing
+      // First tap: notify parent (deactivates any other playing card), then mount
+      onPlayStart();
       setVideoMounted(true);
       setIsPlaying(true);
       return;
@@ -77,12 +89,13 @@ export function PRVideoPlayer({
       player.play();
       setIsPlaying(true);
     }
-  }, [videoMounted, isPlaying, player, status]);
+  }, [videoMounted, isPlaying, player, status, onPlayStart]);
 
   const handleFullscreen = useCallback(() => {
     if (status !== 'ready') return;
     if (!videoMounted) {
       pendingFullscreenRef.current = true;
+      onPlayStart();
       setVideoMounted(true);
       setIsPlaying(true);
       return;
@@ -92,17 +105,16 @@ export function PRVideoPlayer({
       setIsPlaying(true);
     }
     viewRef.current?.enterFullscreen();
-  }, [videoMounted, isPlaying, player, status]);
+  }, [videoMounted, isPlaying, player, status, onPlayStart]);
 
   if (status !== 'ready') return null;
 
   return (
-    <Pressable
-      onPress={handleTogglePlay}
-      style={[styles.container, { height }]}
-    >
-      {/* Native VideoView surface — only mounted after first tap to avoid SurfaceView bleed */}
-      {videoMounted && (
+    <Pressable onPress={handleTogglePlay} style={styles.container}>
+      {/* VideoView is only mounted when this card is the active one AND the user
+          has tapped play. A single mounted SurfaceView at any time eliminates the
+          Android bleed-through artifact. */}
+      {videoMounted && isActive && (
         <VideoView
           ref={viewRef}
           player={player}
@@ -113,34 +125,31 @@ export function PRVideoPlayer({
         />
       )}
 
-      {/* Thumbnail / dark placeholder shown before first play */}
-      {!isPlaying && thumbnailUrl && (
-        <Image
+      {/* Thumbnail shown before first play. The container's aspectRatio is already
+          sized to match the video (set by FeedCard via Image.getSize), so "cover"
+          fills it edge-to-edge with no black bars. */}
+      {!isPlaying && thumbnailUrl ? (
+        <ExpoImage
           source={{ uri: thumbnailUrl }}
           style={StyleSheet.absoluteFill}
-          resizeMode="cover"
+          contentFit="cover"
         />
-      )}
-      {!isPlaying && !thumbnailUrl && (
-        <View style={[StyleSheet.absoluteFill, styles.placeholderBg]} />
-      )}
+      ) : !isPlaying ? (
+        <View style={[StyleSheet.absoluteFill, styles.placeholder]} />
+      ) : null}
 
       {/* Play button — visible when paused */}
       {!isPlaying && (
-        <View style={styles.playOverlay}>
+        <View style={styles.playOverlay} pointerEvents="none">
           <View style={styles.playBtn}>
             <Play size={22} fill="#fff" strokeWidth={0} color="#fff" />
           </View>
         </View>
       )}
 
-      {/* Fullscreen button — top-right corner */}
-      <Pressable
-        onPress={handleFullscreen}
-        style={styles.fullscreenBtn}
-        hitSlop={12}
-      >
-        <Maximize2 size={14} strokeWidth={2} color="#fff" />
+      {/* Fullscreen button — top-right */}
+      <Pressable onPress={handleFullscreen} style={styles.fullscreenBtn} hitSlop={14}>
+        <Maximize2 size={13} strokeWidth={2} color="rgba(255,255,255,0.7)" />
       </Pressable>
     </Pressable>
   );
@@ -148,13 +157,12 @@ export function PRVideoPlayer({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    backgroundColor: '#0d0d0d',
+    flex: 1,
+    backgroundColor: '#000',
     overflow: 'hidden',
-    borderRadius: 1,
   },
-  placeholderBg: {
-    backgroundColor: '#0d0d0d',
+  placeholder: {
+    backgroundColor: '#080808',
   },
   playOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -162,10 +170,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   playBtn: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(0,0,0,0.55)',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(0,0,0,0.60)',
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.25)',
     alignItems: 'center',
@@ -178,7 +186,9 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 8,
-    backgroundColor: 'rgba(0,0,0,0.55)',
+    backgroundColor: 'rgba(0,0,0,0.50)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.10)',
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -8,6 +8,7 @@ import {
   StyleSheet,
   TextInput,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSocialStore } from '@/store/useSocialStore';
@@ -33,6 +34,7 @@ import {
 import { Colors, Fonts } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
 import { PRVideoPlayer } from '@/components/features/PRVideoPlayer';
+import type { FeedPost } from '@/types/social';
 
 // ─── Feed helpers ─────────────────────────────────────────────────────────────
 
@@ -141,20 +143,183 @@ function formatConvTime(iso: string | null): string {
 
 function FeedSkeleton() {
   return (
+    <View style={[feedStyles.card, { borderColor: '#1e1e1e' }]}>
+      {/* Header skeleton */}
+      <View style={feedStyles.cardHeader}>
+        <View style={{ width: 42, height: 42, borderRadius: 21, backgroundColor: '#242424' }} />
+        <View style={{ flex: 1, gap: 8 }}>
+          <View style={{ height: 12, width: '45%', borderRadius: 6, backgroundColor: '#242424' }} />
+          <View style={{ height: 10, width: '65%', borderRadius: 5, backgroundColor: '#1e1e1e' }} />
+        </View>
+        <View style={{ width: 40, height: 24, borderRadius: 8, backgroundColor: '#1e1e1e' }} />
+      </View>
+      {/* Media skeleton — 4:5 matches the default before thumbnail detection */}
+      <View style={[feedStyles.mediaArea, { aspectRatio: 4 / 5, backgroundColor: '#191919' }]} />
+      {/* Footer skeleton */}
+      <View style={feedStyles.cardFooter}>
+        <View style={{ height: 14, width: 80, borderRadius: 6, backgroundColor: '#242424' }} />
+        <View style={{ height: 34, width: 90, borderRadius: 12, backgroundColor: '#1e1e1e' }} />
+      </View>
+    </View>
+  );
+}
+
+// ─── PR stat visual (no video attached) ──────────────────────────────────────
+
+function PRStatVisual({ post }: { post: FeedPost }) {
+  return (
+    <View style={feedStyles.statVisual}>
+      <LinearGradient
+        colors={['#141414', '#0d0808']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+      />
+      {/* Left accent strip */}
+      <LinearGradient
+        colors={[Colors.accent, Colors.accentDark]}
+        style={feedStyles.statAccentStrip}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+      />
+      {/* Center content */}
+      <View style={feedStyles.statContent}>
+        <Text style={feedStyles.statExercise}>{post.exercise_label.toUpperCase()}</Text>
+        <View style={feedStyles.statValueWrap}>
+          <Text style={feedStyles.statValueText}>{post.value}</Text>
+          <Text style={feedStyles.statUnitText}>{post.unit.toUpperCase()}</Text>
+        </View>
+      </View>
+      {/* NEW PR badge */}
+      <View style={feedStyles.newPrTag}>
+        <Text style={feedStyles.newPrTagText}>NEW PR</Text>
+      </View>
+    </View>
+  );
+}
+
+// ─── Feed card ────────────────────────────────────────────────────────────────
+
+interface FeedCardProps {
+  post: FeedPost;
+  userId: string;
+  isVideoActive: boolean;
+  onVideoPlay: () => void;
+  onLike: () => void;
+}
+
+function FeedCard({ post, userId, isVideoActive, onVideoPlay, onLike }: FeedCardProps) {
+  const isMe = post.user_id === userId;
+  const hasVideo = post.video?.status === 'ready';
+  const isUploading = post.video?.status === 'uploading' && isMe;
+
+  const displayName = post.author_name ?? post.author_username ?? 'Athlete';
+  const location = post.author_gym ?? 'Gym';
+  const timestamp = formatRelativeTime(post.created_at);
+
+  // Dynamically derived from the thumbnail using Image.getSize.
+  // Starts at 9:16 (tall portrait) so the card fills space while loading;
+  // updates to the video's real ratio, clamped between 9:16 (max portrait)
+  // and 16:9 (max landscape) so the card never exceeds those extremes.
+  const [mediaRatio, setMediaRatio] = useState<number>(9 / 16);
+  useEffect(() => {
+    const thumb = post.video?.thumbnail_url;
+    if (!thumb || !hasVideo) return;
+    let cancelled = false;
+    Image.getSize(
+      thumb,
+      (w, h) => {
+        if (!cancelled && w > 0 && h > 0) {
+          const ratio = w / h;
+          setMediaRatio(Math.min(Math.max(ratio, 9 / 16), 16 / 9));
+        }
+      },
+      () => {} // leave default on error
+    );
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [post.video?.thumbnail_url]);
+
+  return (
     <View style={feedStyles.card}>
-      <View style={[feedStyles.videoAreaCompact, { backgroundColor: '#1a1a1a' }]} />
-      <View style={feedStyles.cardBody}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-          <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#2a2a2a' }} />
-          <View style={{ flex: 1, gap: 6 }}>
-            <View style={{ height: 12, width: '50%', borderRadius: 6, backgroundColor: '#2a2a2a' }} />
-            <View style={{ height: 10, width: '70%', borderRadius: 5, backgroundColor: '#232323' }} />
+      {/* ── Header: author info ── */}
+      <View style={feedStyles.cardHeader}>
+        <FriendAvatar id={post.user_id} name={displayName} size={42} />
+        <View style={{ flex: 1 }}>
+          <Text style={feedStyles.authorName}>{displayName}</Text>
+          <View style={feedStyles.metaRow}>
+            <MapPin size={10} strokeWidth={2} color="#555" />
+            <Text style={feedStyles.metaText}>{location} · {timestamp}</Text>
           </View>
         </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <View style={{ height: 14, width: 80, borderRadius: 6, backgroundColor: '#2a2a2a' }} />
-          <View style={{ height: 34, width: 80, borderRadius: 12, backgroundColor: '#242424' }} />
+        <View style={feedStyles.levelPill}>
+          <Text style={feedStyles.levelPillText}>LV{post.author_level}</Text>
         </View>
+      </View>
+
+      {/* ── Media area — aspect ratio driven by video dimensions ── */}
+      <View style={[feedStyles.mediaArea, { aspectRatio: hasVideo ? mediaRatio : 1 }]}>
+        {hasVideo ? (
+          <PRVideoPlayer
+            videoUrl={post.video!.video_url}
+            thumbnailUrl={post.video!.thumbnail_url}
+            status={post.video!.status}
+            isOwn={isMe}
+            isActive={isVideoActive}
+            onPlayStart={onVideoPlay}
+          />
+        ) : (
+          <PRStatVisual post={post} />
+        )}
+
+        {isUploading && (
+          <View style={feedStyles.uploadingBadge}>
+            <ActivityIndicator size="small" color="#555" style={{ transform: [{ scale: 0.75 }] }} />
+            <Text style={feedStyles.uploadingBadgeText}>VIDEO UPLOADING…</Text>
+          </View>
+        )}
+
+        {/* PR value overlay at bottom — only for video posts so it doesn't double with PRStatVisual */}
+        {hasVideo && (
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.90)']}
+            style={feedStyles.prOverlay}
+            pointerEvents="none"
+          >
+            <Text style={feedStyles.prExercise}>{post.exercise_label.toUpperCase()}</Text>
+            <View style={feedStyles.prValueRow}>
+              <Text style={feedStyles.prValue}>{post.value}</Text>
+              <Text style={feedStyles.prUnit}>{post.unit.toUpperCase()}</Text>
+            </View>
+          </LinearGradient>
+        )}
+      </View>
+
+      {/* ── Footer: likes + action ── */}
+      <View style={feedStyles.cardFooter}>
+        <View style={feedStyles.likesDisplay}>
+          <Flame size={16} strokeWidth={2} color={Colors.accent} />
+          <Text style={feedStyles.likesCount}>{post.likes_count}</Text>
+          <Text style={feedStyles.likesLabel}>LIKES</Text>
+        </View>
+        {!isMe ? (
+          <Pressable
+            onPress={onLike}
+            style={[feedStyles.likeBtn, post.has_liked && feedStyles.likeBtnActive]}
+          >
+            <Heart
+              size={13}
+              strokeWidth={2}
+              fill={post.has_liked ? Colors.accent : 'none'}
+              color={post.has_liked ? Colors.accent : '#707070'}
+            />
+            <Text style={[feedStyles.likeBtnText, post.has_liked && feedStyles.likeBtnTextActive]}>
+              {post.has_liked ? 'LIKED' : 'LIKE'}
+            </Text>
+          </Pressable>
+        ) : (
+          <Text style={feedStyles.yourPrLabel}>YOUR PR</Text>
+        )}
       </View>
     </View>
   );
@@ -172,6 +337,10 @@ function FeedContent() {
     toggleLike,
     subscribeToFeedEvents,
   } = useSocialStore();
+
+  // Tracks which post's VideoView is currently mounted.
+  // Only one VideoView is alive at a time — eliminates Android SurfaceView bleed.
+  const [playingPostId, setPlayingPostId] = useState<string | null>(null);
 
   // Initial load
   useEffect(() => {
@@ -212,107 +381,16 @@ function FeedContent() {
 
   return (
     <>
-      {feed.map(post => {
-        const isMe = post.user_id === userId;
-        const displayName = post.author_name ?? post.author_username ?? 'Athlete';
-        const location = post.author_gym ?? 'Unknown gym';
-        const timestamp = formatRelativeTime(post.created_at);
-
-        return (
-          <View key={post.id} style={[feedStyles.card, feedStyles.cardDefault]}>
-            {/* Video / PR visual area */}
-            {(() => {
-              const hasReadyVideo = post.video?.status === 'ready';
-              const isUploading = post.video?.status === 'uploading' && isMe;
-              return (
-                <View style={hasReadyVideo ? feedStyles.videoArea : feedStyles.videoAreaCompact}>
-                  {hasReadyVideo && (
-                    <PRVideoPlayer
-                      videoUrl={post.video!.video_url}
-                      thumbnailUrl={post.video!.thumbnail_url}
-                      status={post.video!.status}
-                      isOwn={isMe}
-                      height={200}
-                    />
-                  )}
-                  {isUploading && (
-                    <View style={feedStyles.uploadingBadge}>
-                      <ActivityIndicator size="small" color="#555" style={{ transform: [{ scale: 0.7 }] }} />
-                      <Text style={feedStyles.uploadingBadgeText}>VIDEO UPLOADING…</Text>
-                    </View>
-                  )}
-                  {/* PR value overlay at the bottom of the visual area */}
-                  <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.9)']}
-                    style={feedStyles.videoGradient}
-                    pointerEvents="none"
-                  >
-                    <View style={feedStyles.prOverlay}>
-                      <View>
-                        <View style={feedStyles.prValueRow}>
-                          <Text style={feedStyles.prValue}>{post.value}</Text>
-                          <Text style={feedStyles.prUnit}>{post.unit.toUpperCase()}</Text>
-                        </View>
-                        <Text style={feedStyles.prExercise}>{post.exercise_label.toUpperCase()}</Text>
-                      </View>
-                    </View>
-                  </LinearGradient>
-                </View>
-              );
-            })()}
-
-            {/* Card body */}
-            <View style={feedStyles.cardBody}>
-              <View style={feedStyles.userRow}>
-                <FriendAvatar id={post.user_id} name={displayName} size={36} />
-                <View style={{ flex: 1 }}>
-                  <Text style={feedStyles.userName}>{displayName}</Text>
-                  <View style={feedStyles.metaRow}>
-                    <MapPin size={10} strokeWidth={2} color="#555" />
-                    <Text style={feedStyles.metaText}>
-                      {location} {'·'} {timestamp}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-
-              <View style={feedStyles.actionRow}>
-                <View style={feedStyles.likesDisplay}>
-                  <Flame size={16} strokeWidth={2} color={Colors.accent} />
-                  <Text style={feedStyles.likesCount}>{post.likes_count}</Text>
-                  <Text style={feedStyles.likesLabel}>LIKES</Text>
-                </View>
-                {!isMe ? (
-                  <Pressable
-                    onPress={() => toggleLike(userId, post.id)}
-                    style={[
-                      feedStyles.likeBtn,
-                      post.has_liked ? feedStyles.likeBtnActive : feedStyles.likeBtnDefault,
-                    ]}
-                  >
-                    <Heart
-                      size={13}
-                      strokeWidth={2}
-                      fill={post.has_liked ? Colors.accent : 'none'}
-                      color={post.has_liked ? Colors.accent : '#707070'}
-                    />
-                    <Text
-                      style={[
-                        feedStyles.likeBtnText,
-                        post.has_liked && feedStyles.likeBtnTextActive,
-                      ]}
-                    >
-                      {post.has_liked ? 'LIKED' : 'LIKE'}
-                    </Text>
-                  </Pressable>
-                ) : (
-                  <Text style={feedStyles.yourPrLabel}>YOUR PR</Text>
-                )}
-              </View>
-            </View>
-          </View>
-        );
-      })}
+      {feed.map(post => (
+        <FeedCard
+          key={post.id}
+          post={post}
+          userId={userId}
+          isVideoActive={playingPostId === post.id}
+          onVideoPlay={() => setPlayingPostId(post.id)}
+          onLike={() => toggleLike(userId, post.id)}
+        />
+      ))}
       <Text style={feedStyles.footerNote}>{"YOU'RE ALL CAUGHT UP"}</Text>
     </>
   );
@@ -886,32 +964,63 @@ export default function SocialScreen() {
 // ─── Feed Styles ──────────────────────────────────────────────────────────────
 
 const feedStyles = StyleSheet.create({
+  // ── Card shell ──
   card: {
     borderRadius: 20,
     marginBottom: 14,
     overflow: 'hidden',
+    backgroundColor: '#1c1c1c',
     borderWidth: 1.5,
-  },
-  cardVerified: {
-    backgroundColor: '#1c1c1c',
-    borderColor: 'rgba(230,48,48,0.35)',
-  },
-  cardDefault: {
-    backgroundColor: '#1c1c1c',
     borderColor: '#242424',
   },
-  videoArea: {
-    height: 200,
-    backgroundColor: '#0d0d0d',
-    overflow: 'hidden',
-    borderRadius: 1,
+
+  // ── Header row ──
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 14,
+    paddingTop: 14,
+    paddingBottom: 12,
   },
-  videoAreaCompact: {
-    height: 110,
-    backgroundColor: '#0d0d0d',
-    overflow: 'hidden',
-    borderRadius: 1,
+  authorName: {
+    fontFamily: Fonts.bodySemiBold,
+    fontSize: 14,
+    color: '#fff',
+    marginBottom: 2,
   },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  metaText: {
+    fontFamily: Fonts.body,
+    fontSize: 11,
+    color: '#555',
+  },
+  levelPill: {
+    backgroundColor: '#232323',
+    borderWidth: 1,
+    borderColor: '#2e2e2e',
+    borderRadius: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  levelPillText: {
+    fontFamily: Fonts.display,
+    fontSize: 11,
+    color: '#606060',
+    letterSpacing: 1,
+  },
+
+  // ── Media area — no hardcoded aspectRatio; it is applied inline per-card ──
+  mediaArea: {
+    backgroundColor: '#000',
+    overflow: 'hidden',
+  },
+
+  // Uploading indicator (shown inside mediaArea)
   uploadingBadge: {
     position: 'absolute',
     top: 10,
@@ -919,7 +1028,7 @@ const feedStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgba(0,0,0,0.60)',
     borderRadius: 20,
     paddingVertical: 5,
     paddingHorizontal: 10,
@@ -930,19 +1039,23 @@ const feedStyles = StyleSheet.create({
     color: '#666',
     letterSpacing: 1.5,
   },
-  videoGradient: {
+
+  // PR overlay gradient at the bottom of video posts
+  prOverlay: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    paddingHorizontal: 16,
-    paddingBottom: 14,
-    paddingTop: 36,
+    paddingHorizontal: 14,
+    paddingBottom: 12,
+    paddingTop: 44,
   },
-  prOverlay: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
+  prExercise: {
+    fontFamily: Fonts.display,
+    fontSize: 10,
+    color: '#bbb',
+    letterSpacing: 2.5,
+    marginBottom: 2,
   },
   prValueRow: {
     flexDirection: 'row',
@@ -951,68 +1064,85 @@ const feedStyles = StyleSheet.create({
   },
   prValue: {
     fontFamily: Fonts.display,
-    fontSize: 30,
+    fontSize: 32,
     color: '#fff',
     letterSpacing: 2,
-    lineHeight: 32,
+    lineHeight: 34,
   },
   prUnit: {
     fontFamily: Fonts.display,
     fontSize: 16,
     color: '#aaa',
   },
-  prExercise: {
-    fontFamily: Fonts.display,
-    fontSize: 11,
-    color: '#aaa',
-    letterSpacing: 2,
-    marginTop: 2,
+
+  // ── PR stat visual (no video) ──
+  statVisual: {
+    flex: 1,
+    overflow: 'hidden',
   },
-  trendingBadge: {
-    flexDirection: 'row',
+  statAccentStrip: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 4,
+  },
+  statContent: {
+    flex: 1,
     alignItems: 'center',
-    gap: 5,
-    backgroundColor: 'rgba(230,48,48,0.9)',
-    borderRadius: 20,
-    paddingVertical: 4,
+    justifyContent: 'center',
+  },
+  statExercise: {
+    fontFamily: Fonts.display,
+    fontSize: 12,
+    color: '#666',
+    letterSpacing: 3,
+    marginBottom: 6,
+  },
+  statValueWrap: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 4,
+  },
+  statValueText: {
+    fontFamily: Fonts.display,
+    fontSize: 54,
+    color: '#fff',
+    letterSpacing: 2,
+    lineHeight: 56,
+  },
+  statUnitText: {
+    fontFamily: Fonts.display,
+    fontSize: 22,
+    color: '#666',
+    letterSpacing: 2,
+    marginBottom: 6,
+  },
+  newPrTag: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: 'rgba(230,48,48,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(230,48,48,0.30)',
+    borderRadius: 8,
+    paddingVertical: 5,
     paddingHorizontal: 10,
   },
-  trendingText: {
+  newPrTagText: {
     fontFamily: Fonts.display,
     fontSize: 10,
-    color: '#fff',
-    letterSpacing: 1,
+    color: Colors.accent,
+    letterSpacing: 2,
   },
-  cardBody: {
-    paddingHorizontal: 16,
-    paddingVertical: 13,
-  },
-  userRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 12,
-  },
-  userName: {
-    fontFamily: Fonts.bodySemiBold,
-    fontSize: 14,
-    color: '#fff',
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 2,
-  },
-  metaText: {
-    fontFamily: Fonts.body,
-    fontSize: 11,
-    color: '#555',
-  },
-  actionRow: {
+
+  // ── Footer row ──
+  cardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    paddingVertical: 13,
   },
   likesDisplay: {
     flexDirection: 'row',
@@ -1038,13 +1168,11 @@ const feedStyles = StyleSheet.create({
     paddingHorizontal: 18,
     borderRadius: 12,
     borderWidth: 1.5,
-  },
-  likeBtnDefault: {
     borderColor: '#2a2a2a',
     backgroundColor: '#242424',
   },
   likeBtnActive: {
-    borderColor: 'rgba(230,48,48,0.5)',
+    borderColor: 'rgba(230,48,48,0.50)',
     backgroundColor: 'rgba(230,48,48,0.08)',
   },
   likeBtnText: {
@@ -1062,6 +1190,8 @@ const feedStyles = StyleSheet.create({
     color: '#404040',
     letterSpacing: 1,
   },
+
+  // ── Misc ──
   footerNote: {
     textAlign: 'center',
     paddingVertical: 24,
