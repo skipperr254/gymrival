@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Pressable, TextInput, StyleSheet, ActivityIndicator, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import {
   Medal,
   Zap,
@@ -18,14 +19,18 @@ import {
   Gift,
   Swords,
   Users,
-  ArrowLeft,
   RefreshCw,
   AlertCircle,
+  X,
 } from 'lucide-react-native';
 import { Colors, Fonts } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCompeteStore } from '@/store/useCompeteStore';
+import { useSocialStore } from '@/store/useSocialStore';
 import type { GlobalLeaderboardEntry } from '@/types/compete';
+import type { ChallengeWithStats, ChallengeMetric } from '@/types/challenge';
+import { endsInLabel, formatChallengeScore, metricLabel } from '@/types/challenge';
+import type { FriendProfile } from '@/types/social';
 
 /** Converts an ISO 3166-1 alpha-2 code (e.g. 'NL') to its Unicode flag emoji. */
 function toFlagEmoji(code: string | null | undefined): string {
@@ -36,72 +41,6 @@ function toFlagEmoji(code: string | null | undefined): string {
     code.toUpperCase().charCodeAt(1) + base,
   );
 }
-
-// ─── Challenge Data ───────────────────────────────────────────────────────────
-
-type ChallengeEntry = {
-  id: number;
-  name: string;
-  username: string;
-  val: string;
-  unit: string;
-  isMe?: boolean;
-};
-
-type ChallengeData = {
-  id: string;
-  title: string;
-  desc: string;
-  Icon: typeof Dumbbell;
-  prize: string;
-  endsIn: string;
-  participants: number;
-  color: string;
-  leaderboard: ChallengeEntry[];
-};
-
-const WEEKLY_CHALLENGE: ChallengeData = {
-  id: 'weekly',
-  title: 'BENCH BATTLE',
-  desc: 'Who has the highest bench press PR this week?',
-  Icon: Dumbbell,
-  prize: 'Gold badge + 500 XP',
-  endsIn: '4 days',
-  participants: 47,
-  color: '#e63030',
-  leaderboard: [
-    { id: 3, name: 'Sara', username: '@sara_lifts', val: '105', unit: 'kg' },
-    { id: 2, name: 'Daan', username: '@daanfit',    val: '102', unit: 'kg' },
-    { id: 1, name: 'You',  username: '@you',        val: '100', unit: 'kg', isMe: true },
-    { id: 4, name: 'Mike', username: '@mike_gains', val: '98',  unit: 'kg' },
-    { id: 5, name: 'Lisa', username: '@lisastrong', val: '92',  unit: 'kg' },
-  ],
-};
-
-const MONTHLY_CHALLENGE: ChallengeData = {
-  id: 'monthly',
-  title: 'MOST IMPROVED',
-  desc: 'Who makes the biggest PR progress this month?',
-  Icon: TrendingUp,
-  prize: 'Platinum badge + 2000 XP + 1 month Pro',
-  endsIn: '18 days',
-  participants: 124,
-  color: '#4a9eff',
-  leaderboard: [
-    { id: 4, name: 'Mike', username: '@mike_gains',  val: '+28kg', unit: 'total' },
-    { id: 5, name: 'Lisa', username: '@lisastrong',  val: '+22kg', unit: 'total' },
-    { id: 2, name: 'Daan', username: '@daanfit',     val: '+19kg', unit: 'total' },
-    { id: 1, name: 'You',  username: '@you',         val: '+15kg', unit: 'total', isMe: true },
-    { id: 3, name: 'Sara', username: '@sara_lifts',  val: '+12kg', unit: 'total' },
-  ],
-};
-
-const CHALLENGE_FRIENDS = [
-  { id: 2, name: 'Daan' },
-  { id: 3, name: 'Sara' },
-  { id: 4, name: 'Mike' },
-  { id: 5, name: 'Lisa' },
-];
 
 // ─── Tab config ───────────────────────────────────────────────────────────────
 
@@ -307,75 +246,101 @@ const rivalsStyles = StyleSheet.create({
 
 // ─── Challenge Card ───────────────────────────────────────────────────────────
 
+const CHALLENGE_COLOR = '#e63030';
+
 function ChallengeCard({
   ch,
-  joined,
+  topEntries,
+  unit,
   onJoin,
-  onOpen,
+  onLeave,
+  joining,
 }: {
-  ch: ChallengeData;
-  joined: boolean;
-  onJoin: (id: string) => void;
-  onOpen: (id: string) => void;
+  ch: ChallengeWithStats;
+  topEntries: { user_id: string; full_name: string | null; username: string | null; score: number; is_me: boolean }[];
+  unit: string;
+  onJoin: () => void;
+  onLeave: () => void;
+  joining: boolean;
 }) {
-  const ChalIcon = ch.Icon;
+  const isFriend = ch.type === 'friend';
+  const color    = isFriend ? '#4a9eff' : CHALLENGE_COLOR;
+  const MetricIcon = ch.metric === 'most_improved' ? TrendingUp
+    : ch.metric === 'total_volume' ? Activity
+    : Dumbbell;
+
   return (
-    <View style={[cStyles.card, { borderColor: ch.color + '22' }]}>
-      {/* Header row */}
+    <View style={[cStyles.card, { borderColor: color + '22' }]}>
       <View style={cStyles.cardHeader}>
-        <View style={[cStyles.iconBox, { backgroundColor: ch.color + '15', borderColor: ch.color + '33' }]}>
-          <ChalIcon size={22} strokeWidth={1.5} color={ch.color} />
+        <View style={[cStyles.iconBox, { backgroundColor: color + '15', borderColor: color + '33' }]}>
+          <MetricIcon size={22} strokeWidth={1.5} color={color} />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={cStyles.cardTitle}>{ch.title}</Text>
-          <Text style={cStyles.cardDesc}>{ch.desc}</Text>
+          <Text style={cStyles.cardDesc}>{ch.description ?? metricLabel(ch.metric)}</Text>
         </View>
       </View>
 
-      {/* Stats row */}
       <View style={cStyles.statsRow}>
         <View style={cStyles.statItem}>
           <Clock size={12} strokeWidth={1.8} color="#555" />
-          <Text style={cStyles.statText}>{ch.endsIn}</Text>
+          <Text style={cStyles.statText}>{endsInLabel(ch.ends_at)}</Text>
         </View>
         <View style={cStyles.statItem}>
           <Users size={12} strokeWidth={1.8} color="#555" />
-          <Text style={cStyles.statText}>{ch.participants} joined</Text>
+          <Text style={cStyles.statText}>{ch.participant_count} joined</Text>
         </View>
-        <View style={cStyles.statItem}>
-          <Gift size={12} strokeWidth={1.8} color="#555" />
-          <Text style={cStyles.statText}>{ch.prize}</Text>
-        </View>
+        {!!ch.prize_label && (
+          <View style={cStyles.statItem}>
+            <Gift size={12} strokeWidth={1.8} color="#555" />
+            <Text style={cStyles.statText}>{ch.prize_label}</Text>
+          </View>
+        )}
       </View>
 
-      {/* Mini leaderboard – top 3 */}
-      {ch.leaderboard.slice(0, 3).map((p, i) => (
-        <View key={i} style={cStyles.miniRow}>
-          <View style={cStyles.miniMedal}>
-            <Trophy size={16} strokeWidth={1.8} color={MEDAL_COLORS[i]} />
+      {topEntries.slice(0, 3).map((p, i) => {
+        const displayName = p.full_name ?? p.username ?? 'Unknown';
+        return (
+          <View key={p.user_id} style={cStyles.miniRow}>
+            <View style={cStyles.miniMedal}>
+              <Trophy size={16} strokeWidth={1.8} color={MEDAL_COLORS[i]} />
+            </View>
+            <LeaderboardAvatar id={p.user_id} name={displayName} size={26} />
+            <Text style={[cStyles.miniName, p.is_me && { color, fontFamily: Fonts.bodyMedium }]}>
+              {displayName}{p.is_me ? ' (You)' : ''}
+            </Text>
+            <Text style={[cStyles.miniVal, p.is_me && { color }]}>
+              {formatChallengeScore(p.score, ch.metric, unit)}{' '}
+              <Text style={cStyles.miniUnit}>{unit.toUpperCase()}</Text>
+            </Text>
           </View>
-          <LeaderboardAvatar id={p.id} name={p.name} size={26} />
-          <Text style={[cStyles.miniName, p.isMe && { color: ch.color, fontFamily: Fonts.bodyMedium }]}>
-            {p.name}{p.isMe ? ' (You)' : ''}
-          </Text>
-          <Text style={[cStyles.miniVal, p.isMe && { color: ch.color }]}>
-            {p.val}{' '}
-            <Text style={cStyles.miniUnit}>{p.unit}</Text>
+        );
+      })}
+
+      {ch.is_joined && ch.user_rank != null && (
+        <View style={[cStyles.statItem, { marginTop: 10, marginBottom: 2 }]}>
+          <Trophy size={12} strokeWidth={1.8} color={color} />
+          <Text style={[cStyles.statText, { color }]}>
+            {'Your rank: #'}{ch.user_rank}
+            {ch.user_score != null ? `  ·  ${formatChallengeScore(ch.user_score, ch.metric, unit)}` : ''}
           </Text>
         </View>
-      ))}
+      )}
 
-      {/* Action buttons */}
       <View style={cStyles.btnRow}>
-        <Pressable onPress={() => onJoin(ch.id)} style={{ flex: 1 }}>
-          {joined ? (
+        <Pressable onPress={ch.is_joined ? onLeave : onJoin} style={{ flex: 1 }} disabled={joining}>
+          {ch.is_joined ? (
             <View style={cStyles.btnJoinedInactive}>
               <CheckCircle size={13} strokeWidth={2} color="#555" />
               <Text style={cStyles.btnJoinedText}>JOINED</Text>
             </View>
+          ) : joining ? (
+            <View style={cStyles.btnJoinedInactive}>
+              <ActivityIndicator size="small" color="#555" />
+            </View>
           ) : (
             <LinearGradient
-              colors={[ch.color, ch.color + '99']}
+              colors={[color, color + '99']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={cStyles.btnJoin}
@@ -386,155 +351,422 @@ function ChallengeCard({
           )}
         </Pressable>
         <Pressable
-          onPress={() => onOpen(ch.id)}
-          style={[cStyles.btnViewAll, { borderColor: ch.color + '44' }]}
+          onPress={() => router.push(`/(tabs)/compete/challenge/${ch.id}` as any)}
+          style={[cStyles.btnViewAll, { borderColor: color + '44' }]}
         >
-          <Text style={[cStyles.btnViewAllText, { color: ch.color }]}>VIEW ALL</Text>
-          <ChevronRight size={13} strokeWidth={2} color={ch.color} />
+          <Text style={[cStyles.btnViewAllText, { color }]}>VIEW ALL</Text>
+          <ChevronRight size={13} strokeWidth={2} color={color} />
         </Pressable>
       </View>
     </View>
   );
 }
 
-// ─── Challenge Detail ─────────────────────────────────────────────────────────
+// ─── Invitation Card ──────────────────────────────────────────────────────────
 
-function ChallengeDetail({
-  ch,
-  joined,
-  onJoin,
-  onBack,
+function InvitationCard({
+  invitation,
+  onAccept,
+  onDecline,
+  loading,
 }: {
-  ch: ChallengeData;
-  joined: boolean;
-  onJoin: (id: string) => void;
-  onBack: () => void;
+  invitation: import('@/types/challenge').ChallengeInvitation;
+  onAccept: () => void;
+  onDecline: () => void;
+  loading: boolean;
 }) {
-  const ChalIcon = ch.Icon;
+  const ch       = invitation.challenge;
+  const inviter  = invitation.inviter;
+  const title    = ch?.title ?? 'Challenge Invite';
+  const name     = inviter?.full_name ?? inviter?.username ?? 'Someone';
+
   return (
-    <>
-      <Pressable onPress={onBack} style={cStyles.backBtn}>
-        <ArrowLeft size={16} strokeWidth={2} color="#fff" />
-        <Text style={cStyles.backBtnText}>BACK</Text>
-      </Pressable>
-
-      <View style={[cStyles.card, { borderColor: ch.color + '33' }]}>
-        <View style={[cStyles.iconBoxLg, { backgroundColor: ch.color + '15', borderColor: ch.color + '33' }]}>
-          <ChalIcon size={26} strokeWidth={1.4} color={ch.color} />
+    <View style={[cStyles.card, { borderColor: '#4a9eff33' }]}>
+      <View style={cStyles.cardHeader}>
+        <View style={[cStyles.iconBox, { backgroundColor: '#4a9eff15', borderColor: '#4a9eff33' }]}>
+          <Swords size={20} strokeWidth={1.6} color="#4a9eff" />
         </View>
-        <Text style={cStyles.detailTitle}>{ch.title}</Text>
-        <Text style={cStyles.detailDesc}>{ch.desc}</Text>
-
-        <View style={cStyles.prizeBox}>
-          <Gift size={15} strokeWidth={1.8} color={ch.color} />
-          <View>
-            <Text style={cStyles.prizeLabel}>PRIZE</Text>
-            <Text style={[cStyles.prizeVal, { color: ch.color }]}>{ch.prize}</Text>
-          </View>
-        </View>
-
-        <View style={cStyles.detailStatsRow}>
-          <View style={cStyles.detailStatItem}>
-            <Clock size={14} strokeWidth={1.8} color="#555" />
-            <View>
-              <Text style={cStyles.detailStatLabel}>ENDS IN</Text>
-              <Text style={cStyles.detailStatVal}>{ch.endsIn}</Text>
-            </View>
-          </View>
-          <View style={cStyles.detailStatItem}>
-            <Users size={14} strokeWidth={1.8} color="#555" />
-            <View>
-              <Text style={cStyles.detailStatLabel}>PARTICIPANTS</Text>
-              <Text style={cStyles.detailStatVal}>{ch.participants}</Text>
-            </View>
-          </View>
+        <View style={{ flex: 1 }}>
+          <Text style={cStyles.cardTitle}>{title}</Text>
+          <Text style={cStyles.cardDesc}>
+            {name}{' challenged you'}
+            {ch?.ends_at ? `  ·  ${endsInLabel(ch.ends_at)}` : ''}
+          </Text>
         </View>
       </View>
-
-      <Text style={cStyles.sectionLabel}>FULL RANKINGS</Text>
-
-      {ch.leaderboard.map((p, i) => (
-        <View
-          key={i}
-          style={[
-            cStyles.rankRow,
-            p.isMe
-              ? { backgroundColor: ch.color + '12', borderColor: ch.color + '44' }
-              : { backgroundColor: '#1e1e1e', borderColor: '#2a2a2a' },
-          ]}
-        >
-          <View style={cStyles.rankMedal}>
-            {i < 3 ? (
-              <Trophy size={16} strokeWidth={1.8} color={MEDAL_COLORS[i]} />
-            ) : (
-              <Text style={cStyles.rankNumSmall}>#{i + 1}</Text>
-            )}
-          </View>
-          <LeaderboardAvatar id={p.id} name={p.name} size={36} />
-          <View style={{ flex: 1 }}>
-            <Text style={[cStyles.rankName, p.isMe && { color: ch.color }]}>
-              {p.name}{p.isMe ? ' (You)' : ''}
-            </Text>
-            <Text style={cStyles.rankUsername}>{p.username}</Text>
-          </View>
-          <View style={{ alignItems: 'flex-end' }}>
-            <Text style={[cStyles.rankVal, p.isMe && { color: ch.color }]}>{p.val}</Text>
-            <Text style={cStyles.rankUnit}>{p.unit.toUpperCase()}</Text>
-          </View>
+      {!!ch?.prize_label && (
+        <View style={[cStyles.statItem, { marginBottom: 12 }]}>
+          <Gift size={12} strokeWidth={1.8} color="#4a9eff" />
+          <Text style={[cStyles.statText, { color: '#4a9eff' }]}>{ch.prize_label}</Text>
         </View>
-      ))}
-
-      <Pressable onPress={() => onJoin(ch.id)} style={{ marginTop: 8, marginBottom: 16 }}>
-        {joined ? (
-          <View style={cStyles.detailBtnJoined}>
-            <CheckCircle size={15} strokeWidth={2} color="#555" />
-            <Text style={cStyles.detailBtnJoinedText}>JOINED</Text>
-          </View>
-        ) : (
+      )}
+      <View style={cStyles.btnRow}>
+        <Pressable
+          onPress={onAccept}
+          disabled={loading}
+          style={{ flex: 1 }}
+        >
           <LinearGradient
-            colors={[ch.color, ch.color + '99']}
+            colors={['#4a9eff', '#4a9eff99']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={cStyles.detailBtnJoin}
+            style={cStyles.btnJoin}
           >
-            <Zap size={15} strokeWidth={2} color="#fff" />
-            <Text style={cStyles.detailBtnJoinText}>JOIN CHALLENGE</Text>
+            {loading
+              ? <ActivityIndicator size="small" color="#fff" />
+              : <><CheckCircle size={13} strokeWidth={2} color="#fff" /><Text style={cStyles.btnJoinText}>ACCEPT</Text></>
+            }
           </LinearGradient>
-        )}
-      </Pressable>
-    </>
+        </Pressable>
+        <Pressable
+          onPress={onDecline}
+          disabled={loading}
+          style={[cStyles.btnViewAll, { borderColor: '#2a2a2a', flex: 1 }]}
+        >
+          <X size={13} strokeWidth={2} color="#555" />
+          <Text style={[cStyles.btnViewAllText, { color: '#555' }]}>DECLINE</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+// ─── Create Friend Challenge Modal ────────────────────────────────────────────
+
+const DURATION_OPTIONS = [
+  { label: '3 Days',  days: 3  },
+  { label: '1 Week',  days: 7  },
+  { label: '2 Weeks', days: 14 },
+  { label: '1 Month', days: 30 },
+];
+
+const METRIC_OPTIONS: { label: string; value: ChallengeMetric }[] = [
+  { label: 'Highest PR',    value: 'highest_pr'    },
+  { label: 'Most Improved', value: 'most_improved' },
+  { label: 'Total Volume',  value: 'total_volume'  },
+];
+
+function CreateChallengeModal({
+  visible,
+  friends,
+  exercises,
+  onClose,
+  onCreate,
+  loading,
+  errorMsg,
+}: {
+  visible: boolean;
+  friends: FriendProfile[];
+  exercises: import('@/types/pr').ExerciseType[];
+  onClose: () => void;
+  onCreate: (friendId: string, exerciseKey: string, metric: ChallengeMetric, durationDays: number) => void;
+  loading: boolean;
+  errorMsg?: string | null;
+}) {
+  const [selected, setSelected] = useState<FriendProfile | null>(null);
+  const [query,    setQuery]    = useState('');
+  const [exercise, setExercise] = useState(exercises[0]?.key ?? 'bench');
+  const [metric,   setMetric]   = useState<ChallengeMetric>('highest_pr');
+  const [duration, setDuration] = useState(7);
+
+  useEffect(() => {
+    if (!visible) return;
+    setSelected(null);
+    setQuery('');
+    setExercise(exercises[0]?.key ?? 'bench');
+    setMetric('highest_pr');
+    setDuration(7);
+  }, [visible, exercises]);
+
+  const filtered = query.trim()
+    ? friends.filter(f => {
+        const q = query.toLowerCase();
+        return f.full_name?.toLowerCase().includes(q) || f.username?.toLowerCase().includes(q);
+      })
+    : friends;
+
+  const canSend = !!selected && !loading;
+
+  return (
+    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+      <View style={mStyles.overlay}>
+        <View style={mStyles.sheet}>
+          <View style={mStyles.header}>
+            <Text style={mStyles.title}>{'CHALLENGE'}</Text>
+            <Pressable onPress={onClose} style={mStyles.closeBtn}>
+              <X size={18} strokeWidth={2} color="#fff" />
+            </Pressable>
+          </View>
+
+          <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+
+            {/* ── Friend picker ────────────────────────────── */}
+            <Text style={mStyles.label}>CHALLENGE</Text>
+
+            {selected ? (
+              <View style={mStyles.selectedRow}>
+                <LeaderboardAvatar
+                  id={selected.id}
+                  name={selected.full_name ?? selected.username ?? '?'}
+                  size={34}
+                />
+                <Text style={mStyles.selectedName} numberOfLines={1}>
+                  {selected.full_name ?? selected.username}
+                </Text>
+                <Pressable onPress={() => setSelected(null)} style={mStyles.changeBtn}>
+                  <Text style={mStyles.changeBtnText}>CHANGE</Text>
+                </Pressable>
+              </View>
+            ) : (
+              <>
+                <View style={mStyles.searchWrap}>
+                  <Search size={14} strokeWidth={1.8} color="#555" style={mStyles.searchIcon} />
+                  <TextInput
+                    value={query}
+                    onChangeText={setQuery}
+                    placeholder="Search friends..."
+                    placeholderTextColor="#555"
+                    style={mStyles.searchInput}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                </View>
+
+                {friends.length === 0 ? (
+                  <Text style={mStyles.noFriendsText}>{"Add friends first to challenge them"}</Text>
+                ) : filtered.length === 0 ? (
+                  <Text style={mStyles.noFriendsText}>{"No matching friends"}</Text>
+                ) : (
+                  <View style={mStyles.friendList}>
+                    {filtered.map((f, i) => {
+                      const name = f.full_name ?? f.username ?? 'Friend';
+                      return (
+                        <Pressable
+                          key={f.id}
+                          onPress={() => setSelected(f)}
+                          style={({ pressed }) => [
+                            mStyles.friendItem,
+                            i > 0 && mStyles.friendItemBorder,
+                            pressed && { backgroundColor: '#2a2a2a' },
+                          ]}
+                        >
+                          <LeaderboardAvatar id={f.id} name={name} size={34} />
+                          <View style={{ flex: 1 }}>
+                            <Text style={mStyles.friendItemName} numberOfLines={1}>{name}</Text>
+                            {!!f.username && (
+                              <Text style={mStyles.friendItemUsername}>{'@'}{f.username}</Text>
+                            )}
+                          </View>
+                          <ChevronRight size={14} strokeWidth={1.8} color="#555" />
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                )}
+              </>
+            )}
+
+            <View style={{ height: 20 }} />
+
+            {/* ── Exercise ─────────────────────────────────── */}
+            <Text style={mStyles.label}>EXERCISE</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
+              <View style={{ flexDirection: 'row', gap: 6, paddingBottom: 4 }}>
+                {exercises.map(ex => (
+                  <Pressable
+                    key={ex.key}
+                    onPress={() => setExercise(ex.key)}
+                    style={[mStyles.chip, exercise === ex.key && mStyles.chipActive]}
+                  >
+                    <Text style={[mStyles.chipLabel, exercise === ex.key && mStyles.chipLabelActive]}>
+                      {ex.label.toUpperCase()}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            </ScrollView>
+
+            {/* ── Metric ───────────────────────────────────── */}
+            <Text style={mStyles.label}>METRIC</Text>
+            <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
+              {METRIC_OPTIONS.map(opt => (
+                <Pressable
+                  key={opt.value}
+                  onPress={() => setMetric(opt.value)}
+                  style={[mStyles.chip, { flex: 1 }, metric === opt.value && mStyles.chipActive]}
+                >
+                  <Text style={[mStyles.chipLabel, metric === opt.value && mStyles.chipLabelActive]}>
+                    {opt.label.toUpperCase()}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+
+            {/* ── Duration ─────────────────────────────────── */}
+            <Text style={mStyles.label}>DURATION</Text>
+            <View style={{ flexDirection: 'row', gap: 8, marginBottom: 28 }}>
+              {DURATION_OPTIONS.map(opt => (
+                <Pressable
+                  key={opt.days}
+                  onPress={() => setDuration(opt.days)}
+                  style={[mStyles.chip, { flex: 1 }, duration === opt.days && mStyles.chipActive]}
+                >
+                  <Text style={[mStyles.chipLabel, duration === opt.days && mStyles.chipLabelActive]}>
+                    {opt.label.toUpperCase()}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+
+            {/* ── Error ────────────────────────────────────── */}
+            {!!errorMsg && (
+              <View style={mStyles.errorRow}>
+                <AlertCircle size={14} strokeWidth={1.8} color={Colors.accent} />
+                <Text style={mStyles.errorText}>{errorMsg}</Text>
+              </View>
+            )}
+
+            {/* ── Send ─────────────────────────────────────── */}
+            <Pressable
+              onPress={() => { if (canSend) onCreate(selected!.id, exercise, metric, duration); }}
+              disabled={!canSend}
+              style={[{ borderRadius: 14, overflow: 'hidden' }, !canSend && { opacity: 0.35 }]}
+            >
+              <LinearGradient
+                colors={[Colors.accent, Colors.accentDark]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={mStyles.sendBtn}
+              >
+                {loading
+                  ? <ActivityIndicator size="small" color="#fff" />
+                  : <><Zap size={16} strokeWidth={2} color="#fff" /><Text style={mStyles.sendBtnText}>SEND CHALLENGE</Text></>
+                }
+              </LinearGradient>
+            </Pressable>
+
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
   );
 }
 
 // ─── Challenges Content ───────────────────────────────────────────────────────
 
 function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) {
-  const [joined, setJoined]       = useState<string[]>([]);
-  const [detail, setDetail]       = useState<string | null>(null);
-  const [challenged, setChallenged] = useState<Record<number, boolean>>({});
+  const { user }    = useAuthStore();
+  const {
+    challenges,
+    loadingChallenges,
+    challengesError,
+    leaderboards,
+    pendingInvitations,
+    loadingInvitations,
+    exercises,
+    loadChallenges,
+    loadLeaderboard,
+    joinChallenge,
+    leaveChallenge,
+    loadPendingInvitations,
+    respondToInvitation,
+    createFriendChallenge,
+    loadExercises,
+  } = useCompeteStore();
 
-  const toggle = (id: string) =>
-    setJoined(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  const { friends, loadFriends } = useSocialStore();
 
-  const handleOpen = (id: string) => {
-    setDetail(id);
+  const [joiningId,    setJoiningId]    = useState<string | null>(null);
+  const [invLoading,   setInvLoading]   = useState<string | null>(null);
+  const [showModal,    setShowModal]    = useState(false);
+  const [creating,     setCreating]     = useState(false);
+  const [createError,  setCreateError]  = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    loadChallenges(user.id);
+    loadPendingInvitations(user.id);
+    loadFriends(user.id);
+    loadExercises();
+  }, [user?.id, loadChallenges, loadPendingInvitations, loadFriends, loadExercises]);
+
+  useEffect(() => {
+    if (!user?.id || challenges.length === 0) return;
+    challenges.forEach(ch => {
+      if (!leaderboards[ch.id]) loadLeaderboard(ch.id, user.id!);
+    });
+  }, [challenges, leaderboards, loadLeaderboard, user?.id]);
+
+  const handleJoin = async (challengeId: string) => {
+    if (!user?.id) return;
+    setJoiningId(challengeId);
+    await joinChallenge(challengeId, user.id);
+    setJoiningId(null);
     onDetailChange?.();
   };
 
-  const handleBack = () => {
-    setDetail(null);
+  const handleLeave = async (challengeId: string) => {
+    if (!user?.id) return;
+    await leaveChallenge(challengeId, user.id);
     onDetailChange?.();
   };
 
-  if (detail) {
-    const ch = detail === 'weekly' ? WEEKLY_CHALLENGE : MONTHLY_CHALLENGE;
+  const handleInvitation = async (
+    invId: string, chalId: string, response: 'accepted' | 'declined',
+  ) => {
+    if (!user?.id) return;
+    setInvLoading(invId);
+    await respondToInvitation(invId, chalId, user.id, response);
+    setInvLoading(null);
+    onDetailChange?.();
+  };
+
+  const handleCreate = async (friendId: string, exerciseKey: string, metric: ChallengeMetric, durationDays: number) => {
+    if (!user?.id) return;
+    setCreating(true);
+    setCreateError(null);
+    const endsAt = new Date(Date.now() + durationDays * 86_400_000).toISOString();
+    const ex = exercises.find(e => e.key === exerciseKey);
+    const { error } = await createFriendChallenge(user.id, {
+      metric,
+      exercise_key: exerciseKey,
+      title:        `${ex?.label ?? exerciseKey} — ${metricLabel(metric)}`,
+      ends_at:      endsAt,
+      invitee_id:   friendId,
+    });
+    setCreating(false);
+    if (!error) {
+      setShowModal(false);
+    } else {
+      console.error('[createFriendChallenge]', error);
+      setCreateError(error);
+    }
+  };
+
+  const adminChallenges  = challenges.filter(c => c.type === 'admin');
+  const friendChallenges = challenges.filter(c => c.type === 'friend');
+
+  if (loadingChallenges && challenges.length === 0) {
     return (
-      <ChallengeDetail
-        ch={ch}
-        joined={joined.includes(detail)}
-        onJoin={toggle}
-        onBack={handleBack}
-      />
+      <View style={{ alignItems: 'center', paddingVertical: 60 }}>
+        <ActivityIndicator color={Colors.accent} />
+      </View>
+    );
+  }
+
+  if (challengesError && challenges.length === 0) {
+    return (
+      <View style={[gStyles.errorCard, { marginTop: 24 }]}>
+        <AlertCircle size={22} strokeWidth={1.6} color={Colors.accent} />
+        <Text style={gStyles.errorText}>{"Could not load challenges"}</Text>
+        <Pressable
+          onPress={() => user?.id && loadChallenges(user.id)}
+          style={gStyles.retryBtn}
+        >
+          <RefreshCw size={13} strokeWidth={2} color="#fff" />
+          <Text style={gStyles.retryText}>RETRY</Text>
+        </Pressable>
+      </View>
     );
   }
 
@@ -542,59 +774,130 @@ function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) 
     <>
       <View style={{ height: 16 }} />
 
-      <Text style={cStyles.sectionLabel}>THIS WEEK</Text>
-      <ChallengeCard
-        ch={WEEKLY_CHALLENGE}
-        joined={joined.includes('weekly')}
-        onJoin={toggle}
-        onOpen={handleOpen}
-      />
+      {/* ── Pending Invitations ─────────────────────────────────────── */}
+      {(pendingInvitations.length > 0 || loadingInvitations) && (
+        <>
+          <Text style={cStyles.sectionLabel}>PENDING INVITATIONS</Text>
+          {loadingInvitations ? (
+            <ActivityIndicator color={Colors.accent} style={{ marginBottom: 16 }} />
+          ) : (
+            pendingInvitations.map(inv => (
+              <InvitationCard
+                key={inv.id}
+                invitation={inv}
+                onAccept={() => handleInvitation(inv.id, inv.challenge_id, 'accepted')}
+                onDecline={() => handleInvitation(inv.id, inv.challenge_id, 'declined')}
+                loading={invLoading === inv.id}
+              />
+            ))
+          )}
+        </>
+      )}
 
-      <Text style={cStyles.sectionLabel}>THIS MONTH</Text>
-      <ChallengeCard
-        ch={MONTHLY_CHALLENGE}
-        joined={joined.includes('monthly')}
-        onJoin={toggle}
-        onOpen={handleOpen}
-      />
+      {/* ── Admin / Global Challenges ───────────────────────────────── */}
+      {adminChallenges.length > 0 && (
+        <>
+          <Text style={cStyles.sectionLabel}>ACTIVE CHALLENGES</Text>
+          {adminChallenges.map(ch => (
+            <ChallengeCard
+              key={ch.id}
+              ch={ch}
+              topEntries={leaderboards[ch.id] ?? []}
+              unit={exercises.find(e => e.key === ch.exercise_key)?.unit ?? 'kg'}
+              onJoin={() => handleJoin(ch.id)}
+              onLeave={() => handleLeave(ch.id)}
+              joining={joiningId === ch.id}
+            />
+          ))}
+        </>
+      )}
 
-      {/* Challenge a Friend */}
-      <View style={[cStyles.card, { borderColor: '#2a2a2a' }]}>
+      {/* ── Friend Challenges ───────────────────────────────────────── */}
+      {friendChallenges.length > 0 && (
+        <>
+          <Text style={cStyles.sectionLabel}>FRIEND CHALLENGES</Text>
+          {friendChallenges.map(ch => (
+            <ChallengeCard
+              key={ch.id}
+              ch={ch}
+              topEntries={leaderboards[ch.id] ?? []}
+              unit={exercises.find(e => e.key === ch.exercise_key)?.unit ?? 'kg'}
+              onJoin={() => handleJoin(ch.id)}
+              onLeave={() => handleLeave(ch.id)}
+              joining={joiningId === ch.id}
+            />
+          ))}
+        </>
+      )}
+
+      {/* ── Empty state ─────────────────────────────────────────────── */}
+      {!loadingChallenges && challenges.length === 0 && (
+        <View style={[gStyles.emptyCard, { marginTop: 0 }]}>
+          <Zap size={32} strokeWidth={1.4} color="#333" />
+          <Text style={gStyles.emptyTitle}>NO ACTIVE CHALLENGES</Text>
+          <Text style={gStyles.emptySub}>
+            {"Check back soon — or challenge a friend below!"}
+          </Text>
+        </View>
+      )}
+
+      {/* ── Challenge a Friend ──────────────────────────────────────── */}
+      <View style={[cStyles.card, { borderColor: '#2a2a2a', marginTop: 4 }]}>
         <View style={cStyles.friendHeader}>
           <Swords size={17} strokeWidth={1.6} color={Colors.accent} />
           <Text style={cStyles.friendTitle}>CHALLENGE A FRIEND</Text>
         </View>
-        <Text style={cStyles.friendSubtitle}>Send a personal challenge to a friend</Text>
-        {CHALLENGE_FRIENDS.map((f, i) => (
-          <View
-            key={f.id}
-            style={[
-              cStyles.friendRow,
-              i > 0 && cStyles.friendRowBordered,
-            ]}
-          >
-            <LeaderboardAvatar id={f.id} name={f.name} size={36} />
-            <Text style={cStyles.friendName}>{f.name}</Text>
-            <Pressable
-              onPress={() => setChallenged(prev => ({ ...prev, [f.id]: true }))}
-              disabled={challenged[f.id]}
-              style={[cStyles.challengeBtn, challenged[f.id] && cStyles.challengeBtnSent]}
-            >
-              {challenged[f.id] ? (
-                <>
-                  <CheckCircle size={11} strokeWidth={2} color="#555" />
-                  <Text style={cStyles.challengeBtnTextSent}>SENT</Text>
-                </>
-              ) : (
-                <>
-                  <Zap size={11} strokeWidth={2} color={Colors.accent} />
-                  <Text style={cStyles.challengeBtnText}>CHALLENGE</Text>
-                </>
-              )}
-            </Pressable>
+        <Text style={cStyles.friendSubtitle}>{"Pick a friend and set the terms"}</Text>
+
+        {friends.length > 0 && (
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+            {friends.slice(0, 6).map(f => (
+              <LeaderboardAvatar
+                key={f.id}
+                id={f.id}
+                name={f.full_name ?? f.username ?? '?'}
+                size={36}
+              />
+            ))}
+            {friends.length > 6 && (
+              <View style={cStyles.moreCount}>
+                <Text style={cStyles.moreCountText}>{'+' + (friends.length - 6)}</Text>
+              </View>
+            )}
           </View>
-        ))}
+        )}
+
+        <Pressable
+          onPress={() => setShowModal(true)}
+          disabled={friends.length === 0}
+          style={[
+            { borderRadius: 14, overflow: 'hidden' },
+            friends.length === 0 && { opacity: 0.35 },
+          ]}
+        >
+          <LinearGradient
+            colors={['rgba(230,48,48,0.14)', 'rgba(230,48,48,0.06)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={cStyles.challengeFriendBtn}
+          >
+            <Swords size={14} strokeWidth={1.8} color={Colors.accent} />
+            <Text style={cStyles.challengeFriendBtnText}>
+              {friends.length === 0 ? 'ADD FRIENDS FIRST' : 'CHALLENGE A FRIEND'}
+            </Text>
+          </LinearGradient>
+        </Pressable>
       </View>
+
+      <CreateChallengeModal
+        visible={showModal}
+        friends={friends}
+        exercises={exercises}
+        onClose={() => { setShowModal(false); setCreateError(null); }}
+        onCreate={handleCreate}
+        loading={creating}
+        errorMsg={createError}
+      />
     </>
   );
 }
@@ -1261,21 +1564,219 @@ const cStyles = StyleSheet.create({
     borderColor: Colors.accent,
     backgroundColor: 'rgba(230,48,48,0.08)',
   },
-  challengeBtnSent: {
+  moreCount: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#252525',
+    borderWidth: 1,
     borderColor: '#2a2a2a',
-    backgroundColor: '#2a2a2a',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  challengeBtnText: {
+  moreCountText: {
     fontFamily: Fonts.display,
     fontSize: 11,
-    letterSpacing: 1,
+    color: '#555',
+  },
+  challengeFriendBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 13,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(230,48,48,0.25)',
+  },
+  challengeFriendBtnText: {
+    fontFamily: Fonts.display,
+    fontSize: 12,
+    letterSpacing: 2,
     color: Colors.accent,
   },
-  challengeBtnTextSent: {
+});
+
+// ─── Create Challenge Modal Styles ────────────────────────────────────────────
+
+const mStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.75)',
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    backgroundColor: '#1e1e1e',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    paddingBottom: 40,
+    maxHeight: '92%',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  title: {
     fontFamily: Fonts.display,
+    fontSize: 20,
+    letterSpacing: 3,
+    color: '#fff',
+    flex: 1,
+  },
+  closeBtn: {
+    padding: 4,
+  },
+  // ── Friend picker ──────────────────────────────────────────────────────────
+  selectedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: '#252525',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+    marginBottom: 4,
+  },
+  selectedName: {
+    flex: 1,
+    fontFamily: Fonts.bodyMedium,
+    fontSize: 14,
+    color: '#fff',
+  },
+  changeBtn: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#383838',
+  },
+  changeBtnText: {
+    fontFamily: Fonts.display,
+    fontSize: 9,
+    letterSpacing: 1,
+    color: '#888',
+  },
+  searchWrap: {
+    marginBottom: 10,
+    justifyContent: 'center' as const,
+  },
+  searchIcon: {
+    position: 'absolute' as const,
+    left: 12,
+    zIndex: 1,
+  },
+  searchInput: {
+    backgroundColor: '#252525',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#333',
+    paddingVertical: 10,
+    paddingLeft: 36,
+    paddingRight: 14,
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    color: '#fff',
+  },
+  friendList: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+    overflow: 'hidden' as const,
+    marginBottom: 4,
+  },
+  friendItem: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    backgroundColor: '#252525',
+  },
+  friendItemBorder: {
+    borderTopWidth: 1,
+    borderTopColor: '#2a2a2a',
+  },
+  friendItemName: {
+    fontFamily: Fonts.bodyMedium,
+    fontSize: 13,
+    color: '#fff',
+  },
+  friendItemUsername: {
+    fontFamily: Fonts.body,
     fontSize: 11,
+    color: '#555',
+  },
+  noFriendsText: {
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    color: '#555',
+    textAlign: 'center' as const,
+    paddingVertical: 16,
+  },
+  errorRow: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 8,
+    backgroundColor: 'rgba(230,48,48,0.08)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(230,48,48,0.2)',
+    padding: 12,
+    marginBottom: 12,
+  },
+  errorText: {
+    flex: 1,
+    fontFamily: Fonts.body,
+    fontSize: 12,
+    color: Colors.accent,
+    lineHeight: 18,
+  },
+  label: {
+    fontFamily: Fonts.display,
+    fontSize: 10,
+    letterSpacing: 3,
+    color: '#555',
+    marginBottom: 10,
+  },
+  chip: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: '#2a2a2a',
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  chipActive: {
+    borderColor: Colors.accent,
+    backgroundColor: 'rgba(230,48,48,0.1)',
+  },
+  chipLabel: {
+    fontFamily: Fonts.display,
+    fontSize: 10,
     letterSpacing: 1,
     color: '#555',
+  },
+  chipLabelActive: {
+    color: Colors.accent,
+  },
+  sendBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 14,
+  },
+  sendBtnText: {
+    fontFamily: Fonts.display,
+    fontSize: 14,
+    letterSpacing: 3,
+    color: '#fff',
   },
 });
 

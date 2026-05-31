@@ -1,11 +1,24 @@
 import { create } from "zustand";
 import type { ExerciseType } from "@/types/pr";
 import type { RivalEntry, GlobalLeaderboardEntry } from "@/types/compete";
+import type {
+  ChallengeWithStats,
+  ChallengeLeaderboardEntry,
+  ChallengeInvitation,
+  CreateFriendChallengeInput,
+} from "@/types/challenge";
 import {
   fetchExerciseTypes,
   fetchRivalsLeaderboard,
   fetchGlobalLeaderboard,
   fetchMyGlobalRank,
+  fetchActiveChallenges,
+  fetchChallengeLeaderboard,
+  joinChallenge as apiJoinChallenge,
+  leaveChallenge as apiLeaveChallenge,
+  createFriendChallenge as apiCreateFriendChallenge,
+  fetchPendingInvitations,
+  respondToInvitation as apiRespondToInvitation,
 } from "@/lib/api";
 
 const PAGE_SIZE = 50;
@@ -22,13 +35,25 @@ interface CompeteState {
 
   // ─── Global leaderboard ─────────────────────────────────────────────────────
   globalEntries: GlobalLeaderboardEntry[];
-  /** Current user's own rank + stats; null when they have no big-3 PRs logged */
   myGlobalRank: GlobalLeaderboardEntry | null;
   loadingGlobal: boolean;
   loadingMyRank: boolean;
   globalHasMore: boolean;
   globalOffset: number;
   globalError: string | null;
+
+  // ─── Challenges ─────────────────────────────────────────────────────────────
+  challenges: ChallengeWithStats[];
+  loadingChallenges: boolean;
+  challengesError: string | null;
+
+  /** Leaderboard entries keyed by challenge id */
+  leaderboards: Record<string, ChallengeLeaderboardEntry[]>;
+  loadingLeaderboard: Record<string, boolean>;
+
+  /** Pending challenge invitations for the current user */
+  pendingInvitations: ChallengeInvitation[];
+  loadingInvitations: boolean;
 
   // ─── Shared ─────────────────────────────────────────────────────────────────
   error: string | null;
@@ -38,15 +63,26 @@ interface CompeteState {
   loadRivals: (userId: string) => Promise<void>;
   setSelectedExercise: (key: string, userId: string) => Promise<void>;
 
-  /**
-   * Load (or reload) the global leaderboard from page 0.
-   * Pass `search` to filter by username / full_name.
-   */
   loadGlobalLeaderboard: (userId: string, search?: string) => Promise<void>;
-  /** Append the next page of global results (no-op when already at the end). */
   loadMoreGlobal: (userId: string, search?: string) => Promise<void>;
-  /** Fetch (or refresh) the current user's own global rank. */
   loadMyGlobalRank: (userId: string) => Promise<void>;
+
+  // Challenges
+  loadChallenges: (userId: string) => Promise<void>;
+  loadLeaderboard: (challengeId: string, userId: string) => Promise<void>;
+  joinChallenge: (challengeId: string, userId: string) => Promise<{ error: string | null }>;
+  leaveChallenge: (challengeId: string, userId: string) => Promise<{ error: string | null }>;
+  createFriendChallenge: (
+    creatorId: string,
+    input: CreateFriendChallengeInput,
+  ) => Promise<{ challengeId: string | null; error: string | null }>;
+  loadPendingInvitations: (userId: string) => Promise<void>;
+  respondToInvitation: (
+    invitationId: string,
+    challengeId: string,
+    userId: string,
+    response: 'accepted' | 'declined',
+  ) => Promise<{ error: string | null }>;
 
   reset: () => void;
 }
@@ -66,6 +102,16 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
   globalHasMore: true,
   globalOffset: 0,
   globalError: null,
+
+  challenges: [],
+  loadingChallenges: false,
+  challengesError: null,
+
+  leaderboards: {},
+  loadingLeaderboard: {},
+
+  pendingInvitations: [],
+  loadingInvitations: false,
 
   error: null,
 
@@ -126,6 +172,100 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
     set({ myGlobalRank: data, loadingMyRank: false });
   },
 
+  // ─── Challenges ─────────────────────────────────────────────────────────────
+
+  loadChallenges: async (userId) => {
+    set({ loadingChallenges: true, challengesError: null });
+    const { data, error } = await fetchActiveChallenges(userId);
+    set({ challenges: data, loadingChallenges: false, challengesError: error });
+  },
+
+  loadLeaderboard: async (challengeId, userId) => {
+    set((state) => ({
+      loadingLeaderboard: { ...state.loadingLeaderboard, [challengeId]: true },
+    }));
+    const { data, error } = await fetchChallengeLeaderboard(challengeId, userId);
+    set((state) => ({
+      leaderboards: error
+        ? state.leaderboards
+        : { ...state.leaderboards, [challengeId]: data },
+      loadingLeaderboard: { ...state.loadingLeaderboard, [challengeId]: false },
+    }));
+  },
+
+  joinChallenge: async (challengeId, userId) => {
+    const result = await apiJoinChallenge(challengeId, userId);
+    if (!result.error) {
+      // Optimistically mark as joined and increment count
+      set((state) => ({
+        challenges: state.challenges.map((c) =>
+          c.id === challengeId
+            ? { ...c, is_joined: true, participant_count: c.participant_count + 1 }
+            : c,
+        ),
+      }));
+      // Reload leaderboard to reflect new participant
+      await get().loadLeaderboard(challengeId, userId);
+    }
+    return result;
+  },
+
+  leaveChallenge: async (challengeId, userId) => {
+    const result = await apiLeaveChallenge(challengeId, userId);
+    if (!result.error) {
+      set((state) => ({
+        challenges: state.challenges.map((c) =>
+          c.id === challengeId
+            ? {
+                ...c,
+                is_joined: false,
+                participant_count: Math.max(0, c.participant_count - 1),
+                user_score: null,
+                user_rank: null,
+              }
+            : c,
+        ),
+        leaderboards: {
+          ...state.leaderboards,
+          [challengeId]: (state.leaderboards[challengeId] ?? []).filter(
+            (e) => e.user_id !== userId,
+          ),
+        },
+      }));
+    }
+    return result;
+  },
+
+  createFriendChallenge: async (creatorId, input) => {
+    const result = await apiCreateFriendChallenge(creatorId, input);
+    if (!result.error) {
+      // Reload challenges so new one appears in the list
+      await get().loadChallenges(creatorId);
+    }
+    return result;
+  },
+
+  loadPendingInvitations: async (userId) => {
+    set({ loadingInvitations: true });
+    const { data } = await fetchPendingInvitations(userId);
+    set({ pendingInvitations: data, loadingInvitations: false });
+  },
+
+  respondToInvitation: async (invitationId, challengeId, userId, response) => {
+    const result = await apiRespondToInvitation(invitationId, challengeId, userId, response);
+    if (!result.error) {
+      // Remove from pending list
+      set((state) => ({
+        pendingInvitations: state.pendingInvitations.filter((i) => i.id !== invitationId),
+      }));
+      if (response === 'accepted') {
+        // Reload challenges to pick up the newly joined one
+        await get().loadChallenges(userId);
+      }
+    }
+    return result;
+  },
+
   // ─── Reset ──────────────────────────────────────────────────────────────────
 
   reset: () =>
@@ -143,5 +283,12 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
       globalOffset: 0,
       globalError: null,
       error: null,
+      challenges: [],
+      loadingChallenges: false,
+      challengesError: null,
+      leaderboards: {},
+      loadingLeaderboard: {},
+      pendingInvitations: [],
+      loadingInvitations: false,
     }),
 }));

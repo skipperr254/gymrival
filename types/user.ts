@@ -15,6 +15,7 @@ export interface Profile {
   is_pro: boolean;
   streak: number;
   friends_count: number;
+  role: 'user' | 'admin';
   created_at: string;
   updated_at: string;
 }
