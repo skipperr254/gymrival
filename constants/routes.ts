@@ -38,6 +38,7 @@ trainSchemas: '/(tabs)/train/schema',
   profileEdit: '/(tabs)/profile/edit',
   profilePRHistory: '/(tabs)/profile/pr-history',
   profileBadges: '/(tabs)/profile/badges',
+  notifications: '/(tabs)/profile/notifications',
 
   // Dev
   gallery: '/gallery',

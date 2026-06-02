@@ -4,6 +4,7 @@ import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { TabActions } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, Fonts } from '@/constants/theme';
+import { useNotificationStore } from '@/store/useNotificationStore';
 
 interface Props extends BottomTabBarProps {
   onLogPress: () => void;
@@ -20,6 +21,7 @@ const TAB_CONFIG: Record<string, { label: string; active: IoniconName; inactive:
 
 export function CustomTabBar({ state, navigation, onLogPress }: Props) {
   const insets = useSafeAreaInsets();
+  const unreadCount = useNotificationStore((s) => s.unreadCount);
 
   const renderTab = (route: (typeof state.routes)[0], globalIndex: number) => {
     const isFocused = state.index === globalIndex;
@@ -37,6 +39,8 @@ export function CustomTabBar({ state, navigation, onLogPress }: Props) {
       }
     };
 
+    const showBadge = route.name === 'profile' && unreadCount > 0;
+
     return (
       <Pressable
         key={route.key}
@@ -46,11 +50,14 @@ export function CustomTabBar({ state, navigation, onLogPress }: Props) {
         accessibilityState={isFocused ? { selected: true } : {}}
         accessibilityLabel={config.label}
       >
-        <Ionicons
-          name={isFocused ? config.active : config.inactive}
-          size={22}
-          color={isFocused ? Colors.primary : Colors.muted}
-        />
+        <View style={styles.iconWrap}>
+          <Ionicons
+            name={isFocused ? config.active : config.inactive}
+            size={22}
+            color={isFocused ? Colors.primary : Colors.muted}
+          />
+          {showBadge && <View style={styles.tabBadge} />}
+        </View>
         <Text style={[styles.label, isFocused && styles.labelActive]}>
           {config.label}
         </Text>
@@ -96,6 +103,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingTop: 2,
     gap: 3,
+  },
+  iconWrap: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabBadge: {
+    position: 'absolute',
+    top: -1,
+    right: -4,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Colors.accent,
+    borderWidth: 1.5,
+    borderColor: '#121212',
   },
   tabPressed: {
     opacity: 0.6,

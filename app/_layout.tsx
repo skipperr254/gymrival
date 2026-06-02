@@ -1,8 +1,10 @@
 import "../global.css";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { Platform } from "react-native";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import Constants, { ExecutionEnvironment } from "expo-constants";
 import { useFonts } from "expo-font";
 import { BebasNeue_400Regular } from "@expo-google-fonts/bebas-neue";
 import {
@@ -13,9 +15,68 @@ import {
 } from "@expo-google-fonts/dm-sans";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useChatStore } from "@/store/useChatStore";
+import { useNotificationStore } from "@/store/useNotificationStore";
+import { savePushToken } from "@/lib/api";
 import { Routes } from "@/constants/routes";
 
 SplashScreen.preventAutoHideAsync();
+
+// Push-notification registration.
+// expo-notifications requires a custom dev/standalone build — its native module
+// is not present in Expo Go (removed since SDK 53) and is also absent from a
+// dev client built before the package was added. We skip Expo Go up front and
+// wrap the require() so a missing native module can never crash the app.
+async function registerPushToken(userId: string) {
+  // storeClient = running inside Expo Go; remote push is unsupported there.
+  if (Constants.executionEnvironment === ExecutionEnvironment.StoreClient) return;
+
+  let Notifications: typeof import("expo-notifications");
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    Notifications = require("expo-notifications");
+  } catch {
+    // Native module not compiled into this build (e.g. stale dev client).
+    // Rebuild the dev client to enable push. Skip silently for now.
+    return;
+  }
+
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+
+  try {
+    const { status: existing } = await Notifications.getPermissionsAsync();
+    let finalStatus = existing;
+    if (existing !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") return;
+
+    if (Platform.OS === "android") {
+      await Notifications.setNotificationChannelAsync("default", {
+        name: "Default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+      });
+    }
+
+    const projectId =
+      Constants.expoConfig?.extra?.eas?.projectId as string | undefined;
+    const tokenData = await Notifications.getExpoPushTokenAsync(
+      projectId ? { projectId } : undefined
+    );
+    await savePushToken(userId, tokenData.data);
+  } catch {
+    // Best-effort — never crash the app over push registration.
+  }
+}
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -31,6 +92,9 @@ export default function RootLayout() {
   const segments = useSegments();
   const router = useRouter();
   const startPresenceHeartbeat = useChatStore((s) => s.startPresenceHeartbeat);
+  const { loadNotifications, subscribeToNotifications, reset: resetNotifications } =
+    useNotificationStore();
+  const notifCleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     initialize();
@@ -41,6 +105,30 @@ export default function RootLayout() {
     if (!session?.user?.id) return;
     return startPresenceHeartbeat(session.user.id);
   }, [session?.user?.id, startPresenceHeartbeat]);
+
+  // Load notifications + subscribe to realtime when authenticated
+  useEffect(() => {
+    const userId = session?.user?.id;
+    if (!userId) {
+      resetNotifications();
+      return;
+    }
+
+    loadNotifications(userId);
+    notifCleanupRef.current = subscribeToNotifications(userId);
+
+    return () => {
+      notifCleanupRef.current?.();
+      notifCleanupRef.current = null;
+    };
+  }, [session?.user?.id, loadNotifications, subscribeToNotifications, resetNotifications]);
+
+  // Register device push token — silently skipped in Expo Go
+  useEffect(() => {
+    const userId = session?.user?.id;
+    if (!userId) return;
+    registerPushToken(userId);
+  }, [session?.user?.id]);
 
   // Hide splash once fonts AND auth state are ready
   useEffect(() => {

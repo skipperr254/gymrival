@@ -14,6 +14,7 @@ import { Colors, Fonts, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
+import { useNotificationStore } from '@/store/useNotificationStore';
 import { Avatar } from '@/components/ui/Avatar';
 import type { PersonalRecordWithExercise } from '@/types/pr';
 
@@ -127,6 +128,7 @@ export default function ProfileScreen() {
   const { user, signOut } = useAuthStore();
   const { profile, bestPRs, prCount, loadProfile, loadBestPRs, setProStatus } =
     useProfileStore();
+  const unreadCount = useNotificationStore((s) => s.unreadCount);
 
   const displayName =
     profile?.full_name ??
@@ -179,8 +181,20 @@ export default function ProfileScreen() {
           </View>
           <Pressable
             style={({ pressed }) => [styles.headerBtn, pressed && { opacity: 0.5 }]}
+            onPress={() => router.push(Routes.notifications as never)}
           >
-            <Ionicons name="notifications-outline" size={18} color='#909090' />
+            <Ionicons
+              name={unreadCount > 0 ? 'notifications' : 'notifications-outline'}
+              size={18}
+              color={unreadCount > 0 ? Colors.accent : '#909090'}
+            />
+            {unreadCount > 0 && (
+              <View style={styles.bellBadge}>
+                <Text style={styles.bellBadgeText}>
+                  {unreadCount > 9 ? '9+' : String(unreadCount)}
+                </Text>
+              </View>
+            )}
           </Pressable>
         </View>
 
@@ -436,6 +450,25 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  bellBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: Colors.accent,
+    borderRadius: 8,
+    minWidth: 16,
+    height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+    borderWidth: 1.5,
+    borderColor: Colors.base,
+  },
+  bellBadgeText: {
+    fontFamily: Fonts.bodyBold,
+    fontSize: 9,
+    color: '#fff',
   },
 
   // Profile card

@@ -13,5 +13,5 @@
     "expo-env.d.ts",
     "nativewind-env.d.ts"
   ],
-  "exclude": ["node_modules", "extras", "designs"]
+  "exclude": ["node_modules", "extras", "designs", "supabase/functions"]
 }
