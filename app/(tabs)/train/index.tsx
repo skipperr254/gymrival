@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors, Fonts } from '@/constants/theme';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { CheckInView } from '@/components/features/CheckInView';
+import { ProgressView } from '@/components/features/progress/ProgressView';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useTrainStore } from '@/store/useTrainStore';
 import { DAY_NAMES, DAY_NAME_TO_INDEX, DAY_SHORT, type DayOfWeek } from '@/types/train';
@@ -44,7 +45,7 @@ export default function TrainScreen() {
 
   const loadSessions = useTrainStore((s) => s.loadSessions);
 
-  const [activeTab, setActiveTab] = useState<0 | 1>(0);
+  const [activeTab, setActiveTab] = useState<0 | 1 | 2>(0);
   const [selected, setSelected] = useState<TrainingSessionWithExercises | null>(null);
   const [workoutStarted, setWorkoutStarted] = useState(false);
   const [completedSets, setCompletedSets] = useState<Record<string, boolean>>({});
@@ -211,7 +212,7 @@ export default function TrainScreen() {
             <View>
               <Text style={styles.appTitle}>GYM RIVAL</Text>
               <Text style={styles.pageLabel}>
-                {activeTab === 0 ? 'WORKOUT SCHEDULE' : 'GYM CHECK-IN'}
+                {activeTab === 0 ? 'WORKOUT SCHEDULE' : activeTab === 1 ? 'GYM CHECK-IN' : 'PROGRESS'}
               </Text>
             </View>
           )}
@@ -221,9 +222,9 @@ export default function TrainScreen() {
         {!selected && (
           <View style={styles.tabSwitcher}>
             <SegmentedControl
-              options={['SCHEDULE', 'CHECK IN']}
+              options={['SCHEDULE', 'CHECK IN', 'PROGRESS']}
               selectedIndex={activeTab}
-              onChange={(i) => setActiveTab(i as 0 | 1)}
+              onChange={(i) => setActiveTab(i as 0 | 1 | 2)}
             />
           </View>
         )}
@@ -233,7 +234,9 @@ export default function TrainScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {!selected && activeTab === 1 ? (
+          {!selected && activeTab === 2 ? (
+            <ProgressView />
+          ) : !selected && activeTab === 1 ? (
             <CheckInView />
           ) : !selected ? (
             <>
