@@ -10,21 +10,48 @@ Think like a senior mobile developer. Build practical, working features. Avoid o
 
 ## Project Overview
 
-GymRival is a mobile fitness app where users log PRs (personal records), compete on leaderboards with friends, track macros and body progress, and get personalised insights from an AI coach.
+GymRival is a mobile fitness app where users log PRs (personal records), compete on leaderboards with friends, share activity in a social feed, and stay accountable with gym check-ins and challenges.
 
-Core features:
+v1 core features:
 
 - PR logging with leaderboard rankings (friends + global)
+- PR video proof
 - Weekly and monthly challenges
 - Social feed (PR posts, likes, friend activity)
 - Friends system and in-app chat
-- Workout of the Day and program/schema tracking
-- Macro and calorie tracking
-- Body scan / progress photo tracking
-- Weight log
-- AI Coach powered by the Anthropic API (via Supabase Edge Function)
+- Gym check-ins with weekly streak tracking
 - Push notifications
 - Onboarding, sign up, and sign in flows
+
+---
+
+## v1 Scope
+
+This section is the single source of truth for what is and is not in the v1 client preview build. Do not implement or scaffold anything in the "Deferred" list.
+
+### In v1
+
+- **Auth**: onboarding, sign-in, sign-up, email verify, profile setup, forgot password, reset password
+- **Compete tab**: Rivals (friends) leaderboard, Global leaderboard, Challenges, Challenge detail — all implemented and working
+- **Social tab**: Feed, Friends (dedicated screen at `social/friends.tsx` — currently a stub, will be made real in a later phase), Chat
+- **Train tab**: single segmented screen with **Schedule** and **Gym Check-in** (both working today); **Progress** is a planned third tab for a future phase — do not build it now
+- **Profile tab**: Profile, Edit, PR history, Badges, Notifications
+- **PR logging + PR video proof**
+- **Push notifications**
+- **FAB (center Log button)**: exactly **two** actions — **Log a PR** and **Gym Check-in**. Nothing else. Do not add Log Meal, Log Weight, or any other action.
+
+### Deferred — not in v1, do not scaffold
+
+- AI Coach (the `ai-coach` edge function does not exist; do not create it or any UI for it)
+- Macros / calorie tracking
+- Body scan / progress photos
+- Weight log
+- Workout of the Day (WOD)
+- The old "schema" / program concept (superseded by the Schedule feature)
+- Stripe / in-app payments for Pro tier
+- Admin dashboard
+- Deep links
+- App Store / Play Store submission config
 
 ---
 
@@ -41,9 +68,8 @@ Core features:
 | Auth              | Supabase Auth (email/password + OAuth)              |
 | Database          | Supabase (Postgres + Row Level Security)            |
 | Realtime          | Supabase Realtime (leaderboard, chat)               |
-| Storage           | Supabase Storage (profile photos, future PR video)  |
+| Storage           | Supabase Storage (profile photos, PR video)         |
 | Backend functions | Supabase Edge Functions                             |
-| AI Coach          | Anthropic API via Supabase Edge Function            |
 | Notifications     | Expo Notifications + Supabase Edge Function trigger |
 
 Do not introduce new major libraries without a strong reason. If a new library would significantly simplify an implementation, recommend it, explain why, and ask for approval before adding it.
@@ -61,6 +87,10 @@ gymrival/
       onboarding.tsx
       sign-in.tsx
       sign-up.tsx
+      verify.tsx
+      setup.tsx
+      forgot-password.tsx
+      reset-password.tsx
     (tabs)/                   # Main authenticated tab navigator
       _layout.tsx
       compete/
@@ -70,26 +100,17 @@ gymrival/
         challenge/[id].tsx
       social/
         index.tsx             # Feed (default)
-        friends.tsx
+        friends.tsx           # Dedicated Friends screen (stub → real in later phase)
         messages.tsx
         chat/[userId].tsx
       train/
-        index.tsx             # Train & Track overview
-        wod.tsx
-        schema/
-          index.tsx
-          [id].tsx
-        coach.tsx
-        checkin.tsx
-        macros.tsx
-        bodyscan.tsx
-        weight.tsx
-        progress.tsx
+        index.tsx             # Segmented screen: Schedule | Check-in | (Progress — planned)
       profile/
         index.tsx
         edit.tsx
         pr-history.tsx
         badges.tsx
+        notifications.tsx
     _layout.tsx               # Root layout (auth gate)
   components/
     ui/                       # Primitives used across the app
@@ -108,8 +129,6 @@ gymrival/
   supabase/
     migrations/               # SQL migration files
     functions/                # Edge Functions
-      ai-coach/
-        index.ts
       send-notification/
         index.ts
   assets/
@@ -121,7 +140,7 @@ gymrival/
 
 **`app/`** — Screens and layouts only. Screens compose components, call hooks and stores, and handle navigation. No large UI blocks or business logic inline.
 
-**`components/`** — Create a component only when it is reused in multiple places, it makes a screen significantly easier to read, or it represents a clear UI concept like `PRCard`, `LeaderboardRow`, `MacroRing`, `ChallengeCard`, or `BottomSheet`. Do not extract one-off UI too early. When unsure, ask: _should this be a component, or stay inline for now?_
+**`components/`** — Create a component only when it is reused in multiple places, it makes a screen significantly easier to read, or it represents a clear UI concept like `PRCard`, `LeaderboardRow`, `ChallengeCard`, or `BottomSheet`. Do not extract one-off UI too early. When unsure, ask: _should this be a component, or stay inline for now?_
 
 **`constants/theme.ts`** — Single source of truth for all design tokens. Every color, font size, spacing value, and border radius used in the app must come from here. Never hardcode a color hex value in a component.
 
@@ -218,6 +237,39 @@ Before writing any NativeWind code, check the installed version in `package.json
 
 Add reusable utility classes to `global.css` using BEM conventions when a pattern appears more than twice. Example: a recurring `card` pattern, a `heading-display` font utility, or a `screen-container` layout utility.
 
+### Existing StyleSheet tech debt
+
+The codebase currently has a large `StyleSheet.create` footprint that predates the NativeWind-first rule. That existing code is known tech debt earmarked for a dedicated migration pass — **do not fix it now**. For all **new** code, follow the NativeWind-first rule and the exceptions table above. Do not add new `StyleSheet` blocks where NativeWind would work.
+
+---
+
+## Code Quality Rules
+
+### Screen files must compose, not contain
+
+Screen files in `app/` are composition roots. They call hooks and stores, handle navigation, and render extracted components. They must not contain:
+
+- Large inline UI blocks
+- Multiple modal or bottom-sheet definitions
+- Several sub-features implemented inline in one file
+
+### File size guideline
+
+If a screen or component file exceeds **~400 lines**, that is a signal to extract sub-components into `components/features/` (feature-specific) or `components/ui/` (reusable primitives). New files should not be written past this limit without a stated reason.
+
+### Known tech debt (do not fix now)
+
+Several existing files violate the guideline above — they are slated for a dedicated refactor phase:
+
+| File                            | Approx. lines |
+| ------------------------------- | ------------- |
+| `compete/index.tsx`             | ~2292         |
+| `social/index.tsx`              | ~1747         |
+| `components/features/LogPRSheet.tsx` | ~1063    |
+| `train/index.tsx`               | ~985          |
+
+Do not let new code follow that pattern. Do not refactor these files unless explicitly asked.
+
 ---
 
 ## UI Implementation Rules
@@ -286,7 +338,7 @@ The app uses Expo Router with the following top-level structure:
 ```
 app/
   _layout.tsx          # Root layout — checks auth state, redirects to (auth) or (tabs)
-  (auth)/              # Stack: splash → onboarding → sign-in / sign-up
+  (auth)/              # Stack: splash → onboarding → sign-in / sign-up / verify / setup
   (tabs)/              # Bottom tab navigator: Compete, Social, Train, Profile
 ```
 
@@ -302,7 +354,7 @@ app/
 | 4        | Train 🏋️   | `/(tabs)/train`                      |
 | 5        | Profile 👤 | `/(tabs)/profile`                    |
 
-The Log FAB opens a bottom sheet modal with options: Log PR, Log Meal, Log Weight, Gym Check-in. It does not navigate to a new route — it presents a sheet over the current screen.
+The Log FAB opens a bottom sheet with exactly **two** actions: **Log a PR** and **Gym Check-in**. It does not navigate to a new route — it presents a sheet over the current screen. Do not add any other actions (Log Meal, Log Weight, etc.).
 
 ### Route Constants
 
@@ -335,8 +387,7 @@ Use Zustand for all global client state. Use local `useState` for temporary UI s
 | `useAuthStore`         | Current user, session, loading state                     |
 | `useCompeteStore`      | Selected exercise, leaderboard data, joined challenges   |
 | `useSocialStore`       | Feed posts, friends list, friend requests, conversations |
-| `useTrainStore`        | Workout state, check-ins, streak, active schema          |
-| `useTrackStore`        | Meals, weight log, body scan entries, macro goals        |
+| `useTrainStore`        | Workout state, check-ins, streak, active schedule        |
 | `useProfileStore`      | Profile data, PRs, badges, XP, level                     |
 | `useNotificationStore` | Notification list, unread count                          |
 
@@ -360,7 +411,6 @@ types/
   pr.ts
   challenge.ts
   workout.ts
-  meal.ts
   social.ts
   notification.ts
 ```
@@ -397,7 +447,7 @@ Subscribe in a `useEffect` inside the relevant hook or screen. Always unsubscrib
 
 ### Storage
 
-Profile photos and future PR video uploads go to Supabase Storage. Generate signed URLs server-side when the bucket is private.
+Profile photos and PR video uploads go to Supabase Storage. Generate signed URLs server-side when the bucket is private.
 
 ---
 
@@ -409,15 +459,7 @@ Current functions:
 
 | Function            | Purpose                                                                               |
 | ------------------- | ------------------------------------------------------------------------------------- |
-| `ai-coach`          | Calls the Anthropic API and returns a coaching response                               |
 | `send-notification` | Triggers Expo push notifications for events (new PR, challenge, like, friend request) |
-
-### AI Coach function rules
-
-- Receive the user's message and relevant context (their PR data, recent activity) in the request body
-- Call the Anthropic API server-side
-- Return the response to the client
-- Never expose the Anthropic API key in the mobile app bundle
 
 ### Calling Edge Functions from the app
 
@@ -425,9 +467,9 @@ Use the Supabase client's `functions.invoke()` method. Create a wrapper in `lib/
 
 ```ts
 // lib/api.ts
-export async function askAICoach(message: string, context: CoachContext) {
-  const { data, error } = await supabase.functions.invoke("ai-coach", {
-    body: { message, context },
+export async function sendNotification(payload: NotificationPayload) {
+  const { data, error } = await supabase.functions.invoke("send-notification", {
+    body: payload,
   });
   if (error) throw error;
   return data;
@@ -469,9 +511,11 @@ When asked to build a feature:
 
 ---
 
-## PR Video Uploads
+## PR Video Proof
 
-Video recording and upload are **deferred to a later version**. Do not implement or scaffold this now. When this feature is built, it will use Expo ImagePicker for selection and Supabase Storage for upload with client-side compression before uploading.
+PR video proof is **in v1**. Users record or upload a short video clip when logging a PR. The flow uses Expo ImagePicker for selection, uploads to the `pr-videos` Supabase Storage bucket, and displays the video inline in the feed and PR history.
+
+Do not conflate this with a full "replay / highlight" feature — the v1 scope is proof-of-PR video only.
 
 ---
 
@@ -519,19 +563,9 @@ Be concise. After implementing a feature, briefly explain:
 ## Security Constraints
 
 - Never put API keys, secrets, or service role keys in the mobile app bundle
-- All third-party API calls (Anthropic, etc.) go through Supabase Edge Functions
+- All third-party API calls go through Supabase Edge Functions
 - All Supabase tables have RLS enabled
 - Use Supabase Auth — do not roll custom auth
-
----
-
-## Deferred Features (do not implement until explicitly requested)
-
-- PR video recording and upload
-- Stripe / in-app payments for Pro tier
-- Admin dashboard
-- Deep links
-- App Store / Play Store submission config
 
 ---
 

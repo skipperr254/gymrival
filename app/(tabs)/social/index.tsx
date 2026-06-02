@@ -15,7 +15,7 @@ import { useSocialStore } from '@/store/useSocialStore';
 import { useChatStore } from '@/store/useChatStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import {
   Flame,
   Heart,
@@ -885,7 +885,11 @@ function MessagesContent() {
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function SocialScreen() {
-  const [activeTab, setActiveTab] = useState<TabKey>('feed');
+  const { tab } = useLocalSearchParams<{ tab?: string }>();
+  const initialTab: TabKey = (TABS.map(t => t.key) as string[]).includes(tab ?? '')
+    ? (tab as TabKey)
+    : 'feed';
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
   const [refreshing, setRefreshing] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   const currentTab = TABS.find(t => t.key === activeTab)!;

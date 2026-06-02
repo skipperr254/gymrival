@@ -98,7 +98,7 @@ function handleNotificationPress(n: AppNotification) {
       break;
     case 'friend_request':
     case 'friend_request_accepted':
-      router.push(Routes.socialFriends as never);
+      router.push({ pathname: Routes.social as never, params: { tab: 'friends' } });
       break;
     case 'pr_liked':
     case 'friend_pr':
