@@ -1,32 +1,64 @@
-import { View, Text, Pressable, Modal, StyleSheet } from 'react-native';
+import { useRef, useEffect, useState } from 'react';
+import { View, Text, Pressable, Modal, Animated, Easing, StyleSheet, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, Fonts } from '@/constants/theme';
 
+const SHEET_HEIGHT = Dimensions.get('window').height;
+
 interface Props {
   visible: boolean;
   onClose: () => void;
-  onLogPR?: () => void;
+  onLogPR: () => void;
+  onCheckIn: () => void;
 }
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
 const ACTIONS: { id: string; icon: IoniconName; label: string; sub: string }[] = [
   { id: 'pr', icon: 'trophy', label: 'Log a PR', sub: 'Record a new personal record' },
-  { id: 'meal', icon: 'restaurant', label: 'Log a Meal', sub: 'Add calories & macros' },
-  { id: 'weight', icon: 'body', label: 'Log Weight', sub: 'Track your bodyweight' },
   { id: 'checkin', icon: 'location', label: 'Gym Check-in', sub: 'Check in to your gym' },
 ];
 
-export function LogSheet({ visible, onClose, onLogPR }: Props) {
+export function LogSheet({ visible, onClose, onLogPR, onCheckIn }: Props) {
   const insets = useSafeAreaInsets();
+  const [mounted, setMounted] = useState(false);
+  const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
+
+  useEffect(() => {
+    if (visible) {
+      setMounted(true);
+      translateY.setValue(SHEET_HEIGHT);
+      const raf = requestAnimationFrame(() => {
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 320,
+          easing: Easing.bezier(0.32, 0.72, 0, 1),
+          useNativeDriver: true,
+        }).start();
+      });
+      return () => cancelAnimationFrame(raf);
+    } else {
+      Animated.timing(translateY, {
+        toValue: SHEET_HEIGHT,
+        duration: 240,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) setMounted(false);
+      });
+    }
+  }, [visible, translateY]);
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose}>
-        <Pressable
-          style={[styles.sheet, { paddingBottom: Math.max(insets.bottom + 16, 32) }]}
-          onPress={() => undefined}
+    <Modal visible={mounted} transparent animationType="none" onRequestClose={onClose}>
+      <View style={styles.overlay}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+        <Animated.View
+          style={[
+            styles.sheet,
+            { paddingBottom: Math.max(insets.bottom + 16, 32), transform: [{ translateY }] },
+          ]}
         >
           <View style={styles.handle} />
           <Text style={styles.title}>LOG ACTIVITY</Text>
@@ -36,12 +68,9 @@ export function LogSheet({ visible, onClose, onLogPR }: Props) {
               key={action.id}
               style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
               onPress={() => {
-                if (action.id === 'pr' && onLogPR) {
-                  onClose();
-                  onLogPR();
-                } else {
-                  onClose();
-                }
+                onClose();
+                if (action.id === 'pr') onLogPR();
+                else onCheckIn();
               }}
             >
               <View style={styles.iconBox}>
@@ -54,14 +83,14 @@ export function LogSheet({ visible, onClose, onLogPR }: Props) {
               <Ionicons name="chevron-forward" size={16} color={Colors.hint} />
             </Pressable>
           ))}
-        </Pressable>
-      </Pressable>
+        </Animated.View>
+      </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  backdrop: {
+  overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.7)',
     justifyContent: 'flex-end',
