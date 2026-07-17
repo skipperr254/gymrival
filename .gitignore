@@ -45,3 +45,8 @@ app-example
 /extras
 
 /designs
+
+# temporary export dumps
+/Tempgymrival-export*
+
+.mcp.json

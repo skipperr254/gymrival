@@ -34,7 +34,7 @@ This section is the single source of truth for what is and is not in the v1 clie
 - **Auth**: onboarding, sign-in, sign-up, email verify, profile setup, forgot password, reset password
 - **Compete tab**: Rivals (friends) leaderboard, Global leaderboard, Challenges, Challenge detail — all implemented and working
 - **Social tab**: Feed, Friends (dedicated screen at `social/friends.tsx` — currently a stub, will be made real in a later phase), Chat
-- **Train tab**: single segmented screen with **Schedule** and **Gym Check-in** (both working today); **Progress** is a planned third tab for a future phase — do not build it now
+- **Train tab**: segmented screen with **Schedule**, **Gym Check-in**, and **Progress** (all three implemented and in scope for v1)
 - **Profile tab**: Profile, Edit, PR history, Badges, Notifications
 - **PR logging + PR video proof**
 - **Push notifications**
