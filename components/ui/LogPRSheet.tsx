@@ -33,6 +33,7 @@ import {
   PersonStanding,
   VideoOff,
 } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCompeteStore } from '@/store/useCompeteStore';
@@ -83,6 +84,7 @@ interface Props {
 }
 
 export function LogPRSheet({ visible, onClose }: Props) {
+  const { t } = useTranslation('logpr');
   const insets = useSafeAreaInsets();
   const { user } = useAuthStore();
   const { exercises, loadExercises, loadRivals } = useCompeteStore();
@@ -281,10 +283,10 @@ export function LogPRSheet({ visible, onClose }: Props) {
                   )}
                   <View>
                     {step < 3 && (
-                      <Text style={styles.stepLabel}>STEP {step} OF 2</Text>
+                      <Text style={styles.stepLabel}>{t('step.stepOf', { step })}</Text>
                     )}
                     <Text style={styles.stepTitle}>
-                      {step === 1 ? 'Log Your PR' : step === 2 ? 'Add Proof' : ''}
+                      {step === 1 ? t('step.logYourPr') : step === 2 ? t('step.addProof') : ''}
                     </Text>
                   </View>
                 </View>
@@ -373,9 +375,10 @@ interface Step1Props {
 }
 
 function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangePR, currentPR, isBelowCurrent, selectedEx, canProceed, onNext, prMap }: Step1Props) {
+  const { t } = useTranslation('logpr');
   return (
     <>
-      <Text style={s1.sectionLabel}>SELECT EXERCISE</Text>
+      <Text style={s1.sectionLabel}>{t('selectExercise')}</Text>
 
       <View style={s1.grid}>
         {exercises.map(ex => {
@@ -400,7 +403,7 @@ function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangePR, curr
                   {ex.label}
                 </Text>
                 <Text style={s1.exPR}>
-                  {exPR != null ? `PR  ${exPR} ${ex.unit}` : 'No PR yet'}
+                  {exPR != null ? t('prWithValue', { value: exPR, unit: ex.unit }) : t('noPrYet')}
                 </Text>
               </View>
             </Pressable>
@@ -410,7 +413,7 @@ function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangePR, curr
 
       {selectedExKey && selectedEx && (
         <View style={s1.inputSection}>
-          <Text style={s1.sectionLabel}>YOUR NEW PR</Text>
+          <Text style={s1.sectionLabel}>{t('yourNewPr')}</Text>
           <View style={[s1.inputRow, !!prValue && s1.inputRowActive]}>
             <TextInput
               value={prValue}
@@ -428,7 +431,7 @@ function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangePR, curr
             <View style={s1.warnRow}>
               <AlertTriangle size={12} strokeWidth={2} color={Colors.warning} />
               <Text style={s1.warnText}>
-                {'Not higher than your current PR (' + currentPR + ' ' + selectedEx.unit + ')'}
+                {t('notHigherThanCurrent', { value: currentPR, unit: selectedEx.unit })}
               </Text>
             </View>
           )}
@@ -447,12 +450,12 @@ function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangePR, curr
             end={{ x: 1, y: 1 }}
             style={s1.nextBtn}
           >
-            <Text style={s1.nextBtnText}>NEXT — ADD PROOF</Text>
+            <Text style={s1.nextBtnText}>{t('nextAddProof')}</Text>
             <TrendingUp size={16} strokeWidth={2} color="#fff" />
           </LinearGradient>
         ) : (
           <View style={[s1.nextBtn, s1.nextBtnDisabled]}>
-            <Text style={[s1.nextBtnText, s1.nextBtnTextDisabled]}>NEXT — ADD PROOF</Text>
+            <Text style={[s1.nextBtnText, s1.nextBtnTextDisabled]}>{t('nextAddProof')}</Text>
           </View>
         )}
       </Pressable>
@@ -606,9 +609,10 @@ function Step2({
   videoAsset, onVideoSelected, onVideoRemoved,
   onSave,
 }: Step2Props) {
+  const { t } = useTranslation('logpr');
   const ExIcon = getIcon(selectedEx.key);
   const hasVideo = !!videoAsset;
-  const xpLabel = hasVideo ? '+100 XP' : '+50 XP';
+  const xpLabel = hasVideo ? t('xpWithVideo') : t('xpWithoutVideo');
 
   return (
     <>
@@ -620,7 +624,7 @@ function Step2({
             <Text style={s2.summaryExercise}>{selectedEx.label}</Text>
           </View>
           <Text style={s2.summaryPrev}>
-            {currentPR != null ? 'Previous: ' + currentPR + ' ' + selectedEx.unit : 'First PR'}
+            {currentPR != null ? t('previousWithValue', { value: currentPR, unit: selectedEx.unit }) : t('firstPr')}
           </Text>
         </View>
         <View style={{ alignItems: 'flex-end' }}>
@@ -632,12 +636,12 @@ function Step2({
       {/* XP indicators — active state follows video selection */}
       <View style={s2.xpRow}>
         <View style={[s2.xpCard, hasVideo ? s2.xpCardActive : s2.xpCardInactive]}>
-          <Text style={[s2.xpAmount, hasVideo && { color: Colors.accent }]}>+100 XP</Text>
-          <Text style={s2.xpLabel}>With video</Text>
+          <Text style={[s2.xpAmount, hasVideo && { color: Colors.accent }]}>{t('xpWithVideo')}</Text>
+          <Text style={s2.xpLabel}>{t('withVideo')}</Text>
         </View>
         <View style={[s2.xpCard, !hasVideo ? s2.xpCardActive : s2.xpCardInactive]}>
-          <Text style={[s2.xpAmount, !hasVideo && { color: Colors.accent }]}>+50 XP</Text>
-          <Text style={s2.xpLabel}>Without video</Text>
+          <Text style={[s2.xpAmount, !hasVideo && { color: Colors.accent }]}>{t('xpWithoutVideo')}</Text>
+          <Text style={s2.xpLabel}>{t('withoutVideo')}</Text>
         </View>
       </View>
 
@@ -668,7 +672,7 @@ function Step2({
           ) : (
             <>
               <CheckCircle size={16} strokeWidth={2} color="#fff" />
-              <Text style={s2.saveBtnText}>{'SAVE PR — ' + xpLabel}</Text>
+              <Text style={s2.saveBtnText}>{t('savePr', { xp: xpLabel })}</Text>
             </>
           )}
         </LinearGradient>
@@ -680,7 +684,7 @@ function Step2({
           disabled={saving}
           style={({ pressed }) => [s2.skipBtn, pressed && { opacity: 0.6 }]}
         >
-          <Text style={s2.skipBtnText}>{'Remove video, save for +50 XP'}</Text>
+          <Text style={s2.skipBtnText}>{t('removeVideoSave')}</Text>
         </Pressable>
       )}
     </>
@@ -798,8 +802,9 @@ interface Step3Props {
 }
 
 function Step3({ exercise, savedValue, hasVideo, videoUploading, videoUploadDone, videoUploadFailed }: Step3Props) {
+  const { t } = useTranslation('logpr');
   const ExIcon = getIcon(exercise.key);
-  const xpEarned = hasVideo && videoUploadDone ? '+100 XP EARNED' : '+50 XP EARNED';
+  const xpEarned = hasVideo && videoUploadDone ? t('xpEarnedWithVideo') : t('xpEarnedWithoutVideo');
 
   return (
     <View style={s3.container}>
@@ -817,7 +822,7 @@ function Step3({ exercise, savedValue, hasVideo, videoUploading, videoUploadDone
         </LinearGradient>
       </View>
 
-      <Text style={s3.heading}>PR SAVED!</Text>
+      <Text style={s3.heading}>{t('prSaved')}</Text>
       <Text style={s3.xpLabel}>{xpEarned}</Text>
 
       {/* PR card */}
@@ -826,7 +831,7 @@ function Step3({ exercise, savedValue, hasVideo, videoUploading, videoUploadDone
           <ExIcon size={14} strokeWidth={1.8} color="#888" />
           <Text style={s3.prCardExercise}>{exercise.label.toUpperCase()}</Text>
         </View>
-        <Text style={s3.prCardLabel}>NEW BEST</Text>
+        <Text style={s3.prCardLabel}>{t('newBest')}</Text>
         <View style={s3.prCardValueRow}>
           <Text style={s3.prCardValue}>{savedValue}</Text>
           <Text style={s3.prCardUnit}>{exercise.unit}</Text>
@@ -839,19 +844,19 @@ function Step3({ exercise, savedValue, hasVideo, videoUploading, videoUploadDone
           {videoUploading && (
             <>
               <ActivityIndicator size="small" color="#555" />
-              <Text style={s3.videoStatusText}>Uploading video proof…</Text>
+              <Text style={s3.videoStatusText}>{t('uploadingVideoProof')}</Text>
             </>
           )}
           {videoUploadDone && (
             <>
               <Zap size={13} strokeWidth={2} color={Colors.success} />
-              <Text style={[s3.videoStatusText, { color: Colors.success }]}>Video proof saved</Text>
+              <Text style={[s3.videoStatusText, { color: Colors.success }]}>{t('videoProofSaved')}</Text>
             </>
           )}
           {videoUploadFailed && (
             <>
               <VideoOff size={13} strokeWidth={2} color="#555" />
-              <Text style={s3.videoStatusText}>Video upload failed — PR is still saved</Text>
+              <Text style={s3.videoStatusText}>{t('videoUploadFailed')}</Text>
             </>
           )}
         </View>
@@ -859,7 +864,7 @@ function Step3({ exercise, savedValue, hasVideo, videoUploading, videoUploadDone
 
       <View style={s3.celebRow}>
         <Zap size={13} strokeWidth={2} color={Colors.accent} />
-        <Text style={s3.celebText}>Added to the leaderboard</Text>
+        <Text style={s3.celebText}>{t('addedToLeaderboard')}</Text>
         <Zap size={13} strokeWidth={2} color={Colors.accent} />
       </View>
     </View>

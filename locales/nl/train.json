@@ -1,0 +1,62 @@
+{
+  "header": {
+    "brand": "GYM RIVAL",
+    "schedule": "TRAININGSSCHEMA",
+    "checkin": "GYM CHECK-IN",
+    "progress": "VOORTGANG"
+  },
+  "tabs": {
+    "schedule": "SCHEMA",
+    "checkin": "CHECK-IN",
+    "progress": "VOORTGANG"
+  },
+  "days": {
+    "full": { "0": "Maandag", "1": "Dinsdag", "2": "Woensdag", "3": "Donderdag", "4": "Vrijdag", "5": "Zaterdag", "6": "Zondag" },
+    "short": { "0": "Ma", "1": "Di", "2": "Wo", "3": "Do", "4": "Vr", "5": "Za", "6": "Zo" }
+  },
+  "flexible": "Flexibel",
+  "workoutsPlanned_one": "{{count}} WORKOUT GEPLAND",
+  "workoutsPlanned_other": "{{count}} WORKOUTS GEPLAND",
+  "new": "NIEUW",
+  "workoutMeta": "{{day}} · {{count}} oefeningen",
+  "emptyTitle": "NOG GEEN SCHEMA'S",
+  "emptySubtitle": "Tik op NIEUW hierboven om je eerste workout te maken",
+  "detailMeta": "{{day}} · {{count}} OEFENINGEN",
+  "progressLabel": "VOORTGANG",
+  "setsProgress": "{{done}} / {{total}} SETS",
+  "exerciseMeta": "{{sets}} sets · {{reps}} reps",
+  "exerciseMetaWithWeight": "{{sets}} sets · {{reps}} reps · {{weight}}kg",
+  "setNumber": "SET {{n}}",
+  "startWorkout": "START WORKOUT",
+  "workoutDone": "WORKOUT VOLTOOID!",
+  "workoutDoneSub": "Alle sets voltooid. Goed gedaan!",
+  "backToSchedule": "TERUG NAAR SCHEMA",
+  "cancelWorkout": "WORKOUT ANNULEREN",
+  "createSchedule": "SCHEMA MAKEN",
+  "workoutName": "WORKOUTNAAM",
+  "workoutNamePlaceholder": "Bijv. Push Day",
+  "day": "DAG",
+  "addExercise": "OEFENING TOEVOEGEN",
+  "exerciseNamePlaceholder": "Naam van oefening",
+  "fields": { "sets": "SETS", "reps": "REPS", "weight": "KG" },
+  "exercisesAdded_one": "{{count}} OEFENING TOEGEVOEGD",
+  "exercisesAdded_other": "{{count}} OEFENINGEN TOEGEVOEGD",
+  "saveSchedule": "SCHEMA OPSLAAN",
+  "checkin": {
+    "weeklyStreak": "WEKELIJKSE REEKS",
+    "ofSevenDays": "/ 7 dagen",
+    "machine": "MACHINE!",
+    "keepItUp": "GA ZO DOOR",
+    "stayStrong": "BLIJF STERK",
+    "checkInNow": "NU INCHECKEN",
+    "noGyms": "Geen sportscholen beschikbaar.",
+    "hereToday": "{{count}} hier vandaag",
+    "confirmCheckIn": "CHECK-IN BEVESTIGEN",
+    "checkedIn": "INGECHECKT!",
+    "yourGym": "Jouw sportschool",
+    "xpEarned": "+25 XP VERDIEND",
+    "undoCheckIn": "CHECK-IN ONGEDAAN MAKEN",
+    "friendsCheckedIn": "VRIENDEN INGECHECKT",
+    "unknown": "Onbekend"
+  }
+}

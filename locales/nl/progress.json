@@ -1,0 +1,22 @@
+{
+  "consistency": "CONSISTENTIE",
+  "checkinsIn12Weeks_one": "{{count}} check-in in 12 weken",
+  "checkinsIn12Weeks_other": "{{count}} check-ins in 12 weken",
+  "less": "Minder",
+  "more": "Meer",
+  "level": "NIVEAU",
+  "xpProgress": "{{xpInLevel}} / {{xpNeeded}} XP",
+  "totalPrs": "TOTAAL PR'S",
+  "records": "records",
+  "dayStreak": "REEKS",
+  "days": "dagen",
+  "workouts": "WORKOUTS",
+  "done": "voltooid",
+  "loadError": "Kon voortgang niet laden:\n{{error}}",
+  "noDataTitle": "NOG GEEN DATA",
+  "noDataSub": "Log een PR of check in bij de sportschool om je voortgang bij te houden.",
+  "strengthProgress": "KRACHTVOORTGANG",
+  "noPrsYet": "Log je eerste PR om je voortgang te zien.",
+  "big3Total": "BIG 3 TOTAAL",
+  "currentBest": "huidig record"
+}

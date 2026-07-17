@@ -1,0 +1,97 @@
+{
+  "header": {
+    "brand": "GYM RIVAL",
+    "pageLabel": "PROFIEL"
+  },
+  "proUpsell": "UPGRADE NAAR PRO — €4,99/MND",
+  "proActive": "PRO-LID — TIK OM UIT TE SCHAKELEN",
+  "details": {
+    "title": "MIJN GEGEVENS",
+    "edit": "BEWERKEN",
+    "gym": "SPORTSCHOOL",
+    "weight": "GEWICHT",
+    "height": "LENGTE",
+    "goal": "DOEL",
+    "memberSince": "LID SINDS",
+    "motto": "MOTTO",
+    "notSet": "—"
+  },
+  "stats": {
+    "prs": "PR'S",
+    "friends": "VRIENDEN",
+    "streak": "REEKS",
+    "level": "NIVEAU"
+  },
+  "bestPrs": "BESTE PR'S",
+  "settings": {
+    "title": "INSTELLINGEN",
+    "notifications": "Meldingen",
+    "notificationsSub": "Pushmeldingen aan",
+    "privacy": "Privacy",
+    "privacySub": "Profiel zichtbaar voor vrienden",
+    "darkMode": "Donkere modus",
+    "darkModeOn": "Aan",
+    "shareProfile": "Profiel delen",
+    "shareProfileSub": "Kopieer je link"
+  },
+  "logOut": "UITLOGGEN",
+  "edit": {
+    "title": "PROFIEL BEWERKEN",
+    "fullName": "VOLLEDIGE NAAM",
+    "fullNamePlaceholder": "Je naam",
+    "username": "GEBRUIKERSNAAM",
+    "usernamePlaceholder": "@gebruikersnaam",
+    "bio": "BIO",
+    "bioPlaceholder": "Vertel je verhaal...",
+    "motto": "JOUW MOTTO",
+    "mottoPlaceholder": "Bijv. Geen pijn, geen winst",
+    "gym": "SPORTSCHOOL",
+    "gymPlaceholder": "Jouw sportschool",
+    "weight": "GEWICHT (kg)",
+    "height": "LENGTE (cm)",
+    "goal": "DOEL",
+    "goalPlaceholder": "Bijv. Spiermassa opbouwen",
+    "save": "WIJZIGINGEN OPSLAAN",
+    "invalidWeightTitle": "Ongeldig gewicht",
+    "invalidWeightMsg": "Voer een geldig gewicht in kg in.",
+    "invalidHeightTitle": "Ongeldige lengte",
+    "invalidHeightMsg": "Voer een geldige lengte in cm in.",
+    "saveErrorTitle": "Opslaan mislukt"
+  },
+  "badges": {
+    "title": "BADGES",
+    "earnedCount": "BADGES BEHAALD",
+    "earnedSection": "BEHAALD",
+    "lockedSection": "VERGRENDELD",
+    "items": {
+      "firstPr": "Eerste PR",
+      "sevenDayStreak": "7 Dagen op Rij",
+      "hundredKgBench": "100kg Bankdrukken",
+      "topThreeBoard": "Top 3 Ranglijst",
+      "tenPrs": "10 PR's",
+      "challengeWon": "Challenge Gewonnen",
+      "videoProof": "Videobewijs",
+      "twoHundredKgDeadlift": "200kg Deadlift",
+      "thirtyDayStreak": "30 Dagen op Rij",
+      "hundredLikes": "100 Likes"
+    },
+    "desc": {
+      "videoProof": "Upload een video om te ontgrendelen",
+      "deadlift": "Nog 40 kg te gaan",
+      "streak30": "Nog 23 dagen te gaan",
+      "likes100": "Nog 67 likes te gaan"
+    }
+  },
+  "prHistory": {
+    "title": "PR-GESCHIEDENIS",
+    "best": "Beste: {{value}} {{unit}}",
+    "emptyTitle": "NOG GEEN PR'S",
+    "emptySub": "Log je eerste PR om je voortgang bij te houden"
+  },
+  "notifications": {
+    "title": "MELDINGEN",
+    "markAll": "ALLES GELEZEN",
+    "emptyTitle": "ALLES BIJGEWERKT",
+    "emptySub": "Hier zie je berichten, vriendschapsverzoeken en PR-likes."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "someone": "Alguém",
+  "yourPr": "o teu PR",
+  "aPr": "um PR",
+  "newMessage": "{{name}} enviou-te uma mensagem",
+  "friendRequest": "{{name}} enviou-te um pedido de amizade",
+  "friendRequestAccepted": "{{name}} aceitou o teu pedido de amizade",
+  "prLiked": "{{name}} gostou do teu PR de {{exercise}}{{value}}",
+  "friendPr": "{{name}} acabou de alcançar um novo PR de {{exercise}}{{value}}",
+  "generic": "Tens uma nova notificação"
+}

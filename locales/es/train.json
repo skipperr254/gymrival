@@ -1,0 +1,62 @@
+{
+  "header": {
+    "brand": "GYM RIVAL",
+    "schedule": "PLAN DE ENTRENAMIENTO",
+    "checkin": "CHECK-IN DE GIMNASIO",
+    "progress": "PROGRESO"
+  },
+  "tabs": {
+    "schedule": "PLAN",
+    "checkin": "CHECK-IN",
+    "progress": "PROGRESO"
+  },
+  "days": {
+    "full": { "0": "Lunes", "1": "Martes", "2": "Miércoles", "3": "Jueves", "4": "Viernes", "5": "Sábado", "6": "Domingo" },
+    "short": { "0": "Lun", "1": "Mar", "2": "Mié", "3": "Jue", "4": "Vie", "5": "Sáb", "6": "Dom" }
+  },
+  "flexible": "Flexible",
+  "workoutsPlanned_one": "{{count}} ENTRENAMIENTO PLANEADO",
+  "workoutsPlanned_other": "{{count}} ENTRENAMIENTOS PLANEADOS",
+  "new": "NUEVO",
+  "workoutMeta": "{{day}} · {{count}} ejercicios",
+  "emptyTitle": "AÚN NO HAY PLANES",
+  "emptySubtitle": "Toca NUEVO arriba para crear tu primer entrenamiento",
+  "detailMeta": "{{day}} · {{count}} EJERCICIOS",
+  "progressLabel": "PROGRESO",
+  "setsProgress": "{{done}} / {{total}} SERIES",
+  "exerciseMeta": "{{sets}} series · {{reps}} repeticiones",
+  "exerciseMetaWithWeight": "{{sets}} series · {{reps}} repeticiones · {{weight}}kg",
+  "setNumber": "SERIE {{n}}",
+  "startWorkout": "EMPEZAR ENTRENAMIENTO",
+  "workoutDone": "¡ENTRENAMIENTO COMPLETADO!",
+  "workoutDoneSub": "Todas las series completadas. ¡Buen trabajo!",
+  "backToSchedule": "VOLVER AL PLAN",
+  "cancelWorkout": "CANCELAR ENTRENAMIENTO",
+  "createSchedule": "CREAR PLAN",
+  "workoutName": "NOMBRE DEL ENTRENAMIENTO",
+  "workoutNamePlaceholder": "Ej. Día de empuje",
+  "day": "DÍA",
+  "addExercise": "AÑADIR EJERCICIO",
+  "exerciseNamePlaceholder": "Nombre del ejercicio",
+  "fields": { "sets": "SERIES", "reps": "REPS", "weight": "KG" },
+  "exercisesAdded_one": "{{count}} EJERCICIO AÑADIDO",
+  "exercisesAdded_other": "{{count}} EJERCICIOS AÑADIDOS",
+  "saveSchedule": "GUARDAR PLAN",
+  "checkin": {
+    "weeklyStreak": "RACHA SEMANAL",
+    "ofSevenDays": "/ 7 días",
+    "machine": "¡IMPARABLE!",
+    "keepItUp": "SIGUE ASÍ",
+    "stayStrong": "MANTENTE FUERTE",
+    "checkInNow": "REGISTRAR VISITA",
+    "noGyms": "No hay gimnasios disponibles.",
+    "hereToday": "{{count}} aquí hoy",
+    "confirmCheckIn": "CONFIRMAR CHECK-IN",
+    "checkedIn": "¡REGISTRADO!",
+    "yourGym": "Tu gimnasio",
+    "xpEarned": "+25 XP GANADOS",
+    "undoCheckIn": "DESHACER CHECK-IN",
+    "friendsCheckedIn": "AMIGOS REGISTRADOS",
+    "unknown": "Desconocido"
+  }
+}

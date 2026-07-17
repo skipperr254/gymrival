@@ -1,0 +1,97 @@
+{
+  "header": {
+    "brand": "GYM RIVAL",
+    "pageLabel": "PROFIL"
+  },
+  "proUpsell": "AUF PRO UPGRADEN — 4,99 €/MONAT",
+  "proActive": "PRO-MITGLIED — ZUM DEAKTIVIEREN TIPPEN",
+  "details": {
+    "title": "MEINE DATEN",
+    "edit": "BEARBEITEN",
+    "gym": "STUDIO",
+    "weight": "GEWICHT",
+    "height": "GRÖSSE",
+    "goal": "ZIEL",
+    "memberSince": "MITGLIED SEIT",
+    "motto": "MOTTO",
+    "notSet": "—"
+  },
+  "stats": {
+    "prs": "PRs",
+    "friends": "FREUNDE",
+    "streak": "SERIE",
+    "level": "LEVEL"
+  },
+  "bestPrs": "BESTE PRs",
+  "settings": {
+    "title": "EINSTELLUNGEN",
+    "notifications": "Benachrichtigungen",
+    "notificationsSub": "Push-Benachrichtigungen an",
+    "privacy": "Datenschutz",
+    "privacySub": "Profil für Freunde sichtbar",
+    "darkMode": "Dunkler Modus",
+    "darkModeOn": "An",
+    "shareProfile": "Profil teilen",
+    "shareProfileSub": "Link kopieren"
+  },
+  "logOut": "ABMELDEN",
+  "edit": {
+    "title": "PROFIL BEARBEITEN",
+    "fullName": "VOLLSTÄNDIGER NAME",
+    "fullNamePlaceholder": "Dein Name",
+    "username": "BENUTZERNAME",
+    "usernamePlaceholder": "@benutzername",
+    "bio": "BIO",
+    "bioPlaceholder": "Erzähl deine Geschichte...",
+    "motto": "DEIN MOTTO",
+    "mottoPlaceholder": "Z. B. Ohne Fleiß kein Preis",
+    "gym": "STUDIO",
+    "gymPlaceholder": "Dein Studio",
+    "weight": "GEWICHT (kg)",
+    "height": "GRÖSSE (cm)",
+    "goal": "ZIEL",
+    "goalPlaceholder": "Z. B. Muskelaufbau",
+    "save": "ÄNDERUNGEN SPEICHERN",
+    "invalidWeightTitle": "Ungültiges Gewicht",
+    "invalidWeightMsg": "Bitte gib ein gültiges Gewicht in kg ein.",
+    "invalidHeightTitle": "Ungültige Größe",
+    "invalidHeightMsg": "Bitte gib eine gültige Größe in cm ein.",
+    "saveErrorTitle": "Speichern fehlgeschlagen"
+  },
+  "badges": {
+    "title": "ABZEICHEN",
+    "earnedCount": "ABZEICHEN ERHALTEN",
+    "earnedSection": "ERHALTEN",
+    "lockedSection": "GESPERRT",
+    "items": {
+      "firstPr": "Erster PR",
+      "sevenDayStreak": "7-Tage-Serie",
+      "hundredKgBench": "100kg Bankdrücken",
+      "topThreeBoard": "Top-3-Rangliste",
+      "tenPrs": "10 PRs",
+      "challengeWon": "Challenge gewonnen",
+      "videoProof": "Videobeweis",
+      "twoHundredKgDeadlift": "200kg Kreuzheben",
+      "thirtyDayStreak": "30-Tage-Serie",
+      "hundredLikes": "100 Likes"
+    },
+    "desc": {
+      "videoProof": "Lade ein Video hoch, um freizuschalten",
+      "deadlift": "Noch 40 kg",
+      "streak30": "Noch 23 Tage",
+      "likes100": "Noch 67 Likes"
+    }
+  },
+  "prHistory": {
+    "title": "PR-VERLAUF",
+    "best": "Beste: {{value}} {{unit}}",
+    "emptyTitle": "NOCH KEINE PRs",
+    "emptySub": "Trage deinen ersten PR ein, um deinen Fortschritt zu verfolgen"
+  },
+  "notifications": {
+    "title": "BENACHRICHTIGUNGEN",
+    "markAll": "ALLE MARKIEREN",
+    "emptyTitle": "ALLES ERLEDIGT",
+    "emptySub": "Hier siehst du Nachrichten, Freundschaftsanfragen und PR-Likes."
+  }
+}

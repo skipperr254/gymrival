@@ -3,10 +3,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts } from '@/constants/theme';
 import { CheckInView } from '@/components/features/CheckInView';
 
 export default function CheckinScreen() {
+  const { t } = useTranslation('train');
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
@@ -17,8 +19,8 @@ export default function CheckinScreen() {
           <Ionicons name="chevron-back" size={22} color={Colors.accent} />
         </Pressable>
         <View>
-          <Text style={styles.appTitle}>GYM RIVAL</Text>
-          <Text style={styles.pageLabel}>GYM CHECK-IN</Text>
+          <Text style={styles.appTitle}>{t('header.brand')}</Text>
+          <Text style={styles.pageLabel}>{t('header.checkin')}</Text>
         </View>
       </View>
 

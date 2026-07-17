@@ -519,6 +519,62 @@ Do not conflate this with a full "replay / highlight" feature — the v1 scope i
 
 ---
 
+## Internationalization (i18n) Rules
+
+The app is fully internationalized via `i18next` + `react-i18next` + `expo-localization`. Every screen across all four tabs, the Auth flow, and the Log-a-PR flow is translated. Supported languages: **English, Dutch, Spanish, German, Portuguese, Arabic** — all six have complete, real translations (no stubs remaining) across every namespace. Arabic content is translated but the layout is not yet mirrored for RTL — see "Arabic / RTL" below.
+
+### The rule: never hardcode user-facing copy
+
+Every string a user sees — `<Text>` content, `placeholder`, `Alert` titles/messages, error copy you compose yourself — must go through `t()`. This applies as you write new JSX, not as a cleanup pass afterward. An ESLint warning (`i18next/no-literal-string`, see `eslint.config.js`) flags new hardcoded JSX text and attributes to catch slips.
+
+Exception: brand wordmarks ("GYM"/"RIVAL"/"GYMRIVAL") are never translated.
+
+### Namespaces
+
+Translation files live in `locales/<code>/<namespace>.json` (`code` = `en`, `nl`, `es`, `de`, `pt`, `ar`). One namespace file per feature area, mirroring the `app/(tabs)/<tab>` structure: `auth.json` (the whole `(auth)` stack), `common.json` (tab bar, shared settings/chart strings), `profile.json`, `train.json`, `progress.json`, `social.json` (feed/friends/messages/chat), `compete.json` (rivals/challenges/global), `logpr.json` (the Log-a-PR sheet + video upload), `notifications.json`, `exercises.json`. When you build a new feature, add its own namespace file (in all six language folders) rather than dumping keys into an existing namespace.
+
+Use `useTranslation('namespaceName')` in a screen/component and call `t('key.path')`, or use a fully-qualified `t('namespace:key.path')` when you need a namespace other than the hook's default (e.g. resolving exercise names via `t('exercises:' + key)`). For module-level constants that back JSX (tab configs, option lists) that can't call hooks, store the i18n **key path** on the object and resolve it with `t()` at render time inside the component — see `TABS`/`METRIC_OPTIONS`/`GLOBAL_STAT_BOXES` in `compete/index.tsx` for the pattern. For plain helper functions that aren't components (e.g. `metricLabel()`/`endsInLabel()` in `types/challenge.ts`), import the default `i18n` instance from `@/lib/i18n` and call `i18n.t(...)` directly instead of the `useTranslation` hook.
+
+### Adding a new language
+
+Registering a language is a content-only change with zero code changes:
+1. Add an entry to `LANGUAGES` in `lib/i18n/languages.ts` with `available: false` until it's translated.
+2. Add `locales/<code>/*.json` for every existing namespace (start from the English files).
+3. Flip `available: true` once translated — it then appears in the in-app language picker (Profile → Language).
+
+### Dates and numbers
+
+Never call `toLocaleDateString`, `toLocaleString`, or hardcode a locale like `'en-US'`. Use the helpers in `lib/i18n/format.ts` (`formatDate`, `formatMonthYear`, `formatNumber`, `formatCompactNumber`, `formatRelativeTime`, `formatRelativeDay`) — they read the current i18next language at call time so they stay correct after a runtime language switch.
+
+### Database content
+
+Two different patterns depending on what the content is:
+- **Static reference data** (e.g. `exercise_types`) — the DB row's stable `key` column is the i18n key. Add the display name to `locales/*/exercises.json` keyed by that `key`; don't add translation columns to the table itself.
+- **Admin-authored dynamic content** (e.g. challenge titles/descriptions) — needs a real per-locale table, like `challenge_translations` (migration `026_challenge_translations.sql`). The base column stays the original-authored-language text; a translation row overrides it for a given locale, with the base column as fallback when no translation exists. This only covers admin-created challenges — friend-vs-friend challenge titles are the creator's own free text and are never machine-translated, same as a chat message.
+- **Notification history**: never freeze translated/rendered text into a `notifications.data` JSONB column — store the stable key (e.g. `exercise_key`, not `exercise_label`) and resolve the display text client-side at render time, so old notifications render correctly in whatever language the viewer is currently using (see migration `027_notification_exercise_key.sql` for why this matters).
+
+### Language detection & persistence
+
+`lib/i18n/languageDetector.ts` resolves the active language in this order: an explicit choice cached in AsyncStorage → the device's locale (`expo-localization`) mapped to the nearest supported language → English. Once a signed-in user explicitly picks a language in Settings, it's also written to `profiles.language` and becomes the cross-device source of truth (synced in `app/_layout.tsx`); `NULL` means "keep following the device."
+
+### Push notifications (server-side, locale-aware)
+
+Push notifications are triggered entirely server-side: an `AFTER INSERT` trigger on `notifications` (`tr_notifications_push`, migration `028_push_notification_webhook.sql`) calls the `send-notification` edge function via `pg_net`, which composes the push title/body using the **recipient's** `profiles.language` — not the actor's. This is deliberate: the action that causes a notification (e.g. a PR like) is taken by a different user than the one receiving the push, so client-side composition would always use the wrong person's language. There is no client-side `sendPushNotification()` wrapper for this reason — do not reintroduce one.
+
+The edge function embeds its own copy of the notification templates and exercise names (`supabase/functions/send-notification/index.ts`) since Deno edge functions can't import the RN app's `locales/*.json` files directly — keep these two in sync by hand when `notifications.json` or `exercises.json` changes.
+
+The webhook call requires a one-time manual setup (a shared secret in Supabase Vault + a matching edge function secret) documented at the top of migration `028`; until that's done, the trigger silently no-ops rather than failing.
+
+### Arabic / RTL (deferred)
+
+Arabic has complete, real translations across every namespace and is selectable in the language picker today — but the app's layout is not RTL-aware (no `I18nManager.forceRTL`, no mirrored `flex-row`/icons/text-alignment). Selecting Arabic renders correct Arabic text in a left-to-right layout. Full RTL layout support is a deliberately separate, larger follow-up piece (it touches nearly every screen's layout, not just text) — do not attempt to bolt it on piecemeal; treat it as its own project.
+
+### Explicitly out of scope
+
+Unit conversion (metric ⇄ imperial) is not part of this i18n work — `weight_kg`/`height_cm` stay metric-only regardless of language. This would be a separate feature (a unit-system preference threaded through PR logging, leaderboards, and profile display), not a translation concern.
+
+---
+
 ## Linting and Validation
 
 Run after every feature:

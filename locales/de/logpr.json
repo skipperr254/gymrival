@@ -1,0 +1,47 @@
+{
+  "logSheet": {
+    "title": "AKTIVITÄT PROTOKOLLIEREN",
+    "logPr": { "label": "PR protokollieren", "sub": "Erfasse einen neuen persönlichen Rekord" },
+    "checkin": { "label": "Gym Check-in", "sub": "Im Studio einchecken" }
+  },
+  "step": {
+    "stepOf": "SCHRITT {{step}} VON 2",
+    "logYourPr": "PR protokollieren",
+    "addProof": "Beweis hinzufügen"
+  },
+  "selectExercise": "ÜBUNG AUSWÄHLEN",
+  "prWithValue": "PR  {{value}} {{unit}}",
+  "noPrYet": "Noch kein PR",
+  "yourNewPr": "DEIN NEUER PR",
+  "notHigherThanCurrent": "Nicht höher als dein aktueller PR ({{value}} {{unit}})",
+  "nextAddProof": "WEITER — BEWEIS HINZUFÜGEN",
+  "previousWithValue": "Vorher: {{value}} {{unit}}",
+  "firstPr": "Erster PR",
+  "xpWithVideo": "+100 XP",
+  "xpWithoutVideo": "+50 XP",
+  "withVideo": "Mit Video",
+  "withoutVideo": "Ohne Video",
+  "savePr": "PR SPEICHERN — {{xp}}",
+  "removeVideoSave": "Video entfernen, für +50 XP speichern",
+  "prSaved": "PR GESPEICHERT!",
+  "newBest": "NEUER BESTWERT",
+  "uploadingVideoProof": "Videobeweis wird hochgeladen…",
+  "videoProofSaved": "Videobeweis gespeichert",
+  "videoUploadFailed": "Video-Upload fehlgeschlagen — PR ist trotzdem gespeichert",
+  "addedToLeaderboard": "Zur Rangliste hinzugefügt",
+  "xpEarnedWithVideo": "+100 XP ERHALTEN",
+  "xpEarnedWithoutVideo": "+50 XP ERHALTEN",
+  "video": {
+    "readyLabel": "VIDEO BEREIT",
+    "addProofTitle": "VIDEOBEWEIS HINZUFÜGEN",
+    "addProofSub": "Kamera oder Bibliothek · max. 60 Sek.",
+    "permissionNeededTitle": "Berechtigung erforderlich",
+    "permissionLibraryMsg": "Erlaube Zugriff auf deine Fotobibliothek, um ein Video anzuhängen.",
+    "permissionCameraMsg": "Erlaube Kamerazugriff, um deinen Lift aufzunehmen.",
+    "pickerTitle": "Videobeweis hinzufügen",
+    "pickerMsg": "Nimm deinen Lift auf oder wähle ein vorhandenes Video (max. 60 Sekunden)",
+    "recordVideo": "Video aufnehmen",
+    "chooseFromLibrary": "Aus Bibliothek wählen",
+    "cancel": "Abbrechen"
+  }
+}

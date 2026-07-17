@@ -24,9 +24,11 @@ import {
   AlertCircle,
   RefreshCw,
 } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCompeteStore } from '@/store/useCompeteStore';
+import { formatNumber } from '@/lib/i18n/format';
 import type { ChallengeWithStats, ChallengeLeaderboardEntry } from '@/types/challenge';
 import {
   endsInLabel,
@@ -75,6 +77,7 @@ function Avatar({ id, name, size = 38 }: { id: string; name: string; size?: numb
 }
 
 export default function ChallengeDetailScreen() {
+  const { t } = useTranslation('compete');
   const { id }   = useLocalSearchParams<{ id: string }>();
   const { user } = useAuthStore();
   const {
@@ -129,12 +132,12 @@ export default function ChallengeDetailScreen() {
           >
             <ArrowLeft size={20} strokeWidth={2} color={Colors.accent} />
           </Pressable>
-          <Text style={styles.heading}>CHALLENGE</Text>
+          <Text style={styles.heading}>{t('detail.heading')}</Text>
           <View style={{ width: 36 }} />
         </View>
         <View style={styles.errorCenter}>
           <AlertCircle size={26} strokeWidth={1.6} color={Colors.accent} />
-          <Text style={styles.errorText}>{"Challenge not found"}</Text>
+          <Text style={styles.errorText}>{t('detail.notFound')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -157,7 +160,7 @@ export default function ChallengeDetailScreen() {
         >
           <ArrowLeft size={20} strokeWidth={2} color={Colors.accent} />
         </Pressable>
-        <Text style={styles.heading}>CHALLENGE</Text>
+        <Text style={styles.heading}>{t('detail.heading')}</Text>
         <View style={{ width: 36 }} />
       </View>
 
@@ -183,7 +186,7 @@ export default function ChallengeDetailScreen() {
               <View style={[styles.prizeBox, { borderColor: accentColor + '33' }]}>
                 <Gift size={15} strokeWidth={1.8} color={accentColor} />
                 <View>
-                  <Text style={styles.prizeLabel}>PRIZE</Text>
+                  <Text style={styles.prizeLabel}>{t('detail.prize')}</Text>
                   <Text style={[styles.prizeVal, { color: accentColor }]}>
                     {challenge.prize_label}
                   </Text>
@@ -195,14 +198,14 @@ export default function ChallengeDetailScreen() {
               <View style={styles.statItem}>
                 <Clock size={14} strokeWidth={1.8} color="#555" />
                 <View>
-                  <Text style={styles.statLabel}>ENDS IN</Text>
+                  <Text style={styles.statLabel}>{t('detail.endsIn')}</Text>
                   <Text style={styles.statVal}>{endsInLabel(challenge.ends_at)}</Text>
                 </View>
               </View>
               <View style={styles.statItem}>
                 <Users size={14} strokeWidth={1.8} color="#555" />
                 <View>
-                  <Text style={styles.statLabel}>PARTICIPANTS</Text>
+                  <Text style={styles.statLabel}>{t('detail.participants')}</Text>
                   <Text style={styles.statVal}>{challenge.participant_count}</Text>
                 </View>
               </View>
@@ -210,7 +213,7 @@ export default function ChallengeDetailScreen() {
                 <View style={styles.statItem}>
                   <Zap size={14} strokeWidth={1.8} color="#555" />
                   <View>
-                    <Text style={styles.statLabel}>XP REWARD</Text>
+                    <Text style={styles.statLabel}>{t('detail.xpReward')}</Text>
                     <Text style={styles.statVal}>{challenge.reward_xp}</Text>
                   </View>
                 </View>
@@ -221,7 +224,7 @@ export default function ChallengeDetailScreen() {
               <View style={[styles.rankBadge, { backgroundColor: accentColor + '15', borderColor: accentColor + '33' }]}>
                 <Trophy size={13} strokeWidth={1.8} color={accentColor} />
                 <Text style={[styles.rankBadgeText, { color: accentColor }]}>
-                  {'Your rank: #'}{challenge.user_rank}
+                  {t('card.yourRank', { rank: challenge.user_rank })}
                   {challenge.user_score != null
                     ? `  ·  ${formatChallengeScore(challenge.user_score, challenge.metric, '')}`
                     : ''}
@@ -243,7 +246,7 @@ export default function ChallengeDetailScreen() {
         )}
 
         {/* Leaderboard */}
-        <Text style={styles.sectionLabel}>LEADERBOARD</Text>
+        <Text style={styles.sectionLabel}>{t('detail.leaderboard')}</Text>
 
         {isLoadingBoard && entries.length === 0 && (
           <View style={{ alignItems: 'center', paddingVertical: 32 }}>
@@ -254,13 +257,13 @@ export default function ChallengeDetailScreen() {
         {!isLoadingBoard && entries.length === 0 && (
           <View style={styles.emptyBoard}>
             <Trophy size={28} strokeWidth={1.4} color="#333" />
-            <Text style={styles.emptyBoardText}>{"No participants yet"}</Text>
-            <Text style={styles.emptyBoardSub}>{"Be the first to join!"}</Text>
+            <Text style={styles.emptyBoardText}>{t('detail.noParticipants')}</Text>
+            <Text style={styles.emptyBoardSub}>{t('detail.beFirst')}</Text>
           </View>
         )}
 
         {entries.map((entry, i) => {
-          const displayName = entry.full_name ?? entry.username ?? 'Unknown';
+          const displayName = entry.full_name ?? entry.username ?? t('unknown');
           const rankIdx     = Number(entry.rank) - 1;
           return (
             <View
@@ -283,7 +286,7 @@ export default function ChallengeDetailScreen() {
               <View style={{ flex: 1 }}>
                 <Text style={[styles.rowName, entry.is_me && { color: accentColor }]} numberOfLines={1}>
                   {displayName}
-                  {entry.is_me ? ' (You)' : ''}
+                  {entry.is_me ? t('youSuffix') : ''}
                 </Text>
                 <Text style={styles.rowUsername} numberOfLines={1}>
                   {entry.username ?? ''}
@@ -293,9 +296,9 @@ export default function ChallengeDetailScreen() {
                 <Text style={[styles.rowScore, entry.is_me && { color: accentColor }]}>
                   {challenge
                     ? formatChallengeScore(entry.score, challenge.metric, '')
-                    : entry.score}
+                    : formatNumber(entry.score)}
                 </Text>
-                <Text style={styles.rowUnit}>{'LVL '}{entry.level}</Text>
+                <Text style={styles.rowUnit}>{t('lvl', { level: entry.level })}</Text>
               </View>
             </View>
           );
@@ -308,7 +311,7 @@ export default function ChallengeDetailScreen() {
             style={styles.refreshBtn}
           >
             <RefreshCw size={12} strokeWidth={2} color="#383838" />
-            <Text style={styles.refreshText}>REFRESH</Text>
+            <Text style={styles.refreshText}>{t('detail.refresh')}</Text>
           </Pressable>
         )}
 
@@ -322,7 +325,7 @@ export default function ChallengeDetailScreen() {
             {challenge.is_joined ? (
               <View style={styles.leaveBtn}>
                 <CheckCircle size={15} strokeWidth={2} color="#555" />
-                <Text style={styles.leaveBtnText}>JOINED — TAP TO LEAVE</Text>
+                <Text style={styles.leaveBtnText}>{t('detail.joinedTapToLeave')}</Text>
               </View>
             ) : joining ? (
               <LinearGradient
@@ -341,7 +344,7 @@ export default function ChallengeDetailScreen() {
                 style={styles.joinBtn}
               >
                 <Zap size={15} strokeWidth={2} color="#fff" />
-                <Text style={styles.joinBtnText}>JOIN CHALLENGE</Text>
+                <Text style={styles.joinBtnText}>{t('detail.joinChallenge')}</Text>
               </LinearGradient>
             )}
           </Pressable>
@@ -350,7 +353,7 @@ export default function ChallengeDetailScreen() {
         {challenge?.status === 'completed' && (
           <View style={styles.completedBanner}>
             <Trophy size={15} strokeWidth={1.8} color="#d4a017" />
-            <Text style={styles.completedText}>CHALLENGE ENDED</Text>
+            <Text style={styles.completedText}>{t('detail.challengeEnded')}</Text>
           </View>
         )}
       </ScrollView>

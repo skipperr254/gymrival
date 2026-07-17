@@ -2,24 +2,26 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Users, ArrowLeft } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts } from '@/constants/theme';
 
 export default function FriendsScreen() {
+  const { t } = useTranslation('social');
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <Pressable onPress={() => router.back()} style={styles.back}>
         <ArrowLeft size={20} strokeWidth={2} color={Colors.accent} />
-        <Text style={styles.backText}>SOCIAL</Text>
+        <Text style={styles.backText}>{t('friendsStub.back')}</Text>
       </Pressable>
 
       <View style={styles.center}>
         <View style={styles.iconWrap}>
           <Users size={32} strokeWidth={1.4} color="#333" />
         </View>
-        <Text style={styles.title}>FRIENDS</Text>
-        <Text style={styles.subtitle}>Add and manage your gym rivals</Text>
+        <Text style={styles.title}>{t('friendsStub.title')}</Text>
+        <Text style={styles.subtitle}>{t('friendsStub.subtitle')}</Text>
         <View style={styles.pill}>
-          <Text style={styles.pillText}>COMING SOON</Text>
+          <Text style={styles.pillText}>{t('friendsStub.comingSoon')}</Text>
         </View>
       </View>
     </SafeAreaView>

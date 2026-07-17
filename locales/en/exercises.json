@@ -1,0 +1,19 @@
+{
+  "bench": "Bench Press",
+  "squat": "Squat",
+  "deadlift": "Deadlift",
+  "pullups": "Pull-ups",
+  "overhead": "Overhead Press",
+  "bulgarian": "Bulgarian Split Squat",
+  "rdl": "Romanian Deadlift",
+  "incline": "Incline Bench",
+  "dips": "Dips",
+  "row": "Barbell Row",
+  "curl": "Bicep Curl",
+  "legpress": "Leg Press",
+  "lunge": "Lunges",
+  "facepull": "Face Pull",
+  "hipthrust": "Hip Thrust",
+  "plank": "Plank",
+  "muscle_up": "Muscle Up"
+}

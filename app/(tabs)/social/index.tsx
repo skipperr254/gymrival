@@ -31,25 +31,24 @@ import {
   Dumbbell,
   MessageCircle,
 } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
 import { PRVideoPlayer } from '@/components/features/PRVideoPlayer';
+import {
+  formatDate,
+  formatNumber,
+  formatRelativeTime as formatRelativeTimeIntl,
+} from '@/lib/i18n/format';
 import type { FeedPost } from '@/types/social';
 
 // ─── Feed helpers ─────────────────────────────────────────────────────────────
 
 function formatRelativeTime(dateStr: string): string {
   const date = new Date(dateStr);
-  const diffMs = Date.now() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60_000);
-  const diffHours = Math.floor(diffMs / 3_600_000);
-  const diffDays = Math.floor(diffMs / 86_400_000);
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const diffDays = Math.floor((Date.now() - date.getTime()) / 86_400_000);
+  if (diffDays < 7) return formatRelativeTimeIntl(date);
+  return formatDate(date);
 }
 
 
@@ -70,13 +69,14 @@ function FriendAvatar({
   size?: number;
   online?: boolean;
 }) {
+  const { t } = useTranslation('social');
   // Deterministic color from first 8 hex chars of the UUID
   const charSum = [...id.replace(/-/g, '').slice(0, 8)].reduce(
     (s, c) => s + c.charCodeAt(0),
     0
   );
   const color = AVATAR_PALETTE[charSum % AVATAR_PALETTE.length];
-  const initials = name === 'You' ? 'YOU' : name.slice(0, 2).toUpperCase();
+  const initials = name === 'You' ? t('you') : name.slice(0, 2).toUpperCase();
   const fontSize = Math.round(size * 0.3);
   return (
     <View style={{ position: 'relative', flexShrink: 0 }}>
@@ -119,10 +119,12 @@ function FriendAvatar({
 
 // ─── Tab Config ───────────────────────────────────────────────────────────────
 
+// Display text is resolved via t('tabs.<key>.label'/'subtitle') at render
+// time — this constant only holds the stable key + i18n key paths.
 const TABS = [
-  { key: 'feed',     label: 'Feed',     subtitle: 'FEED' },
-  { key: 'friends',  label: 'Friends',  subtitle: 'FRIENDS' },
-  { key: 'messages', label: 'Messages', subtitle: 'MESSAGES' },
+  { key: 'feed',     labelKey: 'tabs.feed.label',     subtitleKey: 'tabs.feed.subtitle' },
+  { key: 'friends',  labelKey: 'tabs.friends.label',  subtitleKey: 'tabs.friends.subtitle' },
+  { key: 'messages', labelKey: 'tabs.messages.label', subtitleKey: 'tabs.messages.subtitle' },
 ] as const;
 
 type TabKey = (typeof TABS)[number]['key'];
@@ -130,13 +132,11 @@ type TabKey = (typeof TABS)[number]['key'];
 function formatConvTime(iso: string | null): string {
   if (!iso) return '';
   const date = new Date(iso);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / 86_400_000);
-  if (diffDays === 0) return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-  if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return date.toLocaleDateString('en-US', { weekday: 'short' });
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const diffDays = Math.floor((Date.now() - date.getTime()) / 86_400_000);
+  if (diffDays === 0) return formatDate(date, { hour: '2-digit', minute: '2-digit', hour12: false });
+  if (diffDays === 1) return formatRelativeTimeIntl(date);
+  if (diffDays < 7) return formatDate(date, { weekday: 'short' });
+  return formatDate(date);
 }
 
 // ─── Feed skeleton card ───────────────────────────────────────────────────────
@@ -167,6 +167,7 @@ function FeedSkeleton() {
 // ─── PR stat visual (no video attached) ──────────────────────────────────────
 
 function PRStatVisual({ post }: { post: FeedPost }) {
+  const { t } = useTranslation('social');
   return (
     <View style={feedStyles.statVisual}>
       <LinearGradient
@@ -192,7 +193,7 @@ function PRStatVisual({ post }: { post: FeedPost }) {
       </View>
       {/* NEW PR badge */}
       <View style={feedStyles.newPrTag}>
-        <Text style={feedStyles.newPrTagText}>NEW PR</Text>
+        <Text style={feedStyles.newPrTagText}>{t('newPr')}</Text>
       </View>
     </View>
   );
@@ -209,12 +210,13 @@ interface FeedCardProps {
 }
 
 function FeedCard({ post, userId, isVideoActive, onVideoPlay, onLike }: FeedCardProps) {
+  const { t } = useTranslation('social');
   const isMe = post.user_id === userId;
   const hasVideo = post.video?.status === 'ready';
   const isUploading = post.video?.status === 'uploading' && isMe;
 
-  const displayName = post.author_name ?? post.author_username ?? 'Athlete';
-  const location = post.author_gym ?? 'Gym';
+  const displayName = post.author_name ?? post.author_username ?? t('athlete');
+  const location = post.author_gym ?? t('gym');
   const timestamp = formatRelativeTime(post.created_at);
 
   // Dynamically derived from the thumbnail using Image.getSize.
@@ -253,7 +255,7 @@ function FeedCard({ post, userId, isVideoActive, onVideoPlay, onLike }: FeedCard
           </View>
         </View>
         <View style={feedStyles.levelPill}>
-          <Text style={feedStyles.levelPillText}>LV{post.author_level}</Text>
+          <Text style={feedStyles.levelPillText}>{t('levelShort', { level: post.author_level })}</Text>
         </View>
       </View>
 
@@ -275,7 +277,7 @@ function FeedCard({ post, userId, isVideoActive, onVideoPlay, onLike }: FeedCard
         {isUploading && (
           <View style={feedStyles.uploadingBadge}>
             <ActivityIndicator size="small" color="#555" style={{ transform: [{ scale: 0.75 }] }} />
-            <Text style={feedStyles.uploadingBadgeText}>VIDEO UPLOADING…</Text>
+            <Text style={feedStyles.uploadingBadgeText}>{t('videoUploading')}</Text>
           </View>
         )}
 
@@ -300,7 +302,7 @@ function FeedCard({ post, userId, isVideoActive, onVideoPlay, onLike }: FeedCard
         <View style={feedStyles.likesDisplay}>
           <Flame size={16} strokeWidth={2} color={Colors.accent} />
           <Text style={feedStyles.likesCount}>{post.likes_count}</Text>
-          <Text style={feedStyles.likesLabel}>LIKES</Text>
+          <Text style={feedStyles.likesLabel}>{t('likes')}</Text>
         </View>
         {!isMe ? (
           <Pressable
@@ -314,11 +316,11 @@ function FeedCard({ post, userId, isVideoActive, onVideoPlay, onLike }: FeedCard
               color={post.has_liked ? Colors.accent : '#707070'}
             />
             <Text style={[feedStyles.likeBtnText, post.has_liked && feedStyles.likeBtnTextActive]}>
-              {post.has_liked ? 'LIKED' : 'LIKE'}
+              {post.has_liked ? t('liked') : t('like')}
             </Text>
           </Pressable>
         ) : (
-          <Text style={feedStyles.yourPrLabel}>YOUR PR</Text>
+          <Text style={feedStyles.yourPrLabel}>{t('yourPr')}</Text>
         )}
       </View>
     </View>
@@ -328,6 +330,7 @@ function FeedCard({ post, userId, isVideoActive, onVideoPlay, onLike }: FeedCard
 // ─── Feed Content ─────────────────────────────────────────────────────────────
 
 function FeedContent() {
+  const { t } = useTranslation('social');
   const userId = useAuthStore((s) => s.user?.id ?? '');
   const {
     feed,
@@ -371,10 +374,8 @@ function FeedContent() {
         <View style={feedStyles.emptyIconWrap}>
           <Dumbbell size={28} strokeWidth={1.4} color="#404040" />
         </View>
-        <Text style={feedStyles.emptyTitle}>NO ACTIVITY YET</Text>
-        <Text style={feedStyles.emptySubtitle}>
-          Add friends and start logging PRs to see the feed come alive.
-        </Text>
+        <Text style={feedStyles.emptyTitle}>{t('feedEmptyTitle')}</Text>
+        <Text style={feedStyles.emptySubtitle}>{t('feedEmptySubtitle')}</Text>
       </View>
     );
   }
@@ -391,7 +392,7 @@ function FeedContent() {
           onLike={() => toggleLike(userId, post.id)}
         />
       ))}
-      <Text style={feedStyles.footerNote}>{"YOU'RE ALL CAUGHT UP"}</Text>
+      <Text style={feedStyles.footerNote}>{t('allCaughtUp')}</Text>
     </>
   );
 }
@@ -401,6 +402,7 @@ function FeedContent() {
 type FriendsSubTab = 'list' | 'search' | 'requests';
 
 function FriendsContent() {
+  const { t } = useTranslation('social');
   const userId = useAuthStore((s) => s.user?.id ?? '');
   const {
     friends,
@@ -463,11 +465,13 @@ function FriendsContent() {
   const incomingCount = incomingRequests.length;
 
   const subTabs: { key: FriendsSubTab; label: string }[] = [
-    { key: 'list', label: 'FRIENDS' },
-    { key: 'search', label: 'SEARCH' },
+    { key: 'list', label: t('friendsSubTabs.friends') },
+    { key: 'search', label: t('friendsSubTabs.search') },
     {
       key: 'requests',
-      label: incomingCount > 0 ? `REQUESTS · ${incomingCount}` : 'REQUESTS',
+      label: incomingCount > 0
+        ? t('friendsSubTabs.requestsCount', { count: incomingCount })
+        : t('friendsSubTabs.requests'),
     },
   ];
 
@@ -499,11 +503,11 @@ function FriendsContent() {
           <View style={friendsStyles.statsGrid}>
             <View style={friendsStyles.statCard}>
               <Text style={friendsStyles.statValue}>{friends.length}</Text>
-              <Text style={friendsStyles.statLabel}>FRIENDS</Text>
+              <Text style={friendsStyles.statLabel}>{t('friendsCount')}</Text>
             </View>
             <View style={friendsStyles.statCard}>
               <Text style={friendsStyles.statValue}>{incomingCount}</Text>
-              <Text style={friendsStyles.statLabel}>PENDING</Text>
+              <Text style={friendsStyles.statLabel}>{t('pending')}</Text>
             </View>
           </View>
 
@@ -516,12 +520,10 @@ function FriendsContent() {
               <View style={friendsStyles.emptyIconWrap}>
                 <Users size={24} strokeWidth={1.5} color="#404040" />
               </View>
-              <Text style={friendsStyles.emptyTitle}>NO FRIENDS YET</Text>
-              <Text style={friendsStyles.emptySubtitle}>
-                Search for athletes and start competing
-              </Text>
+              <Text style={friendsStyles.emptyTitle}>{t('noFriendsTitle')}</Text>
+              <Text style={friendsStyles.emptySubtitle}>{t('noFriendsSub')}</Text>
               <Pressable onPress={() => setSubTab('search')} style={friendsStyles.emptyBtn}>
-                <Text style={friendsStyles.emptyBtnText}>FIND ATHLETES</Text>
+                <Text style={friendsStyles.emptyBtnText}>{t('findAthletes')}</Text>
               </Pressable>
             </View>
           ) : (
@@ -534,16 +536,16 @@ function FriendsContent() {
                 />
                 <View style={{ flex: 1 }}>
                   <Text style={friendsStyles.userName}>
-                    {friend.full_name ?? friend.username ?? 'Unknown'}
+                    {friend.full_name ?? friend.username ?? t('unknown')}
                   </Text>
                   <Text style={friendsStyles.userHandle}>{friend.username ?? ''}</Text>
                   <View style={friendsStyles.badgeRow}>
                     <View style={friendsStyles.badge}>
-                      <Text style={friendsStyles.badgeText}>LVL {friend.level}</Text>
+                      <Text style={friendsStyles.badgeText}>{t('lvl', { level: friend.level })}</Text>
                     </View>
                     <View style={friendsStyles.badge}>
                       <Text style={friendsStyles.badgeText}>
-                        {friend.xp.toLocaleString()} XP
+                        {formatNumber(friend.xp)} XP
                       </Text>
                     </View>
                   </View>
@@ -576,7 +578,7 @@ function FriendsContent() {
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder="Search by name or @username"
+              placeholder={t('searchPlaceholder')}
               placeholderTextColor="#404040"
               style={friendsStyles.searchInput}
             />
@@ -587,7 +589,7 @@ function FriendsContent() {
             )}
           </View>
 
-          {!query && <Text style={friendsStyles.sectionLabel}>SUGGESTED</Text>}
+          {!query && <Text style={friendsStyles.sectionLabel}>{t('suggested')}</Text>}
 
           {searchLoading ? (
             <ActivityIndicator color="#404040" style={{ marginTop: 16 }} />
@@ -596,9 +598,9 @@ function FriendsContent() {
               <View style={friendsStyles.emptyIconWrap}>
                 <Search size={22} strokeWidth={1.5} color="#383838" />
               </View>
-              <Text style={friendsStyles.emptyTitle}>NO RESULTS</Text>
+              <Text style={friendsStyles.emptyTitle}>{t('noResultsTitle')}</Text>
               <Text style={[friendsStyles.emptySubtitle, { marginBottom: 0 }]}>
-                Try a different name or @username
+                {t('noResultsSub')}
               </Text>
             </View>
           ) : (
@@ -616,7 +618,7 @@ function FriendsContent() {
                   />
                   <View style={{ flex: 1 }}>
                     <Text style={friendsStyles.userName}>
-                      {u.full_name ?? u.username ?? 'Unknown'}
+                      {u.full_name ?? u.username ?? t('unknown')}
                     </Text>
                     <Text style={[friendsStyles.userHandle, { marginBottom: 0 }]}>
                       {u.username ?? ''}
@@ -625,13 +627,13 @@ function FriendsContent() {
                   {isFriend && (
                     <View style={friendsStyles.statusPill}>
                       <UserCheck size={13} strokeWidth={2} color="#505050" />
-                      <Text style={friendsStyles.statusPillText}>FRIENDS</Text>
+                      <Text style={friendsStyles.statusPillText}>{t('friendsPill')}</Text>
                     </View>
                   )}
                   {isSent && (
                     <View style={friendsStyles.statusPill}>
                       <Clock size={13} strokeWidth={2} color="#505050" />
-                      <Text style={friendsStyles.statusPillText}>SENT</Text>
+                      <Text style={friendsStyles.statusPillText}>{t('sentPill')}</Text>
                     </View>
                   )}
                   {hasIncoming && (
@@ -642,7 +644,7 @@ function FriendsContent() {
                       style={friendsStyles.acceptBtn}
                     >
                       <UserCheck size={13} strokeWidth={2} color={Colors.accent} />
-                      <Text style={friendsStyles.acceptBtnText}>ACCEPT</Text>
+                      <Text style={friendsStyles.acceptBtnText}>{t('accept')}</Text>
                     </Pressable>
                   )}
                   {!isFriend && !isSent && !hasIncoming && (
@@ -651,7 +653,7 @@ function FriendsContent() {
                       style={friendsStyles.addBtn}
                     >
                       <UserPlus size={13} strokeWidth={2} color="#808080" />
-                      <Text style={friendsStyles.addBtnText}>ADD</Text>
+                      <Text style={friendsStyles.addBtnText}>{t('add')}</Text>
                     </Pressable>
                   )}
                 </View>
@@ -672,7 +674,7 @@ function FriendsContent() {
             <>
               {incomingRequests.length > 0 && (
                 <>
-                  <Text style={friendsStyles.sectionLabel}>INCOMING</Text>
+                  <Text style={friendsStyles.sectionLabel}>{t('incoming')}</Text>
                   {incomingRequests.map((req) => (
                     <View key={req.friendship_id} style={friendsStyles.requestCard}>
                       <View style={friendsStyles.requestUser}>
@@ -683,10 +685,10 @@ function FriendsContent() {
                         />
                         <View>
                           <Text style={friendsStyles.userName}>
-                            {req.user.full_name ?? req.user.username ?? 'Unknown'}
+                            {req.user.full_name ?? req.user.username ?? t('unknown')}
                           </Text>
                           <Text style={[friendsStyles.userHandle, { marginBottom: 0 }]}>
-                            {req.user.username ?? ''} · LVL {req.user.level}
+                            {req.user.username ?? ''} · {t('lvl', { level: req.user.level })}
                           </Text>
                         </View>
                       </View>
@@ -702,7 +704,7 @@ function FriendsContent() {
                             style={friendsStyles.acceptActionBtn}
                           >
                             <UserCheck size={14} strokeWidth={2} color="#fff" />
-                            <Text style={friendsStyles.acceptActionBtnText}>ACCEPT</Text>
+                            <Text style={friendsStyles.acceptActionBtnText}>{t('accept')}</Text>
                           </LinearGradient>
                         </Pressable>
                         <Pressable
@@ -710,7 +712,7 @@ function FriendsContent() {
                           style={[friendsStyles.declineBtn, { flex: 1 }]}
                         >
                           <X size={14} strokeWidth={2} color="#606060" />
-                          <Text style={friendsStyles.declineBtnText}>DECLINE</Text>
+                          <Text style={friendsStyles.declineBtnText}>{t('decline')}</Text>
                         </Pressable>
                       </View>
                     </View>
@@ -726,7 +728,7 @@ function FriendsContent() {
                       incomingRequests.length > 0 && { marginTop: 8 },
                     ]}
                   >
-                    SENT
+                    {t('sent')}
                   </Text>
                   {outgoingRequests.map((req) => (
                     <View key={req.friendship_id} style={friendsStyles.userCard}>
@@ -737,7 +739,7 @@ function FriendsContent() {
                       />
                       <View style={{ flex: 1 }}>
                         <Text style={friendsStyles.userName}>
-                          {req.user.full_name ?? req.user.username ?? 'Unknown'}
+                          {req.user.full_name ?? req.user.username ?? t('unknown')}
                         </Text>
                         <Text style={[friendsStyles.userHandle, { marginBottom: 0 }]}>
                           {req.user.username ?? ''}
@@ -745,7 +747,7 @@ function FriendsContent() {
                       </View>
                       <View style={friendsStyles.pendingRow}>
                         <Clock size={12} strokeWidth={2} color="#484848" />
-                        <Text style={friendsStyles.pendingText}>PENDING</Text>
+                        <Text style={friendsStyles.pendingText}>{t('pending')}</Text>
                         <Pressable
                           onPress={() => cancelRequest(req.friendship_id)}
                           style={friendsStyles.cancelBtn}
@@ -763,9 +765,9 @@ function FriendsContent() {
                   <View style={friendsStyles.emptyIconWrap}>
                     <Bell size={22} strokeWidth={1.5} color="#383838" />
                   </View>
-                  <Text style={friendsStyles.emptyTitle}>ALL CLEAR</Text>
+                  <Text style={friendsStyles.emptyTitle}>{t('allClearTitle')}</Text>
                   <Text style={[friendsStyles.emptySubtitle, { marginBottom: 0 }]}>
-                    No pending requests
+                    {t('allClearSub')}
                   </Text>
                 </View>
               )}
@@ -780,6 +782,7 @@ function FriendsContent() {
 // ─── Messages Content ─────────────────────────────────────────────────────────
 
 function MessagesContent() {
+  const { t } = useTranslation('social');
   const userId = useAuthStore((s) => s.user?.id ?? '');
   const {
     conversations,
@@ -818,10 +821,8 @@ function MessagesContent() {
         <View style={msgStyles.emptyIconWrap}>
           <MessageCircle size={24} strokeWidth={1.5} color="#404040" />
         </View>
-        <Text style={msgStyles.emptyTitle}>NO MESSAGES YET</Text>
-        <Text style={msgStyles.emptySubtitle}>
-          Add friends and tap the message icon to start chatting
-        </Text>
+        <Text style={msgStyles.emptyTitle}>{t('noMessagesTitle')}</Text>
+        <Text style={msgStyles.emptySubtitle}>{t('noMessagesSub')}</Text>
       </View>
     );
   }
@@ -832,14 +833,14 @@ function MessagesContent() {
     <>
       {total > 0 && (
         <View style={msgStyles.unreadBanner}>
-          <Text style={msgStyles.unreadBannerText}>{total} UNREAD</Text>
+          <Text style={msgStyles.unreadBannerText}>{t('unreadBanner', { count: total })}</Text>
         </View>
       )}
 
-      <Text style={msgStyles.sectionLabel}>ALL MESSAGES</Text>
+      <Text style={msgStyles.sectionLabel}>{t('allMessages')}</Text>
       <View style={msgStyles.convList}>
         {conversations.map((conv) => {
-          const name = conv.other_user.full_name ?? conv.other_user.username ?? 'Athlete';
+          const name = conv.other_user.full_name ?? conv.other_user.username ?? t('athlete');
           const online = isOnline(conv.other_user.id);
           const isFromMe = conv.last_message_sender_id === userId;
           const hasUnread =
@@ -867,9 +868,9 @@ function MessagesContent() {
                   <Text style={[msgStyles.convPreview, hasUnread && msgStyles.convPreviewUnread]} numberOfLines={1}>
                     {conv.last_message_content
                       ? isFromMe
-                        ? `You: ${conv.last_message_content}`
+                        ? t('youPrefix', { message: conv.last_message_content })
                         : conv.last_message_content
-                      : 'Start the conversation'}
+                      : t('startConversation')}
                   </Text>
                   {hasUnread && <View style={msgStyles.unreadDot} />}
                 </View>
@@ -885,6 +886,7 @@ function MessagesContent() {
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function SocialScreen() {
+  const { t } = useTranslation('social');
   const { tab } = useLocalSearchParams<{ tab?: string }>();
   const initialTab: TabKey = (TABS.map(t => t.key) as string[]).includes(tab ?? '')
     ? (tab as TabKey)
@@ -913,7 +915,7 @@ export default function SocialScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.logo}>GYM RIVAL</Text>
-        <Text style={styles.subtitle}>{currentTab.subtitle}</Text>
+        <Text style={styles.subtitle}>{t(currentTab.subtitleKey)}</Text>
 
         <View style={styles.segmented}>
           {TABS.map(tab => {
@@ -930,7 +932,7 @@ export default function SocialScreen() {
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                   <Text style={[styles.segLabel, isActive && styles.segLabelActive]}>
-                    {tab.label.toUpperCase()}
+                    {t(tab.labelKey).toUpperCase()}
                   </Text>
                   {showBadge && (
                     <View style={styles.tabBadge}>

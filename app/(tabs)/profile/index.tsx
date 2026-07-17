@@ -10,12 +10,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
 import { Avatar } from '@/components/ui/Avatar';
+import { LANGUAGES } from '@/lib/i18n/languages';
+import { formatMonthYear } from '@/lib/i18n/format';
 import type { PersonalRecordWithExercise } from '@/types/pr';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -45,10 +48,7 @@ function getExerciseIcon(key: string): IoniconName {
 }
 
 function formatMemberSince(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'long',
-    year: 'numeric',
-  });
+  return formatMonthYear(dateStr);
 }
 
 function computeBarRatios(prs: PersonalRecordWithExercise[]): number[] {
@@ -125,10 +125,13 @@ function SettingsRow({
 // ─── Screen ──────────────────────────────────────────────────────────────────
 
 export default function ProfileScreen() {
+  const { t, i18n } = useTranslation(['common', 'profile']);
   const { user, signOut } = useAuthStore();
   const { profile, bestPRs, prCount, loadProfile, loadBestPRs, setProStatus } =
     useProfileStore();
   const unreadCount = useNotificationStore((s) => s.unreadCount);
+  const currentLanguageName =
+    LANGUAGES.find((l) => l.code === i18n.language)?.nativeName ?? i18n.language;
 
   const displayName =
     profile?.full_name ??
@@ -161,10 +164,10 @@ export default function ProfileScreen() {
     : '—';
 
   const stats = [
-    { label: "PR'S", value: prCount, icon: 'trophy-outline' as IoniconName },
-    { label: 'FRIENDS', value: profile?.friends_count ?? 0, icon: 'people-outline' as IoniconName },
-    { label: 'STREAK', value: profile?.streak ?? 0, icon: 'flame-outline' as IoniconName },
-    { label: 'LEVEL', value: profile?.level ?? 1, icon: 'star-outline' as IoniconName },
+    { label: t('profile:stats.prs'), value: prCount, icon: 'trophy-outline' as IoniconName },
+    { label: t('profile:stats.friends'), value: profile?.friends_count ?? 0, icon: 'people-outline' as IoniconName },
+    { label: t('profile:stats.streak'), value: profile?.streak ?? 0, icon: 'flame-outline' as IoniconName },
+    { label: t('profile:stats.level'), value: profile?.level ?? 1, icon: 'star-outline' as IoniconName },
   ];
 
   return (
@@ -176,8 +179,8 @@ export default function ProfileScreen() {
         {/* ── Header ────────────────────────────────────────── */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.appTitle}>GYM RIVAL</Text>
-            <Text style={styles.pageLabel}>PROFILE</Text>
+            <Text style={styles.appTitle}>{t('profile:header.brand')}</Text>
+            <Text style={styles.pageLabel}>{t('profile:header.pageLabel')}</Text>
           </View>
           <Pressable
             style={({ pressed }) => [styles.headerBtn, pressed && { opacity: 0.5 }]}
@@ -239,7 +242,7 @@ export default function ProfileScreen() {
           {/* Motto */}
           {!!profile?.quote && (
             <View style={styles.mottoBox}>
-              <Text style={styles.mottoLabel}>MOTTO</Text>
+              <Text style={styles.mottoLabel}>{t('profile:details.motto')}</Text>
               <Text style={styles.mottoText}>{`"${profile.quote}"`}</Text>
             </View>
           )}
@@ -269,9 +272,7 @@ export default function ProfileScreen() {
               style={styles.upgradeBtn}
             >
               <Ionicons name="flash" size={18} color={Colors.primary} />
-              <Text style={styles.upgradeText}>
-                {'UPGRADE TO PRO — €4.99/MO'}
-              </Text>
+              <Text style={styles.upgradeText}>{t('profile:proUpsell')}</Text>
             </LinearGradient>
           </Pressable>
         ) : (
@@ -280,38 +281,38 @@ export default function ProfileScreen() {
             onPress={handleTogglePro}
           >
             <Ionicons name="checkmark-circle" size={18} color={Colors.success} />
-            <Text style={styles.proActiveText}>PRO MEMBER — TAP TO DISABLE</Text>
+            <Text style={styles.proActiveText}>{t('profile:proActive')}</Text>
           </Pressable>
         )}
 
         {/* ── My Details ────────────────────────────────────── */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>MY DETAILS</Text>
+            <Text style={styles.sectionTitle}>{t('profile:details.title')}</Text>
             <Pressable
               style={({ pressed }) => [styles.editBtn, pressed && { opacity: 0.5 }]}
               onPress={() => router.push(Routes.profileEdit as never)}
             >
               <Ionicons name="pencil-outline" size={11} color='#b0b0b0' />
-              <Text style={styles.editBtnText}>EDIT</Text>
+              <Text style={styles.editBtnText}>{t('profile:details.edit')}</Text>
             </Pressable>
           </View>
 
-          <DetailRow icon="location-outline" label="GYM" value={profile?.gym ?? '—'} isFirst />
+          <DetailRow icon="location-outline" label={t('profile:details.gym')} value={profile?.gym ?? t('profile:details.notSet')} isFirst />
           <DetailRow
             icon="barbell-outline"
-            label="WEIGHT"
-            value={profile?.weight_kg != null ? `${profile.weight_kg} kg` : '—'}
+            label={t('profile:details.weight')}
+            value={profile?.weight_kg != null ? `${profile.weight_kg} kg` : t('profile:details.notSet')}
           />
           <DetailRow
             icon="resize-outline"
-            label="HEIGHT"
-            value={profile?.height_cm != null ? `${profile.height_cm} cm` : '—'}
+            label={t('profile:details.height')}
+            value={profile?.height_cm != null ? `${profile.height_cm} cm` : t('profile:details.notSet')}
           />
-          <DetailRow icon="flag-outline" label="GOAL" value={profile?.goal ?? '—'} />
+          <DetailRow icon="flag-outline" label={t('profile:details.goal')} value={profile?.goal ?? t('profile:details.notSet')} />
           <DetailRow
             icon="calendar-outline"
-            label="MEMBER SINCE"
+            label={t('profile:details.memberSince')}
             value={memberSince}
           />
         </View>
@@ -320,7 +321,7 @@ export default function ProfileScreen() {
         {bestPRs.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>{"BEST PR'S"}</Text>
+              <Text style={styles.sectionTitle}>{t('profile:bestPrs')}</Text>
             </View>
 
             {bestPRs.map((pr, i) => (
@@ -362,34 +363,41 @@ export default function ProfileScreen() {
         {/* ── Settings ──────────────────────────────────────── */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>SETTINGS</Text>
+            <Text style={styles.sectionTitle}>{t('profile:settings.title')}</Text>
           </View>
           <SettingsRow
-            icon="notifications-outline"
-            label="Notifications"
-            sub="Push notifications on"
-            iconColor="#4a9eff"
-            onPress={() => {}}
+            icon="language-outline"
+            label={t('settings.language')}
+            sub={currentLanguageName}
+            iconColor="#e6a030"
+            onPress={() => router.push(Routes.profileLanguage as never)}
             isFirst
           />
           <SettingsRow
+            icon="notifications-outline"
+            label={t('profile:settings.notifications')}
+            sub={t('profile:settings.notificationsSub')}
+            iconColor="#4a9eff"
+            onPress={() => {}}
+          />
+          <SettingsRow
             icon="lock-closed-outline"
-            label="Privacy"
-            sub="Profile visible to friends"
+            label={t('profile:settings.privacy')}
+            sub={t('profile:settings.privacySub')}
             iconColor="#00cc88"
             onPress={() => {}}
           />
           <SettingsRow
             icon="moon-outline"
-            label="Dark mode"
-            sub="On"
+            label={t('profile:settings.darkMode')}
+            sub={t('profile:settings.darkModeOn')}
             iconColor="#9b7fe8"
             onPress={() => {}}
           />
           <SettingsRow
             icon="share-social-outline"
-            label="Share profile"
-            sub="Copy your link"
+            label={t('profile:settings.shareProfile')}
+            sub={t('profile:settings.shareProfileSub')}
             iconColor="#ffaa00"
             onPress={() => {}}
           />
@@ -401,7 +409,7 @@ export default function ProfileScreen() {
           onPress={handleSignOut}
         >
           <Ionicons name="log-out-outline" size={16} color={Colors.accent} />
-          <Text style={styles.logOutText}>LOG OUT</Text>
+          <Text style={styles.logOutText}>{t('profile:logOut')}</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>

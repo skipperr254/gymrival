@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts } from '@/constants/theme';
 import type { ProgressStats as Stats } from '@/types/progress';
 
@@ -44,6 +45,7 @@ interface ProgressStatsProps {
 }
 
 export function ProgressStats({ stats }: ProgressStatsProps) {
+  const { t } = useTranslation('progress');
   const { level, xp, totalPRs, checkinStreak, workoutsCompleted } = stats;
   const { start, end } = xpBounds(level);
   const pct = Math.min(1, Math.max(0, (xp - start) / (end - start)));
@@ -61,7 +63,7 @@ export function ProgressStats({ stats }: ProgressStatsProps) {
               className="text-muted mb-1"
               style={{ fontFamily: Fonts.display, fontSize: 10, letterSpacing: 2 }}
             >
-              LEVEL
+              {t('level')}
             </Text>
             <Text style={{ fontFamily: Fonts.display, fontSize: 40, color: Colors.accent, lineHeight: 42 }}>
               {level}
@@ -71,7 +73,7 @@ export function ProgressStats({ stats }: ProgressStatsProps) {
             className="text-secondary mb-1"
             style={{ fontFamily: Fonts.body, fontSize: 12 }}
           >
-            {`${xpInLevel} / ${xpNeeded} XP`}
+            {t('xpProgress', { xpInLevel, xpNeeded })}
           </Text>
         </View>
         <View
@@ -87,9 +89,9 @@ export function ProgressStats({ stats }: ProgressStatsProps) {
 
       {/* Three stat cards in one row */}
       <View className="flex-row gap-3">
-        <SmallStat label="TOTAL PRs" value={totalPRs} sub="records" />
-        <SmallStat label="DAY STREAK" value={checkinStreak} sub="days" valueColor={streakColor} />
-        <SmallStat label="WORKOUTS" value={workoutsCompleted} sub="done" />
+        <SmallStat label={t('totalPrs')} value={totalPRs} sub={t('records')} />
+        <SmallStat label={t('dayStreak')} value={checkinStreak} sub={t('days')} valueColor={streakColor} />
+        <SmallStat label={t('workouts')} value={workoutsCompleted} sub={t('done')} />
       </View>
     </View>
   );

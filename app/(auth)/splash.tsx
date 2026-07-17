@@ -2,16 +2,19 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
 
 export default function SplashScreen() {
+  const { t } = useTranslation('auth');
+
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.center}>
         <Text style={styles.logo}>GYM</Text>
         <Text style={styles.logoAccent}>RIVAL</Text>
-        <Text style={styles.tagline}>Compete. Improve. Dominate.</Text>
+        <Text style={styles.tagline}>{t('splash.tagline')}</Text>
       </View>
 
       <View style={styles.footer}>
@@ -19,7 +22,7 @@ export default function SplashScreen() {
           style={({ pressed }) => [styles.primaryBtn, pressed && { opacity: 0.85 }]}
           onPress={() => router.push(Routes.onboarding)}
         >
-          <Text style={styles.primaryBtnText}>GET STARTED</Text>
+          <Text style={styles.primaryBtnText}>{t('splash.getStarted')}</Text>
           <Ionicons name="arrow-forward" size={18} color={Colors.primary} />
         </Pressable>
 
@@ -27,7 +30,7 @@ export default function SplashScreen() {
           style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.65 }]}
           onPress={() => router.push(Routes.signIn)}
         >
-          <Text style={styles.secondaryBtnText}>Already have an account? Sign in</Text>
+          <Text style={styles.secondaryBtnText}>{t('splash.signInPrompt')}</Text>
         </Pressable>
       </View>
     </SafeAreaView>

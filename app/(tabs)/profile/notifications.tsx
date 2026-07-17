@@ -11,47 +11,48 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { Colors, Fonts, FontSizes } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
+import { formatDate, formatRelativeTime } from '@/lib/i18n/format';
 import type { AppNotification, NotificationType } from '@/types/notification';
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
 function timeAgo(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60_000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const diffDays = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86_400_000);
+  if (diffDays < 7) return formatRelativeTime(dateStr);
+  return formatDate(dateStr);
 }
 
-function buildNotificationText(n: AppNotification): string {
-  const name = n.actor_name ?? n.actor_username ?? 'Someone';
+function buildNotificationText(n: AppNotification, t: TFunction): string {
+  const name = n.actor_name ?? n.actor_username ?? t('notifications:someone');
   switch (n.type as NotificationType) {
     case 'new_message':
-      return `${name} sent you a message`;
+      return t('notifications:newMessage', { name });
     case 'friend_request':
-      return `${name} sent you a friend request`;
+      return t('notifications:friendRequest', { name });
     case 'friend_request_accepted':
-      return `${name} accepted your friend request`;
+      return t('notifications:friendRequestAccepted', { name });
     case 'pr_liked': {
-      const label = n.data.exercise_label ?? 'your PR';
-      const val = n.data.value != null ? ` (${n.data.value}${n.data.unit ?? ''})` : '';
-      return `${name} liked your ${label}${val} PR`;
+      const exercise = n.data.exercise_key
+        ? t(`exercises:${n.data.exercise_key}`)
+        : t('notifications:yourPr');
+      const value = n.data.value != null ? ` (${n.data.value}${n.data.unit ?? ''})` : '';
+      return t('notifications:prLiked', { name, exercise, value });
     }
     case 'friend_pr': {
-      const label = n.data.exercise_label ?? 'a PR';
-      const val = n.data.value != null ? ` ${n.data.value}${n.data.unit ?? ''}` : '';
-      return `${name} just hit a new ${label}${val} PR`;
+      const exercise = n.data.exercise_key
+        ? t(`exercises:${n.data.exercise_key}`)
+        : t('notifications:aPr');
+      const value = n.data.value != null ? ` ${n.data.value}${n.data.unit ?? ''}` : '';
+      return t('notifications:friendPr', { name, exercise, value });
     }
     default:
-      return 'You have a new notification';
+      return t('notifications:generic');
   }
 }
 
@@ -116,6 +117,7 @@ function NotificationItem({
   item: AppNotification;
   onPress: (n: AppNotification) => void;
 }) {
+  const { t } = useTranslation();
   const isUnread = !item.read_at;
   const icon = notificationIcon(item.type as NotificationType);
   const bgColor = avatarColor(item.actor_id);
@@ -144,7 +146,7 @@ function NotificationItem({
       {/* Content */}
       <View style={styles.itemBody}>
         <Text style={[styles.itemText, isUnread && styles.itemTextUnread]} numberOfLines={2}>
-          {buildNotificationText(item)}
+          {buildNotificationText(item, t)}
         </Text>
         <Text style={styles.itemTime}>{timeAgo(item.created_at)}</Text>
       </View>
@@ -157,6 +159,7 @@ function NotificationItem({
 // ─── Screen ──────────────────────────────────────────────────────────────────
 
 export default function NotificationsScreen() {
+  const { t } = useTranslation('profile');
   const { user } = useAuthStore();
   const {
     notifications,
@@ -199,7 +202,7 @@ export default function NotificationsScreen() {
         </Pressable>
 
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>NOTIFICATIONS</Text>
+          <Text style={styles.headerTitle}>{t('notifications.title')}</Text>
           {unreadCount > 0 && (
             <View style={styles.headerBadge}>
               <Text style={styles.headerBadgeText}>{unreadCount}</Text>
@@ -212,7 +215,7 @@ export default function NotificationsScreen() {
             style={({ pressed }) => [styles.markAllBtn, pressed && { opacity: 0.5 }]}
             onPress={handleMarkAll}
           >
-            <Text style={styles.markAllText}>MARK ALL</Text>
+            <Text style={styles.markAllText}>{t('notifications.markAll')}</Text>
           </Pressable>
         ) : (
           <View style={styles.markAllBtn} />
@@ -246,10 +249,8 @@ export default function NotificationsScreen() {
               <View style={styles.emptyIconBox}>
                 <Ionicons name="notifications-off-outline" size={40} color={Colors.hint} />
               </View>
-              <Text style={styles.emptyTitle}>ALL CAUGHT UP</Text>
-              <Text style={styles.emptySub}>
-                {"You'll see messages, friend requests, and PR likes here."}
-              </Text>
+              <Text style={styles.emptyTitle}>{t('notifications.emptyTitle')}</Text>
+              <Text style={styles.emptySub}>{t('notifications.emptySub')}</Text>
             </View>
           }
           showsVerticalScrollIndicator={false}

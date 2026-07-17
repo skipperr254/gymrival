@@ -2,24 +2,35 @@ import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts } from '@/constants/theme';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
-const BADGES: { id: number; icon: IoniconName; label: string; earned: boolean; date?: string; desc?: string }[] = [
-  { id: 1, icon: 'trophy', label: 'First PR', earned: true, date: 'Jan 2024' },
-  { id: 2, icon: 'flame', label: '7-Day Streak', earned: true, date: 'Feb 2024' },
-  { id: 3, icon: 'barbell', label: '100kg Bench', earned: true, date: 'Mar 2024' },
-  { id: 4, icon: 'podium', label: 'Top 3 Board', earned: true, date: 'Apr 2024' },
-  { id: 5, icon: 'medal', label: '10 PRs', earned: true, date: 'Apr 2024' },
-  { id: 6, icon: 'flash', label: 'Challenge Won', earned: true, date: 'May 2024' },
-  { id: 7, icon: 'videocam', label: 'Video Proof', earned: false, desc: 'Upload a video to unlock' },
-  { id: 8, icon: 'skull', label: '200kg Deadlift', earned: false, desc: '40 kg to go' },
-  { id: 9, icon: 'calendar', label: '30-Day Streak', earned: false, desc: '23 days to go' },
-  { id: 10, icon: 'heart', label: '100 Likes', earned: false, desc: '67 likes to go' },
+interface BadgeDef {
+  id: number;
+  icon: IoniconName;
+  labelKey: string;
+  earned: boolean;
+  date?: string;
+  descKey?: string;
+}
+
+const BADGES: BadgeDef[] = [
+  { id: 1, icon: 'trophy', labelKey: 'badges.items.firstPr', earned: true, date: 'Jan 2024' },
+  { id: 2, icon: 'flame', labelKey: 'badges.items.sevenDayStreak', earned: true, date: 'Feb 2024' },
+  { id: 3, icon: 'barbell', labelKey: 'badges.items.hundredKgBench', earned: true, date: 'Mar 2024' },
+  { id: 4, icon: 'podium', labelKey: 'badges.items.topThreeBoard', earned: true, date: 'Apr 2024' },
+  { id: 5, icon: 'medal', labelKey: 'badges.items.tenPrs', earned: true, date: 'Apr 2024' },
+  { id: 6, icon: 'flash', labelKey: 'badges.items.challengeWon', earned: true, date: 'May 2024' },
+  { id: 7, icon: 'videocam', labelKey: 'badges.items.videoProof', earned: false, descKey: 'badges.desc.videoProof' },
+  { id: 8, icon: 'skull', labelKey: 'badges.items.twoHundredKgDeadlift', earned: false, descKey: 'badges.desc.deadlift' },
+  { id: 9, icon: 'calendar', labelKey: 'badges.items.thirtyDayStreak', earned: false, descKey: 'badges.desc.streak30' },
+  { id: 10, icon: 'heart', labelKey: 'badges.items.hundredLikes', earned: false, descKey: 'badges.desc.likes100' },
 ];
 
 export default function BadgesScreen() {
+  const { t } = useTranslation('profile');
   const earned = BADGES.filter((b) => b.earned);
   const locked = BADGES.filter((b) => !b.earned);
 
@@ -32,7 +43,7 @@ export default function BadgesScreen() {
         >
           <Ionicons name="arrow-back" size={22} color={Colors.accent} />
         </Pressable>
-        <Text style={styles.heading}>BADGES</Text>
+        <Text style={styles.heading}>{t('badges.title')}</Text>
         <View style={styles.spacer} />
       </View>
 
@@ -40,33 +51,33 @@ export default function BadgesScreen() {
         {/* Summary */}
         <View style={styles.summaryCard}>
           <Text style={styles.summaryNum}>{earned.length}</Text>
-          <Text style={styles.summaryLabel}>BADGES EARNED</Text>
+          <Text style={styles.summaryLabel}>{t('badges.earnedCount')}</Text>
         </View>
 
         {/* Earned */}
-        <Text style={styles.sectionLabel}>EARNED</Text>
+        <Text style={styles.sectionLabel}>{t('badges.earnedSection')}</Text>
         <View style={styles.grid}>
           {earned.map((b) => (
             <View key={b.id} style={styles.badge}>
               <View style={styles.badgeIcon}>
                 <Ionicons name={b.icon} size={24} color={Colors.warning ?? '#ffaa00'} />
               </View>
-              <Text style={styles.badgeLabel}>{b.label}</Text>
+              <Text style={styles.badgeLabel}>{t(b.labelKey)}</Text>
               <Text style={styles.badgeDate}>{b.date}</Text>
             </View>
           ))}
         </View>
 
         {/* Locked */}
-        <Text style={styles.sectionLabel}>LOCKED</Text>
+        <Text style={styles.sectionLabel}>{t('badges.lockedSection')}</Text>
         <View style={styles.grid}>
           {locked.map((b) => (
             <View key={b.id} style={[styles.badge, styles.badgeLocked]}>
               <View style={[styles.badgeIcon, styles.badgeIconLocked]}>
                 <Ionicons name={b.icon} size={24} color={Colors.hint} />
               </View>
-              <Text style={[styles.badgeLabel, styles.badgeLabelLocked]}>{b.label}</Text>
-              <Text style={styles.badgeDate}>{b.desc}</Text>
+              <Text style={[styles.badgeLabel, styles.badgeLabelLocked]}>{t(b.labelKey)}</Text>
+              <Text style={styles.badgeDate}>{b.descKey ? t(b.descKey) : ''}</Text>
             </View>
           ))}
         </View>

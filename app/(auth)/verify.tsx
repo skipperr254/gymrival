@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { Colors } from "@/constants/theme";
 import { Routes } from "@/constants/routes";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -20,6 +21,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 const CODE_LENGTH = 8;
 
 export default function VerifyScreen() {
+  const { t } = useTranslation("auth");
   const { email, type } = useLocalSearchParams<{
     email: string;
     type: "signup" | "recovery";
@@ -124,10 +126,11 @@ export default function VerifyScreen() {
           {/* Header */}
           <View style={styles.header}>
             <Text className="font-heading text-[46px] text-primary tracking-[2px] leading-[50px]">
-              CHECK YOUR{"\n"}EMAIL
+              {t("verify.title")}
             </Text>
             <Text className="font-sans text-[15px] text-secondary mt-3 leading-[22px]">
-              We sent a {CODE_LENGTH}-digit code to{"\n"}
+              {t("verify.subtitle", { count: CODE_LENGTH })}
+              {"\n"}
               <Text className="font-sans-semibold text-primary">{email}</Text>
             </Text>
           </View>
@@ -187,7 +190,7 @@ export default function VerifyScreen() {
           {/* Resend */}
           <View className="flex-row justify-center items-center gap-1 mt-8">
             <Text className="font-sans text-[14px] text-secondary">
-              {"Didn't get a code?"}
+              {t("verify.noCode")}
             </Text>
             <Pressable
               hitSlop={8}
@@ -198,7 +201,10 @@ export default function VerifyScreen() {
                 className="font-sans-semibold text-[14px]"
                 style={{ color: resendCooldown > 0 ? Colors.muted : Colors.accent }}
               >
-                {resendCooldown > 0 ? ` Resend in ${resendCooldown}s` : " Resend"}
+                {" "}
+                {resendCooldown > 0
+                  ? t("verify.resendIn", { seconds: resendCooldown })
+                  : t("verify.resend")}
               </Text>
             </Pressable>
           </View>

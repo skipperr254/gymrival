@@ -1,25 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Avatar } from '@/components/ui/Avatar';
 import { Colors, Fonts } from '@/constants/theme';
 import { useTrainStore } from '@/store/useTrainStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSocialStore } from '@/store/useSocialStore';
+import { formatRelativeTime } from '@/lib/i18n/format';
 import type { GymWithCheckinCount } from '@/types/train';
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function timeAgo(isoString: string): string {
-  const diff = Math.floor((Date.now() - new Date(isoString).getTime()) / 1000);
-  if (diff < 60) return `${diff}s ago`;
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  return `${Math.floor(diff / 3600)}h ago`;
-}
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function CheckInView() {
+  const { t } = useTranslation('train');
   const user = useAuthStore((s) => s.user);
   const friends = useSocialStore((s) => s.friends);
 
@@ -49,7 +43,7 @@ export function CheckInView() {
   const flameColor =
     streak >= 5 ? Colors.accent : streak >= 3 ? '#ff8c00' : '#444444';
   const streakMotivation =
-    streak >= 5 ? 'MACHINE!' : streak >= 3 ? 'KEEP IT UP' : 'STAY STRONG';
+    streak >= 5 ? t('checkin.machine') : streak >= 3 ? t('checkin.keepItUp') : t('checkin.stayStrong');
   const streakMotivationColor =
     streak >= 5 ? Colors.accent : streak >= 3 ? '#ff8c00' : '#555555';
 
@@ -72,10 +66,10 @@ export function CheckInView() {
       <View style={styles.streakCard}>
         <View style={styles.streakTop}>
           <View>
-            <Text style={styles.streakLabel}>WEEKLY STREAK</Text>
+            <Text style={styles.streakLabel}>{t('checkin.weeklyStreak')}</Text>
             <View style={styles.streakCountRow}>
               <Text style={styles.streakNumber}>{streak}</Text>
-              <Text style={styles.streakOf}>/ 7 days</Text>
+              <Text style={styles.streakOf}>{t('checkin.ofSevenDays')}</Text>
             </View>
           </View>
           <View style={styles.flameCol}>
@@ -93,14 +87,14 @@ export function CheckInView() {
         <View style={styles.daysRow}>
           {(weeklyStreak.length > 0
             ? weeklyStreak
-            : [0, 1, 2, 3, 4, 5, 6].map((i) => ({ day: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i], dayIndex: i, checked: false }))
+            : [0, 1, 2, 3, 4, 5, 6].map((i) => ({ day: '', dayIndex: i, checked: false }))
           ).map((d) => (
             <View key={d.dayIndex} style={styles.dayCol}>
               <View style={[styles.dayDot, d.checked && styles.dayDotChecked]}>
                 {d.checked && <Ionicons name="checkmark" size={14} color="#fff" />}
               </View>
               <Text style={[styles.dayText, d.checked && styles.dayTextChecked]}>
-                {d.day}
+                {t(`days.short.${d.dayIndex}`)}
               </Text>
             </View>
           ))}
@@ -116,11 +110,11 @@ export function CheckInView() {
         <View style={styles.checkInCard}>
           <View style={styles.cardHeader}>
             <Ionicons name="location" size={16} color={Colors.accent} />
-            <Text style={styles.cardTitle}>CHECK IN NOW</Text>
+            <Text style={styles.cardTitle}>{t('checkin.checkInNow')}</Text>
           </View>
 
           {gyms.length === 0 && !checkinLoading ? (
-            <Text style={styles.emptyText}>No gyms available.</Text>
+            <Text style={styles.emptyText}>{t('checkin.noGyms')}</Text>
           ) : (
             <ScrollView
               style={styles.gymList}
@@ -158,7 +152,7 @@ export function CheckInView() {
                         <View style={styles.gymCheckedInRow}>
                           <Ionicons name="people" size={11} color="#606060" />
                           <Text style={styles.gymMetaText}>
-                            {`${gym.today_count} here today`}
+                            {t('checkin.hereToday', { count: gym.today_count })}
                           </Text>
                         </View>
                       </View>
@@ -196,7 +190,7 @@ export function CheckInView() {
                     selectedGymId !== null && styles.confirmBtnTextActive,
                   ]}
                 >
-                  CONFIRM CHECK-IN
+                  {t('checkin.confirmCheckIn')}
                 </Text>
               </>
             )}
@@ -208,14 +202,14 @@ export function CheckInView() {
           <View style={styles.confirmedIconWrap}>
             <Ionicons name="checkmark-circle" size={32} color="#4caf50" />
           </View>
-          <Text style={styles.confirmedTitle}>CHECKED IN!</Text>
+          <Text style={styles.confirmedTitle}>{t('checkin.checkedIn')}</Text>
           <Text style={styles.confirmedGym}>
-            {confirmedGym?.name ?? 'Your gym'}
+            {confirmedGym?.name ?? t('checkin.yourGym')}
           </Text>
           {lastCheckinXpAwarded && (
             <View style={styles.xpRow}>
               <Ionicons name="flash" size={13} color="#4caf50" />
-              <Text style={styles.xpText}>+25 XP EARNED</Text>
+              <Text style={styles.xpText}>{t('checkin.xpEarned')}</Text>
             </View>
           )}
           <Pressable
@@ -226,7 +220,7 @@ export function CheckInView() {
             {checkinLoading ? (
               <ActivityIndicator size="small" color="#606060" />
             ) : (
-              <Text style={styles.undoBtnText}>UNDO CHECK-IN</Text>
+              <Text style={styles.undoBtnText}>{t('checkin.undoCheckIn')}</Text>
             )}
           </Pressable>
         </View>
@@ -237,7 +231,7 @@ export function CheckInView() {
         <View style={styles.friendsCard}>
           <View style={styles.cardHeader}>
             <Ionicons name="people" size={15} color={Colors.accent} />
-            <Text style={styles.cardTitle}>FRIENDS CHECKED IN</Text>
+            <Text style={styles.cardTitle}>{t('checkin.friendsCheckedIn')}</Text>
           </View>
 
           {friendsCheckedIn.map((friend, i) => (
@@ -252,7 +246,7 @@ export function CheckInView() {
               />
               <View style={styles.friendInfo}>
                 <Text style={styles.friendName}>
-                  {friend.full_name ?? friend.username ?? 'Unknown'}
+                  {friend.full_name ?? friend.username ?? t('checkin.unknown')}
                 </Text>
                 <View style={styles.friendMeta}>
                   <Ionicons name="location" size={11} color="#606060" />
@@ -262,7 +256,7 @@ export function CheckInView() {
               <View style={styles.friendTimeCol}>
                 <Ionicons name="time-outline" size={11} color="#505050" />
                 <Text style={styles.friendTimeText}>
-                  {timeAgo(friend.checked_in_at)}
+                  {formatRelativeTime(friend.checked_in_at)}
                 </Text>
               </View>
             </View>

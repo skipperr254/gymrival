@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Svg, {
   Path,
   Polyline,
@@ -10,6 +11,7 @@ import Svg, {
   Text as SvgText,
 } from 'react-native-svg';
 import { Colors, Fonts } from '@/constants/theme';
+import { formatDate, formatCompactNumber, formatNumber } from '@/lib/i18n/format';
 
 export interface ChartPoint {
   date: string;
@@ -25,22 +27,22 @@ interface LineChartProps {
 const PAD = { top: 22, bottom: 26, left: 4, right: 4 } as const;
 
 function fmtVal(v: number): string {
-  if (v >= 1000) return `${(v / 1000).toFixed(1)}k`;
-  return String(Math.round(v));
+  if (v >= 1000) return formatCompactNumber(v);
+  return formatNumber(Math.round(v));
 }
 
 function fmtDate(s: string): string {
-  const d = new Date(s + 'T00:00:00');
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return formatDate(s + 'T00:00:00');
 }
 
 export function LineChart({ points, height = 120, color = Colors.accent }: LineChartProps) {
+  const { t } = useTranslation('common');
   const [width, setWidth] = useState(0);
 
   if (points.length === 0) {
     return (
       <View style={[styles.empty, { height }]}>
-        <Text style={styles.emptyText}>No data yet</Text>
+        <Text style={styles.emptyText}>{t('chart.noData')}</Text>
       </View>
     );
   }

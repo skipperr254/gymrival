@@ -1,0 +1,97 @@
+{
+  "header": {
+    "brand": "GYM RIVAL",
+    "pageLabel": "PROFILE"
+  },
+  "proUpsell": "UPGRADE TO PRO — €4.99/MO",
+  "proActive": "PRO MEMBER — TAP TO DISABLE",
+  "details": {
+    "title": "MY DETAILS",
+    "edit": "EDIT",
+    "gym": "GYM",
+    "weight": "WEIGHT",
+    "height": "HEIGHT",
+    "goal": "GOAL",
+    "memberSince": "MEMBER SINCE",
+    "motto": "MOTTO",
+    "notSet": "—"
+  },
+  "stats": {
+    "prs": "PR'S",
+    "friends": "FRIENDS",
+    "streak": "STREAK",
+    "level": "LEVEL"
+  },
+  "bestPrs": "BEST PR'S",
+  "settings": {
+    "title": "SETTINGS",
+    "notifications": "Notifications",
+    "notificationsSub": "Push notifications on",
+    "privacy": "Privacy",
+    "privacySub": "Profile visible to friends",
+    "darkMode": "Dark mode",
+    "darkModeOn": "On",
+    "shareProfile": "Share profile",
+    "shareProfileSub": "Copy your link"
+  },
+  "logOut": "LOG OUT",
+  "edit": {
+    "title": "EDIT PROFILE",
+    "fullName": "FULL NAME",
+    "fullNamePlaceholder": "Your name",
+    "username": "USERNAME",
+    "usernamePlaceholder": "@username",
+    "bio": "BIO",
+    "bioPlaceholder": "Tell your story...",
+    "motto": "YOUR MOTTO",
+    "mottoPlaceholder": "E.g. No pain, no gain",
+    "gym": "GYM",
+    "gymPlaceholder": "Your gym",
+    "weight": "WEIGHT (kg)",
+    "height": "HEIGHT (cm)",
+    "goal": "GOAL",
+    "goalPlaceholder": "E.g. Muscle gain",
+    "save": "SAVE CHANGES",
+    "invalidWeightTitle": "Invalid weight",
+    "invalidWeightMsg": "Please enter a valid weight in kg.",
+    "invalidHeightTitle": "Invalid height",
+    "invalidHeightMsg": "Please enter a valid height in cm.",
+    "saveErrorTitle": "Could not save"
+  },
+  "badges": {
+    "title": "BADGES",
+    "earnedCount": "BADGES EARNED",
+    "earnedSection": "EARNED",
+    "lockedSection": "LOCKED",
+    "items": {
+      "firstPr": "First PR",
+      "sevenDayStreak": "7-Day Streak",
+      "hundredKgBench": "100kg Bench",
+      "topThreeBoard": "Top 3 Board",
+      "tenPrs": "10 PRs",
+      "challengeWon": "Challenge Won",
+      "videoProof": "Video Proof",
+      "twoHundredKgDeadlift": "200kg Deadlift",
+      "thirtyDayStreak": "30-Day Streak",
+      "hundredLikes": "100 Likes"
+    },
+    "desc": {
+      "videoProof": "Upload a video to unlock",
+      "deadlift": "40 kg to go",
+      "streak30": "23 days to go",
+      "likes100": "67 likes to go"
+    }
+  },
+  "prHistory": {
+    "title": "PR HISTORY",
+    "best": "Best: {{value}} {{unit}}",
+    "emptyTitle": "NO PRs YET",
+    "emptySub": "Log your first PR to start tracking your progress"
+  },
+  "notifications": {
+    "title": "NOTIFICATIONS",
+    "markAll": "MARK ALL",
+    "emptyTitle": "ALL CAUGHT UP",
+    "emptySub": "You'll see messages, friend requests, and PR likes here."
+  }
+}

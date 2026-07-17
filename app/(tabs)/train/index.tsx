@@ -14,29 +14,27 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts } from '@/constants/theme';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { CheckInView } from '@/components/features/CheckInView';
 import { ProgressView } from '@/components/features/progress/ProgressView';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useTrainStore } from '@/store/useTrainStore';
-import { DAY_NAMES, DAY_NAME_TO_INDEX, DAY_SHORT, type DayOfWeek } from '@/types/train';
+import { DAY_NAME_TO_INDEX, type DayOfWeek } from '@/types/train';
 import type { TrainingSessionWithExercises } from '@/types/train';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
+// Internal canonical values — never rendered directly, only used as store
+// keys/lookups. Display always goes through t('days.short.<index>') etc.
 const DAYS_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 const DAYS_FULL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as const;
-
-const EXERCISE_FIELDS = [
-  { key: 'sets' as const, label: 'SETS', ph: '3' },
-  { key: 'reps' as const, label: 'REPS', ph: '10' },
-  { key: 'weight' as const, label: 'KG', ph: '0' },
-];
 
 type NewExercise = { name: string; sets: string; reps: string; weight: string };
 type NewWorkout = { name: string; day: string; exercises: Array<{ name: string; sets: number; reps: string; weight: number }> };
 
 export default function TrainScreen() {
+  const { t } = useTranslation('train');
   const insets = useSafeAreaInsets();
   const user = useAuthStore((s) => s.user);
 
@@ -95,8 +93,8 @@ export default function TrainScreen() {
 
   // Map day_of_week to full day name for display
   const sessionDay = (s: TrainingSessionWithExercises): string => {
-    if (s.day_of_week == null) return 'Flexible';
-    return DAY_NAMES[s.day_of_week];
+    if (s.day_of_week == null) return t('flexible');
+    return t(`days.full.${s.day_of_week}`);
   };
 
   const dayHasWorkout = (i: number) =>
@@ -210,9 +208,9 @@ export default function TrainScreen() {
             </>
           ) : (
             <View>
-              <Text style={styles.appTitle}>GYM RIVAL</Text>
+              <Text style={styles.appTitle}>{t('header.brand')}</Text>
               <Text style={styles.pageLabel}>
-                {activeTab === 0 ? 'WORKOUT SCHEDULE' : activeTab === 1 ? 'GYM CHECK-IN' : 'PROGRESS'}
+                {activeTab === 0 ? t('header.schedule') : activeTab === 1 ? t('header.checkin') : t('header.progress')}
               </Text>
             </View>
           )}
@@ -222,7 +220,7 @@ export default function TrainScreen() {
         {!selected && (
           <View style={styles.tabSwitcher}>
             <SegmentedControl
-              options={['SCHEDULE', 'CHECK IN', 'PROGRESS']}
+              options={[t('tabs.schedule'), t('tabs.checkin'), t('tabs.progress')]}
               selectedIndex={activeTab}
               onChange={(i) => setActiveTab(i as 0 | 1 | 2)}
             />
@@ -266,7 +264,9 @@ export default function TrainScreen() {
                           <View style={styles.emptyDot} />
                         )}
                       </View>
-                      <Text style={[styles.dayLabel, has && styles.dayLabelActive]}>{day}</Text>
+                      <Text style={[styles.dayLabel, has && styles.dayLabelActive]}>
+                        {t(`days.short.${i}`)}
+                      </Text>
                     </Pressable>
                   );
                 })}
@@ -275,14 +275,14 @@ export default function TrainScreen() {
               {/* Section label + NEW button */}
               <View style={styles.sectionRow}>
                 <Text style={styles.sectionLabel}>
-                  {`${sessions.length} WORKOUT${sessions.length !== 1 ? 'S' : ''} PLANNED`}
+                  {t('workoutsPlanned', { count: sessions.length })}
                 </Text>
                 <Pressable
                   style={({ pressed }) => [styles.newBtn, pressed && { opacity: 0.7 }]}
                   onPress={() => setShowModal(true)}
                 >
                   <Ionicons name="add" size={14} color={Colors.accent} />
-                  <Text style={styles.newBtnText}>NEW</Text>
+                  <Text style={styles.newBtnText}>{t('new')}</Text>
                 </Pressable>
               </View>
 
@@ -298,7 +298,9 @@ export default function TrainScreen() {
                   </View>
                   <View style={styles.workoutInfo}>
                     <Text style={styles.workoutName}>{s.name.toUpperCase()}</Text>
-                    <Text style={styles.workoutMeta}>{`${sessionDay(s)} · ${s.exercises.length} exercises`}</Text>
+                    <Text style={styles.workoutMeta}>
+                      {t('workoutMeta', { day: sessionDay(s), count: s.exercises.length })}
+                    </Text>
                   </View>
                   <Pressable
                     style={({ pressed }) => [styles.deleteBtn, { opacity: pressed ? 0.9 : 0.4 }]}
@@ -320,10 +322,8 @@ export default function TrainScreen() {
                     color={Colors.muted}
                     style={{ opacity: 0.4, marginBottom: 14 }}
                   />
-                  <Text style={styles.emptyTitle}>NO SCHEDULES YET</Text>
-                  <Text style={styles.emptySubtitle}>
-                    {"Tap NEW above to create your first workout"}
-                  </Text>
+                  <Text style={styles.emptyTitle}>{t('emptyTitle')}</Text>
+                  <Text style={styles.emptySubtitle}>{t('emptySubtitle')}</Text>
                 </View>
               )}
             </>
@@ -339,7 +339,7 @@ export default function TrainScreen() {
                   <View style={{ flex: 1 }}>
                     <Text style={styles.detailName}>{selected.name.toUpperCase()}</Text>
                     <Text style={styles.detailMeta}>
-                      {`${sessionDay(selected).toUpperCase()} · ${selected.exercises.length} EXERCISES`}
+                      {t('detailMeta', { day: sessionDay(selected).toUpperCase(), count: selected.exercises.length })}
                     </Text>
                   </View>
                 </View>
@@ -347,8 +347,8 @@ export default function TrainScreen() {
                 {workoutStarted && (
                   <>
                     <View style={styles.progressRow}>
-                      <Text style={styles.progressLabel}>PROGRESS</Text>
-                      <Text style={styles.progressLabel}>{`${doneSets} / ${totalSets} SETS`}</Text>
+                      <Text style={styles.progressLabel}>{t('progressLabel')}</Text>
+                      <Text style={styles.progressLabel}>{t('setsProgress', { done: doneSets, total: totalSets })}</Text>
                     </View>
                     <View style={styles.progressTrack}>
                       <View style={[styles.progressFill, { flex: doneSets }]} />
@@ -372,7 +372,9 @@ export default function TrainScreen() {
                     <View style={styles.exInfo}>
                       <Text style={styles.exName}>{ex.exercise_name}</Text>
                       <Text style={styles.exMeta}>
-                        {`${ex.sets} sets · ${ex.reps} reps${(ex.target_weight ?? 0) > 0 ? ` · ${ex.target_weight}kg` : ''}`}
+                        {(ex.target_weight ?? 0) > 0
+                          ? t('exerciseMetaWithWeight', { sets: ex.sets, reps: ex.reps, weight: ex.target_weight })
+                          : t('exerciseMeta', { sets: ex.sets, reps: ex.reps })}
                       </Text>
                     </View>
                     {!workoutStarted && (
@@ -399,7 +401,7 @@ export default function TrainScreen() {
                             {done ? (
                               <Ionicons name="checkmark" size={14} color={Colors.accent} />
                             ) : (
-                              <Text style={styles.setBtnLabel}>{`SET ${j + 1}`}</Text>
+                              <Text style={styles.setBtnLabel}>{t('setNumber', { n: j + 1 })}</Text>
                             )}
                           </Pressable>
                         );
@@ -416,18 +418,18 @@ export default function TrainScreen() {
                   onPress={handleStartWorkout}
                 >
                   <Ionicons name="flash" size={18} color={Colors.primary} />
-                  <Text style={styles.startBtnText}>START WORKOUT</Text>
+                  <Text style={styles.startBtnText}>{t('startWorkout')}</Text>
                 </Pressable>
               ) : allDone ? (
                 <View style={styles.doneCard}>
                   <Ionicons name="trophy" size={42} color={Colors.success} style={{ marginBottom: 12 }} />
-                  <Text style={styles.doneTitle}>WORKOUT DONE!</Text>
-                  <Text style={styles.doneSub}>All sets completed. Great work!</Text>
+                  <Text style={styles.doneTitle}>{t('workoutDone')}</Text>
+                  <Text style={styles.doneSub}>{t('workoutDoneSub')}</Text>
                   <Pressable
                     style={({ pressed }) => [styles.doneBtn, pressed && { opacity: 0.8 }]}
                     onPress={handleFinishWorkout}
                   >
-                    <Text style={styles.doneBtnText}>BACK TO SCHEDULE</Text>
+                    <Text style={styles.doneBtnText}>{t('backToSchedule')}</Text>
                   </Pressable>
                 </View>
               ) : (
@@ -436,7 +438,7 @@ export default function TrainScreen() {
                   onPress={handleCancelWorkout}
                 >
                   <Ionicons name="close" size={15} color={Colors.muted} />
-                  <Text style={styles.cancelBtnText}>CANCEL WORKOUT</Text>
+                  <Text style={styles.cancelBtnText}>{t('cancelWorkout')}</Text>
                 </Pressable>
               )}
             </>
@@ -468,7 +470,7 @@ export default function TrainScreen() {
           >
             {/* Sheet header */}
             <View style={styles.sheetHeader}>
-              <Text style={styles.sheetTitle}>CREATE SCHEDULE</Text>
+              <Text style={styles.sheetTitle}>{t('createSchedule')}</Text>
               <Pressable
                 style={({ pressed }) => [styles.closeBtn, pressed && { opacity: 0.6 }]}
                 onPress={() => setShowModal(false)}
@@ -478,49 +480,55 @@ export default function TrainScreen() {
             </View>
 
             {/* Workout name */}
-            <Text style={styles.fieldLabel}>WORKOUT NAME</Text>
+            <Text style={styles.fieldLabel}>{t('workoutName')}</Text>
             <TextInput
               style={styles.input}
               value={newWorkout.name}
-              onChangeText={(t) => setNewWorkout((p) => ({ ...p, name: t }))}
-              placeholder="e.g. Push Day"
+              onChangeText={(v) => setNewWorkout((p) => ({ ...p, name: v }))}
+              placeholder={t('workoutNamePlaceholder')}
               placeholderTextColor={Colors.muted}
             />
 
             {/* Day picker */}
-            <Text style={[styles.fieldLabel, { marginTop: 16 }]}>DAY</Text>
+            <Text style={[styles.fieldLabel, { marginTop: 16 }]}>{t('day')}</Text>
             <View style={styles.dayPicker}>
-              {DAYS_FULL.map((d) => (
+              {DAYS_FULL.map((d, i) => (
                 <Pressable
                   key={d}
                   style={[styles.dayPill, newWorkout.day === d && styles.dayPillActive]}
                   onPress={() => setNewWorkout((p) => ({ ...p, day: d }))}
                 >
                   <Text style={[styles.dayPillText, newWorkout.day === d && styles.dayPillTextActive]}>
-                    {d.slice(0, 3).toUpperCase()}
+                    {t(`days.short.${i}`).toUpperCase()}
                   </Text>
                 </Pressable>
               ))}
             </View>
 
             {/* Add exercise */}
-            <Text style={[styles.fieldLabel, { marginTop: 18 }]}>ADD EXERCISE</Text>
+            <Text style={[styles.fieldLabel, { marginTop: 18 }]}>{t('addExercise')}</Text>
             <View style={styles.exerciseBuilder}>
               <TextInput
                 style={[styles.input, styles.inputOnSurface, { marginBottom: 10 }]}
                 value={newEx.name}
-                onChangeText={(t) => setNewEx((p) => ({ ...p, name: t }))}
-                placeholder="Exercise name"
+                onChangeText={(v) => setNewEx((p) => ({ ...p, name: v }))}
+                placeholder={t('exerciseNamePlaceholder')}
                 placeholderTextColor={Colors.muted}
               />
               <View style={styles.exFieldsRow}>
-                {EXERCISE_FIELDS.map((f) => (
+                {(
+                  [
+                    { key: 'sets' as const, label: t('fields.sets'), ph: '3' },
+                    { key: 'reps' as const, label: t('fields.reps'), ph: '10' },
+                    { key: 'weight' as const, label: t('fields.weight'), ph: '0' },
+                  ]
+                ).map((f) => (
                   <View key={f.key} style={{ flex: 1 }}>
                     <Text style={styles.miniLabel}>{f.label}</Text>
                     <TextInput
                       style={[styles.input, styles.inputOnSurface, styles.inputSmall]}
                       value={newEx[f.key]}
-                      onChangeText={(t) => setNewEx((p) => ({ ...p, [f.key]: t }))}
+                      onChangeText={(v) => setNewEx((p) => ({ ...p, [f.key]: v }))}
                       placeholder={f.ph}
                       placeholderTextColor={Colors.muted}
                       keyboardType="numeric"
@@ -539,7 +547,7 @@ export default function TrainScreen() {
               >
                 <Ionicons name="add" size={14} color={canAddEx ? Colors.primary : Colors.muted} />
                 <Text style={[styles.addExBtnText, !canAddEx && { color: Colors.muted }]}>
-                  ADD EXERCISE
+                  {t('addExercise')}
                 </Text>
               </Pressable>
             </View>
@@ -548,7 +556,7 @@ export default function TrainScreen() {
             {newWorkout.exercises.length > 0 && (
               <View style={{ marginBottom: 16 }}>
                 <Text style={[styles.fieldLabel, { marginBottom: 8 }]}>
-                  {`${newWorkout.exercises.length} EXERCISES ADDED`}
+                  {t('exercisesAdded', { count: newWorkout.exercises.length })}
                 </Text>
                 {newWorkout.exercises.map((ex, i) => (
                   <View key={i} style={styles.addedExRow}>
@@ -558,7 +566,9 @@ export default function TrainScreen() {
                     <View style={{ flex: 1 }}>
                       <Text style={styles.addedExName}>{ex.name}</Text>
                       <Text style={styles.addedExMeta}>
-                        {`${ex.sets} sets · ${ex.reps} reps${ex.weight > 0 ? ` · ${ex.weight}kg` : ''}`}
+                        {ex.weight > 0
+                          ? t('exerciseMetaWithWeight', { sets: ex.sets, reps: ex.reps, weight: ex.weight })
+                          : t('exerciseMeta', { sets: ex.sets, reps: ex.reps })}
                       </Text>
                     </View>
                     <Pressable
@@ -594,7 +604,7 @@ export default function TrainScreen() {
                 <>
                   <Ionicons name="checkmark" size={17} color={canSave ? Colors.primary : Colors.muted} />
                   <Text style={[styles.saveBtnText, !canSave && { color: Colors.muted }]}>
-                    SAVE SCHEDULE
+                    {t('saveSchedule')}
                   </Text>
                 </>
               )}

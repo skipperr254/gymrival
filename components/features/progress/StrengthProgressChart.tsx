@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { LineChart } from '@/components/ui/LineChart';
 import { Colors, Fonts } from '@/constants/theme';
+import { formatNumber } from '@/lib/i18n/format';
 import type { StrengthSeries } from '@/types/progress';
 
 interface StrengthProgressChartProps {
@@ -10,6 +12,7 @@ interface StrengthProgressChartProps {
 }
 
 export function StrengthProgressChart({ series, bigThreeTotal }: StrengthProgressChartProps) {
+  const { t } = useTranslation('progress');
   const allSeries: StrengthSeries[] = bigThreeTotal
     ? [bigThreeTotal, ...series]
     : series;
@@ -25,14 +28,14 @@ export function StrengthProgressChart({ series, bigThreeTotal }: StrengthProgres
           className="text-muted mb-1"
           style={{ fontFamily: Fonts.display, fontSize: 10, letterSpacing: 2 }}
         >
-          STRENGTH PROGRESS
+          {t('strengthProgress')}
         </Text>
         <View className="items-center py-8">
           <Text
             className="text-muted text-center"
             style={{ fontFamily: Fonts.body, fontSize: 13, lineHeight: 20 }}
           >
-            Log your first PR to see your progress.
+            {t('noPrsYet')}
           </Text>
         </View>
       </View>
@@ -50,7 +53,7 @@ export function StrengthProgressChart({ series, bigThreeTotal }: StrengthProgres
         className="text-muted mb-3"
         style={{ fontFamily: Fonts.display, fontSize: 10, letterSpacing: 2 }}
       >
-        STRENGTH PROGRESS
+        {t('strengthProgress')}
       </Text>
 
       {/* Series selector chips */}
@@ -77,7 +80,7 @@ export function StrengthProgressChart({ series, bigThreeTotal }: StrengthProgres
                   color: active ? Colors.primary : Colors.secondary,
                 }}
               >
-                {s.exerciseKey === 'big3_total' ? 'BIG 3 TOTAL' : s.label.toUpperCase()}
+                {s.exerciseKey === 'big3_total' ? t('big3Total') : s.label.toUpperCase()}
               </Text>
             </Pressable>
           );
@@ -88,7 +91,7 @@ export function StrengthProgressChart({ series, bigThreeTotal }: StrengthProgres
       {currentBest !== null && (
         <View className="flex-row items-baseline gap-1 mb-3">
           <Text style={{ fontFamily: Fonts.display, fontSize: 42, color: Colors.primary, lineHeight: 44 }}>
-            {currentBest % 1 === 0 ? currentBest : currentBest.toFixed(1)}
+            {currentBest % 1 === 0 ? formatNumber(currentBest) : formatNumber(currentBest, { maximumFractionDigits: 1 })}
           </Text>
           <Text
             className="text-secondary"
@@ -100,7 +103,7 @@ export function StrengthProgressChart({ series, bigThreeTotal }: StrengthProgres
             className="text-muted ml-1"
             style={{ fontFamily: Fonts.body, fontSize: 12 }}
           >
-            current best
+            {t('currentBest')}
           </Text>
         </View>
       )}

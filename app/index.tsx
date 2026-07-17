@@ -3,8 +3,11 @@ import { Colors } from "@/constants/theme";
 import { router } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 
 export default function HomeScreen() {
+  const { t } = useTranslation("auth");
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }}>
       <View className="flex-1 px-4">
@@ -18,7 +21,7 @@ export default function HomeScreen() {
           </Text>
           <View className="w-10 h-0.75 bg-accent rounded-sm mt-4 mb-4" />
           <Text className="font-sans text-[15px] text-secondary text-center">
-            Your fitness. Your rivals. Your wins.
+            {t("home.tagline")}
           </Text>
         </View>
 
@@ -32,14 +35,14 @@ export default function HomeScreen() {
             onPress={() => router.push(Routes.onboarding)}
           >
             <Text className="font-heading text-xl text-primary tracking-[3px]">
-              GET STARTED
+              {t("splash.getStarted")}
             </Text>
           </Pressable>
 
           <Pressable onPress={() => router.push(Routes.signIn)} hitSlop={12}>
             <Text className="font-sans text-sm text-secondary">
-              Already have an account?{" "}
-              <Text className="font-sans-semibold text-accent">Sign In</Text>
+              {t("signUp.haveAccount")}{" "}
+              <Text className="font-sans-semibold text-accent">{t("signUp.signInLink")}</Text>
             </Text>
           </Pressable>
         </View>

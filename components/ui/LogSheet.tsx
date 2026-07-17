@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import { View, Text, Pressable, Modal, Animated, Easing, StyleSheet, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts } from '@/constants/theme';
 
 const SHEET_HEIGHT = Dimensions.get('window').height;
@@ -15,12 +16,12 @@ interface Props {
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
-const ACTIONS: { id: string; icon: IoniconName; label: string; sub: string }[] = [
-  { id: 'pr', icon: 'trophy', label: 'Log a PR', sub: 'Record a new personal record' },
-  { id: 'checkin', icon: 'location', label: 'Gym Check-in', sub: 'Check in to your gym' },
-];
-
 export function LogSheet({ visible, onClose, onLogPR, onCheckIn }: Props) {
+  const { t } = useTranslation('logpr');
+  const ACTIONS: { id: string; icon: IoniconName; label: string; sub: string }[] = [
+    { id: 'pr', icon: 'trophy', label: t('logSheet.logPr.label'), sub: t('logSheet.logPr.sub') },
+    { id: 'checkin', icon: 'location', label: t('logSheet.checkin.label'), sub: t('logSheet.checkin.sub') },
+  ];
   const insets = useSafeAreaInsets();
   const [mounted, setMounted] = useState(false);
   const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
@@ -61,7 +62,7 @@ export function LogSheet({ visible, onClose, onLogPR, onCheckIn }: Props) {
           ]}
         >
           <View style={styles.handle} />
-          <Text style={styles.title}>LOG ACTIVITY</Text>
+          <Text style={styles.title}>{t('logSheet.title')}</Text>
 
           {ACTIONS.map((action) => (
             <Pressable

@@ -3,25 +3,22 @@ import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator } from
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
+import { formatDate } from '@/lib/i18n/format';
 import type { PRHistoryGroup } from '@/types/pr';
 
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-}
-
 function PRGroup({ group }: { group: PRHistoryGroup }) {
+  const { t } = useTranslation('profile');
   return (
     <View style={styles.group}>
       <View style={styles.groupHeader}>
         <Ionicons name="trophy" size={14} color={Colors.accent} />
         <Text style={styles.groupLabel}>{group.exercise.label.toUpperCase()}</Text>
         <Text style={styles.groupBest}>
-          Best: {group.best} {group.exercise.unit}
+          {t('prHistory.best', { value: group.best, unit: group.exercise.unit })}
         </Text>
       </View>
       {group.entries.map((entry, i) => (
@@ -33,7 +30,9 @@ function PRGroup({ group }: { group: PRHistoryGroup }) {
           ) : (
             <View style={styles.crownSpacer} />
           )}
-          <Text style={styles.prDate}>{formatDate(entry.created_at)}</Text>
+          <Text style={styles.prDate}>
+            {formatDate(entry.created_at, { day: 'numeric', month: 'short', year: 'numeric' })}
+          </Text>
           <Text style={[styles.prValue, entry.value === group.best && styles.prValueBest]}>
             {entry.value} {entry.unit}
           </Text>
@@ -44,6 +43,7 @@ function PRGroup({ group }: { group: PRHistoryGroup }) {
 }
 
 export default function PRHistoryScreen() {
+  const { t } = useTranslation('profile');
   const { user } = useAuthStore();
   const { prHistory, loadPRHistory, loading } = useProfileStore();
 
@@ -60,7 +60,7 @@ export default function PRHistoryScreen() {
         >
           <Ionicons name="arrow-back" size={22} color={Colors.accent} />
         </Pressable>
-        <Text style={styles.heading}>PR HISTORY</Text>
+        <Text style={styles.heading}>{t('prHistory.title')}</Text>
         <View style={styles.spacer} />
       </View>
 
@@ -71,8 +71,8 @@ export default function PRHistoryScreen() {
       ) : prHistory.length === 0 ? (
         <View style={styles.emptyBox}>
           <Ionicons name="trophy-outline" size={40} color="#333" />
-          <Text style={styles.emptyTitle}>NO PRs YET</Text>
-          <Text style={styles.emptySub}>Log your first PR to start tracking your progress</Text>
+          <Text style={styles.emptyTitle}>{t('prHistory.emptyTitle')}</Text>
+          <Text style={styles.emptySub}>{t('prHistory.emptySub')}</Text>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>

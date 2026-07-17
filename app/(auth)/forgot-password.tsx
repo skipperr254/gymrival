@@ -13,11 +13,13 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { Colors } from "@/constants/theme";
 import { Routes } from "@/constants/routes";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export default function ForgotPasswordScreen() {
+  const { t } = useTranslation("auth");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,17 +66,17 @@ export default function ForgotPasswordScreen() {
           {/* Header */}
           <View className="mb-8">
             <Text className="font-heading text-[46px] text-primary tracking-[2px] leading-12.5">
-              FORGOT{"\n"}PASSWORD?
+              {t("forgotPassword.title")}
             </Text>
             <Text className="font-sans text-[15px] text-secondary mt-3 leading-5.75">
-              {"Enter your email and we'll send you a code to reset your password."}
+              {t("forgotPassword.subtitle")}
             </Text>
           </View>
 
           {/* Form */}
           <View>
             <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-              Email
+              {t("forgotPassword.emailLabel")}
             </Text>
             <View
               className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
@@ -83,7 +85,7 @@ export default function ForgotPasswordScreen() {
               <TextInput
                 value={email}
                 onChangeText={setEmail}
-                placeholder="you@example.com"
+                placeholder={t("forgotPassword.emailPlaceholder")}
                 placeholderTextColor={Colors.hint}
                 selectionColor={Colors.accent}
                 style={styles.input}
@@ -116,7 +118,7 @@ export default function ForgotPasswordScreen() {
               <ActivityIndicator color={Colors.primary} />
             ) : (
               <Text className="font-heading text-xl text-primary tracking-[3px]">
-                SEND CODE
+                {t("forgotPassword.submit")}
               </Text>
             )}
           </Pressable>
@@ -124,7 +126,7 @@ export default function ForgotPasswordScreen() {
           {/* Back to sign in */}
           <View className="flex-row justify-center items-center mt-8 gap-1">
             <Text className="font-sans text-[14px] text-secondary">
-              Remember your password?
+              {t("forgotPassword.rememberPassword")}
             </Text>
             <Pressable
               onPress={() => router.replace(Routes.signIn)}
@@ -132,7 +134,7 @@ export default function ForgotPasswordScreen() {
             >
               <Text className="font-sans-semibold text-[14px] text-accent">
                 {" "}
-                Sign In
+                {t("forgotPassword.signInLink")}
               </Text>
             </Pressable>
           </View>

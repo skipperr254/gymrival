@@ -1,0 +1,24 @@
+{
+  "settings": {
+    "language": "Taal",
+    "languageAuto": "Volgt apparaattaal"
+  },
+  "actions": {
+    "back": "Terug",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "done": "Klaar"
+  },
+  "chart": {
+    "noData": "Nog geen data"
+  },
+  "tabs": {
+    "compete": "Strijd",
+    "social": "Sociaal",
+    "train": "Train",
+    "profile": "Profiel"
+  },
+  "accessibility": {
+    "logActivity": "Activiteit loggen"
+  }
+}

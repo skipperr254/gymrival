@@ -1,0 +1,11 @@
+{
+  "someone": "شخص ما",
+  "yourPr": "رقمك القياسي",
+  "aPr": "رقماً قياسياً",
+  "newMessage": "أرسل لك {{name}} رسالة",
+  "friendRequest": "أرسل لك {{name}} طلب صداقة",
+  "friendRequestAccepted": "قبل {{name}} طلب صداقتك",
+  "prLiked": "أعجب {{name}} بـ {{exercise}}{{value}} الخاص بك",
+  "friendPr": "حقق {{name}} للتو رقماً قياسياً جديداً في {{exercise}}{{value}}",
+  "generic": "لديك إشعار جديد"
+}

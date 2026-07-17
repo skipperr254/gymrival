@@ -18,7 +18,7 @@ export interface AppNotification {
     message_preview?: string;
     friendship_id?: string;
     pr_id?: string;
-    exercise_label?: string;
+    exercise_key?: string;
     value?: number;
     unit?: string;
   };

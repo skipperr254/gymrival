@@ -1,0 +1,19 @@
+{
+  "bench": "Bankdrukken",
+  "squat": "Squat",
+  "deadlift": "Deadlift",
+  "pullups": "Optrekken",
+  "overhead": "Overhead Press",
+  "bulgarian": "Bulgaarse Split Squat",
+  "rdl": "Roemeense Deadlift",
+  "incline": "Schuine Bankdrukken",
+  "dips": "Dips",
+  "row": "Barbell Roeien",
+  "curl": "Biceps Curl",
+  "legpress": "Beenpers",
+  "lunge": "Uitvalspassen",
+  "facepull": "Face Pull",
+  "hipthrust": "Heupheffen",
+  "plank": "Plank",
+  "muscle_up": "Muscle Up"
+}

@@ -92,23 +92,29 @@ export interface CreateFriendChallengeInput {
   invitee_id: string;
 }
 
+import i18n from '@/lib/i18n';
+import { formatNumber } from '@/lib/i18n/format';
+
 /** Display-ready format of a score value for any metric type */
 export function formatChallengeScore(
   score: number,
   metric: ChallengeMetric,
   unit: string,
 ): string {
-  if (metric === 'most_improved') return `+${score}${unit}`;
-  if (metric === 'total_volume')  return `${score}${unit}`;
-  return `${score}${unit}`;
+  const value = formatNumber(score);
+  if (metric === 'most_improved') return `+${value}${unit}`;
+  return `${value}${unit}`;
 }
 
-/** Human-readable label for a metric type */
+/**
+ * Human-readable label for a metric type. Uses i18next directly (not the
+ * useTranslation hook) since this is a plain helper, not a component.
+ */
 export function metricLabel(metric: ChallengeMetric): string {
   switch (metric) {
-    case 'highest_pr':    return 'Highest PR';
-    case 'most_improved': return 'Most Improved';
-    case 'total_volume':  return 'Total Volume';
+    case 'highest_pr':    return i18n.t('compete:metric.highestPr');
+    case 'most_improved': return i18n.t('compete:metric.mostImproved');
+    case 'total_volume':  return i18n.t('compete:metric.totalVolume');
   }
 }
 
@@ -120,11 +126,11 @@ export function msUntilEnd(endsAt: string): number {
 /** Returns a human-readable "ends in" string */
 export function endsInLabel(endsAt: string): string {
   const ms = msUntilEnd(endsAt);
-  if (ms <= 0) return 'Ended';
+  if (ms <= 0) return i18n.t('compete:endsIn.ended');
   const days = Math.floor(ms / 86_400_000);
-  if (days > 0) return `${days}d left`;
+  if (days > 0) return i18n.t('compete:endsIn.days', { count: days });
   const hours = Math.floor(ms / 3_600_000);
-  if (hours > 0) return `${hours}h left`;
+  if (hours > 0) return i18n.t('compete:endsIn.hours', { count: hours });
   const mins = Math.floor(ms / 60_000);
-  return `${mins}m left`;
+  return i18n.t('compete:endsIn.minutes', { count: mins });
 }

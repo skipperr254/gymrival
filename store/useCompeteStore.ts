@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import i18n from "@/lib/i18n";
 import type { ExerciseType } from "@/types/pr";
 import type { RivalEntry, GlobalLeaderboardEntry } from "@/types/compete";
 import type {
@@ -176,7 +177,7 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
 
   loadChallenges: async (userId) => {
     set({ loadingChallenges: true, challengesError: null });
-    const { data, error } = await fetchActiveChallenges(userId);
+    const { data, error } = await fetchActiveChallenges(userId, i18n.language);
     set({ challenges: data, loadingChallenges: false, challengesError: error });
   },
 

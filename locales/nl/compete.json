@@ -1,0 +1,108 @@
+{
+  "tabs": {
+    "rivals": { "label": "Rivalen", "subtitle": "RIVALEN" },
+    "challenges": { "label": "Challenges", "subtitle": "CHALLENGES" },
+    "global": { "label": "Wereldwijd", "subtitle": "WERELDRANGLIJST" }
+  },
+  "you": "JIJ",
+  "unknown": "Onbekend",
+  "youSuffix": " (Jij)",
+  "lvl": "LVL {{level}}",
+  "metric": {
+    "highestPr": "Hoogste PR",
+    "mostImproved": "Meeste Verbetering",
+    "totalVolume": "Totaal Volume"
+  },
+  "endsIn": {
+    "ended": "Beëindigd",
+    "days": "nog {{count}}d",
+    "hours": "nog {{count}}u",
+    "minutes": "nog {{count}}m"
+  },
+  "rivals": {
+    "emptyTitle": "NOG GEEN RIVALEN",
+    "emptySub": "Voeg vrienden toe om op het scorebord te strijden",
+    "footerNote": "GEBASEERD OP PERSOONLIJKE RECORDS"
+  },
+  "card": {
+    "joined": "{{count}} deelnemers",
+    "yourRank": "Jouw positie: #{{rank}}",
+    "joinedBtn": "DEELGENOMEN",
+    "joinBtn": "DEELNEMEN",
+    "viewAll": "ALLES BEKIJKEN"
+  },
+  "invitation": {
+    "defaultTitle": "Challenge Uitnodiging",
+    "someone": "Iemand",
+    "challengedYou": "{{name}} heeft je uitgedaagd",
+    "accept": "ACCEPTEREN",
+    "decline": "AFWIJZEN"
+  },
+  "modal": {
+    "title": "CHALLENGE",
+    "challengeLabel": "UITDAGEN",
+    "change": "WIJZIGEN",
+    "searchFriendsPlaceholder": "Zoek vrienden...",
+    "noFriends": "Voeg eerst vrienden toe om ze uit te dagen",
+    "noMatchingFriends": "Geen overeenkomende vrienden",
+    "friend": "Vriend",
+    "exercise": "OEFENING",
+    "metric": "METRIEK",
+    "duration": "DUUR",
+    "sendChallenge": "CHALLENGE VERSTUREN",
+    "durationOptions": {
+      "3d": "3 Dagen",
+      "1w": "1 Week",
+      "2w": "2 Weken",
+      "1m": "1 Maand"
+    }
+  },
+  "challenges": {
+    "loadError": "Kon challenges niet laden",
+    "retry": "OPNIEUW",
+    "pendingInvitations": "OPENSTAANDE UITNODIGINGEN",
+    "activeChallenges": "ACTIEVE CHALLENGES",
+    "friendChallenges": "VRIENDEN-CHALLENGES",
+    "emptyTitle": "GEEN ACTIEVE CHALLENGES",
+    "emptySub": "Kom later terug — of daag hieronder een vriend uit!",
+    "challengeFriendTitle": "DAAG EEN VRIEND UIT",
+    "challengeFriendSub": "Kies een vriend en stel de voorwaarden in",
+    "moreCount": "+{{count}}",
+    "addFriendsFirst": "VOEG EERST VRIENDEN TOE",
+    "challengeFriendBtn": "DAAG EEN VRIEND UIT"
+  },
+  "global": {
+    "statBench": "BANK",
+    "statSquat": "SQUAT",
+    "statDead": "DEAD",
+    "totalKg": "TOTAAL KG",
+    "searchPlaceholder": "Zoek op naam of @gebruikersnaam...",
+    "loadError": "Kon ranglijst niet laden",
+    "retry": "OPNIEUW",
+    "yourGlobalRank": "JOUW WERELDPOSITIE",
+    "unrankedTitle": "NOG NIET GERANGSCHIKT",
+    "unrankedSub": "Log een Bankdrukken-, Squat- en Deadlift-PR om op de wereldranglijst te komen",
+    "noResultsTitle": "GEEN RESULTATEN",
+    "noResultsSub": "Probeer een andere naam of gebruikersnaam",
+    "noAthletesTitle": "NOG GEEN SPORTERS",
+    "noAthletesSub": "Wees de eerste die een Bankdrukken-, Squat- en Deadlift-PR logt!",
+    "loadMore": "MEER LADEN",
+    "refresh": "VERVERSEN",
+    "footerNote": "GEBASEERD OP GECOMBINEERDE BANKDRUKKEN · SQUAT · DEADLIFT"
+  },
+  "detail": {
+    "heading": "CHALLENGE",
+    "notFound": "Challenge niet gevonden",
+    "endsIn": "EINDIGT OVER",
+    "participants": "DEELNEMERS",
+    "xpReward": "XP BELONING",
+    "prize": "PRIJS",
+    "leaderboard": "SCOREBORD",
+    "noParticipants": "Nog geen deelnemers",
+    "beFirst": "Wees de eerste die meedoet!",
+    "refresh": "VERVERSEN",
+    "joinedTapToLeave": "DEELGENOMEN — TIK OM TE VERLATEN",
+    "joinChallenge": "DEELNEMEN AAN CHALLENGE",
+    "challengeEnded": "CHALLENGE BEËINDIGD"
+  }
+}

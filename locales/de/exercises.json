@@ -1,0 +1,19 @@
+{
+  "bench": "Bankdrücken",
+  "squat": "Kniebeuge",
+  "deadlift": "Kreuzheben",
+  "pullups": "Klimmzüge",
+  "overhead": "Schulterdrücken",
+  "bulgarian": "Bulgarische Split-Kniebeuge",
+  "rdl": "Rumänisches Kreuzheben",
+  "incline": "Schrägbankdrücken",
+  "dips": "Dips",
+  "row": "Langhantelrudern",
+  "curl": "Bizepscurl",
+  "legpress": "Beinpresse",
+  "lunge": "Ausfallschritte",
+  "facepull": "Face Pull",
+  "hipthrust": "Hüftstoßen",
+  "plank": "Unterarmstütz",
+  "muscle_up": "Muscle Up"
+}

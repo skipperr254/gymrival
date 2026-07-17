@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useProgress } from '@/hooks/useProgress';
 import { useAuthStore } from '@/store/useAuthStore';
 import { ProgressStats } from './ProgressStats';
@@ -9,6 +10,7 @@ import { Colors, Fonts } from '@/constants/theme';
 
 // Renders inside the parent ScrollView in train/index.tsx — no nested ScrollView needed.
 export function ProgressView() {
+  const { t } = useTranslation('progress');
   const user = useAuthStore((s) => s.user);
   const { data, loading, error } = useProgress(user?.id);
 
@@ -27,7 +29,7 @@ export function ProgressView() {
           className="text-muted text-center"
           style={{ fontFamily: Fonts.body, fontSize: 13, lineHeight: 20 }}
         >
-          {`Could not load progress:\n${error}`}
+          {t('loadError', { error })}
         </Text>
       </View>
     );
@@ -53,13 +55,13 @@ export function ProgressView() {
             className="text-primary mb-2"
             style={{ fontFamily: Fonts.display, fontSize: 16, letterSpacing: 3 }}
           >
-            NO DATA YET
+            {t('noDataTitle')}
           </Text>
           <Text
             className="text-muted text-center"
             style={{ fontFamily: Fonts.body, fontSize: 13, lineHeight: 20 }}
           >
-            Log a PR or check in to the gym to start tracking your progress.
+            {t('noDataSub')}
           </Text>
         </View>
       )}

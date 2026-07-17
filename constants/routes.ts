@@ -27,5 +27,6 @@ export const Routes = {
   profileEdit: '/(tabs)/profile/edit',
   profilePRHistory: '/(tabs)/profile/pr-history',
   profileBadges: '/(tabs)/profile/badges',
+  profileLanguage: '/(tabs)/profile/language',
   notifications: '/(tabs)/profile/notifications',
 } as const;

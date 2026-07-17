@@ -1,0 +1,22 @@
+{
+  "consistency": "KONSTANZ",
+  "checkinsIn12Weeks_one": "{{count}} Check-in in 12 Wochen",
+  "checkinsIn12Weeks_other": "{{count}} Check-ins in 12 Wochen",
+  "less": "Weniger",
+  "more": "Mehr",
+  "level": "LEVEL",
+  "xpProgress": "{{xpInLevel}} / {{xpNeeded}} XP",
+  "totalPrs": "PRs GESAMT",
+  "records": "Rekorde",
+  "dayStreak": "SERIE",
+  "days": "Tage",
+  "workouts": "WORKOUTS",
+  "done": "erledigt",
+  "loadError": "Fortschritt konnte nicht geladen werden:\n{{error}}",
+  "noDataTitle": "NOCH KEINE DATEN",
+  "noDataSub": "Trage einen PR ein oder checke im Studio ein, um deinen Fortschritt zu verfolgen.",
+  "strengthProgress": "KRAFTFORTSCHRITT",
+  "noPrsYet": "Trage deinen ersten PR ein, um deinen Fortschritt zu sehen.",
+  "big3Total": "BIG-3-GESAMT",
+  "currentBest": "aktueller Bestwert"
+}

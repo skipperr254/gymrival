@@ -1,6 +1,6 @@
 import "../global.css";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -16,8 +16,20 @@ import {
 import { useAuthStore } from "@/store/useAuthStore";
 import { useChatStore } from "@/store/useChatStore";
 import { useNotificationStore } from "@/store/useNotificationStore";
-import { savePushToken } from "@/lib/api";
+import { savePushToken, getUserLanguage } from "@/lib/api";
 import { Routes } from "@/constants/routes";
+import i18n, { initI18n } from "@/lib/i18n";
+import { isSupportedLanguage } from "@/lib/i18n/languages";
+
+// Once a user has explicitly picked a language (profiles.language is set),
+// that choice is the cross-device source of truth and wins over whatever
+// the device's own locale detects. NULL means "keep following the device".
+async function syncProfileLanguage(userId: string) {
+  const { data: language } = await getUserLanguage(userId);
+  if (language && isSupportedLanguage(language) && language !== i18n.language) {
+    await i18n.changeLanguage(language);
+  }
+}
 
 SplashScreen.preventAutoHideAsync();
 
@@ -95,10 +107,23 @@ export default function RootLayout() {
   const { loadNotifications, subscribeToNotifications, reset: resetNotifications } =
     useNotificationStore();
   const notifCleanupRef = useRef<(() => void) | null>(null);
+  const [i18nReady, setI18nReady] = useState(false);
 
   useEffect(() => {
     initialize();
   }, [initialize]);
+
+  useEffect(() => {
+    initI18n().then(() => setI18nReady(true));
+  }, []);
+
+  // Once signed in, an explicit language choice stored on the profile
+  // overrides the device-detected language used at first launch.
+  useEffect(() => {
+    const userId = session?.user?.id;
+    if (!userId) return;
+    syncProfileLanguage(userId);
+  }, [session?.user?.id]);
 
   // Keep presence alive for the entire authenticated session
   useEffect(() => {
@@ -130,16 +155,16 @@ export default function RootLayout() {
     registerPushToken(userId);
   }, [session?.user?.id]);
 
-  // Hide splash once fonts AND auth state are ready
+  // Hide splash once fonts, auth state, AND i18n are ready
   useEffect(() => {
-    if ((fontsLoaded || fontError) && initialized) {
+    if ((fontsLoaded || fontError) && initialized && i18nReady) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, fontError, initialized]);
+  }, [fontsLoaded, fontError, initialized, i18nReady]);
 
   // Auth gate
   useEffect(() => {
-    if (!initialized || (!fontsLoaded && !fontError)) return;
+    if (!initialized || (!fontsLoaded && !fontError) || !i18nReady) return;
 
     const inAuthGroup = segments[0] === "(auth)";
     const inTabsGroup = segments[0] === "(tabs)";
@@ -149,9 +174,9 @@ export default function RootLayout() {
     } else if (!session && inTabsGroup) {
       router.replace(Routes.splash as any);
     }
-  }, [session, initialized, segments, pendingPasswordReset, pendingProfileSetup, fontsLoaded, fontError, router]);
+  }, [session, initialized, segments, pendingPasswordReset, pendingProfileSetup, fontsLoaded, fontError, i18nReady, router]);
 
-  if ((!fontsLoaded && !fontError) || !initialized) return null;
+  if ((!fontsLoaded && !fontError) || !initialized || !i18nReady) return null;
 
   return <Stack screenOptions={{ headerShown: false }} />;
 }

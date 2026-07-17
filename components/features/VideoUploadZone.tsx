@@ -10,6 +10,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { Video, Camera, X, Clock } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Fonts } from '@/constants/theme';
 
 interface VideoAsset {
@@ -29,6 +30,7 @@ interface Props {
 const MAX_DURATION_SEC = 60;
 
 export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabled }: Props) {
+  const { t } = useTranslation('logpr');
   const processAsset = useCallback(async (pickerAsset: ImagePicker.ImagePickerAsset) => {
     const videoUri = pickerAsset.uri;
     const rawDuration = pickerAsset.duration ?? 0;
@@ -54,7 +56,7 @@ export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabl
   const pickFromLibrary = useCallback(async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission needed', 'Allow access to your photo library to attach a video.');
+      Alert.alert(t('video.permissionNeededTitle'), t('video.permissionLibraryMsg'));
       return;
     }
 
@@ -72,7 +74,7 @@ export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabl
   const recordFromCamera = useCallback(async () => {
     const { status: camStatus } = await ImagePicker.requestCameraPermissionsAsync();
     if (camStatus !== 'granted') {
-      Alert.alert('Permission needed', 'Allow camera access to record your lift.');
+      Alert.alert(t('video.permissionNeededTitle'), t('video.permissionCameraMsg'));
       return;
     }
 
@@ -89,12 +91,12 @@ export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabl
   const showPickerOptions = useCallback(() => {
     if (disabled) return;
     Alert.alert(
-      'Add Video Proof',
-      'Record your lift or pick an existing video (max 60 seconds)',
+      t('video.pickerTitle'),
+      t('video.pickerMsg'),
       [
-        { text: 'Record Video', onPress: recordFromCamera },
-        { text: 'Choose from Library', onPress: pickFromLibrary },
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('video.recordVideo'), onPress: recordFromCamera },
+        { text: t('video.chooseFromLibrary'), onPress: pickFromLibrary },
+        { text: t('video.cancel'), style: 'cancel' },
       ]
     );
   }, [disabled, pickFromLibrary, recordFromCamera]);
@@ -127,7 +129,7 @@ export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabl
         </View>
         {/* Ready label */}
         <View style={styles.readyBadge}>
-          <Text style={styles.readyBadgeText}>VIDEO READY</Text>
+          <Text style={styles.readyBadgeText}>{t('video.readyLabel')}</Text>
         </View>
       </View>
     );
@@ -151,8 +153,8 @@ export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabl
           <Video size={20} strokeWidth={1.4} color="#555" />
         </View>
       </View>
-      <Text style={styles.emptyTitle}>ADD VIDEO PROOF</Text>
-      <Text style={styles.emptySub}>Camera or library · max 60 sec</Text>
+      <Text style={styles.emptyTitle}>{t('video.addProofTitle')}</Text>
+      <Text style={styles.emptySub}>{t('video.addProofSub')}</Text>
     </Pressable>
   );
 }

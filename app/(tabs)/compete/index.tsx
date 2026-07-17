@@ -23,10 +23,12 @@ import {
   AlertCircle,
   X,
 } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCompeteStore } from '@/store/useCompeteStore';
 import { useSocialStore } from '@/store/useSocialStore';
+import { formatNumber } from '@/lib/i18n/format';
 import type { GlobalLeaderboardEntry } from '@/types/compete';
 import type { ChallengeWithStats, ChallengeMetric } from '@/types/challenge';
 import { endsInLabel, formatChallengeScore, metricLabel } from '@/types/challenge';
@@ -44,10 +46,11 @@ function toFlagEmoji(code: string | null | undefined): string {
 
 // ─── Tab config ───────────────────────────────────────────────────────────────
 
+// Display text resolved via t('tabs.<key>.label'/'subtitle') at render time.
 const TABS = [
-  { key: 'rivals',     label: 'Rivals',     Icon: Medal, subtitle: 'RIVALS' },
-  { key: 'challenges', label: 'Challenges', Icon: Zap,   subtitle: 'CHALLENGES' },
-  { key: 'global',     label: 'Global',     Icon: Flag,  subtitle: 'GLOBAL LEADERBOARD' },
+  { key: 'rivals',     labelKey: 'tabs.rivals.label',     Icon: Medal, subtitleKey: 'tabs.rivals.subtitle' },
+  { key: 'challenges', labelKey: 'tabs.challenges.label', Icon: Zap,   subtitleKey: 'tabs.challenges.subtitle' },
+  { key: 'global',     labelKey: 'tabs.global.label',     Icon: Flag,  subtitleKey: 'tabs.global.subtitle' },
 ] as const;
 
 type TabKey = (typeof TABS)[number]['key'];
@@ -67,8 +70,9 @@ function avatarColorIndex(id: string | number): number {
 }
 
 function LeaderboardAvatar({ id, name, size = 42 }: { id: string | number; name: string; size?: number }) {
+  const { t } = useTranslation('compete');
   const color    = AVATAR_PALETTE[avatarColorIndex(id) % AVATAR_PALETTE.length];
-  const initials = name === 'You' ? 'YOU' : name.slice(0, 2).toUpperCase();
+  const initials = name === 'You' ? t('you') : name.slice(0, 2).toUpperCase();
   const fontSize = Math.round(size * 0.3);
 
   return (
@@ -97,6 +101,7 @@ function LeaderboardAvatar({ id, name, size = 42 }: { id: string | number; name:
 // ─── Rivals Content ───────────────────────────────────────────────────────────
 
 function RivalsContent() {
+  const { t } = useTranslation('compete');
   const { user } = useAuthStore();
   const {
     exercises,
@@ -154,10 +159,8 @@ function RivalsContent() {
       {!isLoading && rivals.length === 0 && (
         <View style={rivalsStyles.emptyBox}>
           <Trophy size={32} strokeWidth={1.4} color="#333" />
-          <Text style={rivalsStyles.emptyTitle}>NO RIVALS YET</Text>
-          <Text style={rivalsStyles.emptySub}>
-            {"Add friends to compete on the leaderboard"}
-          </Text>
+          <Text style={rivalsStyles.emptyTitle}>{t('rivals.emptyTitle')}</Text>
+          <Text style={rivalsStyles.emptySub}>{t('rivals.emptySub')}</Text>
         </View>
       )}
 
@@ -165,7 +168,7 @@ function RivalsContent() {
         const isFirst = index === 0;
         const prColor = isFirst ? (rival.isMe ? '#000' : Colors.accent) : rival.isMe ? '#333' : '#fff';
         const pct = `${Math.round((rival.bestPR / maxPR) * 100)}%` as `${number}%`;
-        const displayName = rival.fullName || rival.username || 'Unknown';
+        const displayName = rival.fullName || rival.username || t('unknown');
 
         return (
           <View
@@ -185,7 +188,7 @@ function RivalsContent() {
                 <Text style={[styles.userName, rival.isMe && styles.userNameMe]}>
                   {displayName.toUpperCase()}
                 </Text>
-                {rival.isMe && <Text style={styles.youTag}>YOU</Text>}
+                {rival.isMe && <Text style={styles.youTag}>{t('you')}</Text>}
               </View>
               <View style={[styles.barTrack, rival.isMe && styles.barTrackMe]}>
                 {rival.isMe ? (
@@ -211,7 +214,7 @@ function RivalsContent() {
       })}
 
       {!isLoading && rivals.length > 0 && (
-        <Text style={styles.footerNote}>BASED ON PERSONAL RECORDS</Text>
+        <Text style={styles.footerNote}>{t('rivals.footerNote')}</Text>
       )}
     </>
   );
@@ -263,6 +266,7 @@ function ChallengeCard({
   onLeave: () => void;
   joining: boolean;
 }) {
+  const { t } = useTranslation('compete');
   const isFriend = ch.type === 'friend';
   const color    = isFriend ? '#4a9eff' : CHALLENGE_COLOR;
   const MetricIcon = ch.metric === 'most_improved' ? TrendingUp
@@ -288,7 +292,7 @@ function ChallengeCard({
         </View>
         <View style={cStyles.statItem}>
           <Users size={12} strokeWidth={1.8} color="#555" />
-          <Text style={cStyles.statText}>{ch.participant_count} joined</Text>
+          <Text style={cStyles.statText}>{t('card.joined', { count: ch.participant_count })}</Text>
         </View>
         {!!ch.prize_label && (
           <View style={cStyles.statItem}>
@@ -299,7 +303,7 @@ function ChallengeCard({
       </View>
 
       {topEntries.slice(0, 3).map((p, i) => {
-        const displayName = p.full_name ?? p.username ?? 'Unknown';
+        const displayName = p.full_name ?? p.username ?? t('unknown');
         return (
           <View key={p.user_id} style={cStyles.miniRow}>
             <View style={cStyles.miniMedal}>
@@ -307,7 +311,7 @@ function ChallengeCard({
             </View>
             <LeaderboardAvatar id={p.user_id} name={displayName} size={26} />
             <Text style={[cStyles.miniName, p.is_me && { color, fontFamily: Fonts.bodyMedium }]}>
-              {displayName}{p.is_me ? ' (You)' : ''}
+              {displayName}{p.is_me ? t('youSuffix') : ''}
             </Text>
             <Text style={[cStyles.miniVal, p.is_me && { color }]}>
               {formatChallengeScore(p.score, ch.metric, unit)}{' '}
@@ -321,7 +325,7 @@ function ChallengeCard({
         <View style={[cStyles.statItem, { marginTop: 10, marginBottom: 2 }]}>
           <Trophy size={12} strokeWidth={1.8} color={color} />
           <Text style={[cStyles.statText, { color }]}>
-            {'Your rank: #'}{ch.user_rank}
+            {t('card.yourRank', { rank: ch.user_rank })}
             {ch.user_score != null ? `  ·  ${formatChallengeScore(ch.user_score, ch.metric, unit)}` : ''}
           </Text>
         </View>
@@ -332,7 +336,7 @@ function ChallengeCard({
           {ch.is_joined ? (
             <View style={cStyles.btnJoinedInactive}>
               <CheckCircle size={13} strokeWidth={2} color="#555" />
-              <Text style={cStyles.btnJoinedText}>JOINED</Text>
+              <Text style={cStyles.btnJoinedText}>{t('card.joinedBtn')}</Text>
             </View>
           ) : joining ? (
             <View style={cStyles.btnJoinedInactive}>
@@ -346,7 +350,7 @@ function ChallengeCard({
               style={cStyles.btnJoin}
             >
               <Zap size={13} strokeWidth={2} color="#fff" />
-              <Text style={cStyles.btnJoinText}>JOIN</Text>
+              <Text style={cStyles.btnJoinText}>{t('card.joinBtn')}</Text>
             </LinearGradient>
           )}
         </Pressable>
@@ -354,7 +358,7 @@ function ChallengeCard({
           onPress={() => router.push(`/(tabs)/compete/challenge/${ch.id}` as any)}
           style={[cStyles.btnViewAll, { borderColor: color + '44' }]}
         >
-          <Text style={[cStyles.btnViewAllText, { color }]}>VIEW ALL</Text>
+          <Text style={[cStyles.btnViewAllText, { color }]}>{t('card.viewAll')}</Text>
           <ChevronRight size={13} strokeWidth={2} color={color} />
         </Pressable>
       </View>
@@ -375,10 +379,11 @@ function InvitationCard({
   onDecline: () => void;
   loading: boolean;
 }) {
+  const { t } = useTranslation('compete');
   const ch       = invitation.challenge;
   const inviter  = invitation.inviter;
-  const title    = ch?.title ?? 'Challenge Invite';
-  const name     = inviter?.full_name ?? inviter?.username ?? 'Someone';
+  const title    = ch?.title ?? t('invitation.defaultTitle');
+  const name     = inviter?.full_name ?? inviter?.username ?? t('invitation.someone');
 
   return (
     <View style={[cStyles.card, { borderColor: '#4a9eff33' }]}>
@@ -389,7 +394,7 @@ function InvitationCard({
         <View style={{ flex: 1 }}>
           <Text style={cStyles.cardTitle}>{title}</Text>
           <Text style={cStyles.cardDesc}>
-            {name}{' challenged you'}
+            {t('invitation.challengedYou', { name })}
             {ch?.ends_at ? `  ·  ${endsInLabel(ch.ends_at)}` : ''}
           </Text>
         </View>
@@ -414,7 +419,7 @@ function InvitationCard({
           >
             {loading
               ? <ActivityIndicator size="small" color="#fff" />
-              : <><CheckCircle size={13} strokeWidth={2} color="#fff" /><Text style={cStyles.btnJoinText}>ACCEPT</Text></>
+              : <><CheckCircle size={13} strokeWidth={2} color="#fff" /><Text style={cStyles.btnJoinText}>{t('invitation.accept')}</Text></>
             }
           </LinearGradient>
         </Pressable>
@@ -424,7 +429,7 @@ function InvitationCard({
           style={[cStyles.btnViewAll, { borderColor: '#2a2a2a', flex: 1 }]}
         >
           <X size={13} strokeWidth={2} color="#555" />
-          <Text style={[cStyles.btnViewAllText, { color: '#555' }]}>DECLINE</Text>
+          <Text style={[cStyles.btnViewAllText, { color: '#555' }]}>{t('invitation.decline')}</Text>
         </Pressable>
       </View>
     </View>
@@ -433,17 +438,18 @@ function InvitationCard({
 
 // ─── Create Friend Challenge Modal ────────────────────────────────────────────
 
+// Display text resolved via t() at render time — see labelKey usage below.
 const DURATION_OPTIONS = [
-  { label: '3 Days',  days: 3  },
-  { label: '1 Week',  days: 7  },
-  { label: '2 Weeks', days: 14 },
-  { label: '1 Month', days: 30 },
+  { labelKey: 'modal.durationOptions.3d', days: 3  },
+  { labelKey: 'modal.durationOptions.1w', days: 7  },
+  { labelKey: 'modal.durationOptions.2w', days: 14 },
+  { labelKey: 'modal.durationOptions.1m', days: 30 },
 ];
 
-const METRIC_OPTIONS: { label: string; value: ChallengeMetric }[] = [
-  { label: 'Highest PR',    value: 'highest_pr'    },
-  { label: 'Most Improved', value: 'most_improved' },
-  { label: 'Total Volume',  value: 'total_volume'  },
+const METRIC_OPTIONS: { labelKey: string; value: ChallengeMetric }[] = [
+  { labelKey: 'metric.highestPr',    value: 'highest_pr'    },
+  { labelKey: 'metric.mostImproved', value: 'most_improved' },
+  { labelKey: 'metric.totalVolume',  value: 'total_volume'  },
 ];
 
 function CreateChallengeModal({
@@ -463,6 +469,7 @@ function CreateChallengeModal({
   loading: boolean;
   errorMsg?: string | null;
 }) {
+  const { t } = useTranslation('compete');
   const [selected, setSelected] = useState<FriendProfile | null>(null);
   const [query,    setQuery]    = useState('');
   const [exercise, setExercise] = useState(exercises[0]?.key ?? 'bench');
@@ -492,7 +499,7 @@ function CreateChallengeModal({
       <View style={mStyles.overlay}>
         <View style={mStyles.sheet}>
           <View style={mStyles.header}>
-            <Text style={mStyles.title}>{'CHALLENGE'}</Text>
+            <Text style={mStyles.title}>{t('modal.title')}</Text>
             <Pressable onPress={onClose} style={mStyles.closeBtn}>
               <X size={18} strokeWidth={2} color="#fff" />
             </Pressable>
@@ -501,7 +508,7 @@ function CreateChallengeModal({
           <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
 
             {/* ── Friend picker ────────────────────────────── */}
-            <Text style={mStyles.label}>CHALLENGE</Text>
+            <Text style={mStyles.label}>{t('modal.challengeLabel')}</Text>
 
             {selected ? (
               <View style={mStyles.selectedRow}>
@@ -514,7 +521,7 @@ function CreateChallengeModal({
                   {selected.full_name ?? selected.username}
                 </Text>
                 <Pressable onPress={() => setSelected(null)} style={mStyles.changeBtn}>
-                  <Text style={mStyles.changeBtnText}>CHANGE</Text>
+                  <Text style={mStyles.changeBtnText}>{t('modal.change')}</Text>
                 </Pressable>
               </View>
             ) : (
@@ -524,7 +531,7 @@ function CreateChallengeModal({
                   <TextInput
                     value={query}
                     onChangeText={setQuery}
-                    placeholder="Search friends..."
+                    placeholder={t('modal.searchFriendsPlaceholder')}
                     placeholderTextColor="#555"
                     style={mStyles.searchInput}
                     autoCapitalize="none"
@@ -533,13 +540,13 @@ function CreateChallengeModal({
                 </View>
 
                 {friends.length === 0 ? (
-                  <Text style={mStyles.noFriendsText}>{"Add friends first to challenge them"}</Text>
+                  <Text style={mStyles.noFriendsText}>{t('modal.noFriends')}</Text>
                 ) : filtered.length === 0 ? (
-                  <Text style={mStyles.noFriendsText}>{"No matching friends"}</Text>
+                  <Text style={mStyles.noFriendsText}>{t('modal.noMatchingFriends')}</Text>
                 ) : (
                   <View style={mStyles.friendList}>
                     {filtered.map((f, i) => {
-                      const name = f.full_name ?? f.username ?? 'Friend';
+                      const name = f.full_name ?? f.username ?? t('modal.friend');
                       return (
                         <Pressable
                           key={f.id}
@@ -569,7 +576,7 @@ function CreateChallengeModal({
             <View style={{ height: 20 }} />
 
             {/* ── Exercise ─────────────────────────────────── */}
-            <Text style={mStyles.label}>EXERCISE</Text>
+            <Text style={mStyles.label}>{t('modal.exercise')}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
               <View style={{ flexDirection: 'row', gap: 6, paddingBottom: 4 }}>
                 {exercises.map(ex => (
@@ -587,7 +594,7 @@ function CreateChallengeModal({
             </ScrollView>
 
             {/* ── Metric ───────────────────────────────────── */}
-            <Text style={mStyles.label}>METRIC</Text>
+            <Text style={mStyles.label}>{t('modal.metric')}</Text>
             <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
               {METRIC_OPTIONS.map(opt => (
                 <Pressable
@@ -596,14 +603,14 @@ function CreateChallengeModal({
                   style={[mStyles.chip, { flex: 1 }, metric === opt.value && mStyles.chipActive]}
                 >
                   <Text style={[mStyles.chipLabel, metric === opt.value && mStyles.chipLabelActive]}>
-                    {opt.label.toUpperCase()}
+                    {t(opt.labelKey).toUpperCase()}
                   </Text>
                 </Pressable>
               ))}
             </View>
 
             {/* ── Duration ─────────────────────────────────── */}
-            <Text style={mStyles.label}>DURATION</Text>
+            <Text style={mStyles.label}>{t('modal.duration')}</Text>
             <View style={{ flexDirection: 'row', gap: 8, marginBottom: 28 }}>
               {DURATION_OPTIONS.map(opt => (
                 <Pressable
@@ -612,7 +619,7 @@ function CreateChallengeModal({
                   style={[mStyles.chip, { flex: 1 }, duration === opt.days && mStyles.chipActive]}
                 >
                   <Text style={[mStyles.chipLabel, duration === opt.days && mStyles.chipLabelActive]}>
-                    {opt.label.toUpperCase()}
+                    {t(opt.labelKey).toUpperCase()}
                   </Text>
                 </Pressable>
               ))}
@@ -640,7 +647,7 @@ function CreateChallengeModal({
               >
                 {loading
                   ? <ActivityIndicator size="small" color="#fff" />
-                  : <><Zap size={16} strokeWidth={2} color="#fff" /><Text style={mStyles.sendBtnText}>SEND CHALLENGE</Text></>
+                  : <><Zap size={16} strokeWidth={2} color="#fff" /><Text style={mStyles.sendBtnText}>{t('modal.sendChallenge')}</Text></>
                 }
               </LinearGradient>
             </Pressable>
@@ -655,6 +662,7 @@ function CreateChallengeModal({
 // ─── Challenges Content ───────────────────────────────────────────────────────
 
 function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) {
+  const { t } = useTranslation('compete');
   const { user }    = useAuthStore();
   const {
     challenges,
@@ -758,13 +766,13 @@ function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) 
     return (
       <View style={[gStyles.errorCard, { marginTop: 24 }]}>
         <AlertCircle size={22} strokeWidth={1.6} color={Colors.accent} />
-        <Text style={gStyles.errorText}>{"Could not load challenges"}</Text>
+        <Text style={gStyles.errorText}>{t('challenges.loadError')}</Text>
         <Pressable
           onPress={() => user?.id && loadChallenges(user.id)}
           style={gStyles.retryBtn}
         >
           <RefreshCw size={13} strokeWidth={2} color="#fff" />
-          <Text style={gStyles.retryText}>RETRY</Text>
+          <Text style={gStyles.retryText}>{t('challenges.retry')}</Text>
         </Pressable>
       </View>
     );
@@ -777,7 +785,7 @@ function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) 
       {/* ── Pending Invitations ─────────────────────────────────────── */}
       {(pendingInvitations.length > 0 || loadingInvitations) && (
         <>
-          <Text style={cStyles.sectionLabel}>PENDING INVITATIONS</Text>
+          <Text style={cStyles.sectionLabel}>{t('challenges.pendingInvitations')}</Text>
           {loadingInvitations ? (
             <ActivityIndicator color={Colors.accent} style={{ marginBottom: 16 }} />
           ) : (
@@ -797,7 +805,7 @@ function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) 
       {/* ── Admin / Global Challenges ───────────────────────────────── */}
       {adminChallenges.length > 0 && (
         <>
-          <Text style={cStyles.sectionLabel}>ACTIVE CHALLENGES</Text>
+          <Text style={cStyles.sectionLabel}>{t('challenges.activeChallenges')}</Text>
           {adminChallenges.map(ch => (
             <ChallengeCard
               key={ch.id}
@@ -815,7 +823,7 @@ function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) 
       {/* ── Friend Challenges ───────────────────────────────────────── */}
       {friendChallenges.length > 0 && (
         <>
-          <Text style={cStyles.sectionLabel}>FRIEND CHALLENGES</Text>
+          <Text style={cStyles.sectionLabel}>{t('challenges.friendChallenges')}</Text>
           {friendChallenges.map(ch => (
             <ChallengeCard
               key={ch.id}
@@ -834,10 +842,8 @@ function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) 
       {!loadingChallenges && challenges.length === 0 && (
         <View style={[gStyles.emptyCard, { marginTop: 0 }]}>
           <Zap size={32} strokeWidth={1.4} color="#333" />
-          <Text style={gStyles.emptyTitle}>NO ACTIVE CHALLENGES</Text>
-          <Text style={gStyles.emptySub}>
-            {"Check back soon — or challenge a friend below!"}
-          </Text>
+          <Text style={gStyles.emptyTitle}>{t('challenges.emptyTitle')}</Text>
+          <Text style={gStyles.emptySub}>{t('challenges.emptySub')}</Text>
         </View>
       )}
 
@@ -845,9 +851,9 @@ function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) 
       <View style={[cStyles.card, { borderColor: '#2a2a2a', marginTop: 4 }]}>
         <View style={cStyles.friendHeader}>
           <Swords size={17} strokeWidth={1.6} color={Colors.accent} />
-          <Text style={cStyles.friendTitle}>CHALLENGE A FRIEND</Text>
+          <Text style={cStyles.friendTitle}>{t('challenges.challengeFriendTitle')}</Text>
         </View>
-        <Text style={cStyles.friendSubtitle}>{"Pick a friend and set the terms"}</Text>
+        <Text style={cStyles.friendSubtitle}>{t('challenges.challengeFriendSub')}</Text>
 
         {friends.length > 0 && (
           <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
@@ -861,7 +867,7 @@ function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) 
             ))}
             {friends.length > 6 && (
               <View style={cStyles.moreCount}>
-                <Text style={cStyles.moreCountText}>{'+' + (friends.length - 6)}</Text>
+                <Text style={cStyles.moreCountText}>{t('challenges.moreCount', { count: friends.length - 6 })}</Text>
               </View>
             )}
           </View>
@@ -883,7 +889,7 @@ function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) 
           >
             <Swords size={14} strokeWidth={1.8} color={Colors.accent} />
             <Text style={cStyles.challengeFriendBtnText}>
-              {friends.length === 0 ? 'ADD FRIENDS FIRST' : 'CHALLENGE A FRIEND'}
+              {friends.length === 0 ? t('challenges.addFriendsFirst') : t('challenges.challengeFriendBtn')}
             </Text>
           </LinearGradient>
         </Pressable>
@@ -905,9 +911,9 @@ function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) 
 // ─── Global Leaderboard Content ───────────────────────────────────────────────
 
 const GLOBAL_STAT_BOXES = [
-  { key: 'bench_pr'    as const, label: 'BENCH', Icon: Dumbbell },
-  { key: 'squat_pr'    as const, label: 'SQUAT', Icon: Activity },
-  { key: 'deadlift_pr' as const, label: 'DEAD',  Icon: Target   },
+  { key: 'bench_pr'    as const, labelKey: 'global.statBench', Icon: Dumbbell },
+  { key: 'squat_pr'    as const, labelKey: 'global.statSquat', Icon: Activity },
+  { key: 'deadlift_pr' as const, labelKey: 'global.statDead',  Icon: Target   },
 ] as const;
 
 /** Skeleton placeholder rendered while the first page is loading. */
@@ -940,8 +946,9 @@ function GlobalEntryCard({
   entry: GlobalLeaderboardEntry;
   maxTotal: number;
 }) {
+  const { t } = useTranslation('compete');
   const { is_me: isMe, rank } = entry;
-  const displayName = entry.full_name ?? entry.username ?? 'Unknown';
+  const displayName = entry.full_name ?? entry.username ?? t('unknown');
   const total       = entry.total_kg;
   const safeDenom   = maxTotal > 0 ? maxTotal : 1;
   const pct         = `${Math.round((total / safeDenom) * 100)}%` as `${number}%`;
@@ -968,16 +975,16 @@ function GlobalEntryCard({
               {displayName.toUpperCase()}
             </Text>
             {!!flag && <Text style={gStyles.flagText}>{flag}</Text>}
-            {isMe && <Text style={gStyles.youTag}>YOU</Text>}
+            {isMe && <Text style={gStyles.youTag}>{t('you')}</Text>}
           </View>
           <Text style={[gStyles.sub, isMe && gStyles.subMe]} numberOfLines={1}>
-            {entry.username ? `${entry.username} · ` : ''}LVL {entry.level}
+            {entry.username ? `${entry.username} · ` : ''}{t('lvl', { level: entry.level })}
           </Text>
         </View>
 
         <View style={gStyles.totalBox}>
-          <Text style={[gStyles.totalVal, { color: totalColor }]}>{total}</Text>
-          <Text style={[gStyles.totalLabel, isMe && gStyles.totalLabelMe]}>TOTAL KG</Text>
+          <Text style={[gStyles.totalVal, { color: totalColor }]}>{formatNumber(total)}</Text>
+          <Text style={[gStyles.totalLabel, isMe && gStyles.totalLabelMe]}>{t('global.totalKg')}</Text>
         </View>
       </View>
 
@@ -988,9 +995,9 @@ function GlobalEntryCard({
             <View key={s.key} style={[gStyles.statBox, isMe && gStyles.statBoxMe]}>
               <StatIcon size={12} strokeWidth={1.8} color={isMe ? '#888' : '#555'} />
               <Text style={[gStyles.statVal, isMe && gStyles.statValMe]}>
-                {entry[s.key] > 0 ? entry[s.key] : '–'}
+                {entry[s.key] > 0 ? formatNumber(entry[s.key]) : '–'}
               </Text>
-              <Text style={[gStyles.statLabel, isMe && gStyles.statLabelMe]}>{s.label}</Text>
+              <Text style={[gStyles.statLabel, isMe && gStyles.statLabelMe]}>{t(s.labelKey)}</Text>
             </View>
           );
         })}
@@ -1013,6 +1020,7 @@ function GlobalEntryCard({
 }
 
 function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: () => void }) {
+  const { t } = useTranslation('compete');
   const { user } = useAuthStore();
   const {
     globalEntries,
@@ -1081,7 +1089,7 @@ function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: () => vo
         <TextInput
           value={search}
           onChangeText={handleSearch}
-          placeholder="Search by name or @username..."
+          placeholder={t('global.searchPlaceholder')}
           placeholderTextColor="#555"
           style={gStyles.searchInput}
           returnKeyType="search"
@@ -1101,10 +1109,10 @@ function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: () => vo
       {!!globalError && !loadingGlobal && (
         <View style={gStyles.errorCard}>
           <AlertCircle size={22} strokeWidth={1.6} color="#e63030" />
-          <Text style={gStyles.errorText}>{"Could not load leaderboard"}</Text>
+          <Text style={gStyles.errorText}>{t('global.loadError')}</Text>
           <Pressable onPress={handleRefresh} style={gStyles.retryBtn}>
             <RefreshCw size={13} strokeWidth={2} color="#fff" />
-            <Text style={gStyles.retryText}>RETRY</Text>
+            <Text style={gStyles.retryText}>{t('global.retry')}</Text>
           </Pressable>
         </View>
       )}
@@ -1119,7 +1127,7 @@ function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: () => vo
       {/* Pinned "Your Rank" card — shown when user is outside the visible page */}
       {!isFirstLoad && showPinnedRank && (
         <View style={gStyles.pinnedWrap}>
-          <Text style={gStyles.pinnedLabel}>YOUR GLOBAL RANK</Text>
+          <Text style={gStyles.pinnedLabel}>{t('global.yourGlobalRank')}</Text>
           <GlobalEntryCard entry={myGlobalRank!} maxTotal={maxTotal} />
         </View>
       )}
@@ -1128,10 +1136,8 @@ function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: () => vo
       {!isFirstLoad && !myGlobalRank && !loadingMyRank && !search && (
         <View style={gStyles.unrankedCard}>
           <Trophy size={26} strokeWidth={1.4} color="#333" />
-          <Text style={gStyles.unrankedTitle}>{"YOU'RE UNRANKED"}</Text>
-          <Text style={gStyles.unrankedSub}>
-            {"Log a Bench, Squat, and Deadlift PR to join the global leaderboard"}
-          </Text>
+          <Text style={gStyles.unrankedTitle}>{t('global.unrankedTitle')}</Text>
+          <Text style={gStyles.unrankedSub}>{t('global.unrankedSub')}</Text>
         </View>
       )}
 
@@ -1144,8 +1150,8 @@ function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: () => vo
       {!isFirstLoad && !loadingGlobal && !globalError && globalEntries.length === 0 && !!search && (
         <View style={gStyles.emptyCard}>
           <Search size={32} strokeWidth={1.4} color="#555" />
-          <Text style={gStyles.emptyTitle}>NO RESULTS</Text>
-          <Text style={gStyles.emptySub}>{"Try a different name or username"}</Text>
+          <Text style={gStyles.emptyTitle}>{t('global.noResultsTitle')}</Text>
+          <Text style={gStyles.emptySub}>{t('global.noResultsSub')}</Text>
         </View>
       )}
 
@@ -1153,8 +1159,8 @@ function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: () => vo
       {!isFirstLoad && !loadingGlobal && !globalError && globalEntries.length === 0 && !search && (
         <View style={gStyles.emptyCard}>
           <Trophy size={32} strokeWidth={1.4} color="#555" />
-          <Text style={gStyles.emptyTitle}>NO ATHLETES YET</Text>
-          <Text style={gStyles.emptySub}>{"Be the first to log a Bench, Squat, and Deadlift PR!"}</Text>
+          <Text style={gStyles.emptyTitle}>{t('global.noAthletesTitle')}</Text>
+          <Text style={gStyles.emptySub}>{t('global.noAthletesSub')}</Text>
         </View>
       )}
 
@@ -1164,7 +1170,7 @@ function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: () => vo
           {loadingGlobal ? (
             <ActivityIndicator size="small" color={Colors.accent} />
           ) : (
-            <Text style={gStyles.loadMoreText}>LOAD MORE</Text>
+            <Text style={gStyles.loadMoreText}>{t('global.loadMore')}</Text>
           )}
         </Pressable>
       )}
@@ -1173,11 +1179,11 @@ function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: () => vo
       {!isFirstLoad && !globalHasMore && globalEntries.length > 0 && (
         <Pressable onPress={handleRefresh} style={gStyles.refreshBtn} disabled={loadingGlobal}>
           <RefreshCw size={13} strokeWidth={2} color="#383838" />
-          <Text style={gStyles.refreshText}>REFRESH</Text>
+          <Text style={gStyles.refreshText}>{t('global.refresh')}</Text>
         </Pressable>
       )}
 
-      <Text style={gStyles.footerNote}>{'BASED ON COMBINED BENCH · SQUAT · DEADLIFT'}</Text>
+      <Text style={gStyles.footerNote}>{t('global.footerNote')}</Text>
     </>
   );
 }
@@ -1185,6 +1191,7 @@ function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: () => vo
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function CompeteScreen() {
+  const { t } = useTranslation('compete');
   const [activeTab, setActiveTab] = useState<TabKey>('rivals');
   const scrollRef = useRef<ScrollView>(null);
   const currentTab = TABS.find(t => t.key === activeTab)!;
@@ -1195,7 +1202,7 @@ export default function CompeteScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.logo}>GYM RIVAL</Text>
-        <Text style={styles.subtitle}>{currentTab.subtitle}</Text>
+        <Text style={styles.subtitle}>{t(currentTab.subtitleKey)}</Text>
 
         <View style={styles.segmented}>
           {TABS.map(tab => {
@@ -1213,7 +1220,7 @@ export default function CompeteScreen() {
                   color={isActive ? '#000' : '#555'}
                 />
                 <Text style={[styles.segLabel, isActive && styles.segLabelActive]}>
-                  {tab.label.toUpperCase()}
+                  {t(tab.labelKey).toUpperCase()}
                 </Text>
               </Pressable>
             );

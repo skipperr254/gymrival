@@ -1,0 +1,62 @@
+{
+  "header": {
+    "brand": "GYM RIVAL",
+    "schedule": "TRAININGSPLAN",
+    "checkin": "GYM CHECK-IN",
+    "progress": "FORTSCHRITT"
+  },
+  "tabs": {
+    "schedule": "PLAN",
+    "checkin": "CHECK-IN",
+    "progress": "FORTSCHRITT"
+  },
+  "days": {
+    "full": { "0": "Montag", "1": "Dienstag", "2": "Mittwoch", "3": "Donnerstag", "4": "Freitag", "5": "Samstag", "6": "Sonntag" },
+    "short": { "0": "Mo", "1": "Di", "2": "Mi", "3": "Do", "4": "Fr", "5": "Sa", "6": "So" }
+  },
+  "flexible": "Flexibel",
+  "workoutsPlanned_one": "{{count}} WORKOUT GEPLANT",
+  "workoutsPlanned_other": "{{count}} WORKOUTS GEPLANT",
+  "new": "NEU",
+  "workoutMeta": "{{day}} · {{count}} Übungen",
+  "emptyTitle": "NOCH KEINE PLÄNE",
+  "emptySubtitle": "Tippe oben auf NEU, um dein erstes Workout zu erstellen",
+  "detailMeta": "{{day}} · {{count}} ÜBUNGEN",
+  "progressLabel": "FORTSCHRITT",
+  "setsProgress": "{{done}} / {{total}} SÄTZE",
+  "exerciseMeta": "{{sets}} Sätze · {{reps}} Wdh.",
+  "exerciseMetaWithWeight": "{{sets}} Sätze · {{reps}} Wdh. · {{weight}}kg",
+  "setNumber": "SATZ {{n}}",
+  "startWorkout": "WORKOUT STARTEN",
+  "workoutDone": "WORKOUT GESCHAFFT!",
+  "workoutDoneSub": "Alle Sätze abgeschlossen. Gute Arbeit!",
+  "backToSchedule": "ZURÜCK ZUM PLAN",
+  "cancelWorkout": "WORKOUT ABBRECHEN",
+  "createSchedule": "PLAN ERSTELLEN",
+  "workoutName": "WORKOUT-NAME",
+  "workoutNamePlaceholder": "Z. B. Push Day",
+  "day": "TAG",
+  "addExercise": "ÜBUNG HINZUFÜGEN",
+  "exerciseNamePlaceholder": "Name der Übung",
+  "fields": { "sets": "SÄTZE", "reps": "WDH.", "weight": "KG" },
+  "exercisesAdded_one": "{{count}} ÜBUNG HINZUGEFÜGT",
+  "exercisesAdded_other": "{{count}} ÜBUNGEN HINZUGEFÜGT",
+  "saveSchedule": "PLAN SPEICHERN",
+  "checkin": {
+    "weeklyStreak": "WÖCHENTLICHE SERIE",
+    "ofSevenDays": "/ 7 Tage",
+    "machine": "MASCHINE!",
+    "keepItUp": "WEITER SO",
+    "stayStrong": "BLEIB STARK",
+    "checkInNow": "JETZT EINCHECKEN",
+    "noGyms": "Keine Studios verfügbar.",
+    "hereToday": "{{count}} heute hier",
+    "confirmCheckIn": "CHECK-IN BESTÄTIGEN",
+    "checkedIn": "EINGECHECKT!",
+    "yourGym": "Dein Studio",
+    "xpEarned": "+25 XP ERHALTEN",
+    "undoCheckIn": "CHECK-IN RÜCKGÄNGIG MACHEN",
+    "friendsCheckedIn": "FREUNDE EINGECHECKT",
+    "unknown": "Unbekannt"
+  }
+}

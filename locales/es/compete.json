@@ -1,0 +1,108 @@
+{
+  "tabs": {
+    "rivals": { "label": "Rivales", "subtitle": "RIVALES" },
+    "challenges": { "label": "Retos", "subtitle": "RETOS" },
+    "global": { "label": "Global", "subtitle": "CLASIFICACIÓN GLOBAL" }
+  },
+  "you": "TÚ",
+  "unknown": "Desconocido",
+  "youSuffix": " (Tú)",
+  "lvl": "NV {{level}}",
+  "metric": {
+    "highestPr": "PR Más Alto",
+    "mostImproved": "Más Mejorado",
+    "totalVolume": "Volumen Total"
+  },
+  "endsIn": {
+    "ended": "Finalizado",
+    "days": "quedan {{count}}d",
+    "hours": "quedan {{count}}h",
+    "minutes": "quedan {{count}}m"
+  },
+  "rivals": {
+    "emptyTitle": "AÚN SIN RIVALES",
+    "emptySub": "Añade amigos para competir en la clasificación",
+    "footerNote": "BASADO EN RÉCORDS PERSONALES"
+  },
+  "card": {
+    "joined": "{{count}} inscritos",
+    "yourRank": "Tu puesto: #{{rank}}",
+    "joinedBtn": "UNIDO",
+    "joinBtn": "UNIRSE",
+    "viewAll": "VER TODO"
+  },
+  "invitation": {
+    "defaultTitle": "Invitación a Reto",
+    "someone": "Alguien",
+    "challengedYou": "{{name}} te ha retado",
+    "accept": "ACEPTAR",
+    "decline": "RECHAZAR"
+  },
+  "modal": {
+    "title": "RETO",
+    "challengeLabel": "RETAR",
+    "change": "CAMBIAR",
+    "searchFriendsPlaceholder": "Buscar amigos...",
+    "noFriends": "Añade amigos primero para retarlos",
+    "noMatchingFriends": "No hay amigos coincidentes",
+    "friend": "Amigo",
+    "exercise": "EJERCICIO",
+    "metric": "MÉTRICA",
+    "duration": "DURACIÓN",
+    "sendChallenge": "ENVIAR RETO",
+    "durationOptions": {
+      "3d": "3 Días",
+      "1w": "1 Semana",
+      "2w": "2 Semanas",
+      "1m": "1 Mes"
+    }
+  },
+  "challenges": {
+    "loadError": "No se pudieron cargar los retos",
+    "retry": "REINTENTAR",
+    "pendingInvitations": "INVITACIONES PENDIENTES",
+    "activeChallenges": "RETOS ACTIVOS",
+    "friendChallenges": "RETOS DE AMIGOS",
+    "emptyTitle": "SIN RETOS ACTIVOS",
+    "emptySub": "Vuelve pronto — ¡o reta a un amigo abajo!",
+    "challengeFriendTitle": "RETAR A UN AMIGO",
+    "challengeFriendSub": "Elige un amigo y define las condiciones",
+    "moreCount": "+{{count}}",
+    "addFriendsFirst": "AÑADE AMIGOS PRIMERO",
+    "challengeFriendBtn": "RETAR A UN AMIGO"
+  },
+  "global": {
+    "statBench": "BANCA",
+    "statSquat": "SENT.",
+    "statDead": "PESO M.",
+    "totalKg": "TOTAL KG",
+    "searchPlaceholder": "Busca por nombre o @usuario...",
+    "loadError": "No se pudo cargar la clasificación",
+    "retry": "REINTENTAR",
+    "yourGlobalRank": "TU CLASIFICACIÓN GLOBAL",
+    "unrankedTitle": "SIN CLASIFICAR",
+    "unrankedSub": "Registra un PR de press de banca, sentadilla y peso muerto para entrar en la clasificación global",
+    "noResultsTitle": "SIN RESULTADOS",
+    "noResultsSub": "Prueba con otro nombre o nombre de usuario",
+    "noAthletesTitle": "AÚN SIN ATLETAS",
+    "noAthletesSub": "¡Sé el primero en registrar un PR de press de banca, sentadilla y peso muerto!",
+    "loadMore": "CARGAR MÁS",
+    "refresh": "ACTUALIZAR",
+    "footerNote": "BASADO EN PRESS DE BANCA · SENTADILLA · PESO MUERTO COMBINADOS"
+  },
+  "detail": {
+    "heading": "RETO",
+    "notFound": "Reto no encontrado",
+    "endsIn": "TERMINA EN",
+    "participants": "PARTICIPANTES",
+    "xpReward": "RECOMPENSA XP",
+    "prize": "PREMIO",
+    "leaderboard": "CLASIFICACIÓN",
+    "noParticipants": "Aún sin participantes",
+    "beFirst": "¡Sé el primero en unirte!",
+    "refresh": "ACTUALIZAR",
+    "joinedTapToLeave": "UNIDO — TOCA PARA SALIR",
+    "joinChallenge": "UNIRSE AL RETO",
+    "challengeEnded": "RETO FINALIZADO"
+  }
+}

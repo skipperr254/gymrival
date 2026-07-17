@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { Colors } from "@/constants/theme";
 import { Routes } from "@/constants/routes";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -24,6 +25,7 @@ function normaliseUsername(raw: string) {
 }
 
 export default function SetupScreen() {
+  const { t } = useTranslation("auth");
   const [username, setUsername] = useState("");
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
@@ -58,7 +60,7 @@ export default function SetupScreen() {
 
     if (error) {
       if (error.toLowerCase().includes("unique") || error.toLowerCase().includes("duplicate")) {
-        setError("That username is taken. Try another.");
+        setError(t("setup.usernameTaken"));
       } else {
         setError(error);
       }
@@ -90,10 +92,10 @@ export default function SetupScreen() {
           {/* Header */}
           <View className="mb-8">
             <Text className="font-heading text-[46px] text-primary tracking-[2px] leading-[50px]">
-              ALMOST{"\n"}THERE
+              {t("setup.title")}
             </Text>
             <Text className="font-sans text-[15px] text-secondary mt-3 leading-[22px]">
-              Choose your username — this is how your rivals will know you.
+              {t("setup.subtitle")}
             </Text>
           </View>
 
@@ -102,7 +104,7 @@ export default function SetupScreen() {
             {/* Username */}
             <View>
               <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-                Username <Text className="text-accent">*</Text>
+                {t("setup.usernameLabel")} <Text className="text-accent">*</Text>
               </Text>
               <View
                 className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
@@ -115,7 +117,7 @@ export default function SetupScreen() {
                 <TextInput
                   value={username}
                   onChangeText={handleUsernameChange}
-                  placeholder="yourhandle"
+                  placeholder={t("setup.usernamePlaceholder")}
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
                   style={styles.input}
@@ -126,7 +128,7 @@ export default function SetupScreen() {
                 />
               </View>
               <Text className="font-sans text-[12px] text-muted mt-1.5 ml-1">
-                3–20 characters. Letters, numbers, underscores only.
+                {t("setup.usernameHint")}
               </Text>
             </View>
 
@@ -134,9 +136,9 @@ export default function SetupScreen() {
             <View className="flex-row gap-3">
               <View className="flex-1">
                 <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-                  Height{" "}
+                  {t("setup.heightLabel")}{" "}
                   <Text className="text-muted normal-case" style={{ fontSize: 11 }}>
-                    (cm, optional)
+                    {t("setup.heightOptional")}
                   </Text>
                 </Text>
                 <View
@@ -145,8 +147,8 @@ export default function SetupScreen() {
                 >
                   <TextInput
                     value={height}
-                    onChangeText={(t) => setHeight(t.replace(/[^0-9.]/g, ""))}
-                    placeholder="175"
+                    onChangeText={(v) => setHeight(v.replace(/[^0-9.]/g, ""))}
+                    placeholder={t("setup.heightPlaceholder")}
                     placeholderTextColor={Colors.hint}
                     selectionColor={Colors.accent}
                     style={styles.input}
@@ -160,9 +162,9 @@ export default function SetupScreen() {
 
               <View className="flex-1">
                 <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-                  Weight{" "}
+                  {t("setup.weightLabel")}{" "}
                   <Text className="text-muted normal-case" style={{ fontSize: 11 }}>
-                    (kg, optional)
+                    {t("setup.weightOptional")}
                   </Text>
                 </Text>
                 <View
@@ -171,8 +173,8 @@ export default function SetupScreen() {
                 >
                   <TextInput
                     value={weight}
-                    onChangeText={(t) => setWeight(t.replace(/[^0-9.]/g, ""))}
-                    placeholder="80"
+                    onChangeText={(v) => setWeight(v.replace(/[^0-9.]/g, ""))}
+                    placeholder={t("setup.weightPlaceholder")}
                     placeholderTextColor={Colors.hint}
                     selectionColor={Colors.accent}
                     style={styles.input}
@@ -210,7 +212,7 @@ export default function SetupScreen() {
                 className="font-heading text-xl text-primary tracking-[3px]"
                 style={!canSubmit ? { opacity: 0.4 } : undefined}
               >
-                {"LET'S GO"}
+                {t("setup.submit")}
               </Text>
             )}
           </Pressable>
@@ -225,7 +227,7 @@ export default function SetupScreen() {
             }}
           >
             <Text className="font-sans text-[13px] text-muted">
-              Skip for now
+              {t("setup.skip")}
             </Text>
           </Pressable>
         </ScrollView>

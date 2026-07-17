@@ -59,7 +59,8 @@
           "microphonePermission": "Allow GymRival to use your microphone to record video with audio."
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true

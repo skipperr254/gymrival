@@ -14,12 +14,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { Avatar } from '@/components/ui/Avatar';
 
 export default function EditProfileScreen() {
+  const { t } = useTranslation('profile');
   const { user } = useAuthStore();
   const { profile, saving, updateProfile } = useProfileStore();
 
@@ -47,11 +49,11 @@ export default function EditProfileScreen() {
     const height = form.height_cm !== '' ? Number(form.height_cm) : null;
 
     if (form.weight_kg !== '' && (isNaN(weight!) || weight! <= 0)) {
-      Alert.alert('Invalid weight', 'Please enter a valid weight in kg.');
+      Alert.alert(t('edit.invalidWeightTitle'), t('edit.invalidWeightMsg'));
       return;
     }
     if (form.height_cm !== '' && (isNaN(height!) || height! <= 0)) {
-      Alert.alert('Invalid height', 'Please enter a valid height in cm.');
+      Alert.alert(t('edit.invalidHeightTitle'), t('edit.invalidHeightMsg'));
       return;
     }
 
@@ -67,7 +69,7 @@ export default function EditProfileScreen() {
     });
 
     if (error) {
-      Alert.alert('Could not save', error);
+      Alert.alert(t('edit.saveErrorTitle'), error);
     } else {
       router.back();
     }
@@ -83,7 +85,7 @@ export default function EditProfileScreen() {
         >
           <Ionicons name="arrow-back" size={22} color={Colors.accent} />
         </Pressable>
-        <Text style={styles.heading}>EDIT PROFILE</Text>
+        <Text style={styles.heading}>{t('edit.title')}</Text>
         <View style={styles.spacer} />
       </View>
 
@@ -106,54 +108,54 @@ export default function EditProfileScreen() {
 
           {/* Fields */}
           <Field
-            label="FULL NAME"
-            placeholder="Your name"
+            label={t('edit.fullName')}
+            placeholder={t('edit.fullNamePlaceholder')}
             value={form.full_name}
             onChangeText={(v) => set('full_name', v)}
           />
           <Field
-            label="USERNAME"
-            placeholder="@username"
+            label={t('edit.username')}
+            placeholder={t('edit.usernamePlaceholder')}
             value={form.username}
             onChangeText={(v) => set('username', v)}
             autoCapitalize="none"
           />
           <Field
-            label="BIO"
-            placeholder="Tell your story..."
+            label={t('edit.bio')}
+            placeholder={t('edit.bioPlaceholder')}
             value={form.bio}
             onChangeText={(v) => set('bio', v)}
             multiline
           />
           <Field
-            label="YOUR MOTTO"
-            placeholder="E.g. No pain, no gain"
+            label={t('edit.motto')}
+            placeholder={t('edit.mottoPlaceholder')}
             value={form.quote}
             onChangeText={(v) => set('quote', v)}
           />
           <Field
-            label="GYM"
-            placeholder="Your gym"
+            label={t('edit.gym')}
+            placeholder={t('edit.gymPlaceholder')}
             value={form.gym}
             onChangeText={(v) => set('gym', v)}
           />
           <Field
-            label="WEIGHT (kg)"
+            label={t('edit.weight')}
             placeholder="76"
             value={form.weight_kg}
             onChangeText={(v) => set('weight_kg', v)}
             keyboardType="decimal-pad"
           />
           <Field
-            label="HEIGHT (cm)"
+            label={t('edit.height')}
             placeholder="182"
             value={form.height_cm}
             onChangeText={(v) => set('height_cm', v)}
             keyboardType="decimal-pad"
           />
           <Field
-            label="GOAL"
-            placeholder="E.g. Muscle gain"
+            label={t('edit.goal')}
+            placeholder={t('edit.goalPlaceholder')}
             value={form.goal}
             onChangeText={(v) => set('goal', v)}
           />
@@ -166,7 +168,7 @@ export default function EditProfileScreen() {
             {saving ? (
               <ActivityIndicator color={Colors.primary} />
             ) : (
-              <Text style={styles.saveBtnText}>SAVE CHANGES</Text>
+              <Text style={styles.saveBtnText}>{t('edit.save')}</Text>
             )}
           </Pressable>
         </ScrollView>

@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { TabActions } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts } from '@/constants/theme';
 import { useNotificationStore } from '@/store/useNotificationStore';
 
@@ -12,21 +13,29 @@ interface Props extends BottomTabBarProps {
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
-const TAB_CONFIG: Record<string, { label: string; active: IoniconName; inactive: IoniconName }> = {
-  compete: { label: 'COMPETE', active: 'trophy', inactive: 'trophy-outline' },
-  social: { label: 'SOCIAL', active: 'people', inactive: 'people-outline' },
-  train: { label: 'TRAIN', active: 'barbell', inactive: 'barbell-outline' },
-  profile: { label: 'PROFILE', active: 'person', inactive: 'person-outline' },
+const TAB_ICONS: Record<string, { active: IoniconName; inactive: IoniconName }> = {
+  compete: { active: 'trophy', inactive: 'trophy-outline' },
+  social: { active: 'people', inactive: 'people-outline' },
+  train: { active: 'barbell', inactive: 'barbell-outline' },
+  profile: { active: 'person', inactive: 'person-outline' },
 };
 
 export function CustomTabBar({ state, navigation, onLogPress }: Props) {
+  const { t } = useTranslation('common');
   const insets = useSafeAreaInsets();
   const unreadCount = useNotificationStore((s) => s.unreadCount);
+  const tabLabels: Record<string, string> = {
+    compete: t('tabs.compete'),
+    social: t('tabs.social'),
+    train: t('tabs.train'),
+    profile: t('tabs.profile'),
+  };
 
   const renderTab = (route: (typeof state.routes)[0], globalIndex: number) => {
     const isFocused = state.index === globalIndex;
-    const config = TAB_CONFIG[route.name];
-    if (!config) return null;
+    const icons = TAB_ICONS[route.name];
+    if (!icons) return null;
+    const label = tabLabels[route.name].toUpperCase();
 
     const onPress = () => {
       const event = navigation.emit({
@@ -48,18 +57,18 @@ export function CustomTabBar({ state, navigation, onLogPress }: Props) {
         style={({ pressed }) => [styles.tab, pressed && styles.tabPressed]}
         accessibilityRole="button"
         accessibilityState={isFocused ? { selected: true } : {}}
-        accessibilityLabel={config.label}
+        accessibilityLabel={label}
       >
         <View style={styles.iconWrap}>
           <Ionicons
-            name={isFocused ? config.active : config.inactive}
+            name={isFocused ? icons.active : icons.inactive}
             size={22}
             color={isFocused ? Colors.primary : Colors.muted}
           />
           {showBadge && <View style={styles.tabBadge} />}
         </View>
         <Text style={[styles.label, isFocused && styles.labelActive]}>
-          {config.label}
+          {label}
         </Text>
         {isFocused && <View style={styles.dot} />}
       </Pressable>
@@ -77,7 +86,7 @@ export function CustomTabBar({ state, navigation, onLogPress }: Props) {
         onPress={onLogPress}
         style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}
         accessibilityRole="button"
-        accessibilityLabel="Log activity"
+        accessibilityLabel={t('accessibility.logActivity')}
       >
         <Ionicons name="add" size={28} color={Colors.primary} />
       </Pressable>

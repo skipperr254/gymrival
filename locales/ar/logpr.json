@@ -1,0 +1,47 @@
+{
+  "logSheet": {
+    "title": "تسجيل نشاط",
+    "logPr": { "label": "تسجيل رقم قياسي", "sub": "سجّل رقماً قياسياً شخصياً جديداً" },
+    "checkin": { "label": "تسجيل حضور النادي", "sub": "سجّل حضورك في ناديك الرياضي" }
+  },
+  "step": {
+    "stepOf": "الخطوة {{step}} من 2",
+    "logYourPr": "سجّل رقمك القياسي",
+    "addProof": "إضافة إثبات"
+  },
+  "selectExercise": "اختر التمرين",
+  "prWithValue": "الرقم القياسي {{value}} {{unit}}",
+  "noPrYet": "لا يوجد رقم قياسي بعد",
+  "yourNewPr": "رقمك القياسي الجديد",
+  "notHigherThanCurrent": "ليس أعلى من رقمك القياسي الحالي ({{value}} {{unit}})",
+  "nextAddProof": "التالي — إضافة إثبات",
+  "previousWithValue": "السابق: {{value}} {{unit}}",
+  "firstPr": "أول رقم قياسي",
+  "xpWithVideo": "+100 نقطة خبرة",
+  "xpWithoutVideo": "+50 نقطة خبرة",
+  "withVideo": "بفيديو",
+  "withoutVideo": "بدون فيديو",
+  "savePr": "حفظ الرقم القياسي — {{xp}}",
+  "removeVideoSave": "إزالة الفيديو، الحفظ مقابل +50 نقطة خبرة",
+  "prSaved": "تم حفظ الرقم القياسي!",
+  "newBest": "أفضل رقم جديد",
+  "uploadingVideoProof": "جارٍ رفع إثبات الفيديو…",
+  "videoProofSaved": "تم حفظ إثبات الفيديو",
+  "videoUploadFailed": "فشل رفع الفيديو — تم حفظ الرقم القياسي رغم ذلك",
+  "addedToLeaderboard": "أُضيف إلى لوحة المتصدرين",
+  "xpEarnedWithVideo": "+100 نقطة خبرة مكتسبة",
+  "xpEarnedWithoutVideo": "+50 نقطة خبرة مكتسبة",
+  "video": {
+    "readyLabel": "الفيديو جاهز",
+    "addProofTitle": "إضافة إثبات فيديو",
+    "addProofSub": "الكاميرا أو المكتبة · 60 ثانية كحد أقصى",
+    "permissionNeededTitle": "الإذن مطلوب",
+    "permissionLibraryMsg": "اسمح بالوصول إلى مكتبة الصور لإرفاق فيديو.",
+    "permissionCameraMsg": "اسمح بالوصول إلى الكاميرا لتسجيل رفعتك.",
+    "pickerTitle": "إضافة إثبات فيديو",
+    "pickerMsg": "سجّل رفعتك أو اختر فيديو موجوداً (60 ثانية كحد أقصى)",
+    "recordVideo": "تسجيل فيديو",
+    "chooseFromLibrary": "الاختيار من المكتبة",
+    "cancel": "إلغاء"
+  }
+}

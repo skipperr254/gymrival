@@ -1,0 +1,97 @@
+{
+  "header": {
+    "brand": "GYM RIVAL",
+    "pageLabel": "الملف الشخصي"
+  },
+  "proUpsell": "الترقية إلى برو — 4.99€/شهر",
+  "proActive": "عضو برو — اضغط للتعطيل",
+  "details": {
+    "title": "بياناتي",
+    "edit": "تعديل",
+    "gym": "النادي الرياضي",
+    "weight": "الوزن",
+    "height": "الطول",
+    "goal": "الهدف",
+    "memberSince": "عضو منذ",
+    "motto": "الشعار",
+    "notSet": "—"
+  },
+  "stats": {
+    "prs": "الأرقام القياسية",
+    "friends": "الأصدقاء",
+    "streak": "التتابع",
+    "level": "المستوى"
+  },
+  "bestPrs": "أفضل الأرقام القياسية",
+  "settings": {
+    "title": "الإعدادات",
+    "notifications": "الإشعارات",
+    "notificationsSub": "الإشعارات الفورية مفعّلة",
+    "privacy": "الخصوصية",
+    "privacySub": "الملف الشخصي مرئي للأصدقاء",
+    "darkMode": "الوضع الداكن",
+    "darkModeOn": "مفعّل",
+    "shareProfile": "مشاركة الملف الشخصي",
+    "shareProfileSub": "نسخ الرابط الخاص بك"
+  },
+  "logOut": "تسجيل الخروج",
+  "edit": {
+    "title": "تعديل الملف الشخصي",
+    "fullName": "الاسم الكامل",
+    "fullNamePlaceholder": "اسمك",
+    "username": "اسم المستخدم",
+    "usernamePlaceholder": "@اسم_المستخدم",
+    "bio": "نبذة",
+    "bioPlaceholder": "شارك قصتك...",
+    "motto": "شعارك",
+    "mottoPlaceholder": "مثال: لا ألم، لا نتيجة",
+    "gym": "النادي الرياضي",
+    "gymPlaceholder": "ناديك الرياضي",
+    "weight": "الوزن (كجم)",
+    "height": "الطول (سم)",
+    "goal": "الهدف",
+    "goalPlaceholder": "مثال: بناء العضلات",
+    "save": "حفظ التغييرات",
+    "invalidWeightTitle": "وزن غير صالح",
+    "invalidWeightMsg": "الرجاء إدخال وزن صالح بالكيلوغرام.",
+    "invalidHeightTitle": "طول غير صالح",
+    "invalidHeightMsg": "الرجاء إدخال طول صالح بالسنتيمتر.",
+    "saveErrorTitle": "تعذر الحفظ"
+  },
+  "badges": {
+    "title": "الأوسمة",
+    "earnedCount": "الأوسمة المكتسبة",
+    "earnedSection": "مكتسبة",
+    "lockedSection": "مقفلة",
+    "items": {
+      "firstPr": "أول رقم قياسي",
+      "sevenDayStreak": "تتابع 7 أيام",
+      "hundredKgBench": "بنش برس 100 كجم",
+      "topThreeBoard": "أفضل 3 في اللوحة",
+      "tenPrs": "10 أرقام قياسية",
+      "challengeWon": "فوز بتحدٍّ",
+      "videoProof": "إثبات فيديو",
+      "twoHundredKgDeadlift": "رفعة ميتة 200 كجم",
+      "thirtyDayStreak": "تتابع 30 يوماً",
+      "hundredLikes": "100 إعجاب"
+    },
+    "desc": {
+      "videoProof": "ارفع فيديو لفتح هذا الوسام",
+      "deadlift": "تبقّى 40 كجم",
+      "streak30": "تبقّى 23 يوماً",
+      "likes100": "تبقّى 67 إعجاباً"
+    }
+  },
+  "prHistory": {
+    "title": "سجل الأرقام القياسية",
+    "best": "الأفضل: {{value}} {{unit}}",
+    "emptyTitle": "لا توجد أرقام قياسية بعد",
+    "emptySub": "سجّل رقمك القياسي الأول لتبدأ بتتبّع تقدّمك"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "markAll": "تعليم الكل كمقروء",
+    "emptyTitle": "لا شيء جديد",
+    "emptySub": "ستظهر هنا الرسائل وطلبات الصداقة والإعجابات بأرقامك القياسية."
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "header": {
+    "brand": "GYM RIVAL",
+    "schedule": "PLANO DE TREINO",
+    "checkin": "CHECK-IN DE GINÁSIO",
+    "progress": "PROGRESSO"
+  },
+  "tabs": {
+    "schedule": "PLANO",
+    "checkin": "CHECK-IN",
+    "progress": "PROGRESSO"
+  },
+  "days": {
+    "full": { "0": "Segunda-feira", "1": "Terça-feira", "2": "Quarta-feira", "3": "Quinta-feira", "4": "Sexta-feira", "5": "Sábado", "6": "Domingo" },
+    "short": { "0": "Seg", "1": "Ter", "2": "Qua", "3": "Qui", "4": "Sex", "5": "Sáb", "6": "Dom" }
+  },
+  "flexible": "Flexível",
+  "workoutsPlanned_one": "{{count}} TREINO PLANEADO",
+  "workoutsPlanned_other": "{{count}} TREINOS PLANEADOS",
+  "new": "NOVO",
+  "workoutMeta": "{{day}} · {{count}} exercícios",
+  "emptyTitle": "AINDA SEM PLANOS",
+  "emptySubtitle": "Toca em NOVO acima para criares o teu primeiro treino",
+  "detailMeta": "{{day}} · {{count}} EXERCÍCIOS",
+  "progressLabel": "PROGRESSO",
+  "setsProgress": "{{done}} / {{total}} SÉRIES",
+  "exerciseMeta": "{{sets}} séries · {{reps}} reps",
+  "exerciseMetaWithWeight": "{{sets}} séries · {{reps}} reps · {{weight}}kg",
+  "setNumber": "SÉRIE {{n}}",
+  "startWorkout": "COMEÇAR TREINO",
+  "workoutDone": "TREINO CONCLUÍDO!",
+  "workoutDoneSub": "Todas as séries concluídas. Bom trabalho!",
+  "backToSchedule": "VOLTAR AO PLANO",
+  "cancelWorkout": "CANCELAR TREINO",
+  "createSchedule": "CRIAR PLANO",
+  "workoutName": "NOME DO TREINO",
+  "workoutNamePlaceholder": "Ex.: Dia de Peito",
+  "day": "DIA",
+  "addExercise": "ADICIONAR EXERCÍCIO",
+  "exerciseNamePlaceholder": "Nome do exercício",
+  "fields": { "sets": "SÉRIES", "reps": "REPS", "weight": "KG" },
+  "exercisesAdded_one": "{{count}} EXERCÍCIO ADICIONADO",
+  "exercisesAdded_other": "{{count}} EXERCÍCIOS ADICIONADOS",
+  "saveSchedule": "GUARDAR PLANO",
+  "checkin": {
+    "weeklyStreak": "SEQUÊNCIA SEMANAL",
+    "ofSevenDays": "/ 7 dias",
+    "machine": "MÁQUINA!",
+    "keepItUp": "CONTINUA ASSIM",
+    "stayStrong": "MANTÉM-TE FORTE",
+    "checkInNow": "FAZER CHECK-IN AGORA",
+    "noGyms": "Nenhum ginásio disponível.",
+    "hereToday": "{{count}} aqui hoje",
+    "confirmCheckIn": "CONFIRMAR CHECK-IN",
+    "checkedIn": "CHECK-IN FEITO!",
+    "yourGym": "O teu ginásio",
+    "xpEarned": "+25 XP GANHOS",
+    "undoCheckIn": "DESFAZER CHECK-IN",
+    "friendsCheckedIn": "AMIGOS COM CHECK-IN",
+    "unknown": "Desconhecido"
+  }
+}

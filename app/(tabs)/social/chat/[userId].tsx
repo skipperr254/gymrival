@@ -14,10 +14,12 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ChevronLeft, ArrowUp, MessageCircle } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useChatStore } from '@/store/useChatStore';
 import { fetchProfile } from '@/lib/api';
+import { formatDate, formatRelativeDay } from '@/lib/i18n/format';
 
 // ─── Avatar ───────────────────────────────────────────────────────────────────
 
@@ -85,27 +87,21 @@ function ChatAvatar({
 
 function formatDateLabel(iso: string): string {
   const date = new Date(iso);
-  const now = new Date();
-  const diffDays = Math.floor((now.getTime() - date.getTime()) / 86_400_000);
-  if (diffDays === 0) return 'TODAY';
-  if (diffDays === 1) return 'YESTERDAY';
-  if (diffDays < 7) return date.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
+  const diffDays = Math.floor((Date.now() - date.getTime()) / 86_400_000);
+  if (diffDays <= 1) return formatRelativeDay(diffDays).toUpperCase();
+  if (diffDays < 7) return formatDate(date, { weekday: 'long' }).toUpperCase();
+  return formatDate(date).toUpperCase();
 }
 
 function formatMessageTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
+  return formatDate(iso, { hour: '2-digit', minute: '2-digit', hour12: false });
 }
-
-const QUICK_REPLIES = ["Great lift!", "Let's train!", "What's your PR?", "Respect"];
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function ChatScreen() {
+  const { t } = useTranslation('social');
+  const QUICK_REPLIES = t('chat.quickReplies', { returnObjects: true }) as string[];
   const { userId: otherUserId } = useLocalSearchParams<{ userId: string }>();
   const currentUserId = useAuthStore((s) => s.user?.id ?? '');
   const { bottom: bottomInset } = useSafeAreaInsets();
@@ -243,7 +239,7 @@ export default function ChatScreen() {
 
   // ── Derived ───────────────────────────────────────────────────────────────
 
-  const displayName = otherUser?.full_name ?? otherUser?.username ?? 'Athlete';
+  const displayName = otherUser?.full_name ?? otherUser?.username ?? t('athlete');
   const online = otherUserId ? isOnline(otherUserId) : false;
 
   // ── Group messages by date ────────────────────────────────────────────────
@@ -275,8 +271,8 @@ export default function ChatScreen() {
         </View>
         <View style={styles.errorWrap}>
           <MessageCircle size={32} strokeWidth={1.4} color="#333" />
-          <Text style={styles.errorTitle}>{"CAN'T OPEN CHAT"}</Text>
-          <Text style={styles.errorSub}>Something went wrong. Try again later.</Text>
+          <Text style={styles.errorTitle}>{t('chat.cantOpen')}</Text>
+          <Text style={styles.errorSub}>{t('chat.errorSub')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -310,8 +306,8 @@ export default function ChatScreen() {
             {displayName}
           </Text>
           <Text style={[styles.headerStatus, online && styles.headerStatusOnline]}>
-            {online ? 'Online' : 'Offline'}
-            {otherUser ? `  ·  LVL ${otherUser.level}` : ''}
+            {online ? t('chat.online') : t('chat.offline')}
+            {otherUser ? `  ·  ${t('lvl', { level: otherUser.level })}` : ''}
           </Text>
         </View>
       </View>
@@ -341,7 +337,7 @@ export default function ChatScreen() {
         {/* "All caught up" hint when no more history */}
         {!hasMoreMessages && messages.length > 0 && (
           <View style={styles.historyEnd}>
-            <Text style={styles.historyEndText}>START OF CONVERSATION</Text>
+            <Text style={styles.historyEndText}>{t('chat.startOfConversation')}</Text>
           </View>
         )}
 
@@ -356,7 +352,7 @@ export default function ChatScreen() {
         {!messagesLoading && messages.length === 0 && (
           <View style={styles.emptyWrap}>
             <Text style={styles.emptyText}>
-              {`Say hello to ${displayName}!`}
+              {t('chat.sayHello', { name: displayName })}
             </Text>
           </View>
         )}
@@ -410,7 +406,7 @@ export default function ChatScreen() {
                         <Text style={styles.bubbleTime}>{formatMessageTime(msg.created_at)}</Text>
                         {isMe && (
                           <Text style={styles.readStatus}>
-                            {msg.read_at ? 'Read' : 'Sent'}
+                            {msg.read_at ? t('chat.read') : t('chat.sent')}
                           </Text>
                         )}
                       </View>
@@ -449,7 +445,7 @@ export default function ChatScreen() {
             value={input}
             onChangeText={setInput}
             onSubmitEditing={() => handleSend()}
-            placeholder={otherUser ? `Message ${displayName}...` : 'Message...'}
+            placeholder={otherUser ? t('chat.messagePlaceholder', { name: displayName }) : t('chat.messagePlaceholderGeneric')}
             placeholderTextColor={Colors.hint}
             style={styles.input}
             returnKeyType="send"

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Colors, Fonts } from '@/constants/theme';
 import type { CheckinDay } from '@/types/progress';
 
@@ -54,6 +55,7 @@ interface ConsistencyHeatmapProps {
 }
 
 export function ConsistencyHeatmap({ checkins }: ConsistencyHeatmapProps) {
+  const { t } = useTranslation('progress');
   const grid = useMemo(() => buildGrid(checkins), [checkins]);
   const totalCheckins = checkins.reduce((sum, c) => sum + c.count, 0);
 
@@ -64,13 +66,13 @@ export function ConsistencyHeatmap({ checkins }: ConsistencyHeatmapProps) {
           className="text-muted"
           style={{ fontFamily: Fonts.display, fontSize: 10, letterSpacing: 2 }}
         >
-          CONSISTENCY
+          {t('consistency')}
         </Text>
         <Text
           className="text-secondary"
           style={{ fontFamily: Fonts.body, fontSize: 11 }}
         >
-          {`${totalCheckins} check-in${totalCheckins !== 1 ? 's' : ''} in 12 weeks`}
+          {t('checkinsIn12Weeks', { count: totalCheckins })}
         </Text>
       </View>
 
@@ -109,7 +111,7 @@ export function ConsistencyHeatmap({ checkins }: ConsistencyHeatmapProps) {
 
       {/* Legend */}
       <View className="flex-row items-center justify-end gap-2 mt-3">
-        <Text style={{ fontFamily: Fonts.body, fontSize: 9, color: Colors.muted }}>Less</Text>
+        <Text style={{ fontFamily: Fonts.body, fontSize: 9, color: Colors.muted }}>{t('less')}</Text>
         {[0, 1, 2].map((lvl) => (
           <View
             key={lvl}
@@ -121,7 +123,7 @@ export function ConsistencyHeatmap({ checkins }: ConsistencyHeatmapProps) {
             }}
           />
         ))}
-        <Text style={{ fontFamily: Fonts.body, fontSize: 9, color: Colors.muted }}>More</Text>
+        <Text style={{ fontFamily: Fonts.body, fontSize: 9, color: Colors.muted }}>{t('more')}</Text>
       </View>
     </View>
   );

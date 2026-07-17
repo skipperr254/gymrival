@@ -1,0 +1,11 @@
+{
+  "someone": "Iemand",
+  "yourPr": "je PR",
+  "aPr": "een PR",
+  "newMessage": "{{name}} heeft je een bericht gestuurd",
+  "friendRequest": "{{name}} heeft je een vriendschapsverzoek gestuurd",
+  "friendRequestAccepted": "{{name}} heeft je vriendschapsverzoek geaccepteerd",
+  "prLiked": "{{name}} vond je {{exercise}}{{value}} PR leuk",
+  "friendPr": "{{name}} heeft zojuist een nieuwe {{exercise}}{{value}} PR neergezet",
+  "generic": "Je hebt een nieuwe melding"
+}

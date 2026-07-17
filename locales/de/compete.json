@@ -1,0 +1,108 @@
+{
+  "tabs": {
+    "rivals": { "label": "Rivalen", "subtitle": "RIVALEN" },
+    "challenges": { "label": "Challenges", "subtitle": "CHALLENGES" },
+    "global": { "label": "Global", "subtitle": "GLOBALE RANGLISTE" }
+  },
+  "you": "DU",
+  "unknown": "Unbekannt",
+  "youSuffix": " (Du)",
+  "lvl": "LVL {{level}}",
+  "metric": {
+    "highestPr": "Höchster PR",
+    "mostImproved": "Größte Verbesserung",
+    "totalVolume": "Gesamtvolumen"
+  },
+  "endsIn": {
+    "ended": "Beendet",
+    "days": "noch {{count}} T",
+    "hours": "noch {{count}} Std",
+    "minutes": "noch {{count}} Min"
+  },
+  "rivals": {
+    "emptyTitle": "NOCH KEINE RIVALEN",
+    "emptySub": "Füge Freunde hinzu, um in der Rangliste zu konkurrieren",
+    "footerNote": "BASIEREND AUF PERSÖNLICHEN REKORDEN"
+  },
+  "card": {
+    "joined": "{{count}} beigetreten",
+    "yourRank": "Dein Rang: #{{rank}}",
+    "joinedBtn": "BEIGETRETEN",
+    "joinBtn": "BEITRETEN",
+    "viewAll": "ALLE ANZEIGEN"
+  },
+  "invitation": {
+    "defaultTitle": "Challenge-Einladung",
+    "someone": "Jemand",
+    "challengedYou": "{{name}} hat dich herausgefordert",
+    "accept": "ANNEHMEN",
+    "decline": "ABLEHNEN"
+  },
+  "modal": {
+    "title": "CHALLENGE",
+    "challengeLabel": "HERAUSFORDERN",
+    "change": "ÄNDERN",
+    "searchFriendsPlaceholder": "Freunde suchen...",
+    "noFriends": "Füge zuerst Freunde hinzu, um sie herauszufordern",
+    "noMatchingFriends": "Keine passenden Freunde",
+    "friend": "Freund",
+    "exercise": "ÜBUNG",
+    "metric": "METRIK",
+    "duration": "DAUER",
+    "sendChallenge": "CHALLENGE SENDEN",
+    "durationOptions": {
+      "3d": "3 Tage",
+      "1w": "1 Woche",
+      "2w": "2 Wochen",
+      "1m": "1 Monat"
+    }
+  },
+  "challenges": {
+    "loadError": "Challenges konnten nicht geladen werden",
+    "retry": "ERNEUT VERSUCHEN",
+    "pendingInvitations": "AUSSTEHENDE EINLADUNGEN",
+    "activeChallenges": "AKTIVE CHALLENGES",
+    "friendChallenges": "FREUNDES-CHALLENGES",
+    "emptyTitle": "KEINE AKTIVEN CHALLENGES",
+    "emptySub": "Schau später vorbei — oder fordere unten einen Freund heraus!",
+    "challengeFriendTitle": "FREUND HERAUSFORDERN",
+    "challengeFriendSub": "Wähle einen Freund und lege die Bedingungen fest",
+    "moreCount": "+{{count}}",
+    "addFriendsFirst": "ERST FREUNDE HINZUFÜGEN",
+    "challengeFriendBtn": "FREUND HERAUSFORDERN"
+  },
+  "global": {
+    "statBench": "BANK",
+    "statSquat": "KNIEB.",
+    "statDead": "KREUZ.",
+    "totalKg": "GESAMT KG",
+    "searchPlaceholder": "Suche nach Name oder @benutzername...",
+    "loadError": "Rangliste konnte nicht geladen werden",
+    "retry": "ERNEUT VERSUCHEN",
+    "yourGlobalRank": "DEIN GLOBALER RANG",
+    "unrankedTitle": "NOCH NICHT GERANKT",
+    "unrankedSub": "Trage einen Bankdrücken-, Kniebeuge- und Kreuzheben-PR ein, um in die globale Rangliste aufzusteigen",
+    "noResultsTitle": "KEINE ERGEBNISSE",
+    "noResultsSub": "Versuche einen anderen Namen oder Benutzernamen",
+    "noAthletesTitle": "NOCH KEINE ATHLETEN",
+    "noAthletesSub": "Sei der Erste, der einen Bankdrücken-, Kniebeuge- und Kreuzheben-PR einträgt!",
+    "loadMore": "MEHR LADEN",
+    "refresh": "AKTUALISIEREN",
+    "footerNote": "BASIEREND AUF KOMBINIERTEM BANKDRÜCKEN · KNIEBEUGE · KREUZHEBEN"
+  },
+  "detail": {
+    "heading": "CHALLENGE",
+    "notFound": "Challenge nicht gefunden",
+    "endsIn": "ENDET IN",
+    "participants": "TEILNEHMER",
+    "xpReward": "XP-BELOHNUNG",
+    "prize": "PREIS",
+    "leaderboard": "RANGLISTE",
+    "noParticipants": "Noch keine Teilnehmer",
+    "beFirst": "Sei der Erste, der beitritt!",
+    "refresh": "AKTUALISIEREN",
+    "joinedTapToLeave": "BEIGETRETEN — TIPPEN ZUM VERLASSEN",
+    "joinChallenge": "CHALLENGE BEITRETEN",
+    "challengeEnded": "CHALLENGE BEENDET"
+  }
+}

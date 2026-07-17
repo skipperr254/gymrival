@@ -1,0 +1,19 @@
+{
+  "bench": "Press de Banca",
+  "squat": "Sentadilla",
+  "deadlift": "Peso Muerto",
+  "pullups": "Dominadas",
+  "overhead": "Press Militar",
+  "bulgarian": "Sentadilla Búlgara",
+  "rdl": "Peso Muerto Rumano",
+  "incline": "Press Inclinado",
+  "dips": "Fondos",
+  "row": "Remo con Barra",
+  "curl": "Curl de Bíceps",
+  "legpress": "Prensa de Piernas",
+  "lunge": "Zancadas",
+  "facepull": "Jalón de Cara",
+  "hipthrust": "Empuje de Cadera",
+  "plank": "Plancha",
+  "muscle_up": "Muscle Up"
+}

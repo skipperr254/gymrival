@@ -970,9 +970,11 @@ function mapChallengeRow(row: any): ChallengeWithStats {
  */
 export async function fetchActiveChallenges(
   userId: string,
+  locale: string,
 ): Promise<{ data: ChallengeWithStats[]; error: string | null }> {
   const { data, error } = await supabase.rpc('active_challenges_for_user', {
     p_user_id: userId,
+    p_locale: locale,
   });
   if (error) return { data: [], error: error.message };
   return {
@@ -1278,6 +1280,30 @@ export async function markAllNotificationsRead(
   return { error: error?.message ?? null };
 }
 
+/** Fetch just the user's stored language preference — used at app boot, before the full profile is needed. */
+export async function getUserLanguage(
+  userId: string
+): Promise<{ data: string | null; error: string | null }> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('language')
+    .eq('id', userId)
+    .single();
+  return { data: data?.language ?? null, error: error?.message ?? null };
+}
+
+/** Persist an explicit language choice made in Settings so it follows the user across devices. */
+export async function updateLanguage(
+  userId: string,
+  language: string
+): Promise<{ error: string | null }> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ language })
+    .eq('id', userId);
+  return { error: error?.message ?? null };
+}
+
 export async function savePushToken(
   userId: string,
   token: string
@@ -1289,17 +1315,9 @@ export async function savePushToken(
   return { error: error?.message ?? null };
 }
 
-export async function sendPushNotification(
-  userId: string,
-  title: string,
-  body: string,
-  data?: Record<string, unknown>
-): Promise<void> {
-  try {
-    await supabase.functions.invoke('send-notification', {
-      body: { user_id: userId, title, body, data: data ?? {} },
-    });
-  } catch {
-    // Push notifications are best-effort — never let this crash the caller
-  }
-}
+// Push notifications are triggered server-side by a Postgres trigger
+// (tr_notifications_push, migration 028) whenever a row is inserted into
+// `notifications` — see supabase/functions/send-notification. There is no
+// client-side wrapper: composing push text on the client would use the
+// actor's language, not the recipient's, which is exactly the bug this
+// server-side design avoids.

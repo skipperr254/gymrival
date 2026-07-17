@@ -4,6 +4,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -18,6 +19,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignInScreen() {
+  const { t } = useTranslation("auth");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -73,10 +75,10 @@ export default function SignInScreen() {
           {/* Header */}
           <View className="mb-8">
             <Text className="font-heading text-[46px] text-primary tracking-[2px] leading-12.5">
-              WELCOME{"\n"}BACK
+              {t("signIn.title")}
             </Text>
             <Text className="font-sans text-[15px] text-secondary mt-3 leading-5.75">
-              Sign in to continue your grind.
+              {t("signIn.subtitle")}
             </Text>
           </View>
 
@@ -85,7 +87,7 @@ export default function SignInScreen() {
             {/* Email */}
             <View>
               <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-                Email
+                {t("signIn.emailLabel")}
               </Text>
               <View
                 className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
@@ -94,7 +96,7 @@ export default function SignInScreen() {
                 <TextInput
                   value={email}
                   onChangeText={setEmail}
-                  placeholder="you@example.com"
+                  placeholder={t("signIn.emailPlaceholder")}
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
                   style={styles.input}
@@ -110,14 +112,14 @@ export default function SignInScreen() {
             <View>
               <View className="flex-row justify-between items-center mb-2">
                 <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] uppercase">
-                  Password
+                  {t("signIn.passwordLabel")}
                 </Text>
                 <Pressable
                   hitSlop={8}
                   onPress={() => router.push(Routes.forgotPassword)}
                 >
                   <Text className="font-sans-medium text-[12px] text-accent">
-                    Forgot password?
+                    {t("signIn.forgotPassword")}
                   </Text>
                 </Pressable>
               </View>
@@ -129,7 +131,7 @@ export default function SignInScreen() {
                   ref={passwordRef}
                   value={password}
                   onChangeText={setPassword}
-                  placeholder="Your password"
+                  placeholder={t("signIn.passwordPlaceholder")}
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
                   style={[styles.input, { flex: 1 }]}
@@ -171,7 +173,7 @@ export default function SignInScreen() {
               <ActivityIndicator color={Colors.primary} />
             ) : (
               <Text className="font-heading text-xl text-primary tracking-[3px]">
-                SIGN IN
+                {t("signIn.submit")}
               </Text>
             )}
           </Pressable>
@@ -179,7 +181,7 @@ export default function SignInScreen() {
           {/* Sign up link */}
           <View className="flex-row justify-center items-center mt-8 gap-1">
             <Text className="font-sans text-[14px] text-secondary">
-              {"Don't have an account?"}
+              {t("signIn.noAccount")}
             </Text>
             <Pressable
               onPress={() => router.replace(Routes.signUp)}
@@ -187,7 +189,7 @@ export default function SignInScreen() {
             >
               <Text className="font-sans-semibold text-[14px] text-accent">
                 {" "}
-                Sign Up
+                {t("signIn.signUpLink")}
               </Text>
             </Pressable>
           </View>
