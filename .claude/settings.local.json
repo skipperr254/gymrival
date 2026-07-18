@@ -10,7 +10,9 @@
       "Bash(npx eslint *)",
       "Bash(npx tsc *)",
       "Bash(tee tsc_final.log)",
-      "Bash(node \"C:\\\\Users\\\\kanin\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-kanin-Desktop-Dev-clients-fiverr-nordinsell-mv-gymrival\\\\223e5737-37ed-48ae-ac96-783a22a560aa\\\\scratchpad\\\\check_lint.js\")"
+      "Bash(node \"C:\\\\Users\\\\kanin\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-kanin-Desktop-Dev-clients-fiverr-nordinsell-mv-gymrival\\\\223e5737-37ed-48ae-ac96-783a22a560aa\\\\scratchpad\\\\check_lint.js\")",
+      "Bash(grep -v \"\\\\.tsx:.*//\")",
+      "Bash(echo \"=== INSTALL EXIT: $? ===\")"
     ]
   },
   "enableAllProjectMcpServers": true,
