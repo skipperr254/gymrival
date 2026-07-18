@@ -1,8 +1,8 @@
-import { View, Text, Pressable, TextInput, StyleSheet } from 'react-native';
+import { View, Text, Pressable, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { TrendingUp, AlertTriangle } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import type { ExerciseType } from '@/types/pr';
 import { getIcon } from './icons';
 
@@ -24,9 +24,11 @@ export function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangeP
   const { t } = useTranslation('logpr');
   return (
     <>
-      <Text style={s1.sectionLabel}>{t('selectExercise')}</Text>
+      <Text className="font-heading text-[10px] tracking-[2.5px] text-[#555] mb-2.5">
+        {t('selectExercise')}
+      </Text>
 
-      <View style={s1.grid}>
+      <View className="flex-row flex-wrap gap-2 mb-5">
         {exercises.map(ex => {
           const active = selectedExKey === ex.key;
           const ExIcon = getIcon(ex.key);
@@ -35,20 +37,26 @@ export function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangeP
             <Pressable
               key={ex.key}
               onPress={() => onSelectEx(ex.key)}
-              style={({ pressed }) => [
-                s1.exCard,
-                active && s1.exCardActive,
-                pressed && !active && { opacity: 0.7 },
-              ]}
+              className={`w-[48%] flex-row items-center gap-2.5 rounded-2xl py-[11px] px-3 border-[1.5px] ${
+                active ? 'bg-[rgba(230,48,48,0.08)] border-accent' : 'bg-base border-default'
+              }`}
+              style={({ pressed }) => pressed && !active && { opacity: 0.7 }}
             >
-              <View style={[s1.iconWrap, active && s1.iconWrapActive]}>
+              <View
+                className={`w-[34px] h-[34px] rounded-[10px] items-center justify-center shrink-0 ${
+                  active ? 'bg-[rgba(230,48,48,0.12)]' : 'bg-[#1a1a1a]'
+                }`}
+              >
                 <ExIcon size={18} strokeWidth={1.8} color={active ? Colors.accent : '#666'} />
               </View>
-              <View style={{ flex: 1, minWidth: 0 }}>
-                <Text style={[s1.exLabel, active && s1.exLabelActive]} numberOfLines={1}>
+              <View className="flex-1 min-w-0">
+                <Text
+                  className={`font-sans-medium text-xs mb-0.5 ${active ? 'text-accent' : 'text-[#999]'}`}
+                  numberOfLines={1}
+                >
                   {ex.label}
                 </Text>
-                <Text style={s1.exPR}>
+                <Text className="font-sans text-[10px] text-[#555]">
                   {exPR != null ? t('prWithValue', { value: exPR, unit: ex.unit }) : t('noPrYet')}
                 </Text>
               </View>
@@ -58,9 +66,15 @@ export function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangeP
       </View>
 
       {selectedExKey && selectedEx && (
-        <View style={s1.inputSection}>
-          <Text style={s1.sectionLabel}>{t('yourNewPr')}</Text>
-          <View style={[s1.inputRow, !!prValue && s1.inputRowActive]}>
+        <View className="mb-5">
+          <Text className="font-heading text-[10px] tracking-[2.5px] text-[#555] mb-2.5">
+            {t('yourNewPr')}
+          </Text>
+          <View
+            className={`flex-row items-center bg-base rounded-2xl border-[1.5px] px-[18px] py-3 gap-2.5 ${
+              prValue ? 'border-accent' : 'border-default'
+            }`}
+          >
             <TextInput
               value={prValue}
               onChangeText={onChangePR}
@@ -69,14 +83,16 @@ export function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangeP
               keyboardType="numeric"
               returnKeyType="done"
               autoFocus
-              style={s1.input}
+              className="flex-1 font-heading text-[42px] text-primary p-0"
             />
-            <Text style={s1.unit}>{selectedEx.unit.toUpperCase()}</Text>
+            <Text className="font-heading text-base text-[#555] tracking-[1px]">
+              {selectedEx.unit.toUpperCase()}
+            </Text>
           </View>
           {isBelowCurrent && (
-            <View style={s1.warnRow}>
+            <View className="flex-row items-center gap-1.5 mt-2 px-1">
               <AlertTriangle size={12} strokeWidth={2} color={Colors.warning} />
-              <Text style={s1.warnText}>
+              <Text className="font-sans text-[11px] text-warning">
                 {t('notHigherThanCurrent', { value: currentPR, unit: selectedEx.unit })}
               </Text>
             </View>
@@ -94,137 +110,28 @@ export function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangeP
             colors={[Colors.accent, Colors.accentDark]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={s1.nextBtn}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              borderRadius: 16,
+              paddingVertical: 17,
+            }}
           >
-            <Text style={s1.nextBtnText}>{t('nextAddProof')}</Text>
+            <Text className="font-heading text-sm tracking-[2.5px] text-white">
+              {t('nextAddProof')}
+            </Text>
             <TrendingUp size={16} strokeWidth={2} color="#fff" />
           </LinearGradient>
         ) : (
-          <View style={[s1.nextBtn, s1.nextBtnDisabled]}>
-            <Text style={[s1.nextBtnText, s1.nextBtnTextDisabled]}>{t('nextAddProof')}</Text>
+          <View className="flex-row items-center justify-center gap-2 rounded-2xl py-[17px] bg-[#2a2a2a]">
+            <Text className="font-heading text-sm tracking-[2.5px] text-[#555]">
+              {t('nextAddProof')}
+            </Text>
           </View>
         )}
       </Pressable>
     </>
   );
 }
-
-const s1 = StyleSheet.create({
-  sectionLabel: {
-    fontFamily: Fonts.display,
-    fontSize: 10,
-    letterSpacing: 2.5,
-    color: '#555',
-    marginBottom: 10,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 20,
-  },
-  exCard: {
-    width: '48%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    backgroundColor: Colors.base,
-    borderWidth: 1.5,
-    borderColor: Colors.borderDefault,
-    borderRadius: 14,
-    paddingVertical: 11,
-    paddingHorizontal: 12,
-  },
-  exCardActive: {
-    backgroundColor: 'rgba(230,48,48,0.08)',
-    borderColor: Colors.accent,
-  },
-  iconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    backgroundColor: '#1a1a1a',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  iconWrapActive: {
-    backgroundColor: 'rgba(230,48,48,0.12)',
-  },
-  exLabel: {
-    fontFamily: Fonts.bodyMedium,
-    fontSize: 12,
-    color: '#999',
-    marginBottom: 2,
-  },
-  exLabelActive: {
-    color: Colors.accent,
-  },
-  exPR: {
-    fontFamily: Fonts.body,
-    fontSize: 10,
-    color: '#555',
-  },
-  inputSection: {
-    marginBottom: 20,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.base,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: Colors.borderDefault,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    gap: 10,
-  },
-  inputRowActive: {
-    borderColor: Colors.accent,
-  },
-  input: {
-    flex: 1,
-    fontFamily: Fonts.display,
-    fontSize: 42,
-    color: Colors.primary,
-    padding: 0,
-  },
-  unit: {
-    fontFamily: Fonts.display,
-    fontSize: 16,
-    color: '#555',
-    letterSpacing: 1,
-  },
-  warnRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 8,
-    paddingHorizontal: 4,
-  },
-  warnText: {
-    fontFamily: Fonts.body,
-    fontSize: 11,
-    color: Colors.warning,
-  },
-  nextBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    borderRadius: 16,
-    paddingVertical: 17,
-  },
-  nextBtnDisabled: {
-    backgroundColor: '#2a2a2a',
-  },
-  nextBtnText: {
-    fontFamily: Fonts.display,
-    fontSize: 14,
-    letterSpacing: 2.5,
-    color: '#fff',
-  },
-  nextBtnTextDisabled: {
-    color: '#555',
-  },
-});

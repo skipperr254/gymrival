@@ -8,7 +8,6 @@ import type { ChallengeMetric } from '@/types/challenge';
 import type { FriendProfile } from '@/types/social';
 import type { ExerciseType } from '@/types/pr';
 import { LeaderboardAvatar } from './LeaderboardAvatar';
-import { mStyles } from './styles';
 
 // Display text resolved via t() at render time — see labelKey usage below.
 const DURATION_OPTIONS = [
@@ -68,11 +67,13 @@ export function CreateChallengeModal({
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
-      <View style={mStyles.overlay}>
-        <View style={mStyles.sheet}>
-          <View style={mStyles.header}>
-            <Text style={mStyles.title}>{t('modal.title')}</Text>
-            <Pressable onPress={onClose} style={mStyles.closeBtn}>
+      <View className="flex-1 bg-black/75 justify-end">
+        <View className="bg-[#1e1e1e] rounded-t-3xl p-6 pb-10 max-h-[92%]">
+          <View className="flex-row items-center mb-6">
+            <Text className="font-heading text-xl tracking-[3px] text-white flex-1">
+              {t('modal.title')}
+            </Text>
+            <Pressable onPress={onClose} className="p-1">
               <X size={18} strokeWidth={2} color="#fff" />
             </Pressable>
           </View>
@@ -80,60 +81,77 @@ export function CreateChallengeModal({
           <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
 
             {/* ── Friend picker ────────────────────────────── */}
-            <Text style={mStyles.label}>{t('modal.challengeLabel')}</Text>
+            <Text className="font-heading text-[10px] tracking-[3px] text-[#555] mb-2.5">
+              {t('modal.challengeLabel')}
+            </Text>
 
             {selected ? (
-              <View style={mStyles.selectedRow}>
+              <View className="flex-row items-center gap-3 bg-[#252525] rounded-xl p-3 border border-[#2a2a2a] mb-1">
                 <LeaderboardAvatar
                   id={selected.id}
                   name={selected.full_name ?? selected.username ?? '?'}
                   size={34}
                 />
-                <Text style={mStyles.selectedName} numberOfLines={1}>
+                <Text className="flex-1 font-sans-medium text-sm text-white" numberOfLines={1}>
                   {selected.full_name ?? selected.username}
                 </Text>
-                <Pressable onPress={() => setSelected(null)} style={mStyles.changeBtn}>
-                  <Text style={mStyles.changeBtnText}>{t('modal.change')}</Text>
+                <Pressable
+                  onPress={() => setSelected(null)}
+                  className="py-[5px] px-2.5 rounded-lg border border-[#383838]"
+                >
+                  <Text className="font-heading text-[9px] tracking-[1px] text-[#888]">
+                    {t('modal.change')}
+                  </Text>
                 </Pressable>
               </View>
             ) : (
               <>
-                <View style={mStyles.searchWrap}>
-                  <Search size={14} strokeWidth={1.8} color="#555" style={mStyles.searchIcon} />
+                <View className="mb-2.5 justify-center">
+                  <Search
+                    size={14}
+                    strokeWidth={1.8}
+                    color="#555"
+                    style={{ position: 'absolute', left: 12, zIndex: 1 }}
+                  />
                   <TextInput
                     value={query}
                     onChangeText={setQuery}
                     placeholder={t('modal.searchFriendsPlaceholder')}
                     placeholderTextColor="#555"
-                    style={mStyles.searchInput}
+                    className="bg-[#252525] rounded-xl border border-[#333] py-2.5 pl-9 pr-3.5 font-sans text-[13px] text-white"
                     autoCapitalize="none"
                     autoCorrect={false}
                   />
                 </View>
 
                 {friends.length === 0 ? (
-                  <Text style={mStyles.noFriendsText}>{t('modal.noFriends')}</Text>
+                  <Text className="font-sans text-[13px] text-[#555] text-center py-4">
+                    {t('modal.noFriends')}
+                  </Text>
                 ) : filtered.length === 0 ? (
-                  <Text style={mStyles.noFriendsText}>{t('modal.noMatchingFriends')}</Text>
+                  <Text className="font-sans text-[13px] text-[#555] text-center py-4">
+                    {t('modal.noMatchingFriends')}
+                  </Text>
                 ) : (
-                  <View style={mStyles.friendList}>
+                  <View className="rounded-xl border border-[#2a2a2a] overflow-hidden mb-1">
                     {filtered.map((f, i) => {
                       const name = f.full_name ?? f.username ?? t('modal.friend');
                       return (
                         <Pressable
                           key={f.id}
                           onPress={() => setSelected(f)}
-                          style={({ pressed }) => [
-                            mStyles.friendItem,
-                            i > 0 && mStyles.friendItemBorder,
-                            pressed && { backgroundColor: '#2a2a2a' },
-                          ]}
+                          className={`flex-row items-center gap-3 py-3 px-3 bg-[#252525] ${
+                            i > 0 ? 'border-t border-[#2a2a2a]' : ''
+                          }`}
+                          style={({ pressed }) => pressed && { backgroundColor: '#2a2a2a' }}
                         >
                           <LeaderboardAvatar id={f.id} name={name} size={34} />
-                          <View style={{ flex: 1 }}>
-                            <Text style={mStyles.friendItemName} numberOfLines={1}>{name}</Text>
+                          <View className="flex-1">
+                            <Text className="font-sans-medium text-[13px] text-white" numberOfLines={1}>
+                              {name}
+                            </Text>
                             {!!f.username && (
-                              <Text style={mStyles.friendItemUsername}>{'@'}{f.username}</Text>
+                              <Text className="font-sans text-[11px] text-[#555]">{'@'}{f.username}</Text>
                             )}
                           </View>
                           <ChevronRight size={14} strokeWidth={1.8} color="#555" />
@@ -148,16 +166,26 @@ export function CreateChallengeModal({
             <View style={{ height: 20 }} />
 
             {/* ── Exercise ─────────────────────────────────── */}
-            <Text style={mStyles.label}>{t('modal.exercise')}</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
-              <View style={{ flexDirection: 'row', gap: 6, paddingBottom: 4 }}>
+            <Text className="font-heading text-[10px] tracking-[3px] text-[#555] mb-2.5">
+              {t('modal.exercise')}
+            </Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
+              <View className="flex-row gap-1.5 pb-1">
                 {exercises.map(ex => (
                   <Pressable
                     key={ex.key}
                     onPress={() => setExercise(ex.key)}
-                    style={[mStyles.chip, exercise === ex.key && mStyles.chipActive]}
+                    className={`py-2 px-3 rounded-[10px] border-[1.5px] items-center justify-center ${
+                      exercise === ex.key
+                        ? 'border-accent bg-[rgba(230,48,48,0.1)]'
+                        : 'border-[#2a2a2a] bg-transparent'
+                    }`}
                   >
-                    <Text style={[mStyles.chipLabel, exercise === ex.key && mStyles.chipLabelActive]}>
+                    <Text
+                      className={`font-heading text-[10px] tracking-[1px] ${
+                        exercise === ex.key ? 'text-accent' : 'text-[#555]'
+                      }`}
+                    >
                       {ex.label.toUpperCase()}
                     </Text>
                   </Pressable>
@@ -166,15 +194,25 @@ export function CreateChallengeModal({
             </ScrollView>
 
             {/* ── Metric ───────────────────────────────────── */}
-            <Text style={mStyles.label}>{t('modal.metric')}</Text>
-            <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
+            <Text className="font-heading text-[10px] tracking-[3px] text-[#555] mb-2.5">
+              {t('modal.metric')}
+            </Text>
+            <View className="flex-row gap-2 mb-4">
               {METRIC_OPTIONS.map(opt => (
                 <Pressable
                   key={opt.value}
                   onPress={() => setMetric(opt.value)}
-                  style={[mStyles.chip, { flex: 1 }, metric === opt.value && mStyles.chipActive]}
+                  className={`flex-1 py-2 px-3 rounded-[10px] border-[1.5px] items-center justify-center ${
+                    metric === opt.value
+                      ? 'border-accent bg-[rgba(230,48,48,0.1)]'
+                      : 'border-[#2a2a2a] bg-transparent'
+                  }`}
                 >
-                  <Text style={[mStyles.chipLabel, metric === opt.value && mStyles.chipLabelActive]}>
+                  <Text
+                    className={`font-heading text-[10px] tracking-[1px] ${
+                      metric === opt.value ? 'text-accent' : 'text-[#555]'
+                    }`}
+                  >
                     {t(opt.labelKey).toUpperCase()}
                   </Text>
                 </Pressable>
@@ -182,15 +220,25 @@ export function CreateChallengeModal({
             </View>
 
             {/* ── Duration ─────────────────────────────────── */}
-            <Text style={mStyles.label}>{t('modal.duration')}</Text>
-            <View style={{ flexDirection: 'row', gap: 8, marginBottom: 28 }}>
+            <Text className="font-heading text-[10px] tracking-[3px] text-[#555] mb-2.5">
+              {t('modal.duration')}
+            </Text>
+            <View className="flex-row gap-2 mb-7">
               {DURATION_OPTIONS.map(opt => (
                 <Pressable
                   key={opt.days}
                   onPress={() => setDuration(opt.days)}
-                  style={[mStyles.chip, { flex: 1 }, duration === opt.days && mStyles.chipActive]}
+                  className={`flex-1 py-2 px-3 rounded-[10px] border-[1.5px] items-center justify-center ${
+                    duration === opt.days
+                      ? 'border-accent bg-[rgba(230,48,48,0.1)]'
+                      : 'border-[#2a2a2a] bg-transparent'
+                  }`}
                 >
-                  <Text style={[mStyles.chipLabel, duration === opt.days && mStyles.chipLabelActive]}>
+                  <Text
+                    className={`font-heading text-[10px] tracking-[1px] ${
+                      duration === opt.days ? 'text-accent' : 'text-[#555]'
+                    }`}
+                  >
                     {t(opt.labelKey).toUpperCase()}
                   </Text>
                 </Pressable>
@@ -199,9 +247,9 @@ export function CreateChallengeModal({
 
             {/* ── Error ────────────────────────────────────── */}
             {!!errorMsg && (
-              <View style={mStyles.errorRow}>
+              <View className="flex-row items-center gap-2 bg-[rgba(230,48,48,0.08)] rounded-[10px] border border-[rgba(230,48,48,0.2)] p-3 mb-3">
                 <AlertCircle size={14} strokeWidth={1.8} color={Colors.accent} />
-                <Text style={mStyles.errorText}>{errorMsg}</Text>
+                <Text className="flex-1 font-sans text-xs text-accent leading-[18px]">{errorMsg}</Text>
               </View>
             )}
 
@@ -209,17 +257,24 @@ export function CreateChallengeModal({
             <Pressable
               onPress={() => { if (canSend) onCreate(selected!.id, exercise, metric, duration); }}
               disabled={!canSend}
-              style={[{ borderRadius: 14, overflow: 'hidden' }, !canSend && { opacity: 0.35 }]}
+              className={`rounded-2xl overflow-hidden ${!canSend ? 'opacity-35' : ''}`}
             >
               <LinearGradient
                 colors={[Colors.accent, Colors.accentDark]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                style={mStyles.sendBtn}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  paddingVertical: 14,
+                  borderRadius: 14,
+                }}
               >
                 {loading
                   ? <ActivityIndicator size="small" color="#fff" />
-                  : <><Zap size={16} strokeWidth={2} color="#fff" /><Text style={mStyles.sendBtnText}>{t('modal.sendChallenge')}</Text></>
+                  : <><Zap size={16} strokeWidth={2} color="#fff" /><Text className="font-heading text-sm tracking-[3px] text-white">{t('modal.sendChallenge')}</Text></>
                 }
               </LinearGradient>
             </Pressable>

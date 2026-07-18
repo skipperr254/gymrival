@@ -15,7 +15,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Colors, Fonts, FontSizes, Radius, Spacing } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { Avatar } from '@/components/ui/Avatar';
@@ -76,21 +76,24 @@ export default function EditProfileScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
+      <View className="flex-row items-center px-4 py-3">
         <Pressable
           onPress={() => router.back()}
-          style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.5 }]}
+          className="p-1 mr-2"
+          style={({ pressed }) => pressed && { opacity: 0.5 }}
         >
           <Ionicons name="arrow-back" size={22} color={Colors.accent} />
         </Pressable>
-        <Text style={styles.heading}>{t('edit.title')}</Text>
-        <View style={styles.spacer} />
+        <Text className="font-heading text-2xl text-primary tracking-[3px] flex-1">
+          {t('edit.title')}
+        </Text>
+        <View className="w-[30px]" />
       </View>
 
       <KeyboardAvoidingView
-        style={styles.kav}
+        style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
@@ -99,9 +102,9 @@ export default function EditProfileScreen() {
           keyboardShouldPersistTaps="handled"
         >
           {/* Avatar */}
-          <View style={styles.avatarContainer}>
+          <View className="items-center mb-7 relative self-center">
             <Avatar name={displayName} userId={user?.id ?? displayName} size="xl" />
-            <View style={styles.avatarEditBadge}>
+            <View className="absolute bottom-0 right-0 w-7 h-7 rounded-full items-center justify-center border-2 border-base bg-accent">
               <Ionicons name="camera" size={12} color={Colors.primary} />
             </View>
           </View>
@@ -161,14 +164,17 @@ export default function EditProfileScreen() {
           />
 
           <Pressable
-            style={({ pressed }) => [styles.saveBtn, pressed && { opacity: 0.8 }]}
+            className="bg-accent rounded-2xl h-[52px] items-center justify-center mt-2"
+            style={({ pressed }) => pressed && { opacity: 0.8 }}
             onPress={handleSave}
             disabled={saving}
           >
             {saving ? (
               <ActivityIndicator color={Colors.primary} />
             ) : (
-              <Text style={styles.saveBtnText}>{t('edit.save')}</Text>
+              <Text className="font-heading text-base text-primary tracking-[2px]">
+                {t('edit.save')}
+              </Text>
             )}
           </Pressable>
         </ScrollView>
@@ -197,10 +203,13 @@ function Field({
   multiline?: boolean;
 }) {
   return (
-    <View style={styles.field}>
-      <Text style={styles.fieldLabel}>{label}</Text>
+    <View className="mb-4">
+      <Text className="font-heading text-[11px] tracking-[2px] text-[#505050] mb-2">{label}</Text>
       <TextInput
-        style={[styles.input, multiline && styles.inputMultiline]}
+        className={`bg-elevated rounded-xl px-4 py-3.5 font-sans text-[15px] text-primary border border-default ${
+          multiline ? 'min-h-[80px]' : 'min-h-[50px]'
+        }`}
+        style={multiline ? { textAlignVertical: 'top' } : undefined}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
@@ -217,100 +226,8 @@ function Field({
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: Colors.base,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.screenPadding,
-    paddingVertical: 12,
-  },
-  backBtn: {
-    padding: 4,
-    marginRight: 8,
-  },
-  heading: {
-    fontFamily: Fonts.display,
-    fontSize: FontSizes['2xl'],
-    color: Colors.primary,
-    letterSpacing: 3,
-    flex: 1,
-  },
-  spacer: {
-    width: 30,
-  },
-  kav: {
-    flex: 1,
-  },
   content: {
-    paddingHorizontal: Spacing.screenPadding,
-    paddingBottom: 96,
-  },
-
-  // Avatar
-  avatarContainer: {
-    alignItems: 'center',
-    marginBottom: 28,
-    position: 'relative',
-    alignSelf: 'center',
-  },
-  avatarEditBadge: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: Colors.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: Colors.base,
-  },
-
-  // Fields
-  field: {
-    marginBottom: 16,
-  },
-  fieldLabel: {
-    fontFamily: Fonts.display,
-    fontSize: 11,
-    letterSpacing: 2,
-    color: '#505050',
-    marginBottom: 8,
-  },
-  input: {
-    backgroundColor: Colors.elevated,
-    borderRadius: Radius.input,
     paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontFamily: Fonts.body,
-    fontSize: 15,
-    color: Colors.primary,
-    minHeight: 50,
-    borderWidth: 1,
-    borderColor: Colors.borderDefault,
-  },
-  inputMultiline: {
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
-
-  // Save button
-  saveBtn: {
-    backgroundColor: Colors.accent,
-    borderRadius: Radius.button,
-    height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 8,
-  },
-  saveBtnText: {
-    fontFamily: Fonts.display,
-    fontSize: FontSizes.base,
-    color: Colors.primary,
-    letterSpacing: 2,
+    paddingBottom: 96,
   },
 });

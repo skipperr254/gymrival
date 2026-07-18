@@ -14,7 +14,10 @@
       "Bash(grep -v \"\\\\.tsx:.*//\")",
       "Bash(echo \"=== INSTALL EXIT: $? ===\")",
       "Bash(npx jest *)",
-      "Bash(awk '$1 > 400 && $2 !~ /total/')"
+      "Bash(awk '$1 > 400 && $2 !~ /total/')",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('nativewind:', p.dependencies.nativewind\\); console.log\\('expo:', p.dependencies.expo\\); console.log\\('react-native:', p.dependencies['react-native']\\); console.log\\('tailwindcss:', p.dependencies.tailwindcss || p.devDependencies?.tailwindcss\\);\")",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(JSON.stringify\\(p.scripts,null,2\\)\\)\")",
+      "Bash(netstat -ano)"
     ]
   },
   "enableAllProjectMcpServers": true,

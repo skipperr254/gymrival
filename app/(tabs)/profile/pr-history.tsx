@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { formatDate } from '@/lib/i18n/format';
@@ -13,27 +13,37 @@ import type { PRHistoryGroup } from '@/types/pr';
 function PRGroup({ group }: { group: PRHistoryGroup }) {
   const { t } = useTranslation('profile');
   return (
-    <View style={styles.group}>
-      <View style={styles.groupHeader}>
+    <View className="bg-surface rounded-2xl mb-3 overflow-hidden">
+      <View className="flex-row items-center gap-2 bg-elevated py-3.5 px-4">
         <Ionicons name="trophy" size={14} color={Colors.accent} />
-        <Text style={styles.groupLabel}>{group.exercise.label.toUpperCase()}</Text>
-        <Text style={styles.groupBest}>
+        <Text className="flex-1 font-heading text-[13px] text-primary tracking-[2px]">
+          {group.exercise.label.toUpperCase()}
+        </Text>
+        <Text className="font-heading text-[13px] text-accent">
           {t('prHistory.best', { value: group.best, unit: group.exercise.unit })}
         </Text>
       </View>
       {group.entries.map((entry, i) => (
-        <View key={entry.id} style={styles.prRow}>
+        <View
+          key={entry.id}
+          className="flex-row items-center py-3 px-4 gap-2.5"
+          style={{ borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.elevated }}
+        >
           {i === 0 ? (
-            <View style={styles.crownIcon}>
+            <View className="w-5 items-center">
               <Ionicons name="trophy" size={12} color={Colors.warning ?? '#ffaa00'} />
             </View>
           ) : (
-            <View style={styles.crownSpacer} />
+            <View className="w-5" />
           )}
-          <Text style={styles.prDate}>
+          <Text className="flex-1 font-sans text-[13px] text-secondary">
             {formatDate(entry.created_at, { day: 'numeric', month: 'short', year: 'numeric' })}
           </Text>
-          <Text style={[styles.prValue, entry.value === group.best && styles.prValueBest]}>
+          <Text
+            className={`font-heading text-base ${
+              entry.value === group.best ? 'text-accent' : 'text-primary'
+            }`}
+          >
             {entry.value} {entry.unit}
           </Text>
         </View>
@@ -52,27 +62,34 @@ export default function PRHistoryScreen() {
   }, [user?.id, loadPRHistory]);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <View style={styles.header}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
+      <View className="flex-row items-center px-4 py-3">
         <Pressable
           onPress={() => router.back()}
-          style={({ pressed }) => [styles.back, pressed && { opacity: 0.5 }]}
+          className="p-1 mr-2"
+          style={({ pressed }) => pressed && { opacity: 0.5 }}
         >
           <Ionicons name="arrow-back" size={22} color={Colors.accent} />
         </Pressable>
-        <Text style={styles.heading}>{t('prHistory.title')}</Text>
-        <View style={styles.spacer} />
+        <Text className="font-heading text-2xl text-primary tracking-[3px] flex-1">
+          {t('prHistory.title')}
+        </Text>
+        <View className="w-[30px]" />
       </View>
 
       {loading ? (
-        <View style={styles.loadingBox}>
+        <View className="flex-1 items-center justify-center">
           <ActivityIndicator color={Colors.accent} size="small" />
         </View>
       ) : prHistory.length === 0 ? (
-        <View style={styles.emptyBox}>
+        <View className="flex-1 items-center justify-center px-8 gap-2.5">
           <Ionicons name="trophy-outline" size={40} color="#333" />
-          <Text style={styles.emptyTitle}>{t('prHistory.emptyTitle')}</Text>
-          <Text style={styles.emptySub}>{t('prHistory.emptySub')}</Text>
+          <Text className="font-heading text-xl tracking-[2px] text-primary">
+            {t('prHistory.emptyTitle')}
+          </Text>
+          <Text className="font-sans text-[13px] text-muted text-center">
+            {t('prHistory.emptySub')}
+          </Text>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -86,24 +103,5 @@ export default function PRHistoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.base },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 },
-  back: { padding: 4, marginRight: 8 },
-  heading: { fontFamily: Fonts.display, fontSize: 24, color: Colors.primary, letterSpacing: 3, flex: 1 },
-  spacer: { width: 30 },
-  loadingBox: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  emptyBox: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, gap: 10 },
-  emptyTitle: { fontFamily: Fonts.display, fontSize: 20, letterSpacing: 2, color: Colors.primary },
-  emptySub: { fontFamily: Fonts.body, fontSize: 13, color: Colors.muted, textAlign: 'center' },
   content: { paddingHorizontal: 16, paddingBottom: 96 },
-  group: { backgroundColor: Colors.surface, borderRadius: 16, marginBottom: 12, overflow: 'hidden' },
-  groupHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Colors.elevated, padding: 14, paddingHorizontal: 16 },
-  groupLabel: { flex: 1, fontFamily: Fonts.display, fontSize: 13, color: Colors.primary, letterSpacing: 2 },
-  groupBest: { fontFamily: Fonts.display, fontSize: 13, color: Colors.accent },
-  prRow: { flexDirection: 'row', alignItems: 'center', padding: 12, paddingHorizontal: 16, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.elevated, gap: 10 },
-  crownIcon: { width: 20, alignItems: 'center' },
-  crownSpacer: { width: 20 },
-  prDate: { flex: 1, fontFamily: Fonts.body, fontSize: 13, color: Colors.secondary },
-  prValue: { fontFamily: Fonts.display, fontSize: 16, color: Colors.primary },
-  prValueBest: { color: Colors.accent },
 });

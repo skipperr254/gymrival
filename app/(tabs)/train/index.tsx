@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Pressable } from 'react-native';
+import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,6 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { CheckInView } from '@/components/features/CheckInView';
 import { ProgressView } from '@/components/features/progress/ProgressView';
 import { ScheduleList, WorkoutDetail, CreateWorkoutSheet } from '@/components/features/train';
-import { styles } from '@/components/features/train/styles';
 import { DAY_NAME_TO_INDEX, type DayOfWeek, type TrainingSessionWithExercises } from '@/types/train';
 import type { NewWorkout } from '@/components/features/train/constants';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -103,23 +102,26 @@ export default function TrainScreen() {
 
   return (
     <>
-      <SafeAreaView style={styles.safe} edges={['top']}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
         {/* Header */}
-        <View style={styles.header}>
+        <View className="flex-row items-end justify-between px-4 pt-2.5 mb-1">
           {selected ? (
             <>
               <Pressable
-                style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.5 }]}
+                className="p-1"
+                style={({ pressed }) => pressed && { opacity: 0.5 }}
                 onPress={goBack}
               >
                 <Ionicons name="chevron-back" size={22} color={Colors.accent} />
               </Pressable>
-              <View style={{ flex: 1 }} />
+              <View className="flex-1" />
             </>
           ) : (
             <View>
-              <Text style={styles.appTitle}>{t('header.brand')}</Text>
-              <Text style={styles.pageLabel}>
+              <Text className="font-heading text-primary tracking-[4px] text-[26px] leading-7">
+                {t('header.brand')}
+              </Text>
+              <Text className="font-heading text-[11px] text-[#606060] tracking-[2px] mt-0.5">
                 {activeTab === 0 ? t('header.schedule') : activeTab === 1 ? t('header.checkin') : t('header.progress')}
               </Text>
             </View>
@@ -128,7 +130,7 @@ export default function TrainScreen() {
 
         {/* Tab switcher — only visible at top level */}
         {!selected && (
-          <View style={styles.tabSwitcher}>
+          <View className="px-4 pb-2.5">
             <SegmentedControl
               options={[t('tabs.schedule'), t('tabs.checkin'), t('tabs.progress')]}
               selectedIndex={activeTab}
@@ -180,3 +182,11 @@ export default function TrainScreen() {
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  content: {
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 100,
+  },
+});

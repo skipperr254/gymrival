@@ -110,7 +110,7 @@ export function PRVideoPlayer({
   if (status !== 'ready') return null;
 
   return (
-    <Pressable onPress={handleTogglePlay} style={styles.container}>
+    <Pressable onPress={handleTogglePlay} className="flex-1 bg-black overflow-hidden">
       {/* VideoView is only mounted when this card is the active one AND the user
           has tapped play. A single mounted SurfaceView at any time eliminates the
           Android bleed-through artifact. */}
@@ -135,61 +135,26 @@ export function PRVideoPlayer({
           contentFit="cover"
         />
       ) : !isPlaying ? (
-        <View style={[StyleSheet.absoluteFill, styles.placeholder]} />
+        <View className="absolute inset-0 bg-[#080808]" />
       ) : null}
 
       {/* Play button — visible when paused */}
       {!isPlaying && (
-        <View style={styles.playOverlay} pointerEvents="none">
-          <View style={styles.playBtn}>
+        <View className="absolute inset-0 items-center justify-center" pointerEvents="none">
+          <View className="w-[60px] h-[60px] rounded-full bg-black/60 border-2 border-white/25 items-center justify-center">
             <Play size={22} fill="#fff" strokeWidth={0} color="#fff" />
           </View>
         </View>
       )}
 
       {/* Fullscreen button — top-right */}
-      <Pressable onPress={handleFullscreen} style={styles.fullscreenBtn} hitSlop={14}>
+      <Pressable
+        onPress={handleFullscreen}
+        className="absolute top-2.5 right-2.5 w-[30px] h-[30px] rounded-lg bg-black/50 border border-white/10 items-center justify-center"
+        hitSlop={14}
+      >
         <Maximize2 size={13} strokeWidth={2} color="rgba(255,255,255,0.7)" />
       </Pressable>
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-    overflow: 'hidden',
-  },
-  placeholder: {
-    backgroundColor: '#080808',
-  },
-  playOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  playBtn: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'rgba(0,0,0,0.60)',
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.25)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  fullscreenBtn: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 30,
-    height: 30,
-    borderRadius: 8,
-    backgroundColor: 'rgba(0,0,0,0.50)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

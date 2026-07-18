@@ -22,8 +22,14 @@ export default function LanguageScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
-      <View style={styles.header}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={["top"]}>
+      <View
+        className="flex-row items-center px-4 py-3.5"
+        style={{
+          borderBottomWidth: StyleSheet.hairlineWidth,
+          borderBottomColor: Colors.borderDefault,
+        }}
+      >
         <Pressable
           className="w-9 h-9 items-center justify-center"
           onPress={() => router.back()}
@@ -47,8 +53,9 @@ export default function LanguageScreen() {
           return (
             <Pressable
               key={lang.code}
-              className="card-elevated flex-row items-center justify-between"
-              style={isActive ? styles.cardActive : undefined}
+              className={`card-elevated flex-row items-center justify-between ${
+                isActive ? 'border-[1.5px] border-accent' : ''
+              }`}
               onPress={() => handleSelect(lang.code)}
             >
               <Text className="font-sans-medium text-base text-primary">
@@ -64,22 +71,3 @@ export default function LanguageScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: Colors.base,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.borderDefault,
-  },
-  cardActive: {
-    borderWidth: 1.5,
-    borderColor: Colors.accent,
-  },
-});

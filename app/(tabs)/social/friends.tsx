@@ -1,95 +1,37 @@
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Users, ArrowLeft } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 export default function FriendsScreen() {
   const { t } = useTranslation('social');
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <Pressable onPress={() => router.back()} style={styles.back}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
+      <Pressable onPress={() => router.back()} className="flex-row items-center gap-1.5 px-4 py-3.5">
         <ArrowLeft size={20} strokeWidth={2} color={Colors.accent} />
-        <Text style={styles.backText}>{t('friendsStub.back')}</Text>
+        <Text className="font-heading text-[13px] text-accent tracking-[1px]">
+          {t('friendsStub.back')}
+        </Text>
       </Pressable>
 
-      <View style={styles.center}>
-        <View style={styles.iconWrap}>
+      <View className="flex-1 items-center justify-center px-8 -mt-[60px]">
+        <View className="w-16 h-16 rounded-full bg-surface items-center justify-center mb-4 border border-default">
           <Users size={32} strokeWidth={1.4} color="#333" />
         </View>
-        <Text style={styles.title}>{t('friendsStub.title')}</Text>
-        <Text style={styles.subtitle}>{t('friendsStub.subtitle')}</Text>
-        <View style={styles.pill}>
-          <Text style={styles.pillText}>{t('friendsStub.comingSoon')}</Text>
+        <Text className="font-heading text-xl tracking-[3px] text-white mb-2">
+          {t('friendsStub.title')}
+        </Text>
+        <Text className="font-sans text-[13px] text-[#555] text-center mb-5">
+          {t('friendsStub.subtitle')}
+        </Text>
+        <View className="py-1.5 px-4 rounded-full border border-default bg-surface">
+          <Text className="font-heading text-[10px] text-[#404040] tracking-[2px]">
+            {t('friendsStub.comingSoon')}
+          </Text>
         </View>
       </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: Colors.base,
-  },
-  back: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
-  backText: {
-    fontFamily: Fonts.display,
-    fontSize: 13,
-    color: Colors.accent,
-    letterSpacing: 1,
-  },
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 32,
-    marginTop: -60,
-  },
-  iconWrap: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#1e1e1e',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
-  },
-  title: {
-    fontFamily: Fonts.display,
-    fontSize: 20,
-    letterSpacing: 3,
-    color: '#fff',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontFamily: Fonts.body,
-    fontSize: 13,
-    color: '#555',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  pill: {
-    paddingVertical: 6,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
-    backgroundColor: '#1e1e1e',
-  },
-  pillText: {
-    fontFamily: Fonts.display,
-    fontSize: 10,
-    color: '#404040',
-    letterSpacing: 2,
-  },
-});

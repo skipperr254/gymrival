@@ -7,6 +7,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -16,7 +17,7 @@ import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useChatStore } from '@/store/useChatStore';
 import { fetchProfile } from '@/lib/api';
-import { ChatAvatar, MessageList, styles } from '@/components/features/social/chat';
+import { ChatAvatar, MessageList } from '@/components/features/social/chat';
 
 export default function ChatScreen() {
   const { t } = useTranslation('social');
@@ -165,19 +166,27 @@ export default function ChatScreen() {
 
   if (initError) {
     return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
-        <View style={styles.header}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
+        <View
+          className="flex-row items-center gap-3 px-4 py-3 bg-[#1a1a1a]"
+          style={{ borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#242424' }}
+        >
           <Pressable
             onPress={() => router.back()}
-            style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.6 }]}
+            className="w-9 h-9 rounded-full border border-[#2a2a2a] bg-[#242424] items-center justify-center shrink-0"
+            style={({ pressed }) => pressed && { opacity: 0.6 }}
           >
             <ChevronLeft size={18} strokeWidth={2} color="#888" />
           </Pressable>
         </View>
-        <View style={styles.errorWrap}>
+        <View className="flex-1 items-center justify-center gap-3 px-8 -mt-[60px]">
           <MessageCircle size={32} strokeWidth={1.4} color="#333" />
-          <Text style={styles.errorTitle}>{t('chat.cantOpen')}</Text>
-          <Text style={styles.errorSub}>{t('chat.errorSub')}</Text>
+          <Text className="font-heading text-lg tracking-[2px] text-white">
+            {t('chat.cantOpen')}
+          </Text>
+          <Text className="font-sans text-[13px] text-[#555] text-center">
+            {t('chat.errorSub')}
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -190,12 +199,16 @@ export default function ChatScreen() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
+      <View
+        className="flex-row items-center gap-3 px-4 py-3 bg-[#1a1a1a]"
+        style={{ borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#242424' }}
+      >
         <Pressable
           onPress={() => router.back()}
-          style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.6 }]}
+          className="w-9 h-9 rounded-full border border-[#2a2a2a] bg-[#242424] items-center justify-center shrink-0"
+          style={({ pressed }) => pressed && { opacity: 0.6 }}
         >
           <ChevronLeft size={18} strokeWidth={2} color="#888" />
         </Pressable>
@@ -203,14 +216,18 @@ export default function ChatScreen() {
         {otherUserId ? (
           <ChatAvatar userId={otherUserId} name={displayName} size={40} online={online} />
         ) : (
-          <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#242424' }} />
+          <View className="w-10 h-10 rounded-full bg-[#242424]" />
         )}
 
-        <View style={styles.headerInfo}>
-          <Text style={styles.headerName} numberOfLines={1}>
+        <View className="flex-1">
+          <Text className="font-sans-semibold text-[15px] text-white" numberOfLines={1}>
             {displayName}
           </Text>
-          <Text style={[styles.headerStatus, online && styles.headerStatusOnline]}>
+          <Text
+            className={`font-sans text-[11px] mt-px ${
+              online ? 'text-success' : 'text-[#505050]'
+            }`}
+          >
             {online ? t('chat.online') : t('chat.offline')}
             {otherUser ? `  ·  ${t('lvl', { level: otherUser.level })}` : ''}
           </Text>
@@ -241,23 +258,24 @@ export default function ChatScreen() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={styles.quickScroll}
+        className="grow-0 pb-2"
         contentContainerStyle={styles.quickContent}
       >
         {QUICK_REPLIES.map((q, i) => (
           <Pressable
             key={i}
             onPress={() => handleSend(q)}
-            style={({ pressed }) => [styles.quickBtn, pressed && { opacity: 0.7 }]}
+            className="py-1.5 px-3.5 rounded-full border border-[#2a2a2a] bg-[#1c1c1c]"
+            style={({ pressed }) => pressed && { opacity: 0.7 }}
           >
-            <Text style={styles.quickBtnText}>{q}</Text>
+            <Text className="font-sans text-xs text-[#888]">{q}</Text>
           </Pressable>
         ))}
       </ScrollView>
 
       {/* Input bar */}
-      <View style={[styles.inputRow, { paddingBottom: inputBottomPad }]}>
-        <View style={styles.inputWrap}>
+      <View className="flex-row items-end gap-2 px-4 pt-2.5" style={{ paddingBottom: inputBottomPad }}>
+        <View className="flex-1 flex-row items-end bg-[#1c1c1c] border-[1.5px] border-[#2a2a2a] rounded-[22px] pl-4 pr-1 py-1">
           <TextInput
             ref={inputRef}
             value={input}
@@ -265,7 +283,7 @@ export default function ChatScreen() {
             onSubmitEditing={() => handleSend()}
             placeholder={otherUser ? t('chat.messagePlaceholder', { name: displayName }) : t('chat.messagePlaceholderGeneric')}
             placeholderTextColor={Colors.hint}
-            style={styles.input}
+            className="flex-1 font-sans text-sm text-white py-2.5 max-h-[120px]"
             returnKeyType="send"
             blurOnSubmit={false}
             multiline
@@ -273,7 +291,9 @@ export default function ChatScreen() {
           <Pressable
             onPress={() => handleSend()}
             disabled={!input.trim() || !conversationId}
-            style={[styles.sendBtn, input.trim() && conversationId ? styles.sendBtnActive : styles.sendBtnInactive]}
+            className={`w-[34px] h-[34px] rounded-full items-center justify-center shrink-0 mb-0.5 ${
+              input.trim() && conversationId ? 'bg-accent' : 'bg-[#242424]'
+            }`}
           >
             <ArrowUp size={16} strokeWidth={2.5} color={input.trim() && conversationId ? '#fff' : '#404040'} />
           </Pressable>
@@ -284,3 +304,11 @@ export default function ChatScreen() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  quickContent: {
+    paddingHorizontal: 16,
+    paddingTop: 4,
+    gap: 7,
+  },
+});

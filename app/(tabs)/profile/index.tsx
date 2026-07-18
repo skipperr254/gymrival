@@ -3,6 +3,7 @@ import {
   Text,
   ScrollView,
   Pressable,
+  StyleSheet,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,7 +11,7 @@ import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@/constants/theme';
+import { Colors, Radius } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
@@ -23,7 +24,6 @@ import {
   getExerciseIcon,
   formatMemberSince,
   computeBarRatios,
-  styles,
   type IoniconName,
 } from '@/components/features/profile';
 
@@ -74,19 +74,24 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         {/* ── Header ────────────────────────────────────────── */}
-        <View style={styles.header}>
+        <View className="flex-row items-end justify-between mb-1">
           <View>
-            <Text style={styles.appTitle}>{t('profile:header.brand')}</Text>
-            <Text style={styles.pageLabel}>{t('profile:header.pageLabel')}</Text>
+            <Text className="font-heading text-primary tracking-[4px] text-[26px] leading-7">
+              {t('profile:header.brand')}
+            </Text>
+            <Text className="font-heading text-[11px] text-[#606060] tracking-[2px] mt-0.5">
+              {t('profile:header.pageLabel')}
+            </Text>
           </View>
           <Pressable
-            style={({ pressed }) => [styles.headerBtn, pressed && { opacity: 0.5 }]}
+            className="w-9 h-9 rounded-[10px] bg-surface items-center justify-center"
+            style={({ pressed }) => pressed && { opacity: 0.5 }}
             onPress={() => router.push(Routes.notifications as never)}
           >
             <Ionicons
@@ -95,8 +100,8 @@ export default function ProfileScreen() {
               color={unreadCount > 0 ? Colors.accent : '#909090'}
             />
             {unreadCount > 0 && (
-              <View style={styles.bellBadge}>
-                <Text style={styles.bellBadgeText}>
+              <View className="absolute -top-1 -right-1 bg-accent rounded-full min-w-[16px] h-4 items-center justify-center px-[3px] border-[1.5px] border-base">
+                <Text className="font-sans-bold text-[9px] text-white">
                   {unreadCount > 9 ? '9+' : String(unreadCount)}
                 </Text>
               </View>
@@ -112,30 +117,28 @@ export default function ProfileScreen() {
           style={styles.profileCard}
         >
           {/* Avatar + name row */}
-          <View style={styles.profileTop}>
-            <View style={styles.avatarWrapper}>
+          <View className="flex-row items-center gap-4 mb-[18px]">
+            <View className="relative">
               <Avatar
                 name={displayName}
                 userId={user?.id ?? displayName}
                 size="xl"
               />
               <Pressable
-                style={({ pressed }) => [
-                  styles.avatarEditBadge,
-                  pressed && { opacity: 0.7 },
-                ]}
+                className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-accent items-center justify-center border-2 border-[#1a0000]"
+                style={({ pressed }) => pressed && { opacity: 0.7 }}
                 onPress={() => router.push(Routes.profileEdit as never)}
               >
                 <Ionicons name="pencil" size={10} color={Colors.primary} />
               </Pressable>
             </View>
-            <View style={styles.profileMeta}>
-              <Text style={styles.profileName} numberOfLines={1}>
+            <View className="flex-1 gap-0.5">
+              <Text className="font-heading text-2xl text-primary tracking-[2px]" numberOfLines={1}>
                 {displayName.toUpperCase()}
               </Text>
-              <Text style={styles.profileUsername}>@{username}</Text>
+              <Text className="font-sans text-[13px] text-[#909090] mb-1">@{username}</Text>
               {!!profile?.bio && (
-                <Text style={styles.profileBio} numberOfLines={2}>
+                <Text className="font-sans text-[13px] text-secondary italic leading-[18px]" numberOfLines={2}>
                   {profile.bio}
                 </Text>
               )}
@@ -144,19 +147,25 @@ export default function ProfileScreen() {
 
           {/* Motto */}
           {!!profile?.quote && (
-            <View style={styles.mottoBox}>
-              <Text style={styles.mottoLabel}>{t('profile:details.motto')}</Text>
-              <Text style={styles.mottoText}>{`"${profile.quote}"`}</Text>
+            <View className="bg-[rgba(230,48,48,0.08)] border border-[rgba(230,48,48,0.2)] rounded-xl px-4 py-3.5 mb-4">
+              <Text className="font-heading text-[11px] text-accent tracking-[2px] mb-1.5">
+                {t('profile:details.motto')}
+              </Text>
+              <Text className="font-sans text-sm text-primary italic leading-[22px]">{`"${profile.quote}"`}</Text>
             </View>
           )}
 
           {/* Stats */}
-          <View style={styles.statsRow}>
+          <View className="flex-row gap-2">
             {stats.map((s) => (
-              <View key={s.label} style={styles.statBox}>
+              <View key={s.label} className="flex-1 items-center bg-[rgba(0,0,0,0.35)] rounded-xl py-2.5 px-1.5 gap-1">
                 <Ionicons name={s.icon} size={14} color={Colors.accent} />
-                <Text style={styles.statValue}>{s.value}</Text>
-                <Text style={styles.statLabel}>{s.label}</Text>
+                <Text className="font-heading text-primary tracking-[1px] text-[22px] leading-6">
+                  {s.value}
+                </Text>
+                <Text className="font-sans text-[9px] text-[#606060] tracking-[1px] font-bold">
+                  {s.label}
+                </Text>
               </View>
             ))}
           </View>
@@ -175,29 +184,39 @@ export default function ProfileScreen() {
               style={styles.upgradeBtn}
             >
               <Ionicons name="flash" size={18} color={Colors.primary} />
-              <Text style={styles.upgradeText}>{t('profile:proUpsell')}</Text>
+              <Text className="font-heading text-[15px] text-primary tracking-[3px]">
+                {t('profile:proUpsell')}
+              </Text>
             </LinearGradient>
           </Pressable>
         ) : (
           <Pressable
-            style={({ pressed }) => [styles.proActiveBtn, pressed && { opacity: 0.82 }]}
+            className="flex-row items-center justify-center gap-2 bg-surface rounded-2xl h-[52px] border border-success"
+            style={({ pressed }) => pressed && { opacity: 0.82 }}
             onPress={handleTogglePro}
           >
             <Ionicons name="checkmark-circle" size={18} color={Colors.success} />
-            <Text style={styles.proActiveText}>{t('profile:proActive')}</Text>
+            <Text className="font-heading text-base text-success tracking-[1.5px]">
+              {t('profile:proActive')}
+            </Text>
           </Pressable>
         )}
 
         {/* ── My Details ────────────────────────────────────── */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>{t('profile:details.title')}</Text>
+        <View className="bg-surface rounded-[20px] overflow-hidden">
+          <View className="flex-row items-center justify-between px-5 pt-[18px] pb-4">
+            <Text className="font-heading text-[15px] text-primary tracking-[3px]">
+              {t('profile:details.title')}
+            </Text>
             <Pressable
-              style={({ pressed }) => [styles.editBtn, pressed && { opacity: 0.5 }]}
+              className="flex-row items-center gap-1.5 bg-elevated rounded-[10px] px-3.5 py-1.5"
+              style={({ pressed }) => pressed && { opacity: 0.5 }}
               onPress={() => router.push(Routes.profileEdit as never)}
             >
               <Ionicons name="pencil-outline" size={11} color='#b0b0b0' />
-              <Text style={styles.editBtnText}>{t('profile:details.edit')}</Text>
+              <Text className="font-heading text-[11px] text-secondary tracking-[1px]">
+                {t('profile:details.edit')}
+              </Text>
             </Pressable>
           </View>
 
@@ -222,38 +241,37 @@ export default function ProfileScreen() {
 
         {/* ── Best PRs ──────────────────────────────────────── */}
         {bestPRs.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>{t('profile:bestPrs')}</Text>
+          <View className="bg-surface rounded-[20px] overflow-hidden">
+            <View className="flex-row items-center justify-between px-5 pt-[18px] pb-4">
+              <Text className="font-heading text-[15px] text-primary tracking-[3px]">
+                {t('profile:bestPrs')}
+              </Text>
             </View>
 
             {bestPRs.map((pr, i) => (
               <View key={pr.id}>
-                <View style={[styles.prRow, i > 0 && styles.rowBorder]}>
-                  <View style={styles.prIconBox}>
+                <View className={`flex-row items-center gap-3 px-5 py-3.5 ${i > 0 ? 'border-t border-elevated' : ''}`}>
+                  <View className="w-9 h-9 rounded-[10px] bg-[rgba(230,48,48,0.1)] items-center justify-center shrink-0">
                     <Ionicons
                       name={getExerciseIcon(pr.exercise_key)}
                       size={17}
                       color={Colors.accent}
                     />
                   </View>
-                  <View style={styles.prContent}>
-                    <View style={styles.prTopRow}>
-                      <Text style={styles.prName}>{pr.exercise.label}</Text>
-                      <View style={styles.prValueGroup}>
-                        <Text style={styles.prNum}>{pr.value}</Text>
-                        <Text style={styles.prUnit}> {pr.unit}</Text>
+                  <View className="flex-1">
+                    <View className="flex-row items-center justify-between mb-[5px]">
+                      <Text className="font-sans-medium text-[13px] text-secondary">{pr.exercise.label}</Text>
+                      <View className="flex-row items-baseline">
+                        <Text className="font-heading text-base text-accent tracking-[1px]">{pr.value}</Text>
+                        <Text className="font-heading text-[11px] text-[#606060]"> {pr.unit}</Text>
                       </View>
                     </View>
-                    <View style={styles.prBarTrack}>
+                    <View className="h-[3px] bg-elevated rounded-[3px] overflow-hidden">
                       <LinearGradient
                         colors={[Colors.accent, '#ff6060']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
-                        style={[
-                          styles.prBarFill,
-                          { width: `${Math.round(barRatios[i] * 100)}%` },
-                        ]}
+                        style={{ height: 3, borderRadius: 3, width: `${Math.round(barRatios[i] * 100)}%` }}
                       />
                     </View>
                   </View>
@@ -264,9 +282,11 @@ export default function ProfileScreen() {
         )}
 
         {/* ── Settings ──────────────────────────────────────── */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>{t('profile:settings.title')}</Text>
+        <View className="bg-surface rounded-[20px] overflow-hidden">
+          <View className="flex-row items-center justify-between px-5 pt-[18px] pb-4">
+            <Text className="font-heading text-[15px] text-primary tracking-[3px]">
+              {t('profile:settings.title')}
+            </Text>
           </View>
           <SettingsRow
             icon="language-outline"
@@ -308,13 +328,38 @@ export default function ProfileScreen() {
 
         {/* ── Log Out ───────────────────────────────────────── */}
         <Pressable
-          style={({ pressed }) => [styles.logOutBtn, pressed && { opacity: 0.6 }]}
+          className="flex-row items-center justify-center gap-2.5 py-3.5 rounded-2xl border border-[#3a1a1a] mb-2.5"
+          style={({ pressed }) => pressed && { opacity: 0.6 }}
           onPress={handleSignOut}
         >
           <Ionicons name="log-out-outline" size={16} color={Colors.accent} />
-          <Text style={styles.logOutText}>{t('profile:logOut')}</Text>
+          <Text className="font-heading text-sm text-accent tracking-[3px]">{t('profile:logOut')}</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  content: {
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 100,
+    gap: 14,
+  },
+  profileCard: {
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#3a1a1a',
+    padding: 20,
+    paddingTop: 24,
+  },
+  upgradeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    borderRadius: Radius.button,
+    height: 52,
+  },
+});

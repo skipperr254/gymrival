@@ -1,10 +1,9 @@
 import type { RefObject } from 'react';
-import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import type { Message } from '@/types/social';
 import { ChatAvatar } from './ChatAvatar';
 import { formatDateLabel, formatMessageTime } from './helpers';
-import { styles } from './styles';
 
 type ScrollEvent = {
   nativeEvent: {
@@ -55,7 +54,7 @@ export function MessageList({
   return (
     <ScrollView
       ref={scrollRef}
-      style={styles.messageArea}
+      className="flex-1"
       contentContainerStyle={styles.messageContent}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
@@ -69,22 +68,24 @@ export function MessageList({
 
       {/* "All caught up" hint when no more history */}
       {!hasMoreMessages && messages.length > 0 && (
-        <View style={styles.historyEnd}>
-          <Text style={styles.historyEndText}>{t('chat.startOfConversation')}</Text>
+        <View className="flex-row items-center gap-2.5 mb-2">
+          <Text className="font-heading text-[9px] text-[#333] tracking-[2px]">
+            {t('chat.startOfConversation')}
+          </Text>
         </View>
       )}
 
       {/* Initial loading */}
       {messagesLoading && (
-        <View style={styles.loadingWrap}>
+        <View className="flex-1 items-center justify-center py-12">
           <ActivityIndicator color="#404040" />
         </View>
       )}
 
       {/* Empty conversation */}
       {!messagesLoading && messages.length === 0 && (
-        <View style={styles.emptyWrap}>
-          <Text style={styles.emptyText}>
+        <View className="items-center py-16 px-8">
+          <Text className="font-sans text-sm text-[#484848] text-center">
             {t('chat.sayHello', { name: displayName })}
           </Text>
         </View>
@@ -94,10 +95,12 @@ export function MessageList({
       {groups.map((group) => (
         <View key={group.label}>
           {/* Date divider */}
-          <View style={styles.dateDivider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>{group.label}</Text>
-            <View style={styles.dividerLine} />
+          <View className="flex-row items-center gap-2.5 mb-1.5 mt-1.5">
+            <View className="flex-1 h-px bg-surface" />
+            <Text className="font-heading text-[9px] text-[#404040] tracking-[1.5px]">
+              {group.label}
+            </Text>
+            <View className="flex-1 h-px bg-surface" />
           </View>
 
           {group.msgs.map((msg, i) => {
@@ -110,35 +113,41 @@ export function MessageList({
             return (
               <View
                 key={msg.id}
-                style={[
-                  styles.messageRow,
-                  isMe ? styles.messageRowMe : styles.messageRowOther,
-                  { marginBottom: isLastInGroup ? 8 : 2 },
-                ]}
+                className={`flex-row items-end gap-2 ${
+                  isMe ? 'justify-end' : 'justify-start'
+                } ${isLastInGroup ? 'mb-2' : 'mb-0.5'}`}
               >
                 {!isMe && (
                   showAvatar ? (
                     <ChatAvatar userId={otherUserId ?? ''} name={displayName} size={28} />
                   ) : (
-                    <View style={{ width: 28, flexShrink: 0 }} />
+                    <View className="w-7 shrink-0" />
                   )
                 )}
 
-                <View style={[styles.bubbleGroup, isMe ? styles.bubbleGroupMe : styles.bubbleGroupOther]}>
-                  <View style={[
-                    styles.bubble,
-                    isMe ? styles.bubbleMe : styles.bubbleOther,
-                    msg.id.startsWith('temp-') && styles.bubbleSending,
-                  ]}>
-                    <Text style={[styles.bubbleText, isMe && styles.bubbleTextMe]}>
+                <View className={`max-w-[72%] gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}>
+                  <View
+                    className={`py-2.5 px-3.5 ${
+                      isMe
+                        ? 'bg-accent rounded-[18px] rounded-br-[4px]'
+                        : 'bg-[#242424] rounded-[18px] rounded-bl-[4px]'
+                    } ${msg.id.startsWith('temp-') ? 'opacity-60' : ''}`}
+                  >
+                    <Text
+                      className={`font-sans text-sm leading-[21px] ${
+                        isMe ? 'text-white' : 'text-secondary'
+                      }`}
+                    >
                       {msg.content}
                     </Text>
                   </View>
                   {isLastInGroup && (
-                    <View style={[styles.metaRow, isMe && styles.metaRowMe]}>
-                      <Text style={styles.bubbleTime}>{formatMessageTime(msg.created_at)}</Text>
+                    <View className={`flex-row items-center gap-1.5 mt-0.5 ${isMe ? 'justify-end' : ''}`}>
+                      <Text className="font-sans text-[10px] text-[#404040]">
+                        {formatMessageTime(msg.created_at)}
+                      </Text>
                       {isMe && (
-                        <Text style={styles.readStatus}>
+                        <Text className="font-sans text-[10px] text-[#404040]">
                           {msg.read_at ? t('chat.read') : t('chat.sent')}
                         </Text>
                       )}
@@ -153,3 +162,11 @@ export function MessageList({
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  messageContent: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+});

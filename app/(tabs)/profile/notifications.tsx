@@ -13,7 +13,7 @@ import { router } from 'expo-router';
 import { useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { Colors, Fonts, FontSizes } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
@@ -124,34 +124,45 @@ function NotificationItem({
 
   return (
     <Pressable
+      className={`flex-row items-center px-4 py-3.5 gap-3 ${isUnread ? 'bg-surface' : ''}`}
       style={({ pressed }) => [
-        styles.item,
-        isUnread && styles.itemUnread,
+        { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: Colors.borderSubtle },
         pressed && { opacity: 0.75 },
       ]}
       onPress={() => onPress(item)}
     >
-      {isUnread && <View style={styles.unreadBar} />}
+      {isUnread && <View className="absolute left-0 top-0 bottom-0 w-[3px] bg-accent rounded-r-[2px]" />}
 
       {/* Avatar */}
-      <View style={[styles.avatar, { backgroundColor: bgColor + '30', borderColor: bgColor + '50' }]}>
-        <Text style={[styles.avatarText, { color: bgColor }]}>
+      <View
+        className="w-[46px] h-[46px] rounded-full items-center justify-center border shrink-0"
+        style={{ backgroundColor: bgColor + '30', borderColor: bgColor + '50' }}
+      >
+        <Text className="font-heading text-lg" style={{ color: bgColor }}>
           {actorInitial(item)}
         </Text>
-        <View style={[styles.iconBadge, { backgroundColor: icon.color }]}>
+        <View
+          className="absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] rounded-full items-center justify-center border-2 border-base"
+          style={{ backgroundColor: icon.color }}
+        >
           <Ionicons name={icon.name} size={9} color="#fff" />
         </View>
       </View>
 
       {/* Content */}
-      <View style={styles.itemBody}>
-        <Text style={[styles.itemText, isUnread && styles.itemTextUnread]} numberOfLines={2}>
+      <View className="flex-1 gap-[3px]">
+        <Text
+          className={`font-sans text-sm leading-[19px] ${
+            isUnread ? 'font-sans-medium text-primary' : 'text-secondary'
+          }`}
+          numberOfLines={2}
+        >
           {buildNotificationText(item, t)}
         </Text>
-        <Text style={styles.itemTime}>{timeAgo(item.created_at)}</Text>
+        <Text className="font-sans text-xs text-muted">{timeAgo(item.created_at)}</Text>
       </View>
 
-      {isUnread && <View style={styles.unreadDot} />}
+      {isUnread && <View className="w-2 h-2 rounded-full bg-accent shrink-0" />}
     </Pressable>
   );
 }
@@ -191,39 +202,48 @@ export default function NotificationsScreen() {
   }, [user?.id, markAllRead]);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
+      <View
+        className="flex-row items-center px-4 py-3.5"
+        style={{ borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: Colors.borderDefault }}
+      >
         <Pressable
-          style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.5 }]}
+          className="w-9 h-9 items-center justify-center"
+          style={({ pressed }) => pressed && { opacity: 0.5 }}
           onPress={() => router.back()}
         >
           <Ionicons name="chevron-back" size={22} color={Colors.primary} />
         </Pressable>
 
-        <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>{t('notifications.title')}</Text>
+        <View className="flex-1 flex-row items-center justify-center gap-2">
+          <Text className="font-heading text-xl text-primary tracking-[2px]">
+            {t('notifications.title')}
+          </Text>
           {unreadCount > 0 && (
-            <View style={styles.headerBadge}>
-              <Text style={styles.headerBadgeText}>{unreadCount}</Text>
+            <View className="bg-accent rounded-full min-w-[20px] h-5 items-center justify-center px-[5px]">
+              <Text className="font-sans-bold text-[11px] text-white">{unreadCount}</Text>
             </View>
           )}
         </View>
 
         {unreadCount > 0 ? (
           <Pressable
-            style={({ pressed }) => [styles.markAllBtn, pressed && { opacity: 0.5 }]}
+            className="w-[68px] items-end"
+            style={({ pressed }) => pressed && { opacity: 0.5 }}
             onPress={handleMarkAll}
           >
-            <Text style={styles.markAllText}>{t('notifications.markAll')}</Text>
+            <Text className="font-heading text-[11px] text-accent tracking-[1px]">
+              {t('notifications.markAll')}
+            </Text>
           </Pressable>
         ) : (
-          <View style={styles.markAllBtn} />
+          <View className="w-[68px] items-end" />
         )}
       </View>
 
       {loading && notifications.length === 0 ? (
-        <View style={styles.centered}>
+        <View className="flex-1 items-center justify-center">
           <ActivityIndicator color={Colors.accent} />
         </View>
       ) : (
@@ -245,12 +265,16 @@ export default function NotificationsScreen() {
             />
           }
           ListEmptyComponent={
-            <View style={styles.emptyState}>
-              <View style={styles.emptyIconBox}>
+            <View className="flex-1 items-center justify-center px-10 pt-20 gap-3">
+              <View className="w-[72px] h-[72px] rounded-full items-center justify-center bg-surface mb-1">
                 <Ionicons name="notifications-off-outline" size={40} color={Colors.hint} />
               </View>
-              <Text style={styles.emptyTitle}>{t('notifications.emptyTitle')}</Text>
-              <Text style={styles.emptySub}>{t('notifications.emptySub')}</Text>
+              <Text className="font-heading text-2xl text-primary tracking-[2px]">
+                {t('notifications.emptyTitle')}
+              </Text>
+              <Text className="font-sans text-sm text-muted text-center leading-5">
+                {t('notifications.emptySub')}
+              </Text>
             </View>
           }
           showsVerticalScrollIndicator={false}
@@ -263,173 +287,10 @@ export default function NotificationsScreen() {
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: Colors.base,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.borderDefault,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerCenter: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  headerTitle: {
-    fontFamily: Fonts.display,
-    fontSize: FontSizes.xl,
-    color: Colors.primary,
-    letterSpacing: 2,
-  },
-  headerBadge: {
-    backgroundColor: Colors.accent,
-    borderRadius: 10,
-    minWidth: 20,
-    height: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 5,
-  },
-  headerBadgeText: {
-    fontFamily: Fonts.bodyBold,
-    fontSize: 11,
-    color: '#fff',
-  },
-  markAllBtn: {
-    width: 68,
-    alignItems: 'flex-end',
-  },
-  markAllText: {
-    fontFamily: Fonts.display,
-    fontSize: 11,
-    color: Colors.accent,
-    letterSpacing: 1,
-  },
-  centered: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   list: {
     paddingBottom: 100,
   },
   emptyContainer: {
     flex: 1,
-  },
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.borderSubtle,
-    gap: 12,
-  },
-  itemUnread: {
-    backgroundColor: Colors.surface,
-  },
-  unreadBar: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 3,
-    backgroundColor: Colors.accent,
-    borderTopRightRadius: 2,
-    borderBottomRightRadius: 2,
-  },
-  avatar: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    flexShrink: 0,
-  },
-  avatarText: {
-    fontFamily: Fonts.display,
-    fontSize: FontSizes.lg,
-  },
-  iconBadge: {
-    position: 'absolute',
-    bottom: -2,
-    right: -2,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: Colors.base,
-  },
-  itemBody: {
-    flex: 1,
-    gap: 3,
-  },
-  itemText: {
-    fontFamily: Fonts.body,
-    fontSize: FontSizes.sm,
-    color: Colors.secondary,
-    lineHeight: 19,
-  },
-  itemTextUnread: {
-    color: Colors.primary,
-    fontFamily: Fonts.bodyMedium,
-  },
-  itemTime: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
-    color: Colors.muted,
-  },
-  unreadDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: Colors.accent,
-    flexShrink: 0,
-  },
-  emptyState: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 40,
-    paddingTop: 80,
-    gap: 12,
-  },
-  emptyIconBox: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: Colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 4,
-  },
-  emptyTitle: {
-    fontFamily: Fonts.display,
-    fontSize: FontSizes['2xl'],
-    color: Colors.primary,
-    letterSpacing: 2,
-  },
-  emptySub: {
-    fontFamily: Fonts.body,
-    fontSize: FontSizes.sm,
-    color: Colors.muted,
-    textAlign: 'center',
-    lineHeight: 20,
   },
 });

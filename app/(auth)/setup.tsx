@@ -107,20 +107,22 @@ export default function SetupScreen() {
                 {t("setup.usernameLabel")} <Text className="text-accent">*</Text>
               </Text>
               <View
-                className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
-                style={[
-                  styles.inputBorder,
-                  username.length > 0 && (usernameValid ? styles.inputValid : styles.inputError),
-                ]}
+                className={`bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] ${
+                  username.length > 0
+                    ? usernameValid
+                      ? 'border-success'
+                      : 'border-accent'
+                    : 'border-elevated'
+                }`}
               >
-                <Text style={styles.atSign}>@</Text>
+                <Text className="font-sans-medium text-[15px] text-secondary mr-0.5">@</Text>
                 <TextInput
                   value={username}
                   onChangeText={handleUsernameChange}
                   placeholder={t("setup.usernamePlaceholder")}
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
-                  style={styles.input}
+                  className="flex-1 font-sans text-[15px] text-primary"
                   autoCapitalize="none"
                   autoCorrect={false}
                   returnKeyType="next"
@@ -141,22 +143,19 @@ export default function SetupScreen() {
                     {t("setup.heightOptional")}
                   </Text>
                 </Text>
-                <View
-                  className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
-                  style={styles.inputBorder}
-                >
+                <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
                   <TextInput
                     value={height}
                     onChangeText={(v) => setHeight(v.replace(/[^0-9.]/g, ""))}
                     placeholder={t("setup.heightPlaceholder")}
                     placeholderTextColor={Colors.hint}
                     selectionColor={Colors.accent}
-                    style={styles.input}
+                    className="flex-1 font-sans text-[15px] text-primary"
                     keyboardType="decimal-pad"
                     returnKeyType="next"
                     maxLength={6}
                   />
-                  <Text style={styles.unit}>cm</Text>
+                  <Text className="font-sans text-[13px] text-muted ml-1">cm</Text>
                 </View>
               </View>
 
@@ -167,23 +166,20 @@ export default function SetupScreen() {
                     {t("setup.weightOptional")}
                   </Text>
                 </Text>
-                <View
-                  className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
-                  style={styles.inputBorder}
-                >
+                <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
                   <TextInput
                     value={weight}
                     onChangeText={(v) => setWeight(v.replace(/[^0-9.]/g, ""))}
                     placeholder={t("setup.weightPlaceholder")}
                     placeholderTextColor={Colors.hint}
                     selectionColor={Colors.accent}
-                    style={styles.input}
+                    className="flex-1 font-sans text-[15px] text-primary"
                     keyboardType="decimal-pad"
                     returnKeyType="done"
                     onSubmitEditing={handleSubmit}
                     maxLength={6}
                   />
-                  <Text style={styles.unit}>kg</Text>
+                  <Text className="font-sans text-[13px] text-muted ml-1">kg</Text>
                 </View>
               </View>
             </View>
@@ -242,33 +238,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 40,
-  },
-  inputBorder: {
-    borderWidth: 1.5,
-    borderColor: Colors.elevated,
-  },
-  inputValid: {
-    borderColor: Colors.success,
-  },
-  inputError: {
-    borderColor: Colors.accent,
-  },
-  input: {
-    flex: 1,
-    fontFamily: "DMSans_400Regular",
-    fontSize: 15,
-    color: Colors.primary,
-  },
-  atSign: {
-    fontFamily: "DMSans_500Medium",
-    fontSize: 15,
-    color: Colors.secondary,
-    marginRight: 2,
-  },
-  unit: {
-    fontFamily: "DMSans_400Regular",
-    fontSize: 13,
-    color: Colors.muted,
-    marginLeft: 4,
   },
 });

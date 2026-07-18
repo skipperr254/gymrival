@@ -78,17 +78,14 @@ export default function ForgotPasswordScreen() {
             <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
               {t("forgotPassword.emailLabel")}
             </Text>
-            <View
-              className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
-              style={styles.inputBorder}
-            >
+            <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
               <TextInput
                 value={email}
                 onChangeText={setEmail}
                 placeholder={t("forgotPassword.emailPlaceholder")}
                 placeholderTextColor={Colors.hint}
                 selectionColor={Colors.accent}
-                style={styles.input}
+                className="flex-1 font-sans text-[15px] text-primary"
                 autoCapitalize="none"
                 keyboardType="email-address"
                 returnKeyType="done"
@@ -150,15 +147,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 40,
-  },
-  inputBorder: {
-    borderWidth: 1.5,
-    borderColor: Colors.elevated,
-  },
-  input: {
-    flex: 1,
-    fontFamily: "DMSans_400Regular",
-    fontSize: 15,
-    color: Colors.primary,
   },
 });

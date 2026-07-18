@@ -1,5 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Colors, Fonts } from '@/constants/theme';
+import { Pressable, Text, View } from 'react-native';
 
 export interface SectionHeaderAction {
   label: string;
@@ -13,37 +12,19 @@ export interface SectionHeaderProps {
 
 export function SectionHeader({ label, action }: SectionHeaderProps) {
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>{label.toUpperCase()}</Text>
+    <View className="flex-row items-center justify-between mb-3">
+      <Text className="font-heading text-xl text-primary tracking-[2px]">
+        {label.toUpperCase()}
+      </Text>
       {action ? (
         <Pressable
           onPress={action.onPress}
           hitSlop={10}
           style={({ pressed }) => pressed && { opacity: 0.6 }}
         >
-          <Text style={styles.action}>{action.label}</Text>
+          <Text className="font-sans-medium text-[13px] text-accent">{action.label}</Text>
         </Pressable>
       ) : null}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  label: {
-    fontFamily: Fonts.display,
-    fontSize: 20,
-    color: Colors.primary,
-    letterSpacing: 2,
-  },
-  action: {
-    fontFamily: Fonts.bodyMedium,
-    fontSize: 13,
-    color: Colors.accent,
-  },
-});

@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSocialStore } from '@/store/useSocialStore';
 import { FeedCard, FeedSkeleton } from './FeedCard';
-import { feedStyles } from './feedStyles';
 
 export function FeedContent() {
   const { t } = useTranslation('social');
@@ -48,12 +47,16 @@ export function FeedContent() {
 
   if (!feedLoading && feed.length === 0) {
     return (
-      <View style={feedStyles.emptyWrap}>
-        <View style={feedStyles.emptyIconWrap}>
+      <View className="items-center py-16 px-8">
+        <View className="w-16 h-16 rounded-full bg-surface border border-default items-center justify-center mb-4">
           <Dumbbell size={28} strokeWidth={1.4} color="#404040" />
         </View>
-        <Text style={feedStyles.emptyTitle}>{t('feedEmptyTitle')}</Text>
-        <Text style={feedStyles.emptySubtitle}>{t('feedEmptySubtitle')}</Text>
+        <Text className="font-heading text-lg tracking-[2px] text-white mb-2">
+          {t('feedEmptyTitle')}
+        </Text>
+        <Text className="font-sans text-[13px] text-[#555] text-center leading-5">
+          {t('feedEmptySubtitle')}
+        </Text>
       </View>
     );
   }
@@ -70,7 +73,9 @@ export function FeedContent() {
           onLike={() => toggleLike(userId, post.id)}
         />
       ))}
-      <Text style={feedStyles.footerNote}>{t('allCaughtUp')}</Text>
+      <Text className="text-center py-6 font-heading text-[10px] text-[#383838] tracking-[2px]">
+        {t('allCaughtUp')}
+      </Text>
     </>
   );
 }

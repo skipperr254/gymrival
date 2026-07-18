@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Dumbbell, Trophy } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +7,6 @@ import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCompeteStore } from '@/store/useCompeteStore';
 import { LeaderboardAvatar, MEDAL_COLORS } from './LeaderboardAvatar';
-import { styles, rivalsStyles } from './styles';
 
 export function RivalsContent() {
   const { t } = useTranslation('compete');
@@ -46,10 +45,16 @@ export function RivalsContent() {
             <Pressable
               key={exercise.key}
               onPress={() => user?.id && setSelectedExercise(exercise.key, user.id)}
-              style={[styles.chip, active && styles.chipActive]}
+              className={`flex-row items-center gap-[5px] py-[7px] px-3 rounded-full border-[1.5px] ${
+                active ? 'border-white bg-white' : 'border-[#2a2a2a] bg-transparent'
+              }`}
             >
               <Dumbbell size={12} strokeWidth={2} color={active ? '#000' : '#555'} />
-              <Text style={[styles.chipLabel, active && styles.chipLabelActive]}>
+              <Text
+                className={`font-heading text-[11px] tracking-[1px] ${
+                  active ? 'text-black' : 'text-[#555]'
+                }`}
+              >
                 {exercise.label.toUpperCase()}
               </Text>
             </Pressable>
@@ -60,16 +65,20 @@ export function RivalsContent() {
       <View style={{ height: 16 }} />
 
       {isLoading && (
-        <View style={rivalsStyles.loadingBox}>
+        <View className="items-center py-12">
           <ActivityIndicator color={Colors.accent} size="small" />
         </View>
       )}
 
       {!isLoading && rivals.length === 0 && (
-        <View style={rivalsStyles.emptyBox}>
+        <View className="items-center bg-[#1e1e1e] rounded-2xl py-12 px-5 gap-2">
           <Trophy size={32} strokeWidth={1.4} color="#333" />
-          <Text style={rivalsStyles.emptyTitle}>{t('rivals.emptyTitle')}</Text>
-          <Text style={rivalsStyles.emptySub}>{t('rivals.emptySub')}</Text>
+          <Text className="font-heading text-lg tracking-[2px] text-white">
+            {t('rivals.emptyTitle')}
+          </Text>
+          <Text className="font-sans text-[13px] text-[#555] text-center">
+            {t('rivals.emptySub')}
+          </Text>
         </View>
       )}
 
@@ -82,39 +91,60 @@ export function RivalsContent() {
         return (
           <View
             key={rival.userId}
-            style={[styles.row, rival.isMe ? styles.rowMe : styles.rowOther]}
+            className={`flex-row items-center gap-3 rounded-2xl py-3.5 px-4 mb-2.5 ${
+              rival.isMe ? 'bg-white' : 'bg-[#1e1e1e] border border-[#2a2a2a]'
+            }`}
+            style={rival.isMe ? { transform: [{ scale: 1.025 }] } : undefined}
           >
-            <View style={styles.rankBox}>
+            <View className="w-7 items-center shrink-0">
               {index < 3 ? (
                 <Trophy size={16} strokeWidth={1.8} color={MEDAL_COLORS[index]} />
               ) : (
-                <Text style={styles.rankNum}>#{index + 1}</Text>
+                <Text className="font-heading text-[13px] text-[#505050]">#{index + 1}</Text>
               )}
             </View>
             <LeaderboardAvatar id={rival.userId} name={displayName} size={42} />
-            <View style={styles.rowCenter}>
-              <View style={styles.nameRow}>
-                <Text style={[styles.userName, rival.isMe && styles.userNameMe]}>
+            <View className="flex-1 min-w-0">
+              <View className="flex-row items-center mb-[5px]">
+                <Text
+                  className={`font-heading text-[15px] tracking-[1px] ${
+                    rival.isMe ? 'text-black' : 'text-white'
+                  }`}
+                >
                   {displayName.toUpperCase()}
                 </Text>
-                {rival.isMe && <Text style={styles.youTag}>{t('you')}</Text>}
+                {rival.isMe && (
+                  <Text className="font-heading text-[9px] text-accent ml-2 tracking-[1px]">
+                    {t('you')}
+                  </Text>
+                )}
               </View>
-              <View style={[styles.barTrack, rival.isMe && styles.barTrackMe]}>
+              <View
+                className={`h-1 rounded overflow-hidden ${
+                  rival.isMe ? 'bg-black/10' : 'bg-[#2a2a2a]'
+                }`}
+              >
                 {rival.isMe ? (
-                  <View style={[styles.barFillMe, { width: pct }]} />
+                  <View className="h-1 rounded bg-black" style={{ width: pct }} />
                 ) : (
                   <LinearGradient
                     colors={['#e63030', '#ff6b6b']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    style={[styles.barFillOther, { width: pct }]}
+                    style={{ height: 4, borderRadius: 4, width: pct }}
                   />
                 )}
               </View>
             </View>
-            <View style={styles.prBox}>
-              <Text style={[styles.prValue, { color: prColor }]}>{rival.bestPR}</Text>
-              <Text style={[styles.prUnit, rival.isMe && styles.prUnitMe]}>
+            <View className="items-end shrink-0">
+              <Text className="font-heading text-[28px] leading-7" style={{ color: prColor }}>
+                {rival.bestPR}
+              </Text>
+              <Text
+                className={`font-heading text-[9px] tracking-[1px] ${
+                  rival.isMe ? 'text-[#888]' : 'text-[#505050]'
+                }`}
+              >
                 {(selectedEx?.unit ?? rival.unit).toUpperCase()}
               </Text>
             </View>
@@ -123,8 +153,19 @@ export function RivalsContent() {
       })}
 
       {!isLoading && rivals.length > 0 && (
-        <Text style={styles.footerNote}>{t('rivals.footerNote')}</Text>
+        <Text className="text-center pt-4 pb-2 font-heading text-[10px] text-[#383838] tracking-[2px]">
+          {t('rivals.footerNote')}
+        </Text>
       )}
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  chipsRow: {
+    flexDirection: 'row',
+    gap: 6,
+    paddingTop: 16,
+    paddingBottom: 4,
+  },
+});

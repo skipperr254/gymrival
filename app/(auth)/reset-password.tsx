@@ -87,17 +87,14 @@ export default function ResetPasswordScreen() {
               <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
                 {t("resetPassword.newPasswordLabel")}
               </Text>
-              <View
-                className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
-                style={styles.inputBorder}
-              >
+              <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
                 <TextInput
                   value={password}
                   onChangeText={setPassword}
                   placeholder={t("resetPassword.newPasswordPlaceholder")}
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
-                  style={[styles.input, { flex: 1 }]}
+                  className="flex-1 font-sans text-[15px] text-primary"
                   secureTextEntry={!showPassword}
                   returnKeyType="next"
                   onSubmitEditing={() => confirmRef.current?.focus()}
@@ -124,10 +121,7 @@ export default function ResetPasswordScreen() {
               <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
                 {t("resetPassword.confirmPasswordLabel")}
               </Text>
-              <View
-                className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
-                style={styles.inputBorder}
-              >
+              <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
                 <TextInput
                   ref={confirmRef}
                   value={confirmPassword}
@@ -135,7 +129,7 @@ export default function ResetPasswordScreen() {
                   placeholder={t("resetPassword.confirmPasswordPlaceholder")}
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
-                  style={[styles.input, { flex: 1 }]}
+                  className="flex-1 font-sans text-[15px] text-primary"
                   secureTextEntry={!showConfirm}
                   returnKeyType="done"
                   onSubmitEditing={handleSubmit}
@@ -190,15 +184,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 40,
-  },
-  inputBorder: {
-    borderWidth: 1.5,
-    borderColor: Colors.elevated,
-  },
-  input: {
-    flex: 1,
-    fontFamily: "DMSans_400Regular",
-    fontSize: 15,
-    color: Colors.primary,
   },
 });

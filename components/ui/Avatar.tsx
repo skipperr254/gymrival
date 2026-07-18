@@ -1,5 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { Fonts } from '@/constants/theme';
+import { Text, View } from 'react-native';
 
 const AVATAR_COLORS = [
   '#e63030',
@@ -53,24 +52,17 @@ export function Avatar({ name, userId, size = 'md' }: AvatarProps) {
 
   return (
     <View
-      style={[
-        styles.container,
-        { width: diameter, height: diameter, borderRadius: diameter / 2, backgroundColor: bgColor },
-      ]}
+      className="items-center justify-center"
+      style={{
+        width: diameter,
+        height: diameter,
+        borderRadius: diameter / 2,
+        backgroundColor: bgColor,
+      }}
     >
-      <Text style={[styles.initials, { fontSize }]}>{initials}</Text>
+      <Text className="font-heading text-white tracking-[1px]" style={{ fontSize }}>
+        {initials}
+      </Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  initials: {
-    fontFamily: Fonts.display,
-    color: '#ffffff',
-    letterSpacing: 1,
-  },
-});

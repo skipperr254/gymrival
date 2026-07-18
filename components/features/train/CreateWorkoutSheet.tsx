@@ -17,7 +17,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { DAYS_FULL, type NewWorkout, type NewExercise } from './constants';
-import { styles } from './styles';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -101,7 +100,8 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
       {/* Backdrop */}
       <Animated.View
         pointerEvents={visible ? 'auto' : 'none'}
-        style={[styles.backdrop, { opacity: backdropAnim }]}
+        className="absolute inset-0 bg-black/[0.82] z-[100]"
+        style={{ opacity: backdropAnim }}
       >
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
       </Animated.View>
@@ -109,7 +109,8 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
       {/* Create workout bottom sheet */}
       <Animated.View
         pointerEvents={visible ? 'auto' : 'none'}
-        style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}
+        className="absolute bottom-0 left-0 right-0 bg-surface rounded-t-3xl max-h-[88%] z-[101]"
+        style={{ transform: [{ translateY: slideAnim }] }}
       >
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -121,10 +122,13 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
             keyboardShouldPersistTaps="handled"
           >
             {/* Sheet header */}
-            <View style={styles.sheetHeader}>
-              <Text style={styles.sheetTitle}>{t('createSchedule')}</Text>
+            <View className="flex-row items-center justify-between mb-5">
+              <Text className="font-heading text-[22px] tracking-[3px] text-primary">
+                {t('createSchedule')}
+              </Text>
               <Pressable
-                style={({ pressed }) => [styles.closeBtn, pressed && { opacity: 0.6 }]}
+                className="w-8 h-8 rounded-2xl bg-elevated items-center justify-center"
+                style={({ pressed }) => pressed && { opacity: 0.6 }}
                 onPress={onClose}
               >
                 <Ionicons name="close" size={15} color={Colors.secondary} />
@@ -132,9 +136,11 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
             </View>
 
             {/* Workout name */}
-            <Text style={styles.fieldLabel}>{t('workoutName')}</Text>
+            <Text className="font-heading text-[10px] tracking-[2px] text-muted mb-[5px]">
+              {t('workoutName')}
+            </Text>
             <TextInput
-              style={styles.input}
+              className="bg-base rounded-xl border border-default px-3.5 py-[11px] text-primary font-sans text-sm"
               value={newWorkout.name}
               onChangeText={(v) => setNewWorkout((p) => ({ ...p, name: v }))}
               placeholder={t('workoutNamePlaceholder')}
@@ -142,15 +148,23 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
             />
 
             {/* Day picker */}
-            <Text style={[styles.fieldLabel, { marginTop: 16 }]}>{t('day')}</Text>
-            <View style={styles.dayPicker}>
+            <Text className="font-heading text-[10px] tracking-[2px] text-muted mb-[5px] mt-4">
+              {t('day')}
+            </Text>
+            <View className="flex-row flex-wrap gap-1.5 mb-1">
               {DAYS_FULL.map((d, i) => (
                 <Pressable
                   key={d}
-                  style={[styles.dayPill, newWorkout.day === d && styles.dayPillActive]}
+                  className={`py-1.5 px-3 rounded-full border-[1.5px] ${
+                    newWorkout.day === d ? 'border-accent bg-accent-ring' : 'border-default'
+                  }`}
                   onPress={() => setNewWorkout((p) => ({ ...p, day: d }))}
                 >
-                  <Text style={[styles.dayPillText, newWorkout.day === d && styles.dayPillTextActive]}>
+                  <Text
+                    className={`font-heading text-[11px] tracking-[1px] ${
+                      newWorkout.day === d ? 'text-accent' : 'text-muted'
+                    }`}
+                  >
                     {t(`days.short.${i}`).toUpperCase()}
                   </Text>
                 </Pressable>
@@ -158,16 +172,18 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
             </View>
 
             {/* Add exercise */}
-            <Text style={[styles.fieldLabel, { marginTop: 18 }]}>{t('addExercise')}</Text>
-            <View style={styles.exerciseBuilder}>
+            <Text className="font-heading text-[10px] tracking-[2px] text-muted mb-[5px] mt-[18px]">
+              {t('addExercise')}
+            </Text>
+            <View className="bg-base rounded-2xl p-3.5 mb-3.5">
               <TextInput
-                style={[styles.input, styles.inputOnSurface, { marginBottom: 10 }]}
+                className="bg-surface rounded-xl border border-default px-3.5 py-[11px] text-primary font-sans text-sm mb-2.5"
                 value={newEx.name}
                 onChangeText={(v) => setNewEx((p) => ({ ...p, name: v }))}
                 placeholder={t('exerciseNamePlaceholder')}
                 placeholderTextColor={Colors.muted}
               />
-              <View style={styles.exFieldsRow}>
+              <View className="flex-row gap-2 mb-2.5">
                 {(
                   [
                     { key: 'sets' as const, label: t('fields.sets'), ph: '3' },
@@ -175,10 +191,12 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
                     { key: 'weight' as const, label: t('fields.weight'), ph: '0' },
                   ]
                 ).map((f) => (
-                  <View key={f.key} style={{ flex: 1 }}>
-                    <Text style={styles.miniLabel}>{f.label}</Text>
+                  <View key={f.key} className="flex-1">
+                    <Text className="font-heading text-[9px] tracking-[1px] text-muted mb-1">
+                      {f.label}
+                    </Text>
                     <TextInput
-                      style={[styles.input, styles.inputOnSurface, styles.inputSmall]}
+                      className="bg-surface rounded-xl border border-default px-2.5 py-2 text-primary font-heading text-base"
                       value={newEx[f.key]}
                       onChangeText={(v) => setNewEx((p) => ({ ...p, [f.key]: v }))}
                       placeholder={f.ph}
@@ -189,16 +207,19 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
                 ))}
               </View>
               <Pressable
-                style={({ pressed }) => [
-                  styles.addExBtn,
-                  !canAddEx && styles.addExBtnDisabled,
-                  pressed && canAddEx ? { opacity: 0.8 } : undefined,
-                ]}
+                className={`flex-row items-center justify-center gap-2 rounded-[10px] py-2.5 ${
+                  canAddEx ? 'bg-accent' : 'bg-elevated'
+                }`}
+                style={({ pressed }) => pressed && canAddEx ? { opacity: 0.8 } : undefined}
                 onPress={addExercise}
                 disabled={!canAddEx}
               >
                 <Ionicons name="add" size={14} color={canAddEx ? Colors.primary : Colors.muted} />
-                <Text style={[styles.addExBtnText, !canAddEx && { color: Colors.muted }]}>
+                <Text
+                  className={`font-heading text-xs tracking-[2px] ${
+                    canAddEx ? 'text-primary' : 'text-muted'
+                  }`}
+                >
                   {t('addExercise')}
                 </Text>
               </Pressable>
@@ -206,18 +227,21 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
 
             {/* Added exercises list */}
             {newWorkout.exercises.length > 0 && (
-              <View style={{ marginBottom: 16 }}>
-                <Text style={[styles.fieldLabel, { marginBottom: 8 }]}>
+              <View className="mb-4">
+                <Text className="font-heading text-[10px] tracking-[2px] text-muted mb-2">
                   {t('exercisesAdded', { count: newWorkout.exercises.length })}
                 </Text>
                 {newWorkout.exercises.map((ex, i) => (
-                  <View key={i} style={styles.addedExRow}>
-                    <View style={styles.addedExIcon}>
+                  <View
+                    key={i}
+                    className="flex-row items-center gap-2.5 bg-base rounded-xl py-2.5 px-3.5 mb-2"
+                  >
+                    <View className="w-7 h-7 rounded-lg bg-surface items-center justify-center">
                       <Ionicons name="pulse" size={14} color={Colors.muted} />
                     </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.addedExName}>{ex.name}</Text>
-                      <Text style={styles.addedExMeta}>
+                    <View className="flex-1">
+                      <Text className="font-sans-semibold text-[13px] text-primary">{ex.name}</Text>
+                      <Text className="font-sans text-[11px] text-muted">
                         {ex.weight > 0
                           ? t('exerciseMetaWithWeight', { sets: ex.sets, reps: ex.reps, weight: ex.weight })
                           : t('exerciseMeta', { sets: ex.sets, reps: ex.reps })}
@@ -231,7 +255,7 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
                         }))
                       }
                       hitSlop={8}
-                      style={({ pressed }) => [{ opacity: pressed ? 1 : 0.5 }]}
+                      style={({ pressed }) => ({ opacity: pressed ? 1 : 0.5 })}
                     >
                       <Ionicons name="close" size={14} color="#ff6b6b" />
                     </Pressable>
@@ -242,11 +266,10 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
 
             {/* Save button */}
             <Pressable
-              style={({ pressed }) => [
-                styles.saveBtn,
-                (!canSave || saving) && styles.saveBtnDisabled,
-                pressed && canSave && !saving ? { opacity: 0.8 } : undefined,
-              ]}
+              className={`flex-row items-center justify-center gap-2.5 rounded-2xl h-[54px] ${
+                !canSave || saving ? 'bg-elevated' : 'bg-accent'
+              }`}
+              style={({ pressed }) => (pressed && canSave && !saving ? { opacity: 0.8 } : undefined)}
               onPress={handleSave}
               disabled={!canSave || saving}
             >
@@ -255,7 +278,11 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
               ) : (
                 <>
                   <Ionicons name="checkmark" size={17} color={canSave ? Colors.primary : Colors.muted} />
-                  <Text style={[styles.saveBtnText, !canSave && { color: Colors.muted }]}>
+                  <Text
+                    className={`font-heading text-[15px] tracking-[3px] ${
+                      canSave ? 'text-primary' : 'text-muted'
+                    }`}
+                  >
                     {t('saveSchedule')}
                   </Text>
                 </>
@@ -267,3 +294,7 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  sheetContent: { padding: 24 },
+});

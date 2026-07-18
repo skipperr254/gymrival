@@ -4,7 +4,7 @@ import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { TabActions } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { useNotificationStore } from '@/store/useNotificationStore';
 
 interface Props extends BottomTabBarProps {
@@ -54,23 +54,30 @@ export function CustomTabBar({ state, navigation, onLogPress }: Props) {
       <Pressable
         key={route.key}
         onPress={onPress}
-        style={({ pressed }) => [styles.tab, pressed && styles.tabPressed]}
+        className="flex-1 items-center px-1 pt-0.5 gap-[3px]"
+        style={({ pressed }) => pressed && { opacity: 0.6 }}
         accessibilityRole="button"
         accessibilityState={isFocused ? { selected: true } : {}}
         accessibilityLabel={label}
       >
-        <View style={styles.iconWrap}>
+        <View className="relative items-center justify-center">
           <Ionicons
             name={isFocused ? icons.active : icons.inactive}
             size={22}
             color={isFocused ? Colors.primary : Colors.muted}
           />
-          {showBadge && <View style={styles.tabBadge} />}
+          {showBadge && (
+            <View className="absolute top-[-1px] right-[-4px] w-2 h-2 rounded-full bg-accent border-[1.5px] border-[#121212]" />
+          )}
         </View>
-        <Text style={[styles.label, isFocused && styles.labelActive]}>
+        <Text
+          className={`font-heading text-[9px] tracking-[1px] ${
+            isFocused ? 'text-accent' : 'text-hint'
+          }`}
+        >
           {label}
         </Text>
-        {isFocused && <View style={styles.dot} />}
+        {isFocused && <View className="w-1 h-1 rounded-full bg-accent -mt-px" />}
       </Pressable>
     );
   };
@@ -79,12 +86,29 @@ export function CustomTabBar({ state, navigation, onLogPress }: Props) {
   const rightRoutes = state.routes.slice(2);
 
   return (
-    <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+    <View
+      className="flex-row items-start justify-around bg-[#121212] pt-2.5"
+      style={{
+        paddingBottom: Math.max(insets.bottom, 12),
+        borderTopWidth: StyleSheet.hairlineWidth,
+        borderTopColor: Colors.borderDefault,
+      }}
+    >
       {leftRoutes.map((route, i) => renderTab(route, i))}
 
       <Pressable
         onPress={onLogPress}
-        style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}
+        className="w-[52px] h-[52px] rounded-full items-center justify-center -mt-4 shrink-0 bg-accent"
+        style={({ pressed }) => [
+          {
+            shadowColor: Colors.accent,
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.45,
+            shadowRadius: 8,
+            elevation: 8,
+          },
+          pressed && { opacity: 0.8 },
+        ]}
         accessibilityRole="button"
         accessibilityLabel={t('accessibility.logActivity')}
       >
@@ -95,75 +119,3 @@ export function CustomTabBar({ state, navigation, onLogPress }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  bar: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-around',
-    backgroundColor: '#121212',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#2a2a2a',
-    paddingTop: 10,
-  },
-  tab: {
-    flex: 1,
-    alignItems: 'center',
-    paddingHorizontal: 4,
-    paddingTop: 2,
-    gap: 3,
-  },
-  iconWrap: {
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tabBadge: {
-    position: 'absolute',
-    top: -1,
-    right: -4,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: Colors.accent,
-    borderWidth: 1.5,
-    borderColor: '#121212',
-  },
-  tabPressed: {
-    opacity: 0.6,
-  },
-  label: {
-    fontFamily: Fonts.display,
-    fontSize: 9,
-    letterSpacing: 1,
-    color: Colors.hint,
-  },
-  labelActive: {
-    color: Colors.accent,
-  },
-  dot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: Colors.accent,
-    marginTop: -1,
-  },
-  fab: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: -16,
-    flexShrink: 0,
-    backgroundColor: Colors.accent,
-    shadowColor: Colors.accent,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.45,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  fabPressed: {
-    opacity: 0.8,
-  },
-});

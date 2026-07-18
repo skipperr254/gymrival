@@ -1,5 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Colors, Fonts, Radius } from '@/constants/theme';
+import { Pressable, Text, View } from 'react-native';
 
 export interface SegmentedControlProps {
   options: string[];
@@ -9,7 +8,7 @@ export interface SegmentedControlProps {
 
 export function SegmentedControl({ options, selectedIndex, onChange }: SegmentedControlProps) {
   return (
-    <View style={styles.container}>
+    <View className="flex-row bg-elevated rounded-2xl p-1 gap-1">
       {options.map((option, index) => {
         const isActive = index === selectedIndex;
         return (
@@ -18,9 +17,15 @@ export function SegmentedControl({ options, selectedIndex, onChange }: Segmented
             onPress={() => onChange(index)}
             accessibilityRole="button"
             accessibilityState={{ selected: isActive }}
-            style={[styles.option, isActive && styles.optionActive]}
+            className={`flex-1 py-2.5 items-center justify-center rounded-xl ${
+              isActive ? 'bg-surface' : ''
+            }`}
           >
-            <Text style={[styles.label, isActive && styles.labelActive]}>
+            <Text
+              className={`font-heading text-[13px] tracking-[1.5px] ${
+                isActive ? 'text-primary' : 'text-muted'
+              }`}
+            >
               {option.toUpperCase()}
             </Text>
           </Pressable>
@@ -29,32 +34,3 @@ export function SegmentedControl({ options, selectedIndex, onChange }: Segmented
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    backgroundColor: Colors.elevated,
-    borderRadius: Radius.card,
-    padding: 4,
-    gap: 4,
-  },
-  option: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 12,
-  },
-  optionActive: {
-    backgroundColor: Colors.surface,
-  },
-  label: {
-    fontFamily: Fonts.display,
-    fontSize: 13,
-    letterSpacing: 1.5,
-    color: Colors.muted,
-  },
-  labelActive: {
-    color: Colors.primary,
-  },
-});

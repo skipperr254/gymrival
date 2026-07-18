@@ -1,7 +1,7 @@
-import { Pressable, StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
+import { Pressable, Text, TextInput, TextInputProps, View } from 'react-native';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -36,16 +36,22 @@ export function Input({
   return (
     <View>
       {label ? (
-        <Text style={styles.label}>{label}</Text>
+        <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] uppercase mb-2">
+          {label}
+        </Text>
       ) : null}
 
-      <View style={[styles.container, hasError && styles.containerError]}>
+      <View
+        className={`flex-row items-center bg-elevated rounded-2xl h-14 px-4 border-[1.5px] ${
+          hasError ? 'border-danger' : 'border-elevated'
+        }`}
+      >
         {leftIcon ? (
           <Ionicons
             name={leftIcon}
             size={18}
             color={Colors.secondary}
-            style={styles.leftIcon}
+            style={{ marginRight: 10 }}
           />
         ) : null}
 
@@ -54,7 +60,7 @@ export function Input({
           secureTextEntry={isPassword && !showPassword}
           placeholderTextColor={Colors.hint}
           selectionColor={Colors.accent}
-          style={[styles.input, leftIcon ? styles.inputWithIcon : undefined]}
+          className="flex-1 font-sans text-[15px] text-primary"
         />
 
         {isPassword ? (
@@ -69,50 +75,8 @@ export function Input({
       </View>
 
       {error ? (
-        <Text style={styles.error}>{error}</Text>
+        <Text className="font-sans text-[13px] text-danger mt-1.5">{error}</Text>
       ) : null}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  label: {
-    fontFamily: Fonts.bodyMedium,
-    fontSize: 11,
-    color: Colors.secondary,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-    marginBottom: 8,
-  },
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.elevated,
-    borderRadius: 16,
-    height: 56,
-    paddingHorizontal: 16,
-    borderWidth: 1.5,
-    borderColor: Colors.elevated,
-  },
-  containerError: {
-    borderColor: Colors.danger,
-  },
-  leftIcon: {
-    marginRight: 10,
-  },
-  input: {
-    flex: 1,
-    fontFamily: Fonts.body,
-    fontSize: 15,
-    color: Colors.primary,
-  },
-  inputWithIcon: {
-    flex: 1,
-  },
-  error: {
-    fontFamily: Fonts.body,
-    fontSize: 13,
-    color: Colors.danger,
-    marginTop: 6,
-  },
-});

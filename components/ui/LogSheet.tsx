@@ -3,7 +3,7 @@ import { View, Text, Pressable, Modal, Animated, Easing, StyleSheet, Dimensions 
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 const SHEET_HEIGHT = Dimensions.get('window').height;
 
@@ -53,33 +53,36 @@ export function LogSheet({ visible, onClose, onLogPR, onCheckIn }: Props) {
 
   return (
     <Modal visible={mounted} transparent animationType="none" onRequestClose={onClose}>
-      <View style={styles.overlay}>
+      <View className="flex-1 bg-black/70 justify-end">
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
         <Animated.View
-          style={[
-            styles.sheet,
-            { paddingBottom: Math.max(insets.bottom + 16, 32), transform: [{ translateY }] },
-          ]}
+          className="bg-[#1a1a1a] rounded-t-3xl px-5 pt-4"
+          style={{ paddingBottom: Math.max(insets.bottom + 16, 32), transform: [{ translateY }] }}
         >
-          <View style={styles.handle} />
-          <Text style={styles.title}>{t('logSheet.title')}</Text>
+          <View className="w-10 h-1 rounded-full bg-elevated self-center mb-5" />
+          <Text className="font-heading text-[13px] tracking-[3px] text-muted mb-3.5">
+            {t('logSheet.title')}
+          </Text>
 
           {ACTIONS.map((action) => (
             <Pressable
               key={action.id}
-              style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+              className="flex-row items-center gap-3.5 bg-[#222] rounded-2xl py-3.5 px-4 mb-2"
+              style={({ pressed }) => pressed && { opacity: 0.7 }}
               onPress={() => {
                 onClose();
                 if (action.id === 'pr') onLogPR();
                 else onCheckIn();
               }}
             >
-              <View style={styles.iconBox}>
+              <View className="w-12 h-12 rounded-[14px] bg-[#1a1a1a] items-center justify-center shrink-0">
                 <Ionicons name={action.icon} size={24} color={Colors.primary} />
               </View>
-              <View style={styles.rowText}>
-                <Text style={styles.rowLabel}>{action.label}</Text>
-                <Text style={styles.rowSub}>{action.sub}</Text>
+              <View className="flex-1">
+                <Text className="font-sans-semibold text-base text-primary mb-0.5">
+                  {action.label}
+                </Text>
+                <Text className="font-sans text-xs text-muted">{action.sub}</Text>
               </View>
               <Ionicons name="chevron-forward" size={16} color={Colors.hint} />
             </Pressable>
@@ -89,69 +92,3 @@ export function LogSheet({ visible, onClose, onLogPR, onCheckIn }: Props) {
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    backgroundColor: '#1a1a1a',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingHorizontal: 20,
-    paddingTop: 16,
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: Colors.elevated,
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
-  title: {
-    fontFamily: Fonts.display,
-    fontSize: 13,
-    letterSpacing: 3,
-    color: Colors.muted,
-    marginBottom: 14,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    backgroundColor: '#222',
-    borderRadius: 16,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    marginBottom: 8,
-  },
-  rowPressed: {
-    opacity: 0.7,
-  },
-  iconBox: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    backgroundColor: '#1a1a1a',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  rowText: {
-    flex: 1,
-  },
-  rowLabel: {
-    fontFamily: Fonts.bodySemiBold,
-    fontSize: 16,
-    color: Colors.primary,
-    marginBottom: 2,
-  },
-  rowSub: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
-    color: Colors.muted,
-  },
-});

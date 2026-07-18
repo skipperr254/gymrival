@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -35,49 +35,67 @@ export default function BadgesScreen() {
   const locked = BADGES.filter((b) => !b.earned);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <View style={styles.header}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
+      <View className="flex-row items-center px-4 py-3">
         <Pressable
           onPress={() => router.back()}
-          style={({ pressed }) => [styles.back, pressed && { opacity: 0.5 }]}
+          className="p-1 mr-2"
+          style={({ pressed }) => pressed && { opacity: 0.5 }}
         >
           <Ionicons name="arrow-back" size={22} color={Colors.accent} />
         </Pressable>
-        <Text style={styles.heading}>{t('badges.title')}</Text>
-        <View style={styles.spacer} />
+        <Text className="font-heading text-2xl text-primary tracking-[3px] flex-1">
+          {t('badges.title')}
+        </Text>
+        <View className="w-[30px]" />
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* Summary */}
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryNum}>{earned.length}</Text>
-          <Text style={styles.summaryLabel}>{t('badges.earnedCount')}</Text>
+        <View className="bg-accent rounded-[20px] p-5 items-center mb-6">
+          <Text className="font-heading text-primary text-[56px]">{earned.length}</Text>
+          <Text className="font-heading text-[12px] text-white/75 tracking-[3px]">
+            {t('badges.earnedCount')}
+          </Text>
         </View>
 
         {/* Earned */}
-        <Text style={styles.sectionLabel}>{t('badges.earnedSection')}</Text>
-        <View style={styles.grid}>
+        <Text className="font-heading text-[11px] tracking-[3px] text-muted mb-3">
+          {t('badges.earnedSection')}
+        </Text>
+        <View className="flex-row flex-wrap gap-2.5 mb-6">
           {earned.map((b) => (
-            <View key={b.id} style={styles.badge}>
-              <View style={styles.badgeIcon}>
+            <View key={b.id} className="w-[30%] grow bg-surface rounded-2xl p-3.5 items-center gap-1.5">
+              <View className="w-[52px] h-[52px] rounded-full items-center justify-center bg-[rgba(255,170,0,0.15)]">
                 <Ionicons name={b.icon} size={24} color={Colors.warning ?? '#ffaa00'} />
               </View>
-              <Text style={styles.badgeLabel}>{t(b.labelKey)}</Text>
-              <Text style={styles.badgeDate}>{b.date}</Text>
+              <Text className="font-sans-medium text-[12px] text-primary text-center">
+                {t(b.labelKey)}
+              </Text>
+              <Text className="font-sans text-[10px] text-muted text-center">{b.date}</Text>
             </View>
           ))}
         </View>
 
         {/* Locked */}
-        <Text style={styles.sectionLabel}>{t('badges.lockedSection')}</Text>
-        <View style={styles.grid}>
+        <Text className="font-heading text-[11px] tracking-[3px] text-muted mb-3">
+          {t('badges.lockedSection')}
+        </Text>
+        <View className="flex-row flex-wrap gap-2.5 mb-6">
           {locked.map((b) => (
-            <View key={b.id} style={[styles.badge, styles.badgeLocked]}>
-              <View style={[styles.badgeIcon, styles.badgeIconLocked]}>
+            <View
+              key={b.id}
+              className="w-[30%] grow bg-surface rounded-2xl p-3.5 items-center gap-1.5 opacity-50"
+            >
+              <View className="w-[52px] h-[52px] rounded-full items-center justify-center bg-elevated">
                 <Ionicons name={b.icon} size={24} color={Colors.hint} />
               </View>
-              <Text style={[styles.badgeLabel, styles.badgeLabelLocked]}>{t(b.labelKey)}</Text>
-              <Text style={styles.badgeDate}>{b.descKey ? t(b.descKey) : ''}</Text>
+              <Text className="font-sans-medium text-[12px] text-muted text-center">
+                {t(b.labelKey)}
+              </Text>
+              <Text className="font-sans text-[10px] text-muted text-center">
+                {b.descKey ? t(b.descKey) : ''}
+              </Text>
             </View>
           ))}
         </View>
@@ -87,22 +105,5 @@ export default function BadgesScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.base },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 },
-  back: { padding: 4, marginRight: 8 },
-  heading: { fontFamily: Fonts.display, fontSize: 24, color: Colors.primary, letterSpacing: 3, flex: 1 },
-  spacer: { width: 30 },
   content: { paddingHorizontal: 16, paddingBottom: 96 },
-  summaryCard: { backgroundColor: Colors.accent, borderRadius: 20, padding: 20, alignItems: 'center', marginBottom: 24 },
-  summaryNum: { fontFamily: Fonts.display, fontSize: 56, color: Colors.primary },
-  summaryLabel: { fontFamily: Fonts.display, fontSize: 12, color: 'rgba(255,255,255,0.75)', letterSpacing: 3 },
-  sectionLabel: { fontFamily: Fonts.display, fontSize: 11, letterSpacing: 3, color: Colors.muted, marginBottom: 12 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 24 },
-  badge: { width: '30%', flexGrow: 1, backgroundColor: Colors.surface, borderRadius: 16, padding: 14, alignItems: 'center', gap: 6 },
-  badgeLocked: { opacity: 0.5 },
-  badgeIcon: { width: 52, height: 52, borderRadius: 26, backgroundColor: 'rgba(255,170,0,0.15)', alignItems: 'center', justifyContent: 'center' },
-  badgeIconLocked: { backgroundColor: Colors.elevated },
-  badgeLabel: { fontFamily: Fonts.bodyMedium, fontSize: 12, color: Colors.primary, textAlign: 'center' },
-  badgeLabelLocked: { color: Colors.muted },
-  badgeDate: { fontFamily: Fonts.body, fontSize: 10, color: Colors.muted, textAlign: 'center' },
 });

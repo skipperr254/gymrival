@@ -4,23 +4,28 @@ import { Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { CheckInView } from '@/components/features/CheckInView';
 
 export default function CheckinScreen() {
   const { t } = useTranslation('train');
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <View style={styles.header}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
+      <View className="flex-row items-end gap-3 px-4 pt-2.5 mb-3.5">
         <Pressable
-          style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.5 }]}
+          className="p-1 mb-0.5"
+          style={({ pressed }) => pressed && { opacity: 0.5 }}
           onPress={() => router.back()}
         >
           <Ionicons name="chevron-back" size={22} color={Colors.accent} />
         </Pressable>
         <View>
-          <Text style={styles.appTitle}>{t('header.brand')}</Text>
-          <Text style={styles.pageLabel}>{t('header.checkin')}</Text>
+          <Text className="font-heading text-primary tracking-[4px] text-[26px] leading-7">
+            {t('header.brand')}
+          </Text>
+          <Text className="font-heading text-[11px] text-[#606060] tracking-[2px] mt-0.5">
+            {t('header.checkin')}
+          </Text>
         </View>
       </View>
 
@@ -35,30 +40,6 @@ export default function CheckinScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.base },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 12,
-    paddingHorizontal: 16,
-    paddingTop: 10,
-    marginBottom: 14,
-  },
-  backBtn: { padding: 4, marginBottom: 2 },
-  appTitle: {
-    fontFamily: Fonts.display,
-    fontSize: 26,
-    color: Colors.primary,
-    letterSpacing: 4,
-    lineHeight: 28,
-  },
-  pageLabel: {
-    fontFamily: Fonts.display,
-    fontSize: 11,
-    color: '#606060',
-    letterSpacing: 2,
-    marginTop: 2,
-  },
   content: {
     paddingHorizontal: 16,
     paddingBottom: 100,

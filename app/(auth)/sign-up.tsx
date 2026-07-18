@@ -88,17 +88,14 @@ export default function SignUpScreen() {
               <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
                 {t("signUp.fullNameLabel")}
               </Text>
-              <View
-                className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
-                style={styles.inputBorder}
-              >
+              <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
                 <TextInput
                   value={name}
                   onChangeText={setName}
                   placeholder={t("signUp.fullNamePlaceholder")}
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
-                  style={styles.input}
+                  className="flex-1 font-sans text-[15px] text-primary"
                   autoCapitalize="words"
                   returnKeyType="next"
                   onSubmitEditing={() => emailRef.current?.focus()}
@@ -111,10 +108,7 @@ export default function SignUpScreen() {
               <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
                 {t("signUp.emailLabel")}
               </Text>
-              <View
-                className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
-                style={styles.inputBorder}
-              >
+              <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
                 <TextInput
                   ref={emailRef}
                   value={email}
@@ -122,7 +116,7 @@ export default function SignUpScreen() {
                   placeholder={t("signUp.emailPlaceholder")}
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
-                  style={styles.input}
+                  className="flex-1 font-sans text-[15px] text-primary"
                   autoCapitalize="none"
                   keyboardType="email-address"
                   returnKeyType="next"
@@ -136,10 +130,7 @@ export default function SignUpScreen() {
               <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
                 {t("signUp.passwordLabel")}
               </Text>
-              <View
-                className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
-                style={styles.inputBorder}
-              >
+              <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
                 <TextInput
                   ref={passwordRef}
                   value={password}
@@ -147,7 +138,7 @@ export default function SignUpScreen() {
                   placeholder={t("signUp.passwordPlaceholder")}
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
-                  style={[styles.input, { flex: 1 }]}
+                  className="flex-1 font-sans text-[15px] text-primary"
                   secureTextEntry={!showPassword}
                   returnKeyType="done"
                   onSubmitEditing={handleSubmit}
@@ -229,15 +220,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 40,
-  },
-  inputBorder: {
-    borderWidth: 1.5,
-    borderColor: Colors.elevated,
-  },
-  input: {
-    flex: 1,
-    fontFamily: "DMSans_400Regular",
-    fontSize: 15,
-    color: Colors.primary,
   },
 });

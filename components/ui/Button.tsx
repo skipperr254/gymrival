@@ -1,6 +1,6 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
+import { ActivityIndicator, Pressable, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -55,9 +55,10 @@ export function Button({
       onPress={onPress}
       disabled={isDisabled}
       accessibilityRole="button"
-      className="h-14 flex-row items-center justify-center gap-2 rounded-2xl"
+      className={`h-14 flex-row items-center justify-center gap-2 rounded-2xl ${
+        isGhost ? 'bg-transparent border-[1.5px] border-accent' : 'bg-accent'
+      }`}
       style={({ pressed }) => [
-        isGhost ? styles.ghost : styles.primary,
         pressed && (isGhost ? { opacity: 0.7 } : { backgroundColor: Colors.accentDark }),
         isDisabled && { opacity: 0.5 },
       ]}
@@ -74,7 +75,11 @@ export function Button({
             />
           )}
           {label ? (
-            <Text style={[styles.label, isGhost ? styles.labelGhost : styles.labelPrimary]}>
+            <Text
+              className={`font-heading text-lg tracking-[2px] ${
+                isGhost ? 'text-accent' : 'text-primary'
+              }`}
+            >
               {label.toUpperCase()}
             </Text>
           ) : null}
@@ -83,25 +88,3 @@ export function Button({
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  primary: {
-    backgroundColor: Colors.accent,
-  },
-  ghost: {
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: Colors.accent,
-  },
-  label: {
-    fontFamily: Fonts.display,
-    fontSize: 18,
-    letterSpacing: 2,
-  },
-  labelPrimary: {
-    color: Colors.primary,
-  },
-  labelGhost: {
-    color: Colors.accent,
-  },
-});

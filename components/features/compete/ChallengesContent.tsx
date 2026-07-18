@@ -13,7 +13,6 @@ import { LeaderboardAvatar } from './LeaderboardAvatar';
 import { ChallengeCard } from './ChallengeCard';
 import { InvitationCard } from './InvitationCard';
 import { CreateChallengeModal } from './CreateChallengeModal';
-import { cStyles, gStyles } from './styles';
 
 export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) {
   const { t } = useTranslation('compete');
@@ -110,7 +109,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
 
   if (loadingChallenges && challenges.length === 0) {
     return (
-      <View style={{ alignItems: 'center', paddingVertical: 60 }}>
+      <View className="items-center py-16">
         <ActivityIndicator color={Colors.accent} />
       </View>
     );
@@ -118,15 +117,17 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
 
   if (challengesError && challenges.length === 0) {
     return (
-      <View style={[gStyles.errorCard, { marginTop: 24 }]}>
+      <View className="items-center bg-[rgba(230,48,48,0.06)] rounded-2xl border border-[rgba(230,48,48,0.2)] py-7 px-5 gap-2 mt-6">
         <AlertCircle size={22} strokeWidth={1.6} color={Colors.accent} />
-        <Text style={gStyles.errorText}>{t('challenges.loadError')}</Text>
+        <Text className="font-sans text-[13px] text-[#b0b0b0]">{t('challenges.loadError')}</Text>
         <Pressable
           onPress={() => user?.id && loadChallenges(user.id)}
-          style={gStyles.retryBtn}
+          className="flex-row items-center gap-1.5 mt-1 bg-accent py-2 px-4 rounded-[10px]"
         >
           <RefreshCw size={13} strokeWidth={2} color="#fff" />
-          <Text style={gStyles.retryText}>{t('challenges.retry')}</Text>
+          <Text className="font-heading text-xs tracking-[2px] text-white">
+            {t('challenges.retry')}
+          </Text>
         </Pressable>
       </View>
     );
@@ -139,7 +140,9 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
       {/* ── Pending Invitations ─────────────────────────────────────── */}
       {(pendingInvitations.length > 0 || loadingInvitations) && (
         <>
-          <Text style={cStyles.sectionLabel}>{t('challenges.pendingInvitations')}</Text>
+          <Text className="font-heading text-[11px] tracking-[3px] text-[#555] mb-2.5">
+            {t('challenges.pendingInvitations')}
+          </Text>
           {loadingInvitations ? (
             <ActivityIndicator color={Colors.accent} style={{ marginBottom: 16 }} />
           ) : (
@@ -159,7 +162,9 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
       {/* ── Admin / Global Challenges ───────────────────────────────── */}
       {adminChallenges.length > 0 && (
         <>
-          <Text style={cStyles.sectionLabel}>{t('challenges.activeChallenges')}</Text>
+          <Text className="font-heading text-[11px] tracking-[3px] text-[#555] mb-2.5">
+            {t('challenges.activeChallenges')}
+          </Text>
           {adminChallenges.map(ch => (
             <ChallengeCard
               key={ch.id}
@@ -177,7 +182,9 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
       {/* ── Friend Challenges ───────────────────────────────────────── */}
       {friendChallenges.length > 0 && (
         <>
-          <Text style={cStyles.sectionLabel}>{t('challenges.friendChallenges')}</Text>
+          <Text className="font-heading text-[11px] tracking-[3px] text-[#555] mb-2.5">
+            {t('challenges.friendChallenges')}
+          </Text>
           {friendChallenges.map(ch => (
             <ChallengeCard
               key={ch.id}
@@ -194,23 +201,29 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
 
       {/* ── Empty state ─────────────────────────────────────────────── */}
       {!loadingChallenges && challenges.length === 0 && (
-        <View style={[gStyles.emptyCard, { marginTop: 0 }]}>
+        <View className="items-center bg-[#1e1e1e] rounded-2xl py-12 px-5 gap-2">
           <Zap size={32} strokeWidth={1.4} color="#333" />
-          <Text style={gStyles.emptyTitle}>{t('challenges.emptyTitle')}</Text>
-          <Text style={gStyles.emptySub}>{t('challenges.emptySub')}</Text>
+          <Text className="font-heading text-lg tracking-[2px] text-white">
+            {t('challenges.emptyTitle')}
+          </Text>
+          <Text className="font-sans text-[13px] text-[#555]">{t('challenges.emptySub')}</Text>
         </View>
       )}
 
       {/* ── Challenge a Friend ──────────────────────────────────────── */}
-      <View style={[cStyles.card, { borderColor: '#2a2a2a', marginTop: 4 }]}>
-        <View style={cStyles.friendHeader}>
+      <View className="bg-[#1e1e1e] rounded-2xl py-4 px-[18px] mb-3 mt-1 border border-[#2a2a2a]">
+        <View className="flex-row items-center gap-2.5 mb-1">
           <Swords size={17} strokeWidth={1.6} color={Colors.accent} />
-          <Text style={cStyles.friendTitle}>{t('challenges.challengeFriendTitle')}</Text>
+          <Text className="font-heading text-sm tracking-[2px] text-white">
+            {t('challenges.challengeFriendTitle')}
+          </Text>
         </View>
-        <Text style={cStyles.friendSubtitle}>{t('challenges.challengeFriendSub')}</Text>
+        <Text className="font-sans text-xs text-[#555] mb-3.5">
+          {t('challenges.challengeFriendSub')}
+        </Text>
 
         {friends.length > 0 && (
-          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+          <View className="flex-row gap-2 mb-3.5 flex-wrap">
             {friends.slice(0, 6).map(f => (
               <LeaderboardAvatar
                 key={f.id}
@@ -220,8 +233,10 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
               />
             ))}
             {friends.length > 6 && (
-              <View style={cStyles.moreCount}>
-                <Text style={cStyles.moreCountText}>{t('challenges.moreCount', { count: friends.length - 6 })}</Text>
+              <View className="w-9 h-9 rounded-full bg-[#252525] border border-[#2a2a2a] items-center justify-center">
+                <Text className="font-heading text-[11px] text-[#555]">
+                  {t('challenges.moreCount', { count: friends.length - 6 })}
+                </Text>
               </View>
             )}
           </View>
@@ -230,19 +245,25 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
         <Pressable
           onPress={() => setShowModal(true)}
           disabled={friends.length === 0}
-          style={[
-            { borderRadius: 14, overflow: 'hidden' },
-            friends.length === 0 && { opacity: 0.35 },
-          ]}
+          className={`rounded-2xl overflow-hidden ${friends.length === 0 ? 'opacity-35' : ''}`}
         >
           <LinearGradient
             colors={['rgba(230,48,48,0.14)', 'rgba(230,48,48,0.06)']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={cStyles.challengeFriendBtn}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              paddingVertical: 13,
+              borderRadius: 14,
+              borderWidth: 1,
+              borderColor: 'rgba(230,48,48,0.25)',
+            }}
           >
             <Swords size={14} strokeWidth={1.8} color={Colors.accent} />
-            <Text style={cStyles.challengeFriendBtnText}>
+            <Text className="font-heading text-xs tracking-[2px] text-accent">
               {friends.length === 0 ? t('challenges.addFriendsFirst') : t('challenges.challengeFriendBtn')}
             </Text>
           </LinearGradient>

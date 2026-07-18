@@ -8,7 +8,6 @@ import { PRVideoPlayer } from '@/components/features/PRVideoPlayer';
 import { formatDate, formatRelativeTime as formatRelativeTimeIntl } from '@/lib/i18n/format';
 import type { FeedPost } from '@/types/social';
 import { FriendAvatar } from './FriendAvatar';
-import { feedStyles } from './feedStyles';
 
 function formatRelativeTime(dateStr: string): string {
   const date = new Date(dateStr);
@@ -20,22 +19,22 @@ function formatRelativeTime(dateStr: string): string {
 /** Skeleton placeholder shown while the first feed page loads. */
 export function FeedSkeleton() {
   return (
-    <View style={[feedStyles.card, { borderColor: '#1e1e1e' }]}>
+    <View className="rounded-[20px] mb-3.5 overflow-hidden bg-[#1c1c1c] border-[1.5px] border-[#1e1e1e]">
       {/* Header skeleton */}
-      <View style={feedStyles.cardHeader}>
-        <View style={{ width: 42, height: 42, borderRadius: 21, backgroundColor: '#242424' }} />
-        <View style={{ flex: 1, gap: 8 }}>
-          <View style={{ height: 12, width: '45%', borderRadius: 6, backgroundColor: '#242424' }} />
-          <View style={{ height: 10, width: '65%', borderRadius: 5, backgroundColor: '#1e1e1e' }} />
+      <View className="flex-row items-center gap-3 px-3.5 pt-3.5 pb-3">
+        <View className="w-[42px] h-[42px] rounded-full bg-[#242424]" />
+        <View className="flex-1 gap-2">
+          <View className="h-3 w-[45%] rounded-md bg-[#242424]" />
+          <View className="h-2.5 w-[65%] rounded-md bg-[#1e1e1e]" />
         </View>
-        <View style={{ width: 40, height: 24, borderRadius: 8, backgroundColor: '#1e1e1e' }} />
+        <View className="w-10 h-6 rounded-lg bg-[#1e1e1e]" />
       </View>
       {/* Media skeleton — 4:5 matches the default before thumbnail detection */}
-      <View style={[feedStyles.mediaArea, { aspectRatio: 4 / 5, backgroundColor: '#191919' }]} />
+      <View className="bg-[#191919]" style={{ aspectRatio: 4 / 5 }} />
       {/* Footer skeleton */}
-      <View style={feedStyles.cardFooter}>
-        <View style={{ height: 14, width: 80, borderRadius: 6, backgroundColor: '#242424' }} />
-        <View style={{ height: 34, width: 90, borderRadius: 12, backgroundColor: '#1e1e1e' }} />
+      <View className="flex-row items-center justify-between px-3.5 py-3.5">
+        <View className="h-3.5 w-20 rounded-md bg-[#242424]" />
+        <View className="h-[34px] w-[90px] rounded-xl bg-[#1e1e1e]" />
       </View>
     </View>
   );
@@ -45,7 +44,7 @@ export function FeedSkeleton() {
 function PRStatVisual({ post }: { post: FeedPost }) {
   const { t } = useTranslation('social');
   return (
-    <View style={feedStyles.statVisual}>
+    <View className="flex-1 overflow-hidden">
       <LinearGradient
         colors={['#141414', '#0d0808']}
         style={StyleSheet.absoluteFill}
@@ -55,21 +54,27 @@ function PRStatVisual({ post }: { post: FeedPost }) {
       {/* Left accent strip */}
       <LinearGradient
         colors={[Colors.accent, Colors.accentDark]}
-        style={feedStyles.statAccentStrip}
+        style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4 }}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
       />
       {/* Center content */}
-      <View style={feedStyles.statContent}>
-        <Text style={feedStyles.statExercise}>{post.exercise_label.toUpperCase()}</Text>
-        <View style={feedStyles.statValueWrap}>
-          <Text style={feedStyles.statValueText}>{post.value}</Text>
-          <Text style={feedStyles.statUnitText}>{post.unit.toUpperCase()}</Text>
+      <View className="flex-1 items-center justify-center">
+        <Text className="font-heading text-xs text-[#666] tracking-[3px] mb-1.5">
+          {post.exercise_label.toUpperCase()}
+        </Text>
+        <View className="flex-row items-end gap-1">
+          <Text className="font-heading text-[54px] text-white tracking-[2px] leading-[56px]">
+            {post.value}
+          </Text>
+          <Text className="font-heading text-[22px] text-[#666] tracking-[2px] mb-1.5">
+            {post.unit.toUpperCase()}
+          </Text>
         </View>
       </View>
       {/* NEW PR badge */}
-      <View style={feedStyles.newPrTag}>
-        <Text style={feedStyles.newPrTagText}>{t('newPr')}</Text>
+      <View className="absolute top-3 right-3 bg-[rgba(230,48,48,0.12)] border border-[rgba(230,48,48,0.30)] rounded-lg py-1.5 px-2.5">
+        <Text className="font-heading text-[10px] text-accent tracking-[2px]">{t('newPr')}</Text>
       </View>
     </View>
   );
@@ -117,24 +122,28 @@ export function FeedCard({ post, userId, isVideoActive, onVideoPlay, onLike }: F
   }, [post.video?.thumbnail_url]);
 
   return (
-    <View style={feedStyles.card}>
+    <View className="rounded-[20px] mb-3.5 overflow-hidden bg-[#1c1c1c] border-[1.5px] border-[#242424]">
       {/* ── Header: author info ── */}
-      <View style={feedStyles.cardHeader}>
+      <View className="flex-row items-center gap-3 px-3.5 pt-3.5 pb-3">
         <FriendAvatar id={post.user_id} name={displayName} size={42} />
-        <View style={{ flex: 1 }}>
-          <Text style={feedStyles.authorName}>{displayName}</Text>
-          <View style={feedStyles.metaRow}>
+        <View className="flex-1">
+          <Text className="font-sans-semibold text-sm text-white mb-0.5">{displayName}</Text>
+          <View className="flex-row items-center gap-1">
             <MapPin size={10} strokeWidth={2} color="#555" />
-            <Text style={feedStyles.metaText}>{location} · {timestamp}</Text>
+            <Text className="font-sans text-[11px] text-[#555]">
+              {location} · {timestamp}
+            </Text>
           </View>
         </View>
-        <View style={feedStyles.levelPill}>
-          <Text style={feedStyles.levelPillText}>{t('levelShort', { level: post.author_level })}</Text>
+        <View className="bg-[#232323] border border-[#2e2e2e] rounded-lg py-1 px-2">
+          <Text className="font-heading text-[11px] text-[#606060] tracking-[1px]">
+            {t('levelShort', { level: post.author_level })}
+          </Text>
         </View>
       </View>
 
       {/* ── Media area — aspect ratio driven by video dimensions ── */}
-      <View style={[feedStyles.mediaArea, { aspectRatio: hasVideo ? mediaRatio : 1 }]}>
+      <View className="bg-black overflow-hidden" style={{ aspectRatio: hasVideo ? mediaRatio : 1 }}>
         {hasVideo ? (
           <PRVideoPlayer
             videoUrl={post.video!.video_url}
@@ -149,9 +158,11 @@ export function FeedCard({ post, userId, isVideoActive, onVideoPlay, onLike }: F
         )}
 
         {isUploading && (
-          <View style={feedStyles.uploadingBadge}>
+          <View className="absolute top-2.5 left-3 flex-row items-center gap-1.5 bg-black/60 rounded-full py-[5px] px-2.5">
             <ActivityIndicator size="small" color="#555" style={{ transform: [{ scale: 0.75 }] }} />
-            <Text style={feedStyles.uploadingBadgeText}>{t('videoUploading')}</Text>
+            <Text className="font-heading text-[9px] text-[#666] tracking-[1.5px]">
+              {t('videoUploading')}
+            </Text>
           </View>
         )}
 
@@ -159,29 +170,37 @@ export function FeedCard({ post, userId, isVideoActive, onVideoPlay, onLike }: F
         {hasVideo && (
           <LinearGradient
             colors={['transparent', 'rgba(0,0,0,0.90)']}
-            style={feedStyles.prOverlay}
+            style={{ position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 14, paddingBottom: 12, paddingTop: 44 }}
             pointerEvents="none"
           >
-            <Text style={feedStyles.prExercise}>{post.exercise_label.toUpperCase()}</Text>
-            <View style={feedStyles.prValueRow}>
-              <Text style={feedStyles.prValue}>{post.value}</Text>
-              <Text style={feedStyles.prUnit}>{post.unit.toUpperCase()}</Text>
+            <Text className="font-heading text-[10px] text-[#bbb] tracking-[2.5px] mb-0.5">
+              {post.exercise_label.toUpperCase()}
+            </Text>
+            <View className="flex-row items-baseline gap-1">
+              <Text className="font-heading text-[32px] text-white tracking-[2px] leading-[34px]">
+                {post.value}
+              </Text>
+              <Text className="font-heading text-base text-[#aaa]">{post.unit.toUpperCase()}</Text>
             </View>
           </LinearGradient>
         )}
       </View>
 
       {/* ── Footer: likes + action ── */}
-      <View style={feedStyles.cardFooter}>
-        <View style={feedStyles.likesDisplay}>
+      <View className="flex-row items-center justify-between px-3.5 py-[13px]">
+        <View className="flex-row items-center gap-1.5">
           <Flame size={16} strokeWidth={2} color={Colors.accent} />
-          <Text style={feedStyles.likesCount}>{post.likes_count}</Text>
-          <Text style={feedStyles.likesLabel}>{t('likes')}</Text>
+          <Text className="font-heading text-lg text-white">{post.likes_count}</Text>
+          <Text className="font-sans text-[11px] text-[#505050] tracking-[1px]">{t('likes')}</Text>
         </View>
         {!isMe ? (
           <Pressable
             onPress={onLike}
-            style={[feedStyles.likeBtn, post.has_liked && feedStyles.likeBtnActive]}
+            className={`flex-row items-center gap-[7px] py-2.5 px-[18px] rounded-xl border-[1.5px] ${
+              post.has_liked
+                ? 'border-[rgba(230,48,48,0.50)] bg-[rgba(230,48,48,0.08)]'
+                : 'border-[#2a2a2a] bg-[#242424]'
+            }`}
           >
             <Heart
               size={13}
@@ -189,12 +208,18 @@ export function FeedCard({ post, userId, isVideoActive, onVideoPlay, onLike }: F
               fill={post.has_liked ? Colors.accent : 'none'}
               color={post.has_liked ? Colors.accent : '#707070'}
             />
-            <Text style={[feedStyles.likeBtnText, post.has_liked && feedStyles.likeBtnTextActive]}>
+            <Text
+              className={`font-heading text-xs tracking-[1px] ${
+                post.has_liked ? 'text-accent' : 'text-[#707070]'
+              }`}
+            >
               {post.has_liked ? t('liked') : t('like')}
             </Text>
           </Pressable>
         ) : (
-          <Text style={feedStyles.yourPrLabel}>{t('yourPr')}</Text>
+          <Text className="font-heading text-[11px] text-[#404040] tracking-[1px]">
+            {t('yourPr')}
+          </Text>
         )}
       </View>
     </View>
