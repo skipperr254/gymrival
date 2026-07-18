@@ -1,0 +1,97 @@
+{
+  "header": {
+    "brand": "GYM RIVAL",
+    "pageLabel": "PERFIL"
+  },
+  "proUpsell": "HAZTE PRO — 4,99 €/MES",
+  "proActive": "MIEMBRO PRO — TOCA PARA DESACTIVAR",
+  "details": {
+    "title": "MIS DATOS",
+    "edit": "EDITAR",
+    "gym": "GIMNASIO",
+    "weight": "PESO",
+    "height": "ALTURA",
+    "goal": "OBJETIVO",
+    "memberSince": "MIEMBRO DESDE",
+    "motto": "LEMA",
+    "notSet": "—"
+  },
+  "stats": {
+    "prs": "PRs",
+    "friends": "AMIGOS",
+    "streak": "RACHA",
+    "level": "NIVEL"
+  },
+  "bestPrs": "MEJORES PRs",
+  "settings": {
+    "title": "AJUSTES",
+    "notifications": "Notificaciones",
+    "notificationsSub": "Notificaciones push activadas",
+    "privacy": "Privacidad",
+    "privacySub": "Perfil visible para amigos",
+    "darkMode": "Modo oscuro",
+    "darkModeOn": "Activado",
+    "shareProfile": "Compartir perfil",
+    "shareProfileSub": "Copiar tu enlace"
+  },
+  "logOut": "CERRAR SESIÓN",
+  "edit": {
+    "title": "EDITAR PERFIL",
+    "fullName": "NOMBRE COMPLETO",
+    "fullNamePlaceholder": "Tu nombre",
+    "username": "NOMBRE DE USUARIO",
+    "usernamePlaceholder": "@usuario",
+    "bio": "BIOGRAFÍA",
+    "bioPlaceholder": "Cuenta tu historia...",
+    "motto": "TU LEMA",
+    "mottoPlaceholder": "Ej. Sin dolor no hay recompensa",
+    "gym": "GIMNASIO",
+    "gymPlaceholder": "Tu gimnasio",
+    "weight": "PESO (kg)",
+    "height": "ALTURA (cm)",
+    "goal": "OBJETIVO",
+    "goalPlaceholder": "Ej. Ganar músculo",
+    "save": "GUARDAR CAMBIOS",
+    "invalidWeightTitle": "Peso no válido",
+    "invalidWeightMsg": "Introduce un peso válido en kg.",
+    "invalidHeightTitle": "Altura no válida",
+    "invalidHeightMsg": "Introduce una altura válida en cm.",
+    "saveErrorTitle": "No se pudo guardar"
+  },
+  "badges": {
+    "title": "INSIGNIAS",
+    "earnedCount": "INSIGNIAS OBTENIDAS",
+    "earnedSection": "OBTENIDAS",
+    "lockedSection": "BLOQUEADAS",
+    "items": {
+      "firstPr": "Primer PR",
+      "sevenDayStreak": "Racha de 7 Días",
+      "hundredKgBench": "Press de Banca 100kg",
+      "topThreeBoard": "Top 3 Clasificación",
+      "tenPrs": "10 PRs",
+      "challengeWon": "Reto Ganado",
+      "videoProof": "Prueba en Vídeo",
+      "twoHundredKgDeadlift": "Peso Muerto 200kg",
+      "thirtyDayStreak": "Racha de 30 Días",
+      "hundredLikes": "100 Me Gusta"
+    },
+    "desc": {
+      "videoProof": "Sube un vídeo para desbloquear",
+      "deadlift": "Faltan 40 kg",
+      "streak30": "Faltan 23 días",
+      "likes100": "Faltan 67 me gusta"
+    }
+  },
+  "prHistory": {
+    "title": "HISTORIAL DE PRs",
+    "best": "Mejor: {{value}} {{unit}}",
+    "emptyTitle": "AÚN NO HAY PRs",
+    "emptySub": "Registra tu primer PR para empezar a seguir tu progreso"
+  },
+  "notifications": {
+    "title": "NOTIFICACIONES",
+    "markAll": "MARCAR TODO",
+    "emptyTitle": "TODO AL DÍA",
+    "emptySub": "Aquí verás mensajes, solicitudes de amistad y me gusta en tus PRs."
+  }
+}

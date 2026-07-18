@@ -1,0 +1,108 @@
+{
+  "tabs": {
+    "rivals": { "label": "Rivals", "subtitle": "RIVALS" },
+    "challenges": { "label": "Challenges", "subtitle": "CHALLENGES" },
+    "global": { "label": "Global", "subtitle": "GLOBAL LEADERBOARD" }
+  },
+  "you": "YOU",
+  "unknown": "Unknown",
+  "youSuffix": " (You)",
+  "lvl": "LVL {{level}}",
+  "metric": {
+    "highestPr": "Highest PR",
+    "mostImproved": "Most Improved",
+    "totalVolume": "Total Volume"
+  },
+  "endsIn": {
+    "ended": "Ended",
+    "days": "{{count}}d left",
+    "hours": "{{count}}h left",
+    "minutes": "{{count}}m left"
+  },
+  "rivals": {
+    "emptyTitle": "NO RIVALS YET",
+    "emptySub": "Add friends to compete on the leaderboard",
+    "footerNote": "BASED ON PERSONAL RECORDS"
+  },
+  "card": {
+    "joined": "{{count}} joined",
+    "yourRank": "Your rank: #{{rank}}",
+    "joinedBtn": "JOINED",
+    "joinBtn": "JOIN",
+    "viewAll": "VIEW ALL"
+  },
+  "invitation": {
+    "defaultTitle": "Challenge Invite",
+    "someone": "Someone",
+    "challengedYou": "{{name}} challenged you",
+    "accept": "ACCEPT",
+    "decline": "DECLINE"
+  },
+  "modal": {
+    "title": "CHALLENGE",
+    "challengeLabel": "CHALLENGE",
+    "change": "CHANGE",
+    "searchFriendsPlaceholder": "Search friends...",
+    "noFriends": "Add friends first to challenge them",
+    "noMatchingFriends": "No matching friends",
+    "friend": "Friend",
+    "exercise": "EXERCISE",
+    "metric": "METRIC",
+    "duration": "DURATION",
+    "sendChallenge": "SEND CHALLENGE",
+    "durationOptions": {
+      "3d": "3 Days",
+      "1w": "1 Week",
+      "2w": "2 Weeks",
+      "1m": "1 Month"
+    }
+  },
+  "challenges": {
+    "loadError": "Could not load challenges",
+    "retry": "RETRY",
+    "pendingInvitations": "PENDING INVITATIONS",
+    "activeChallenges": "ACTIVE CHALLENGES",
+    "friendChallenges": "FRIEND CHALLENGES",
+    "emptyTitle": "NO ACTIVE CHALLENGES",
+    "emptySub": "Check back soon — or challenge a friend below!",
+    "challengeFriendTitle": "CHALLENGE A FRIEND",
+    "challengeFriendSub": "Pick a friend and set the terms",
+    "moreCount": "+{{count}}",
+    "addFriendsFirst": "ADD FRIENDS FIRST",
+    "challengeFriendBtn": "CHALLENGE A FRIEND"
+  },
+  "global": {
+    "statBench": "BENCH",
+    "statSquat": "SQUAT",
+    "statDead": "DEAD",
+    "totalKg": "TOTAL KG",
+    "searchPlaceholder": "Search by name or @username...",
+    "loadError": "Could not load leaderboard",
+    "retry": "RETRY",
+    "yourGlobalRank": "YOUR GLOBAL RANK",
+    "unrankedTitle": "YOU'RE UNRANKED",
+    "unrankedSub": "Log a Bench, Squat, and Deadlift PR to join the global leaderboard",
+    "noResultsTitle": "NO RESULTS",
+    "noResultsSub": "Try a different name or username",
+    "noAthletesTitle": "NO ATHLETES YET",
+    "noAthletesSub": "Be the first to log a Bench, Squat, and Deadlift PR!",
+    "loadMore": "LOAD MORE",
+    "refresh": "REFRESH",
+    "footerNote": "BASED ON COMBINED BENCH · SQUAT · DEADLIFT"
+  },
+  "detail": {
+    "heading": "CHALLENGE",
+    "notFound": "Challenge not found",
+    "endsIn": "ENDS IN",
+    "participants": "PARTICIPANTS",
+    "xpReward": "XP REWARD",
+    "prize": "PRIZE",
+    "leaderboard": "LEADERBOARD",
+    "noParticipants": "No participants yet",
+    "beFirst": "Be the first to join!",
+    "refresh": "REFRESH",
+    "joinedTapToLeave": "JOINED — TAP TO LEAVE",
+    "joinChallenge": "JOIN CHALLENGE",
+    "challengeEnded": "CHALLENGE ENDED"
+  }
+}

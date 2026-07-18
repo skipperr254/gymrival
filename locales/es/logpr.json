@@ -1,0 +1,47 @@
+{
+  "logSheet": {
+    "title": "REGISTRAR ACTIVIDAD",
+    "logPr": { "label": "Registrar un PR", "sub": "Registra un nuevo récord personal" },
+    "checkin": { "label": "Check-in de Gimnasio", "sub": "Regístrate en tu gimnasio" }
+  },
+  "step": {
+    "stepOf": "PASO {{step}} DE 2",
+    "logYourPr": "Registra tu PR",
+    "addProof": "Añadir Prueba"
+  },
+  "selectExercise": "SELECCIONA EJERCICIO",
+  "prWithValue": "PR  {{value}} {{unit}}",
+  "noPrYet": "Aún sin PR",
+  "yourNewPr": "TU NUEVO PR",
+  "notHigherThanCurrent": "No es mayor que tu PR actual ({{value}} {{unit}})",
+  "nextAddProof": "SIGUIENTE — AÑADIR PRUEBA",
+  "previousWithValue": "Anterior: {{value}} {{unit}}",
+  "firstPr": "Primer PR",
+  "xpWithVideo": "+100 XP",
+  "xpWithoutVideo": "+50 XP",
+  "withVideo": "Con vídeo",
+  "withoutVideo": "Sin vídeo",
+  "savePr": "GUARDAR PR — {{xp}}",
+  "removeVideoSave": "Eliminar vídeo, guardar por +50 XP",
+  "prSaved": "¡PR GUARDADO!",
+  "newBest": "NUEVO MEJOR",
+  "uploadingVideoProof": "Subiendo prueba en vídeo…",
+  "videoProofSaved": "Prueba en vídeo guardada",
+  "videoUploadFailed": "Fallo al subir el vídeo — el PR sigue guardado",
+  "addedToLeaderboard": "Añadido a la clasificación",
+  "xpEarnedWithVideo": "+100 XP GANADOS",
+  "xpEarnedWithoutVideo": "+50 XP GANADOS",
+  "video": {
+    "readyLabel": "VÍDEO LISTO",
+    "addProofTitle": "AÑADIR PRUEBA EN VÍDEO",
+    "addProofSub": "Cámara o galería · máx. 60 seg",
+    "permissionNeededTitle": "Permiso necesario",
+    "permissionLibraryMsg": "Permite el acceso a tu galería para adjuntar un vídeo.",
+    "permissionCameraMsg": "Permite el acceso a la cámara para grabar tu levantamiento.",
+    "pickerTitle": "Añadir Prueba en Vídeo",
+    "pickerMsg": "Graba tu levantamiento o elige un vídeo existente (máx. 60 segundos)",
+    "recordVideo": "Grabar Vídeo",
+    "chooseFromLibrary": "Elegir de la Galería",
+    "cancel": "Cancelar"
+  }
+}

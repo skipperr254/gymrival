@@ -1,0 +1,108 @@
+{
+  "tabs": {
+    "rivals": { "label": "Rivais", "subtitle": "RIVAIS" },
+    "challenges": { "label": "Desafios", "subtitle": "DESAFIOS" },
+    "global": { "label": "Global", "subtitle": "CLASSIFICAÇÃO GLOBAL" }
+  },
+  "you": "TU",
+  "unknown": "Desconhecido",
+  "youSuffix": " (Tu)",
+  "lvl": "NV {{level}}",
+  "metric": {
+    "highestPr": "PR Mais Alto",
+    "mostImproved": "Maior Melhoria",
+    "totalVolume": "Volume Total"
+  },
+  "endsIn": {
+    "ended": "Terminado",
+    "days": "faltam {{count}}d",
+    "hours": "faltam {{count}}h",
+    "minutes": "faltam {{count}}m"
+  },
+  "rivals": {
+    "emptyTitle": "AINDA SEM RIVAIS",
+    "emptySub": "Adiciona amigos para competir na tabela classificativa",
+    "footerNote": "BASEADO EM RECORDES PESSOAIS"
+  },
+  "card": {
+    "joined": "{{count}} inscritos",
+    "yourRank": "A tua posição: #{{rank}}",
+    "joinedBtn": "INSCRITO",
+    "joinBtn": "PARTICIPAR",
+    "viewAll": "VER TUDO"
+  },
+  "invitation": {
+    "defaultTitle": "Convite para Desafio",
+    "someone": "Alguém",
+    "challengedYou": "{{name}} desafiou-te",
+    "accept": "ACEITAR",
+    "decline": "RECUSAR"
+  },
+  "modal": {
+    "title": "DESAFIO",
+    "challengeLabel": "DESAFIAR",
+    "change": "ALTERAR",
+    "searchFriendsPlaceholder": "Pesquisar amigos...",
+    "noFriends": "Adiciona amigos primeiro para os desafiares",
+    "noMatchingFriends": "Nenhum amigo correspondente",
+    "friend": "Amigo",
+    "exercise": "EXERCÍCIO",
+    "metric": "MÉTRICA",
+    "duration": "DURAÇÃO",
+    "sendChallenge": "ENVIAR DESAFIO",
+    "durationOptions": {
+      "3d": "3 Dias",
+      "1w": "1 Semana",
+      "2w": "2 Semanas",
+      "1m": "1 Mês"
+    }
+  },
+  "challenges": {
+    "loadError": "Não foi possível carregar os desafios",
+    "retry": "TENTAR NOVAMENTE",
+    "pendingInvitations": "CONVITES PENDENTES",
+    "activeChallenges": "DESAFIOS ATIVOS",
+    "friendChallenges": "DESAFIOS DE AMIGOS",
+    "emptyTitle": "SEM DESAFIOS ATIVOS",
+    "emptySub": "Volta em breve — ou desafia um amigo abaixo!",
+    "challengeFriendTitle": "DESAFIAR UM AMIGO",
+    "challengeFriendSub": "Escolhe um amigo e define os termos",
+    "moreCount": "+{{count}}",
+    "addFriendsFirst": "ADICIONA AMIGOS PRIMEIRO",
+    "challengeFriendBtn": "DESAFIAR UM AMIGO"
+  },
+  "global": {
+    "statBench": "SUPINO",
+    "statSquat": "AGACH.",
+    "statDead": "TERRA",
+    "totalKg": "TOTAL KG",
+    "searchPlaceholder": "Pesquisa por nome ou @utilizador...",
+    "loadError": "Não foi possível carregar a classificação",
+    "retry": "TENTAR NOVAMENTE",
+    "yourGlobalRank": "A TUA CLASSIFICAÇÃO GLOBAL",
+    "unrankedTitle": "AINDA SEM CLASSIFICAÇÃO",
+    "unrankedSub": "Regista um PR de supino, agachamento e levantamento terra para entrares na classificação global",
+    "noResultsTitle": "SEM RESULTADOS",
+    "noResultsSub": "Tenta outro nome ou nome de utilizador",
+    "noAthletesTitle": "AINDA SEM ATLETAS",
+    "noAthletesSub": "Sê o primeiro a registar um PR de supino, agachamento e levantamento terra!",
+    "loadMore": "CARREGAR MAIS",
+    "refresh": "ATUALIZAR",
+    "footerNote": "BASEADO EM SUPINO · AGACHAMENTO · LEVANTAMENTO TERRA COMBINADOS"
+  },
+  "detail": {
+    "heading": "DESAFIO",
+    "notFound": "Desafio não encontrado",
+    "endsIn": "TERMINA EM",
+    "participants": "PARTICIPANTES",
+    "xpReward": "RECOMPENSA XP",
+    "prize": "PRÉMIO",
+    "leaderboard": "CLASSIFICAÇÃO",
+    "noParticipants": "Ainda sem participantes",
+    "beFirst": "Sê o primeiro a participar!",
+    "refresh": "ATUALIZAR",
+    "joinedTapToLeave": "INSCRITO — TOCA PARA SAIR",
+    "joinChallenge": "PARTICIPAR NO DESAFIO",
+    "challengeEnded": "DESAFIO TERMINADO"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "consistency": "CONSISTÊNCIA",
+  "checkinsIn12Weeks_one": "{{count}} check-in em 12 semanas",
+  "checkinsIn12Weeks_other": "{{count}} check-ins em 12 semanas",
+  "less": "Menos",
+  "more": "Mais",
+  "level": "NÍVEL",
+  "xpProgress": "{{xpInLevel}} / {{xpNeeded}} XP",
+  "totalPrs": "PRs TOTAIS",
+  "records": "recordes",
+  "dayStreak": "SEQUÊNCIA",
+  "days": "dias",
+  "workouts": "TREINOS",
+  "done": "concluídos",
+  "loadError": "Não foi possível carregar o progresso:\n{{error}}",
+  "noDataTitle": "AINDA SEM DADOS",
+  "noDataSub": "Regista um PR ou faz check-in no ginásio para começares a acompanhar o teu progresso.",
+  "strengthProgress": "PROGRESSO DE FORÇA",
+  "noPrsYet": "Regista o teu primeiro PR para veres o teu progresso.",
+  "big3Total": "TOTAL BIG 3",
+  "currentBest": "melhor atual"
+}

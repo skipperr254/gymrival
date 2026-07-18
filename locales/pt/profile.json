@@ -1,0 +1,97 @@
+{
+  "header": {
+    "brand": "GYM RIVAL",
+    "pageLabel": "PERFIL"
+  },
+  "proUpsell": "PASSA A PRO — 4,99 €/MÊS",
+  "proActive": "MEMBRO PRO — TOCA PARA DESATIVAR",
+  "details": {
+    "title": "OS MEUS DADOS",
+    "edit": "EDITAR",
+    "gym": "GINÁSIO",
+    "weight": "PESO",
+    "height": "ALTURA",
+    "goal": "OBJETIVO",
+    "memberSince": "MEMBRO DESDE",
+    "motto": "LEMA",
+    "notSet": "—"
+  },
+  "stats": {
+    "prs": "PRs",
+    "friends": "AMIGOS",
+    "streak": "SEQUÊNCIA",
+    "level": "NÍVEL"
+  },
+  "bestPrs": "MELHORES PRs",
+  "settings": {
+    "title": "DEFINIÇÕES",
+    "notifications": "Notificações",
+    "notificationsSub": "Notificações push ativadas",
+    "privacy": "Privacidade",
+    "privacySub": "Perfil visível para amigos",
+    "darkMode": "Modo escuro",
+    "darkModeOn": "Ativado",
+    "shareProfile": "Partilhar perfil",
+    "shareProfileSub": "Copiar o teu link"
+  },
+  "logOut": "TERMINAR SESSÃO",
+  "edit": {
+    "title": "EDITAR PERFIL",
+    "fullName": "NOME COMPLETO",
+    "fullNamePlaceholder": "O teu nome",
+    "username": "NOME DE UTILIZADOR",
+    "usernamePlaceholder": "@utilizador",
+    "bio": "BIOGRAFIA",
+    "bioPlaceholder": "Conta a tua história...",
+    "motto": "O TEU LEMA",
+    "mottoPlaceholder": "Ex.: Sem dor, sem ganho",
+    "gym": "GINÁSIO",
+    "gymPlaceholder": "O teu ginásio",
+    "weight": "PESO (kg)",
+    "height": "ALTURA (cm)",
+    "goal": "OBJETIVO",
+    "goalPlaceholder": "Ex.: Ganhar massa muscular",
+    "save": "GUARDAR ALTERAÇÕES",
+    "invalidWeightTitle": "Peso inválido",
+    "invalidWeightMsg": "Introduz um peso válido em kg.",
+    "invalidHeightTitle": "Altura inválida",
+    "invalidHeightMsg": "Introduz uma altura válida em cm.",
+    "saveErrorTitle": "Não foi possível guardar"
+  },
+  "badges": {
+    "title": "INSÍGNIAS",
+    "earnedCount": "INSÍGNIAS OBTIDAS",
+    "earnedSection": "OBTIDAS",
+    "lockedSection": "BLOQUEADAS",
+    "items": {
+      "firstPr": "Primeiro PR",
+      "sevenDayStreak": "Sequência de 7 Dias",
+      "hundredKgBench": "Supino 100kg",
+      "topThreeBoard": "Top 3 da Tabela",
+      "tenPrs": "10 PRs",
+      "challengeWon": "Desafio Vencido",
+      "videoProof": "Prova em Vídeo",
+      "twoHundredKgDeadlift": "Levantamento Terra 200kg",
+      "thirtyDayStreak": "Sequência de 30 Dias",
+      "hundredLikes": "100 Gostos"
+    },
+    "desc": {
+      "videoProof": "Carrega um vídeo para desbloquear",
+      "deadlift": "Faltam 40 kg",
+      "streak30": "Faltam 23 dias",
+      "likes100": "Faltam 67 gostos"
+    }
+  },
+  "prHistory": {
+    "title": "HISTÓRICO DE PRs",
+    "best": "Melhor: {{value}} {{unit}}",
+    "emptyTitle": "AINDA SEM PRs",
+    "emptySub": "Regista o teu primeiro PR para começar a acompanhar o teu progresso"
+  },
+  "notifications": {
+    "title": "NOTIFICAÇÕES",
+    "markAll": "MARCAR TUDO",
+    "emptyTitle": "TUDO EM DIA",
+    "emptySub": "Aqui vais ver mensagens, pedidos de amizade e gostos nos teus PRs."
+  }
+}

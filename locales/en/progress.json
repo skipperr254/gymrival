@@ -1,0 +1,22 @@
+{
+  "consistency": "CONSISTENCY",
+  "checkinsIn12Weeks_one": "{{count}} check-in in 12 weeks",
+  "checkinsIn12Weeks_other": "{{count}} check-ins in 12 weeks",
+  "less": "Less",
+  "more": "More",
+  "level": "LEVEL",
+  "xpProgress": "{{xpInLevel}} / {{xpNeeded}} XP",
+  "totalPrs": "TOTAL PRs",
+  "records": "records",
+  "dayStreak": "DAY STREAK",
+  "days": "days",
+  "workouts": "WORKOUTS",
+  "done": "done",
+  "loadError": "Could not load progress:\n{{error}}",
+  "noDataTitle": "NO DATA YET",
+  "noDataSub": "Log a PR or check in to the gym to start tracking your progress.",
+  "strengthProgress": "STRENGTH PROGRESS",
+  "noPrsYet": "Log your first PR to see your progress.",
+  "big3Total": "BIG 3 TOTAL",
+  "currentBest": "current best"
+}

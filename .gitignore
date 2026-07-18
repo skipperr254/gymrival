@@ -43,3 +43,12 @@ app-example
 /android
 
 /extras
+
+/designs
+
+# temporary export dumps
+/Tempgymrival-export*
+
+.mcp.json
+
+todo.md

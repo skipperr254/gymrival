@@ -1,0 +1,47 @@
+{
+  "logSheet": {
+    "title": "ACTIVITEIT LOGGEN",
+    "logPr": { "label": "Log een PR", "sub": "Leg een nieuw persoonlijk record vast" },
+    "checkin": { "label": "Gym Check-in", "sub": "Check in bij je sportschool" }
+  },
+  "step": {
+    "stepOf": "STAP {{step}} VAN 2",
+    "logYourPr": "Log Je PR",
+    "addProof": "Bewijs Toevoegen"
+  },
+  "selectExercise": "SELECTEER OEFENING",
+  "prWithValue": "PR  {{value}} {{unit}}",
+  "noPrYet": "Nog geen PR",
+  "yourNewPr": "JOUW NIEUWE PR",
+  "notHigherThanCurrent": "Niet hoger dan je huidige PR ({{value}} {{unit}})",
+  "nextAddProof": "VERDER — BEWIJS TOEVOEGEN",
+  "previousWithValue": "Vorige: {{value}} {{unit}}",
+  "firstPr": "Eerste PR",
+  "xpWithVideo": "+100 XP",
+  "xpWithoutVideo": "+50 XP",
+  "withVideo": "Met video",
+  "withoutVideo": "Zonder video",
+  "savePr": "PR OPSLAAN — {{xp}}",
+  "removeVideoSave": "Verwijder video, sla op voor +50 XP",
+  "prSaved": "PR OPGESLAGEN!",
+  "newBest": "NIEUW RECORD",
+  "uploadingVideoProof": "Videobewijs uploaden…",
+  "videoProofSaved": "Videobewijs opgeslagen",
+  "videoUploadFailed": "Video-upload mislukt — PR is nog steeds opgeslagen",
+  "addedToLeaderboard": "Toegevoegd aan het scorebord",
+  "xpEarnedWithVideo": "+100 XP VERDIEND",
+  "xpEarnedWithoutVideo": "+50 XP VERDIEND",
+  "video": {
+    "readyLabel": "VIDEO KLAAR",
+    "addProofTitle": "VIDEOBEWIJS TOEVOEGEN",
+    "addProofSub": "Camera of bibliotheek · max 60 sec",
+    "permissionNeededTitle": "Toestemming vereist",
+    "permissionLibraryMsg": "Geef toegang tot je fotobibliotheek om een video toe te voegen.",
+    "permissionCameraMsg": "Geef cameratoegang om je lift op te nemen.",
+    "pickerTitle": "Videobewijs Toevoegen",
+    "pickerMsg": "Neem je lift op of kies een bestaande video (max 60 seconden)",
+    "recordVideo": "Video Opnemen",
+    "chooseFromLibrary": "Kies uit Bibliotheek",
+    "cancel": "Annuleren"
+  }
+}

@@ -10,21 +10,48 @@ Think like a senior mobile developer. Build practical, working features. Avoid o
 
 ## Project Overview
 
-GymRival is a mobile fitness app where users log PRs (personal records), compete on leaderboards with friends, track macros and body progress, and get personalised insights from an AI coach.
+GymRival is a mobile fitness app where users log PRs (personal records), compete on leaderboards with friends, share activity in a social feed, and stay accountable with gym check-ins and challenges.
 
-Core features:
+v1 core features:
 
 - PR logging with leaderboard rankings (friends + global)
+- PR video proof
 - Weekly and monthly challenges
 - Social feed (PR posts, likes, friend activity)
 - Friends system and in-app chat
-- Workout of the Day and program/schema tracking
-- Macro and calorie tracking
-- Body scan / progress photo tracking
-- Weight log
-- AI Coach powered by the Anthropic API (via Supabase Edge Function)
+- Gym check-ins with weekly streak tracking
 - Push notifications
 - Onboarding, sign up, and sign in flows
+
+---
+
+## v1 Scope
+
+This section is the single source of truth for what is and is not in the v1 client preview build. Do not implement or scaffold anything in the "Deferred" list.
+
+### In v1
+
+- **Auth**: onboarding, sign-in, sign-up, email verify, profile setup, forgot password, reset password
+- **Compete tab**: Rivals (friends) leaderboard, Global leaderboard, Challenges, Challenge detail — all implemented and working
+- **Social tab**: Feed, Friends (dedicated screen at `social/friends.tsx` — currently a stub, will be made real in a later phase), Chat
+- **Train tab**: segmented screen with **Schedule**, **Gym Check-in**, and **Progress** (all three implemented and in scope for v1)
+- **Profile tab**: Profile, Edit, PR history, Badges, Notifications
+- **PR logging + PR video proof**
+- **Push notifications**
+- **FAB (center Log button)**: exactly **two** actions — **Log a PR** and **Gym Check-in**. Nothing else. Do not add Log Meal, Log Weight, or any other action.
+
+### Deferred — not in v1, do not scaffold
+
+- AI Coach (the `ai-coach` edge function does not exist; do not create it or any UI for it)
+- Macros / calorie tracking
+- Body scan / progress photos
+- Weight log
+- Workout of the Day (WOD)
+- The old "schema" / program concept (superseded by the Schedule feature)
+- Stripe / in-app payments for Pro tier
+- Admin dashboard
+- Deep links
+- App Store / Play Store submission config
 
 ---
 
@@ -41,9 +68,8 @@ Core features:
 | Auth              | Supabase Auth (email/password + OAuth)              |
 | Database          | Supabase (Postgres + Row Level Security)            |
 | Realtime          | Supabase Realtime (leaderboard, chat)               |
-| Storage           | Supabase Storage (profile photos, future PR video)  |
+| Storage           | Supabase Storage (profile photos, PR video)         |
 | Backend functions | Supabase Edge Functions                             |
-| AI Coach          | Anthropic API via Supabase Edge Function            |
 | Notifications     | Expo Notifications + Supabase Edge Function trigger |
 
 Do not introduce new major libraries without a strong reason. If a new library would significantly simplify an implementation, recommend it, explain why, and ask for approval before adding it.
@@ -61,6 +87,10 @@ gymrival/
       onboarding.tsx
       sign-in.tsx
       sign-up.tsx
+      verify.tsx
+      setup.tsx
+      forgot-password.tsx
+      reset-password.tsx
     (tabs)/                   # Main authenticated tab navigator
       _layout.tsx
       compete/
@@ -70,26 +100,17 @@ gymrival/
         challenge/[id].tsx
       social/
         index.tsx             # Feed (default)
-        friends.tsx
+        friends.tsx           # Dedicated Friends screen (stub → real in later phase)
         messages.tsx
         chat/[userId].tsx
       train/
-        index.tsx             # Train & Track overview
-        wod.tsx
-        schema/
-          index.tsx
-          [id].tsx
-        coach.tsx
-        checkin.tsx
-        macros.tsx
-        bodyscan.tsx
-        weight.tsx
-        progress.tsx
+        index.tsx             # Segmented screen: Schedule | Check-in | (Progress — planned)
       profile/
         index.tsx
         edit.tsx
         pr-history.tsx
         badges.tsx
+        notifications.tsx
     _layout.tsx               # Root layout (auth gate)
   components/
     ui/                       # Primitives used across the app
@@ -108,8 +129,6 @@ gymrival/
   supabase/
     migrations/               # SQL migration files
     functions/                # Edge Functions
-      ai-coach/
-        index.ts
       send-notification/
         index.ts
   assets/
@@ -121,7 +140,7 @@ gymrival/
 
 **`app/`** — Screens and layouts only. Screens compose components, call hooks and stores, and handle navigation. No large UI blocks or business logic inline.
 
-**`components/`** — Create a component only when it is reused in multiple places, it makes a screen significantly easier to read, or it represents a clear UI concept like `PRCard`, `LeaderboardRow`, `MacroRing`, `ChallengeCard`, or `BottomSheet`. Do not extract one-off UI too early. When unsure, ask: _should this be a component, or stay inline for now?_
+**`components/`** — Create a component only when it is reused in multiple places, it makes a screen significantly easier to read, or it represents a clear UI concept like `PRCard`, `LeaderboardRow`, `ChallengeCard`, or `BottomSheet`. Do not extract one-off UI too early. When unsure, ask: _should this be a component, or stay inline for now?_
 
 **`constants/theme.ts`** — Single source of truth for all design tokens. Every color, font size, spacing value, and border radius used in the app must come from here. Never hardcode a color hex value in a component.
 
@@ -218,6 +237,39 @@ Before writing any NativeWind code, check the installed version in `package.json
 
 Add reusable utility classes to `global.css` using BEM conventions when a pattern appears more than twice. Example: a recurring `card` pattern, a `heading-display` font utility, or a `screen-container` layout utility.
 
+### Existing StyleSheet tech debt
+
+The codebase currently has a large `StyleSheet.create` footprint that predates the NativeWind-first rule. That existing code is known tech debt earmarked for a dedicated migration pass — **do not fix it now**. For all **new** code, follow the NativeWind-first rule and the exceptions table above. Do not add new `StyleSheet` blocks where NativeWind would work.
+
+---
+
+## Code Quality Rules
+
+### Screen files must compose, not contain
+
+Screen files in `app/` are composition roots. They call hooks and stores, handle navigation, and render extracted components. They must not contain:
+
+- Large inline UI blocks
+- Multiple modal or bottom-sheet definitions
+- Several sub-features implemented inline in one file
+
+### File size guideline
+
+If a screen or component file exceeds **~400 lines**, that is a signal to extract sub-components into `components/features/` (feature-specific) or `components/ui/` (reusable primitives). New files should not be written past this limit without a stated reason.
+
+### Known tech debt (do not fix now)
+
+Several existing files violate the guideline above — they are slated for a dedicated refactor phase:
+
+| File                            | Approx. lines |
+| ------------------------------- | ------------- |
+| `compete/index.tsx`             | ~2292         |
+| `social/index.tsx`              | ~1747         |
+| `components/features/LogPRSheet.tsx` | ~1063    |
+| `train/index.tsx`               | ~985          |
+
+Do not let new code follow that pattern. Do not refactor these files unless explicitly asked.
+
 ---
 
 ## UI Implementation Rules
@@ -286,7 +338,7 @@ The app uses Expo Router with the following top-level structure:
 ```
 app/
   _layout.tsx          # Root layout — checks auth state, redirects to (auth) or (tabs)
-  (auth)/              # Stack: splash → onboarding → sign-in / sign-up
+  (auth)/              # Stack: splash → onboarding → sign-in / sign-up / verify / setup
   (tabs)/              # Bottom tab navigator: Compete, Social, Train, Profile
 ```
 
@@ -302,7 +354,7 @@ app/
 | 4        | Train 🏋️   | `/(tabs)/train`                      |
 | 5        | Profile 👤 | `/(tabs)/profile`                    |
 
-The Log FAB opens a bottom sheet modal with options: Log PR, Log Meal, Log Weight, Gym Check-in. It does not navigate to a new route — it presents a sheet over the current screen.
+The Log FAB opens a bottom sheet with exactly **two** actions: **Log a PR** and **Gym Check-in**. It does not navigate to a new route — it presents a sheet over the current screen. Do not add any other actions (Log Meal, Log Weight, etc.).
 
 ### Route Constants
 
@@ -335,8 +387,7 @@ Use Zustand for all global client state. Use local `useState` for temporary UI s
 | `useAuthStore`         | Current user, session, loading state                     |
 | `useCompeteStore`      | Selected exercise, leaderboard data, joined challenges   |
 | `useSocialStore`       | Feed posts, friends list, friend requests, conversations |
-| `useTrainStore`        | Workout state, check-ins, streak, active schema          |
-| `useTrackStore`        | Meals, weight log, body scan entries, macro goals        |
+| `useTrainStore`        | Workout state, check-ins, streak, active schedule        |
 | `useProfileStore`      | Profile data, PRs, badges, XP, level                     |
 | `useNotificationStore` | Notification list, unread count                          |
 
@@ -360,7 +411,6 @@ types/
   pr.ts
   challenge.ts
   workout.ts
-  meal.ts
   social.ts
   notification.ts
 ```
@@ -397,7 +447,7 @@ Subscribe in a `useEffect` inside the relevant hook or screen. Always unsubscrib
 
 ### Storage
 
-Profile photos and future PR video uploads go to Supabase Storage. Generate signed URLs server-side when the bucket is private.
+Profile photos and PR video uploads go to Supabase Storage. Generate signed URLs server-side when the bucket is private.
 
 ---
 
@@ -409,15 +459,7 @@ Current functions:
 
 | Function            | Purpose                                                                               |
 | ------------------- | ------------------------------------------------------------------------------------- |
-| `ai-coach`          | Calls the Anthropic API and returns a coaching response                               |
 | `send-notification` | Triggers Expo push notifications for events (new PR, challenge, like, friend request) |
-
-### AI Coach function rules
-
-- Receive the user's message and relevant context (their PR data, recent activity) in the request body
-- Call the Anthropic API server-side
-- Return the response to the client
-- Never expose the Anthropic API key in the mobile app bundle
 
 ### Calling Edge Functions from the app
 
@@ -425,9 +467,9 @@ Use the Supabase client's `functions.invoke()` method. Create a wrapper in `lib/
 
 ```ts
 // lib/api.ts
-export async function askAICoach(message: string, context: CoachContext) {
-  const { data, error } = await supabase.functions.invoke("ai-coach", {
-    body: { message, context },
+export async function sendNotification(payload: NotificationPayload) {
+  const { data, error } = await supabase.functions.invoke("send-notification", {
+    body: payload,
   });
   if (error) throw error;
   return data;
@@ -469,9 +511,67 @@ When asked to build a feature:
 
 ---
 
-## PR Video Uploads
+## PR Video Proof
 
-Video recording and upload are **deferred to a later version**. Do not implement or scaffold this now. When this feature is built, it will use Expo ImagePicker for selection and Supabase Storage for upload with client-side compression before uploading.
+PR video proof is **in v1**. Users record or upload a short video clip when logging a PR. The flow uses Expo ImagePicker for selection, uploads to the `pr-videos` Supabase Storage bucket, and displays the video inline in the feed and PR history.
+
+Do not conflate this with a full "replay / highlight" feature — the v1 scope is proof-of-PR video only.
+
+---
+
+## Internationalization (i18n) Rules
+
+The app is fully internationalized via `i18next` + `react-i18next` + `expo-localization`. Every screen across all four tabs, the Auth flow, and the Log-a-PR flow is translated. Supported languages: **English, Dutch, Spanish, German, Portuguese, Arabic** — all six have complete, real translations (no stubs remaining) across every namespace. Arabic content is translated but the layout is not yet mirrored for RTL — see "Arabic / RTL" below.
+
+### The rule: never hardcode user-facing copy
+
+Every string a user sees — `<Text>` content, `placeholder`, `Alert` titles/messages, error copy you compose yourself — must go through `t()`. This applies as you write new JSX, not as a cleanup pass afterward. An ESLint warning (`i18next/no-literal-string`, see `eslint.config.js`) flags new hardcoded JSX text and attributes to catch slips.
+
+Exception: brand wordmarks ("GYM"/"RIVAL"/"GYMRIVAL") are never translated.
+
+### Namespaces
+
+Translation files live in `locales/<code>/<namespace>.json` (`code` = `en`, `nl`, `es`, `de`, `pt`, `ar`). One namespace file per feature area, mirroring the `app/(tabs)/<tab>` structure: `auth.json` (the whole `(auth)` stack), `common.json` (tab bar, shared settings/chart strings), `profile.json`, `train.json`, `progress.json`, `social.json` (feed/friends/messages/chat), `compete.json` (rivals/challenges/global), `logpr.json` (the Log-a-PR sheet + video upload), `notifications.json`, `exercises.json`. When you build a new feature, add its own namespace file (in all six language folders) rather than dumping keys into an existing namespace.
+
+Use `useTranslation('namespaceName')` in a screen/component and call `t('key.path')`, or use a fully-qualified `t('namespace:key.path')` when you need a namespace other than the hook's default (e.g. resolving exercise names via `t('exercises:' + key)`). For module-level constants that back JSX (tab configs, option lists) that can't call hooks, store the i18n **key path** on the object and resolve it with `t()` at render time inside the component — see `TABS`/`METRIC_OPTIONS`/`GLOBAL_STAT_BOXES` in `compete/index.tsx` for the pattern. For plain helper functions that aren't components (e.g. `metricLabel()`/`endsInLabel()` in `types/challenge.ts`), import the default `i18n` instance from `@/lib/i18n` and call `i18n.t(...)` directly instead of the `useTranslation` hook.
+
+### Adding a new language
+
+Registering a language is a content-only change with zero code changes:
+1. Add an entry to `LANGUAGES` in `lib/i18n/languages.ts` with `available: false` until it's translated.
+2. Add `locales/<code>/*.json` for every existing namespace (start from the English files).
+3. Flip `available: true` once translated — it then appears in the in-app language picker (Profile → Language).
+
+### Dates and numbers
+
+Never call `toLocaleDateString`, `toLocaleString`, or hardcode a locale like `'en-US'`. Use the helpers in `lib/i18n/format.ts` (`formatDate`, `formatMonthYear`, `formatNumber`, `formatCompactNumber`, `formatRelativeTime`, `formatRelativeDay`) — they read the current i18next language at call time so they stay correct after a runtime language switch.
+
+### Database content
+
+Two different patterns depending on what the content is:
+- **Static reference data** (e.g. `exercise_types`) — the DB row's stable `key` column is the i18n key. Add the display name to `locales/*/exercises.json` keyed by that `key`; don't add translation columns to the table itself.
+- **Admin-authored dynamic content** (e.g. challenge titles/descriptions) — needs a real per-locale table, like `challenge_translations` (migration `026_challenge_translations.sql`). The base column stays the original-authored-language text; a translation row overrides it for a given locale, with the base column as fallback when no translation exists. This only covers admin-created challenges — friend-vs-friend challenge titles are the creator's own free text and are never machine-translated, same as a chat message.
+- **Notification history**: never freeze translated/rendered text into a `notifications.data` JSONB column — store the stable key (e.g. `exercise_key`, not `exercise_label`) and resolve the display text client-side at render time, so old notifications render correctly in whatever language the viewer is currently using (see migration `027_notification_exercise_key.sql` for why this matters).
+
+### Language detection & persistence
+
+`lib/i18n/languageDetector.ts` resolves the active language in this order: an explicit choice cached in AsyncStorage → the device's locale (`expo-localization`) mapped to the nearest supported language → English. Once a signed-in user explicitly picks a language in Settings, it's also written to `profiles.language` and becomes the cross-device source of truth (synced in `app/_layout.tsx`); `NULL` means "keep following the device."
+
+### Push notifications (server-side, locale-aware)
+
+Push notifications are triggered entirely server-side: an `AFTER INSERT` trigger on `notifications` (`tr_notifications_push`, migration `028_push_notification_webhook.sql`) calls the `send-notification` edge function via `pg_net`, which composes the push title/body using the **recipient's** `profiles.language` — not the actor's. This is deliberate: the action that causes a notification (e.g. a PR like) is taken by a different user than the one receiving the push, so client-side composition would always use the wrong person's language. There is no client-side `sendPushNotification()` wrapper for this reason — do not reintroduce one.
+
+The edge function embeds its own copy of the notification templates and exercise names (`supabase/functions/send-notification/index.ts`) since Deno edge functions can't import the RN app's `locales/*.json` files directly — keep these two in sync by hand when `notifications.json` or `exercises.json` changes.
+
+The webhook call requires a one-time manual setup (a shared secret in Supabase Vault + a matching edge function secret) documented at the top of migration `028`; until that's done, the trigger silently no-ops rather than failing.
+
+### Arabic / RTL (deferred)
+
+Arabic has complete, real translations across every namespace and is selectable in the language picker today — but the app's layout is not RTL-aware (no `I18nManager.forceRTL`, no mirrored `flex-row`/icons/text-alignment). Selecting Arabic renders correct Arabic text in a left-to-right layout. Full RTL layout support is a deliberately separate, larger follow-up piece (it touches nearly every screen's layout, not just text) — do not attempt to bolt it on piecemeal; treat it as its own project.
+
+### Explicitly out of scope
+
+Unit conversion (metric ⇄ imperial) is not part of this i18n work — `weight_kg`/`height_cm` stay metric-only regardless of language. This would be a separate feature (a unit-system preference threaded through PR logging, leaderboards, and profile display), not a translation concern.
 
 ---
 
@@ -485,6 +585,24 @@ npx tsc --noEmit
 ```
 
 Fix all errors and warnings before considering a feature complete.
+
+### JSX apostrophe rule
+
+Never use a bare `'` inside JSX text content — the linter flags it as an unescaped entity. Use one of these instead:
+
+```tsx
+// Wrong
+<Text>Don't stop</Text>
+<Text>You're next</Text>
+
+// Correct — string expression
+<Text>{"Don't stop"}</Text>
+
+// Correct — HTML entity
+<Text>You&apos;re next</Text>
+```
+
+Apply this rule as you write JSX, not as a cleanup pass at the end.
 
 ---
 
@@ -501,19 +619,9 @@ Be concise. After implementing a feature, briefly explain:
 ## Security Constraints
 
 - Never put API keys, secrets, or service role keys in the mobile app bundle
-- All third-party API calls (Anthropic, etc.) go through Supabase Edge Functions
+- All third-party API calls go through Supabase Edge Functions
 - All Supabase tables have RLS enabled
 - Use Supabase Auth — do not roll custom auth
-
----
-
-## Deferred Features (do not implement until explicitly requested)
-
-- PR video recording and upload
-- Stripe / in-app payments for Pro tier
-- Admin dashboard
-- Deep links
-- App Store / Play Store submission config
 
 ---
 

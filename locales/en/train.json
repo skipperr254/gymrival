@@ -1,0 +1,62 @@
+{
+  "header": {
+    "brand": "GYM RIVAL",
+    "schedule": "WORKOUT SCHEDULE",
+    "checkin": "GYM CHECK-IN",
+    "progress": "PROGRESS"
+  },
+  "tabs": {
+    "schedule": "SCHEDULE",
+    "checkin": "CHECK IN",
+    "progress": "PROGRESS"
+  },
+  "days": {
+    "full": { "0": "Monday", "1": "Tuesday", "2": "Wednesday", "3": "Thursday", "4": "Friday", "5": "Saturday", "6": "Sunday" },
+    "short": { "0": "Mon", "1": "Tue", "2": "Wed", "3": "Thu", "4": "Fri", "5": "Sat", "6": "Sun" }
+  },
+  "flexible": "Flexible",
+  "workoutsPlanned_one": "{{count}} WORKOUT PLANNED",
+  "workoutsPlanned_other": "{{count}} WORKOUTS PLANNED",
+  "new": "NEW",
+  "workoutMeta": "{{day}} · {{count}} exercises",
+  "emptyTitle": "NO SCHEDULES YET",
+  "emptySubtitle": "Tap NEW above to create your first workout",
+  "detailMeta": "{{day}} · {{count}} EXERCISES",
+  "progressLabel": "PROGRESS",
+  "setsProgress": "{{done}} / {{total}} SETS",
+  "exerciseMeta": "{{sets}} sets · {{reps}} reps",
+  "exerciseMetaWithWeight": "{{sets}} sets · {{reps}} reps · {{weight}}kg",
+  "setNumber": "SET {{n}}",
+  "startWorkout": "START WORKOUT",
+  "workoutDone": "WORKOUT DONE!",
+  "workoutDoneSub": "All sets completed. Great work!",
+  "backToSchedule": "BACK TO SCHEDULE",
+  "cancelWorkout": "CANCEL WORKOUT",
+  "createSchedule": "CREATE SCHEDULE",
+  "workoutName": "WORKOUT NAME",
+  "workoutNamePlaceholder": "e.g. Push Day",
+  "day": "DAY",
+  "addExercise": "ADD EXERCISE",
+  "exerciseNamePlaceholder": "Exercise name",
+  "fields": { "sets": "SETS", "reps": "REPS", "weight": "KG" },
+  "exercisesAdded_one": "{{count}} EXERCISE ADDED",
+  "exercisesAdded_other": "{{count}} EXERCISES ADDED",
+  "saveSchedule": "SAVE SCHEDULE",
+  "checkin": {
+    "weeklyStreak": "WEEKLY STREAK",
+    "ofSevenDays": "/ 7 days",
+    "machine": "MACHINE!",
+    "keepItUp": "KEEP IT UP",
+    "stayStrong": "STAY STRONG",
+    "checkInNow": "CHECK IN NOW",
+    "noGyms": "No gyms available.",
+    "hereToday": "{{count}} here today",
+    "confirmCheckIn": "CONFIRM CHECK-IN",
+    "checkedIn": "CHECKED IN!",
+    "yourGym": "Your gym",
+    "xpEarned": "+25 XP EARNED",
+    "undoCheckIn": "UNDO CHECK-IN",
+    "friendsCheckedIn": "FRIENDS CHECKED IN",
+    "unknown": "Unknown"
+  }
+}

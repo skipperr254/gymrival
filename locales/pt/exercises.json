@@ -1,0 +1,19 @@
+{
+  "bench": "Supino",
+  "squat": "Agachamento",
+  "deadlift": "Levantamento Terra",
+  "pullups": "Barra Fixa",
+  "overhead": "Desenvolvimento Militar",
+  "bulgarian": "Agachamento Búlgaro",
+  "rdl": "Levantamento Terra Romeno",
+  "incline": "Supino Inclinado",
+  "dips": "Mergulho (Dips)",
+  "row": "Remada com Barra",
+  "curl": "Rosca Bíceps",
+  "legpress": "Leg Press",
+  "lunge": "Afundo",
+  "facepull": "Face Pull",
+  "hipthrust": "Elevação Pélvica",
+  "plank": "Prancha",
+  "muscle_up": "Muscle Up"
+}

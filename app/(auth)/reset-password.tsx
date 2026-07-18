@@ -13,11 +13,13 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { Colors } from "@/constants/theme";
 import { Routes } from "@/constants/routes";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export default function ResetPasswordScreen() {
+  const { t } = useTranslation("auth");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -35,7 +37,7 @@ export default function ResetPasswordScreen() {
   const handleSubmit = async () => {
     if (!canSubmit) return;
     if (password !== confirmPassword) {
-      setError("Passwords don't match.");
+      setError(t("resetPassword.passwordMismatch"));
       return;
     }
     setError(null);
@@ -71,10 +73,10 @@ export default function ResetPasswordScreen() {
           {/* Header */}
           <View className="mb-8">
             <Text className="font-heading text-[46px] text-primary tracking-[2px] leading-12.5">
-              NEW{"\n"}PASSWORD
+              {t("resetPassword.title")}
             </Text>
             <Text className="font-sans text-[15px] text-secondary mt-3 leading-5.75">
-              Choose a strong password for your account.
+              {t("resetPassword.subtitle")}
             </Text>
           </View>
 
@@ -83,7 +85,7 @@ export default function ResetPasswordScreen() {
             {/* New Password */}
             <View>
               <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-                New Password
+                {t("resetPassword.newPasswordLabel")}
               </Text>
               <View
                 className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
@@ -92,7 +94,7 @@ export default function ResetPasswordScreen() {
                 <TextInput
                   value={password}
                   onChangeText={setPassword}
-                  placeholder="Min. 8 characters"
+                  placeholder={t("resetPassword.newPasswordPlaceholder")}
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
                   style={[styles.input, { flex: 1 }]}
@@ -113,14 +115,14 @@ export default function ResetPasswordScreen() {
                 </Pressable>
               </View>
               <Text className="font-sans text-[12px] text-muted mt-1.5 ml-1">
-                Use 8 or more characters.
+                {t("resetPassword.passwordHint")}
               </Text>
             </View>
 
             {/* Confirm Password */}
             <View>
               <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-                Confirm Password
+                {t("resetPassword.confirmPasswordLabel")}
               </Text>
               <View
                 className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
@@ -130,7 +132,7 @@ export default function ResetPasswordScreen() {
                   ref={confirmRef}
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
-                  placeholder="Repeat your password"
+                  placeholder={t("resetPassword.confirmPasswordPlaceholder")}
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
                   style={[styles.input, { flex: 1 }]}
@@ -172,7 +174,7 @@ export default function ResetPasswordScreen() {
               <ActivityIndicator color={Colors.primary} />
             ) : (
               <Text className="font-heading text-xl text-primary tracking-[3px]">
-                UPDATE PASSWORD
+                {t("resetPassword.submit")}
               </Text>
             )}
           </Pressable>

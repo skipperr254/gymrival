@@ -3,6 +3,7 @@ import { Colors } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -18,33 +19,34 @@ type IoniconName = React.ComponentProps<typeof Ionicons>["name"];
 
 interface Slide {
   icon: IoniconName;
-  tag: string;
-  title: string;
-  body: string;
+  tagKey: string;
+  titleKey: string;
+  bodyKey: string;
 }
 
 const SLIDES: Slide[] = [
   {
     icon: "trophy-outline",
-    tag: "TRACK YOUR PRs",
-    title: "COMPETE &\nCONQUER",
-    body: "Log your best lifts, climb the leaderboard, and challenge friends to beat your personal records.",
+    tagKey: "onboarding.slide1.tag",
+    titleKey: "onboarding.slide1.title",
+    bodyKey: "onboarding.slide1.body",
   },
   {
     icon: "flash-outline",
-    tag: "TRAIN SMARTER",
-    title: "LEVEL UP YOUR\nWORKOUT",
-    body: "Follow structured programs, log every session, and get tailored guidance from your AI coach.",
+    tagKey: "onboarding.slide2.tag",
+    titleKey: "onboarding.slide2.title",
+    bodyKey: "onboarding.slide2.body",
   },
   {
     icon: "people-outline",
-    tag: "STAY MOTIVATED",
-    title: "YOUR FIT CREW\nAWAITS",
-    body: "Share your wins, cheer on friends, join challenges, and celebrate every milestone together.",
+    tagKey: "onboarding.slide3.tag",
+    titleKey: "onboarding.slide3.title",
+    bodyKey: "onboarding.slide3.body",
   },
 ];
 
 export default function OnboardingScreen() {
+  const { t } = useTranslation("auth");
   const { width } = useWindowDimensions();
   const scrollRef = useRef<ScrollView>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -76,7 +78,7 @@ export default function OnboardingScreen() {
         {!isLast && (
           <Pressable onPress={skip} hitSlop={12}>
             <Text className="font-sans-medium text-[15px] text-secondary">
-              Skip
+              {t("onboarding.skip")}
             </Text>
           </Pressable>
         )}
@@ -109,13 +111,13 @@ export default function OnboardingScreen() {
             {/* Text */}
             <View className="items-center">
               <Text className="font-sans-semibold text-xs text-accent tracking-[3px] mb-3">
-                {slide.tag}
+                {t(slide.tagKey)}
               </Text>
               <Text className="font-heading text-[52px] text-primary text-center leading-[56px] mb-4">
-                {slide.title}
+                {t(slide.titleKey)}
               </Text>
               <Text className="font-sans text-[15px] text-secondary text-center leading-5.75">
-                {slide.body}
+                {t(slide.bodyKey)}
               </Text>
             </View>
           </View>
@@ -145,7 +147,7 @@ export default function OnboardingScreen() {
           onPress={goNext}
         >
           <Text className="font-heading text-xl text-primary tracking-[3px]">
-            {isLast ? "GET STARTED" : "NEXT"}
+            {isLast ? t("onboarding.getStarted") : t("onboarding.next")}
           </Text>
         </Pressable>
       </View>

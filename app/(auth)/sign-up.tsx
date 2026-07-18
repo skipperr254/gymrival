@@ -13,11 +13,13 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { Colors } from "@/constants/theme";
 import { Routes } from "@/constants/routes";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export default function SignUpScreen() {
+  const { t } = useTranslation("auth");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -72,19 +74,19 @@ export default function SignUpScreen() {
           {/* Header */}
           <View className="mb-8">
             <Text className="font-heading text-[46px] text-primary tracking-[2px] leading-12.5">
-              CREATE YOUR{"\n"}ACCOUNT
+              {t("signUp.title")}
             </Text>
             <Text className="font-sans text-[15px] text-secondary mt-3 leading-5.5">
-              Join GymRival and start competing.
+              {t("signUp.subtitle")}
             </Text>
           </View>
 
           {/* Form */}
           <View className="gap-4">
-            {/* Display Name */}
+            {/* Full Name */}
             <View>
               <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-                Display Name
+                {t("signUp.fullNameLabel")}
               </Text>
               <View
                 className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
@@ -93,7 +95,7 @@ export default function SignUpScreen() {
                 <TextInput
                   value={name}
                   onChangeText={setName}
-                  placeholder="Your name"
+                  placeholder={t("signUp.fullNamePlaceholder")}
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
                   style={styles.input}
@@ -107,7 +109,7 @@ export default function SignUpScreen() {
             {/* Email */}
             <View>
               <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-                Email
+                {t("signUp.emailLabel")}
               </Text>
               <View
                 className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
@@ -117,7 +119,7 @@ export default function SignUpScreen() {
                   ref={emailRef}
                   value={email}
                   onChangeText={setEmail}
-                  placeholder="you@example.com"
+                  placeholder={t("signUp.emailPlaceholder")}
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
                   style={styles.input}
@@ -132,7 +134,7 @@ export default function SignUpScreen() {
             {/* Password */}
             <View>
               <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-                Password
+                {t("signUp.passwordLabel")}
               </Text>
               <View
                 className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
@@ -142,7 +144,7 @@ export default function SignUpScreen() {
                   ref={passwordRef}
                   value={password}
                   onChangeText={setPassword}
-                  placeholder="Min. 8 characters"
+                  placeholder={t("signUp.passwordPlaceholder")}
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
                   style={[styles.input, { flex: 1 }]}
@@ -162,7 +164,7 @@ export default function SignUpScreen() {
                 </Pressable>
               </View>
               <Text className="font-sans text-[12px] text-muted mt-1.5 ml-1">
-                Use 8 or more characters.
+                {t("signUp.passwordHint")}
               </Text>
             </View>
           </View>
@@ -187,22 +189,23 @@ export default function SignUpScreen() {
               <ActivityIndicator color={Colors.primary} />
             ) : (
               <Text className="font-heading text-xl text-primary tracking-[3px]">
-                CREATE ACCOUNT
+                {t("signUp.submit")}
               </Text>
             )}
           </Pressable>
 
           {/* Terms note */}
           <Text className="font-sans text-[12px] text-muted text-center mt-4 leading-4.5">
-            By creating an account you agree to our{" "}
-            <Text className="text-secondary">Terms of Service</Text> and{" "}
-            <Text className="text-secondary">Privacy Policy</Text>.
+            {t("signUp.termsNotice", {
+              terms: t("signUp.termsOfService"),
+              privacy: t("signUp.privacyPolicy"),
+            })}
           </Text>
 
           {/* Sign in link */}
           <View className="flex-row justify-center items-center mt-8 gap-1">
             <Text className="font-sans text-[14px] text-secondary">
-              Already have an account?
+              {t("signUp.haveAccount")}
             </Text>
             <Pressable
               onPress={() => router.replace(Routes.signIn)}
@@ -210,7 +213,7 @@ export default function SignUpScreen() {
             >
               <Text className="font-sans-semibold text-[14px] text-accent">
                 {" "}
-                Sign In
+                {t("signUp.signInLink")}
               </Text>
             </Pressable>
           </View>

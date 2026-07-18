@@ -1,16 +1,32 @@
 export const Routes = {
-  splash: "/(auth)/splash",
-  onboarding: "/(auth)/onboarding",
-  signIn: "/(auth)/sign-in",
-  signUp: "/(auth)/sign-up",
-  verify: "/(auth)/verify",
-  forgotPassword: "/(auth)/forgot-password",
-  resetPassword: "/(auth)/reset-password",
-  compete: "/(tabs)/compete",
-  social: "/(tabs)/social",
-  train: "/(tabs)/train",
-  profile: "/(tabs)/profile",
+  // Auth
+  splash: '/(auth)/splash',
+  onboarding: '/(auth)/onboarding',
+  signIn: '/(auth)/sign-in',
+  signUp: '/(auth)/sign-up',
+  verify: '/(auth)/verify',
+  setup: '/(auth)/setup',
+  forgotPassword: '/(auth)/forgot-password',
+  resetPassword: '/(auth)/reset-password',
+
+  // Compete tab
+  compete: '/(tabs)/compete',
   challengeDetail: (id: string) => `/(tabs)/compete/challenge/${id}`,
+
+  // Social tab
+  social: '/(tabs)/social',
+  socialFriends: '/(tabs)/social/friends',
   chat: (userId: string) => `/(tabs)/social/chat/${userId}`,
-  schemaDetail: (id: string) => `/(tabs)/train/schema/${id}`,
+
+  // Train tab
+  train: '/(tabs)/train',
+  trainCheckin: '/(tabs)/train/checkin',
+
+  // Profile tab
+  profile: '/(tabs)/profile',
+  profileEdit: '/(tabs)/profile/edit',
+  profilePRHistory: '/(tabs)/profile/pr-history',
+  profileBadges: '/(tabs)/profile/badges',
+  profileLanguage: '/(tabs)/profile/language',
+  notifications: '/(tabs)/profile/notifications',
 } as const;

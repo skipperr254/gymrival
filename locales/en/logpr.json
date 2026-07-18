@@ -1,0 +1,47 @@
+{
+  "logSheet": {
+    "title": "LOG ACTIVITY",
+    "logPr": { "label": "Log a PR", "sub": "Record a new personal record" },
+    "checkin": { "label": "Gym Check-in", "sub": "Check in to your gym" }
+  },
+  "step": {
+    "stepOf": "STEP {{step}} OF 2",
+    "logYourPr": "Log Your PR",
+    "addProof": "Add Proof"
+  },
+  "selectExercise": "SELECT EXERCISE",
+  "prWithValue": "PR  {{value}} {{unit}}",
+  "noPrYet": "No PR yet",
+  "yourNewPr": "YOUR NEW PR",
+  "notHigherThanCurrent": "Not higher than your current PR ({{value}} {{unit}})",
+  "nextAddProof": "NEXT — ADD PROOF",
+  "previousWithValue": "Previous: {{value}} {{unit}}",
+  "firstPr": "First PR",
+  "xpWithVideo": "+100 XP",
+  "xpWithoutVideo": "+50 XP",
+  "withVideo": "With video",
+  "withoutVideo": "Without video",
+  "savePr": "SAVE PR — {{xp}}",
+  "removeVideoSave": "Remove video, save for +50 XP",
+  "prSaved": "PR SAVED!",
+  "newBest": "NEW BEST",
+  "uploadingVideoProof": "Uploading video proof…",
+  "videoProofSaved": "Video proof saved",
+  "videoUploadFailed": "Video upload failed — PR is still saved",
+  "addedToLeaderboard": "Added to the leaderboard",
+  "xpEarnedWithVideo": "+100 XP EARNED",
+  "xpEarnedWithoutVideo": "+50 XP EARNED",
+  "video": {
+    "readyLabel": "VIDEO READY",
+    "addProofTitle": "ADD VIDEO PROOF",
+    "addProofSub": "Camera or library · max 60 sec",
+    "permissionNeededTitle": "Permission needed",
+    "permissionLibraryMsg": "Allow access to your photo library to attach a video.",
+    "permissionCameraMsg": "Allow camera access to record your lift.",
+    "pickerTitle": "Add Video Proof",
+    "pickerMsg": "Record your lift or pick an existing video (max 60 seconds)",
+    "recordVideo": "Record Video",
+    "chooseFromLibrary": "Choose from Library",
+    "cancel": "Cancel"
+  }
+}

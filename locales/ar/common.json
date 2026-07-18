@@ -1,0 +1,24 @@
+{
+  "settings": {
+    "language": "اللغة",
+    "languageAuto": "اتباع لغة الجهاز"
+  },
+  "actions": {
+    "back": "رجوع",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "done": "تم"
+  },
+  "chart": {
+    "noData": "لا توجد بيانات بعد"
+  },
+  "tabs": {
+    "compete": "المنافسة",
+    "social": "اجتماعي",
+    "train": "التدريب",
+    "profile": "الملف الشخصي"
+  },
+  "accessibility": {
+    "logActivity": "تسجيل نشاط"
+  }
+}

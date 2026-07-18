@@ -1,0 +1,22 @@
+{
+  "consistency": "الانتظام",
+  "checkinsIn12Weeks_one": "تسجيل حضور واحد خلال 12 أسبوعاً",
+  "checkinsIn12Weeks_other": "{{count}} تسجيل حضور خلال 12 أسبوعاً",
+  "less": "أقل",
+  "more": "أكثر",
+  "level": "المستوى",
+  "xpProgress": "{{xpInLevel}} / {{xpNeeded}} نقطة خبرة",
+  "totalPrs": "إجمالي الأرقام القياسية",
+  "records": "أرقام",
+  "dayStreak": "أيام متتالية",
+  "days": "أيام",
+  "workouts": "التمارين",
+  "done": "منجزة",
+  "loadError": "تعذّر تحميل التقدم:\n{{error}}",
+  "noDataTitle": "لا توجد بيانات بعد",
+  "noDataSub": "سجّل رقماً قياسياً أو سجّل حضورك في النادي لتبدأ بتتبّع تقدّمك.",
+  "strengthProgress": "تقدّم القوة",
+  "noPrsYet": "سجّل رقمك القياسي الأول لترى تقدّمك.",
+  "big3Total": "إجمالي الثلاثة الكبرى",
+  "currentBest": "الأفضل الحالي"
+}

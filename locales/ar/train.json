@@ -1,0 +1,62 @@
+{
+  "header": {
+    "brand": "GYM RIVAL",
+    "schedule": "جدول التمارين",
+    "checkin": "تسجيل حضور النادي",
+    "progress": "التقدم"
+  },
+  "tabs": {
+    "schedule": "الجدول",
+    "checkin": "تسجيل الحضور",
+    "progress": "التقدم"
+  },
+  "days": {
+    "full": { "0": "الإثنين", "1": "الثلاثاء", "2": "الأربعاء", "3": "الخميس", "4": "الجمعة", "5": "السبت", "6": "الأحد" },
+    "short": { "0": "إثن", "1": "ثلا", "2": "أرب", "3": "خمی", "4": "جمع", "5": "سبت", "6": "أحد" }
+  },
+  "flexible": "مرن",
+  "workoutsPlanned_one": "تمرين واحد مخطط",
+  "workoutsPlanned_other": "{{count}} تمرين مخطط",
+  "new": "جديد",
+  "workoutMeta": "{{day}} · {{count}} تمارين",
+  "emptyTitle": "لا توجد جداول بعد",
+  "emptySubtitle": "اضغط على جديد أعلاه لإنشاء أول تمرين لك",
+  "detailMeta": "{{day}} · {{count}} تمارين",
+  "progressLabel": "التقدم",
+  "setsProgress": "{{done}} / {{total}} مجموعات",
+  "exerciseMeta": "{{sets}} مجموعات · {{reps}} تكرارات",
+  "exerciseMetaWithWeight": "{{sets}} مجموعات · {{reps}} تكرارات · {{weight}} كجم",
+  "setNumber": "المجموعة {{n}}",
+  "startWorkout": "ابدأ التمرين",
+  "workoutDone": "تم إنجاز التمرين!",
+  "workoutDoneSub": "تم إكمال جميع المجموعات. عمل رائع!",
+  "backToSchedule": "العودة إلى الجدول",
+  "cancelWorkout": "إلغاء التمرين",
+  "createSchedule": "إنشاء جدول",
+  "workoutName": "اسم التمرين",
+  "workoutNamePlaceholder": "مثال: يوم الدفع",
+  "day": "اليوم",
+  "addExercise": "إضافة تمرين",
+  "exerciseNamePlaceholder": "اسم التمرين",
+  "fields": { "sets": "مجموعات", "reps": "تكرارات", "weight": "كجم" },
+  "exercisesAdded_one": "تمرين واحد مضاف",
+  "exercisesAdded_other": "{{count}} تمارين مضافة",
+  "saveSchedule": "حفظ الجدول",
+  "checkin": {
+    "weeklyStreak": "التتابع الأسبوعي",
+    "ofSevenDays": "/ 7 أيام",
+    "machine": "آلة حقيقية!",
+    "keepItUp": "واصل التقدم",
+    "stayStrong": "ابق قوياً",
+    "checkInNow": "سجّل حضورك الآن",
+    "noGyms": "لا توجد نوادٍ متاحة.",
+    "hereToday": "{{count}} هنا اليوم",
+    "confirmCheckIn": "تأكيد تسجيل الحضور",
+    "checkedIn": "تم تسجيل الحضور!",
+    "yourGym": "ناديك الرياضي",
+    "xpEarned": "+25 نقطة خبرة",
+    "undoCheckIn": "التراجع عن تسجيل الحضور",
+    "friendsCheckedIn": "أصدقاء سجّلوا حضورهم",
+    "unknown": "غير معروف"
+  }
+}

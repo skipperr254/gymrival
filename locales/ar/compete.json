@@ -1,0 +1,108 @@
+{
+  "tabs": {
+    "rivals": { "label": "المنافسون", "subtitle": "المنافسون" },
+    "challenges": { "label": "التحديات", "subtitle": "التحديات" },
+    "global": { "label": "العالمي", "subtitle": "التصنيف العالمي" }
+  },
+  "you": "أنت",
+  "unknown": "غير معروف",
+  "youSuffix": " (أنت)",
+  "lvl": "المستوى {{level}}",
+  "metric": {
+    "highestPr": "أعلى رقم قياسي",
+    "mostImproved": "الأكثر تحسناً",
+    "totalVolume": "الحجم الإجمالي"
+  },
+  "endsIn": {
+    "ended": "انتهى",
+    "days": "متبقٍ {{count}} يوم",
+    "hours": "متبقٍ {{count}} ساعة",
+    "minutes": "متبقٍ {{count}} دقيقة"
+  },
+  "rivals": {
+    "emptyTitle": "لا يوجد منافسون بعد",
+    "emptySub": "أضف أصدقاء للمنافسة في لوحة المتصدرين",
+    "footerNote": "استناداً إلى الأرقام القياسية الشخصية"
+  },
+  "card": {
+    "joined": "{{count}} منضم",
+    "yourRank": "ترتيبك: #{{rank}}",
+    "joinedBtn": "منضم",
+    "joinBtn": "انضمام",
+    "viewAll": "عرض الكل"
+  },
+  "invitation": {
+    "defaultTitle": "دعوة تحدٍّ",
+    "someone": "شخص ما",
+    "challengedYou": "تحداك {{name}}",
+    "accept": "قبول",
+    "decline": "رفض"
+  },
+  "modal": {
+    "title": "تحدٍّ",
+    "challengeLabel": "تحدٍّ",
+    "change": "تغيير",
+    "searchFriendsPlaceholder": "ابحث عن أصدقاء...",
+    "noFriends": "أضف أصدقاء أولاً لتتحداهم",
+    "noMatchingFriends": "لا يوجد أصدقاء مطابقون",
+    "friend": "صديق",
+    "exercise": "التمرين",
+    "metric": "المقياس",
+    "duration": "المدة",
+    "sendChallenge": "إرسال التحدي",
+    "durationOptions": {
+      "3d": "3 أيام",
+      "1w": "أسبوع واحد",
+      "2w": "أسبوعان",
+      "1m": "شهر واحد"
+    }
+  },
+  "challenges": {
+    "loadError": "تعذّر تحميل التحديات",
+    "retry": "إعادة المحاولة",
+    "pendingInvitations": "دعوات معلّقة",
+    "activeChallenges": "التحديات النشطة",
+    "friendChallenges": "تحديات الأصدقاء",
+    "emptyTitle": "لا توجد تحديات نشطة",
+    "emptySub": "عد قريباً — أو تحدَّ صديقاً أدناه!",
+    "challengeFriendTitle": "تحدَّ صديقاً",
+    "challengeFriendSub": "اختر صديقاً وحدد الشروط",
+    "moreCount": "+{{count}}",
+    "addFriendsFirst": "أضف أصدقاء أولاً",
+    "challengeFriendBtn": "تحدَّ صديقاً"
+  },
+  "global": {
+    "statBench": "بنش",
+    "statSquat": "سكوات",
+    "statDead": "رفعة",
+    "totalKg": "الإجمالي كجم",
+    "searchPlaceholder": "ابحث بالاسم أو @اسم_المستخدم...",
+    "loadError": "تعذّر تحميل لوحة المتصدرين",
+    "retry": "إعادة المحاولة",
+    "yourGlobalRank": "ترتيبك العالمي",
+    "unrankedTitle": "لست مصنّفاً بعد",
+    "unrankedSub": "سجّل رقماً قياسياً في البنش والسكوات والرفعة الميتة للانضمام إلى التصنيف العالمي",
+    "noResultsTitle": "لا توجد نتائج",
+    "noResultsSub": "جرّب اسماً آخر أو اسم مستخدم آخر",
+    "noAthletesTitle": "لا يوجد رياضيون بعد",
+    "noAthletesSub": "كن أول من يسجّل رقماً قياسياً في البنش والسكوات والرفعة الميتة!",
+    "loadMore": "تحميل المزيد",
+    "refresh": "تحديث",
+    "footerNote": "استناداً إلى مجموع البنش والسكوات والرفعة الميتة"
+  },
+  "detail": {
+    "heading": "تحدٍّ",
+    "notFound": "التحدي غير موجود",
+    "endsIn": "ينتهي خلال",
+    "participants": "المشاركون",
+    "xpReward": "مكافأة نقاط الخبرة",
+    "prize": "الجائزة",
+    "leaderboard": "لوحة المتصدرين",
+    "noParticipants": "لا يوجد مشاركون بعد",
+    "beFirst": "كن أول من ينضم!",
+    "refresh": "تحديث",
+    "joinedTapToLeave": "منضم — اضغط للمغادرة",
+    "joinChallenge": "الانضمام إلى التحدي",
+    "challengeEnded": "انتهى التحدي"
+  }
+}
