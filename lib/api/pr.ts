@@ -134,7 +134,9 @@ export async function uploadPRVideo(
   videoUri: string,
   thumbnailUri: string | null,
   durationSec: number | null,
-  fileSizeBytes: number | null
+  fileSizeBytes: number | null,
+  videoWidth: number | null = null,
+  videoHeight: number | null = null
 ): Promise<{ prVideoId: string | null; error: string | null }> {
   // Derive extension and MIME type from the local URI
   const rawExt = videoUri.split('?')[0].split('.').pop()?.toLowerCase() ?? 'mp4';
@@ -153,6 +155,8 @@ export async function uploadPRVideo(
       thumbnail_path: thumbnailPath,
       duration_sec: durationSec,
       file_size_bytes: fileSizeBytes,
+      video_width: videoWidth,
+      video_height: videoHeight,
       status: 'uploading',
     })
     .select('id')

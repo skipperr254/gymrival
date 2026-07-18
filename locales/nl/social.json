@@ -1,15 +1,11 @@
 {
-  "friendsStub": {
-    "back": "SOCIAAL",
-    "title": "VRIENDEN",
-    "subtitle": "Voeg je gymrivalen toe en beheer ze",
-    "comingSoon": "BINNENKORT"
-  },
-  "tabs": {
-    "feed": { "label": "Feed", "subtitle": "FEED" },
-    "friends": { "label": "Vrienden", "subtitle": "VRIENDEN" },
-    "messages": { "label": "Berichten", "subtitle": "BERICHTEN" }
-  },
+  "backToSocial": "SOCIAAL",
+  "friendsTitle": "VRIENDEN",
+  "messagesTitle": "BERICHTEN",
+  "headerFriends": "Vrienden",
+  "headerMessages": "Berichten",
+  "soundOn": "Geluid aanzetten",
+  "soundOff": "Geluid uitzetten",
   "you": "JIJ",
   "athlete": "Sporter",
   "gym": "Sportschool",

@@ -1,15 +1,11 @@
 {
-  "friendsStub": {
-    "back": "SOZIAL",
-    "title": "FREUNDE",
-    "subtitle": "Füge deine Trainingsrivalen hinzu und verwalte sie",
-    "comingSoon": "DEMNÄCHST"
-  },
-  "tabs": {
-    "feed": { "label": "Feed", "subtitle": "FEED" },
-    "friends": { "label": "Freunde", "subtitle": "FREUNDE" },
-    "messages": { "label": "Nachrichten", "subtitle": "NACHRICHTEN" }
-  },
+  "backToSocial": "SOZIAL",
+  "friendsTitle": "FREUNDE",
+  "messagesTitle": "NACHRICHTEN",
+  "headerFriends": "Freunde",
+  "headerMessages": "Nachrichten",
+  "soundOn": "Ton einschalten",
+  "soundOff": "Ton ausschalten",
   "you": "DU",
   "athlete": "Athlet",
   "gym": "Studio",

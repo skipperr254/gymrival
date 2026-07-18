@@ -12,6 +12,8 @@ export interface VideoAssetShape {
   thumbnailUri: string;
   durationSec: number;
   fileSizeBytes: number;
+  width: number | null;
+  height: number | null;
 }
 
 interface Step2Props {

@@ -11,6 +11,9 @@ export interface PRVideo {
   /** Full public URL or null if thumbnail generation failed */
   thumbnail_url: string | null;
   duration_sec: number | null;
+  /** Source video dimensions, captured at upload time — null on legacy rows */
+  video_width: number | null;
+  video_height: number | null;
   status: PRVideoStatus;
   created_at: string;
 }

@@ -28,6 +28,8 @@ interface VideoAsset {
   thumbnailUri: string;
   durationSec: number;
   fileSizeBytes: number;
+  width: number | null;
+  height: number | null;
 }
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -181,6 +183,8 @@ export function LogPRSheet({ visible, onClose }: Props) {
         asset.thumbnailUri || null,
         asset.durationSec,
         asset.fileSizeBytes,
+        asset.width,
+        asset.height,
       );
 
       if (mountedRef.current) {

@@ -1,15 +1,11 @@
 {
-  "friendsStub": {
-    "back": "SOCIAL",
-    "title": "AMIS",
-    "subtitle": "Ajoute et gère tes rivaux de salle",
-    "comingSoon": "BIENTÔT DISPONIBLE"
-  },
-  "tabs": {
-    "feed": { "label": "Fil", "subtitle": "FIL" },
-    "friends": { "label": "Amis", "subtitle": "AMIS" },
-    "messages": { "label": "Messages", "subtitle": "MESSAGES" }
-  },
+  "backToSocial": "SOCIAL",
+  "friendsTitle": "AMIS",
+  "messagesTitle": "MESSAGES",
+  "headerFriends": "Amis",
+  "headerMessages": "Messages",
+  "soundOn": "Activer le son",
+  "soundOff": "Couper le son",
   "you": "TOI",
   "athlete": "Athlète",
   "gym": "Salle",

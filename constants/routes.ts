@@ -16,6 +16,7 @@ export const Routes = {
   // Social tab
   social: '/(tabs)/social',
   socialFriends: '/(tabs)/social/friends',
+  socialMessages: '/(tabs)/social/messages',
   chat: (userId: string) => `/(tabs)/social/chat/${userId}`,
 
   // Train tab

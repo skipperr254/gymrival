@@ -14,6 +14,7 @@ import {
   likePR,
   unlikePR,
   getPRVideoPublicUrl,
+  FEED_PAGE_SIZE,
 } from "@/lib/api";
 import type { FriendProfile, FriendRequest, UserSearchResult, FeedPost } from "@/types/social";
 import type { PRVideo, PRVideoStatus } from "@/types/pr";
@@ -51,15 +52,26 @@ interface SocialState {
   // ── Feed ─────────────────────────────────────────────────────────────────────
   feed: FeedPost[];
   feedLoading: boolean;
+  feedLoadingMore: boolean;
+  feedHasMore: boolean;
   /** IDs of users whose PRs appear in the feed (current user + accepted friends) */
   feedParticipantIds: string[];
+  /**
+   * Global feed mute (Instagram-style): videos autoplay muted; unmuting one
+   * keeps subsequent videos unmuted. Session-scoped — not persisted.
+   */
+  feedMuted: boolean;
+  setFeedMuted: (muted: boolean) => void;
 
   /**
-   * Loads the feed: fetches accepted friend IDs, then fetches the combined
-   * personal_records feed with like counts. Stores participantIds for the
-   * realtime subscription to use.
+   * Loads the first feed page: fetches accepted friend IDs, then fetches the
+   * combined personal_records feed with like counts. Stores participantIds for
+   * the realtime subscription to use. Also serves as the pull-to-refresh reset.
    */
   loadFeed: (userId: string) => Promise<void>;
+
+  /** Loads the next page (keyset cursor on the oldest loaded post's created_at). */
+  loadMoreFeed: (userId: string) => Promise<void>;
 
   /**
    * Optimistically toggles a like on a feed post and syncs to the database.
@@ -92,7 +104,12 @@ export const useSocialStore = create<SocialState>((set, get) => ({
   // ── Feed initial state ───────────────────────────────────────────────────────
   feed: [],
   feedLoading: false,
+  feedLoadingMore: false,
+  feedHasMore: true,
   feedParticipantIds: [],
+  feedMuted: true,
+
+  setFeedMuted: (muted) => set({ feedMuted: muted }),
 
   // ─── Loaders ───────────────────────────────────────────────────────────────
 
@@ -309,10 +326,37 @@ export const useSocialStore = create<SocialState>((set, get) => ({
     const participantIds = [userId, ...friendIds];
     set({ feedParticipantIds: participantIds });
 
-    // 2. Fetch the feed posts
-    const { data, error } = await fetchFeed(userId, participantIds);
-    if (!error) set({ feed: data });
+    // 2. Fetch the first page of feed posts
+    const { data, hasMore, error } = await fetchFeed(userId, participantIds, {
+      limit: FEED_PAGE_SIZE,
+    });
+    if (!error) set({ feed: data, feedHasMore: hasMore });
     set({ feedLoading: false });
+  },
+
+  loadMoreFeed: async (userId) => {
+    const s = get();
+    if (s.feedLoadingMore || s.feedLoading || !s.feedHasMore || s.feed.length === 0) return;
+
+    set({ feedLoadingMore: true });
+
+    const cursor = s.feed[s.feed.length - 1].created_at;
+    const { data, hasMore, error } = await fetchFeed(userId, s.feedParticipantIds, {
+      limit: FEED_PAGE_SIZE,
+      before: cursor,
+    });
+
+    if (!error) {
+      set((state) => ({
+        // De-dupe by id: realtime prepends or created_at ties could overlap pages
+        feed: [
+          ...state.feed,
+          ...data.filter((p) => !state.feed.some((q) => q.id === p.id)),
+        ],
+        feedHasMore: hasMore,
+      }));
+    }
+    set({ feedLoadingMore: false });
   },
 
   toggleLike: async (userId, prId) => {
@@ -360,7 +404,7 @@ export const useSocialStore = create<SocialState>((set, get) => ({
       _feedChannel = null;
     }
 
-    _feedChannel = supabase
+    const channel = supabase
       .channel(`feed-events-${userId}`)
 
       // ── Like added ──────────────────────────────────────────────────────────
@@ -433,6 +477,8 @@ export const useSocialStore = create<SocialState>((set, get) => ({
             video_path: string;
             thumbnail_path: string | null;
             duration_sec: number | null;
+            video_width: number | null;
+            video_height: number | null;
             status: string;
             created_at: string;
           };
@@ -445,6 +491,8 @@ export const useSocialStore = create<SocialState>((set, get) => ({
               ? getPRVideoPublicUrl(row.thumbnail_path)
               : null,
             duration_sec: row.duration_sec,
+            video_width: row.video_width ?? null,
+            video_height: row.video_height ?? null,
             status: row.status as PRVideoStatus,
             created_at: row.created_at,
           };
@@ -493,11 +541,13 @@ export const useSocialStore = create<SocialState>((set, get) => ({
 
       .subscribe();
 
+    _feedChannel = channel;
+
     return () => {
-      if (_feedChannel) {
-        supabase.removeChannel(_feedChannel);
-        _feedChannel = null;
-      }
+      // Owner-aware cleanup — a stale cleanup must not remove a newer
+      // subscriber's channel (see subscribeToFriendEvents for details).
+      supabase.removeChannel(channel);
+      if (_feedChannel === channel) _feedChannel = null;
     };
   },
 
@@ -510,7 +560,7 @@ export const useSocialStore = create<SocialState>((set, get) => ({
       _friendChannel = null;
     }
 
-    _friendChannel = supabase
+    const channel = supabase
       .channel(`friend-events-${userId}`)
 
       // ── Someone sent ME a request ──────────────────────────────────────────
@@ -673,11 +723,16 @@ export const useSocialStore = create<SocialState>((set, get) => ({
 
       .subscribe();
 
+    _friendChannel = channel;
+
     return () => {
-      if (_friendChannel) {
-        supabase.removeChannel(_friendChannel);
-        _friendChannel = null;
-      }
+      // Owner-aware cleanup: only clear the module ref if it still points at
+      // the channel THIS subscriber created. Both the feed screen (badges) and
+      // the Friends screen subscribe; on back-navigation the popped screen's
+      // cleanup can run AFTER the feed re-subscribed on focus — it must not
+      // kill the fresh channel.
+      supabase.removeChannel(channel);
+      if (_friendChannel === channel) _friendChannel = null;
     };
   },
 }));

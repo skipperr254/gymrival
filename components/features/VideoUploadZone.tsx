@@ -16,6 +16,8 @@ interface VideoAsset {
   thumbnailUri: string;
   durationSec: number;
   fileSizeBytes: number;
+  width: number | null;
+  height: number | null;
 }
 
 interface Props {
@@ -36,19 +38,27 @@ export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabl
     const durationSec = rawDuration > 1000 ? Math.round(rawDuration / 1000) : Math.round(rawDuration);
     const fileSizeBytes = pickerAsset.fileSize ?? 0;
 
-    // Generate thumbnail from first frame
+    // Generate thumbnail from first frame. The rendered frame's dimensions
+    // respect rotation metadata, unlike the picker's container dimensions on
+    // some Android encoders — so prefer them for the video's width/height.
     let thumbnailUri = '';
+    let width: number | null = pickerAsset.width || null;
+    let height: number | null = pickerAsset.height || null;
     try {
       const thumb = await VideoThumbnails.getThumbnailAsync(videoUri, {
         time: 0,
         quality: 0.7,
       });
       thumbnailUri = thumb.uri;
+      if (thumb.width && thumb.height) {
+        width = thumb.width;
+        height = thumb.height;
+      }
     } catch {
       // Thumbnail failure is non-fatal — upload will proceed without one
     }
 
-    onVideoSelected({ uri: videoUri, thumbnailUri, durationSec, fileSizeBytes });
+    onVideoSelected({ uri: videoUri, thumbnailUri, durationSec, fileSizeBytes, width, height });
   }, [onVideoSelected]);
 
   const pickFromLibrary = useCallback(async () => {

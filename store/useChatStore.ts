@@ -231,7 +231,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       _inboxChannel = null;
     }
 
-    _inboxChannel = supabase
+    const channel = supabase
       .channel(`inbox-${userId}`)
       .on(
         "postgres_changes",
@@ -275,11 +275,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
       )
       .subscribe();
 
+    _inboxChannel = channel;
+
     return () => {
-      if (_inboxChannel) {
-        supabase.removeChannel(_inboxChannel);
-        _inboxChannel = null;
-      }
+      // Owner-aware cleanup: only clear the module ref if it still points at
+      // the channel THIS subscriber created. A stale cleanup (e.g. a popped
+      // screen unmounting after the feed screen re-subscribed on focus) must
+      // not kill the newer subscriber's channel.
+      supabase.removeChannel(channel);
+      if (_inboxChannel === channel) _inboxChannel = null;
     };
   },
 

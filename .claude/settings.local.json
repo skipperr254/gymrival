@@ -23,7 +23,9 @@
       "PowerShell(Get-NetTCPConnection *)",
       "PowerShell(Get-Process *)",
       "PowerShell(Stop-Process *)",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "Bash(git grep *)",
+      "Bash(grep -v \"^.*//.*\")"
     ]
   },
   "enableAllProjectMcpServers": true,

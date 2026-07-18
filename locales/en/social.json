@@ -1,15 +1,11 @@
 {
-  "friendsStub": {
-    "back": "SOCIAL",
-    "title": "FRIENDS",
-    "subtitle": "Add and manage your gym rivals",
-    "comingSoon": "COMING SOON"
-  },
-  "tabs": {
-    "feed": { "label": "Feed", "subtitle": "FEED" },
-    "friends": { "label": "Friends", "subtitle": "FRIENDS" },
-    "messages": { "label": "Messages", "subtitle": "MESSAGES" }
-  },
+  "backToSocial": "SOCIAL",
+  "friendsTitle": "FRIENDS",
+  "messagesTitle": "MESSAGES",
+  "headerFriends": "Friends",
+  "headerMessages": "Messages",
+  "soundOn": "Turn sound on",
+  "soundOff": "Turn sound off",
   "you": "YOU",
   "athlete": "Athlete",
   "gym": "Gym",

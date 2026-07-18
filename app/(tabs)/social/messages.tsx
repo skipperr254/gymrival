@@ -4,26 +4,25 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useSocialStore } from '@/store/useSocialStore';
-import { FriendsContent, SocialSubHeader } from '@/components/features/social';
+import { useChatStore } from '@/store/useChatStore';
+import { MessagesContent, SocialSubHeader } from '@/components/features/social';
 
-export default function FriendsScreen() {
+export default function MessagesScreen() {
   const { t } = useTranslation('social');
   const userId = useAuthStore((s) => s.user?.id ?? '');
-  const loadFriends = useSocialStore((s) => s.loadFriends);
-  const loadRequests = useSocialStore((s) => s.loadRequests);
+  const loadConversations = useChatStore((s) => s.loadConversations);
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(async () => {
     if (!userId) return;
     setRefreshing(true);
-    await Promise.all([loadFriends(userId), loadRequests(userId)]);
+    await loadConversations(userId);
     setRefreshing(false);
-  }, [userId, loadFriends, loadRequests]);
+  }, [userId, loadConversations]);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <SocialSubHeader title={t('friendsTitle')} />
+      <SocialSubHeader title={t('messagesTitle')} />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -36,7 +35,7 @@ export default function FriendsScreen() {
           />
         }
       >
-        <FriendsContent />
+        <MessagesContent />
       </ScrollView>
     </SafeAreaView>
   );

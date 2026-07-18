@@ -1,15 +1,11 @@
 {
-  "friendsStub": {
-    "back": "اجتماعي",
-    "title": "الأصدقاء",
-    "subtitle": "أضف منافسيك في النادي وأدرهم",
-    "comingSoon": "قريباً"
-  },
-  "tabs": {
-    "feed": { "label": "الخلاصة", "subtitle": "الخلاصة" },
-    "friends": { "label": "الأصدقاء", "subtitle": "الأصدقاء" },
-    "messages": { "label": "الرسائل", "subtitle": "الرسائل" }
-  },
+  "backToSocial": "اجتماعي",
+  "friendsTitle": "الأصدقاء",
+  "messagesTitle": "الرسائل",
+  "headerFriends": "الأصدقاء",
+  "headerMessages": "الرسائل",
+  "soundOn": "تشغيل الصوت",
+  "soundOff": "كتم الصوت",
   "you": "أنت",
   "athlete": "رياضي",
   "gym": "النادي",
