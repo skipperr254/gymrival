@@ -58,6 +58,17 @@ import ptSocial from "@/locales/pt/social.json";
 import ptCompete from "@/locales/pt/compete.json";
 import ptLogpr from "@/locales/pt/logpr.json";
 
+import frCommon from "@/locales/fr/common.json";
+import frAuth from "@/locales/fr/auth.json";
+import frNotifications from "@/locales/fr/notifications.json";
+import frExercises from "@/locales/fr/exercises.json";
+import frProfile from "@/locales/fr/profile.json";
+import frTrain from "@/locales/fr/train.json";
+import frProgress from "@/locales/fr/progress.json";
+import frSocial from "@/locales/fr/social.json";
+import frCompete from "@/locales/fr/compete.json";
+import frLogpr from "@/locales/fr/logpr.json";
+
 import arCommon from "@/locales/ar/common.json";
 import arAuth from "@/locales/ar/auth.json";
 import arNotifications from "@/locales/ar/notifications.json";
@@ -77,6 +88,7 @@ export const resources = {
   es: { common: esCommon, auth: esAuth, notifications: esNotifications, exercises: esExercises, profile: esProfile, train: esTrain, progress: esProgress, social: esSocial, compete: esCompete, logpr: esLogpr },
   de: { common: deCommon, auth: deAuth, notifications: deNotifications, exercises: deExercises, profile: deProfile, train: deTrain, progress: deProgress, social: deSocial, compete: deCompete, logpr: deLogpr },
   pt: { common: ptCommon, auth: ptAuth, notifications: ptNotifications, exercises: ptExercises, profile: ptProfile, train: ptTrain, progress: ptProgress, social: ptSocial, compete: ptCompete, logpr: ptLogpr },
+  fr: { common: frCommon, auth: frAuth, notifications: frNotifications, exercises: frExercises, profile: frProfile, train: frTrain, progress: frProgress, social: frSocial, compete: frCompete, logpr: frLogpr },
   ar: { common: arCommon, auth: arAuth, notifications: arNotifications, exercises: arExercises, profile: arProfile, train: arTrain, progress: arProgress, social: arSocial, compete: arCompete, logpr: arLogpr },
 } as const;
 

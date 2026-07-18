@@ -4,4 +4,4 @@ export const DAYS_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as c
 export const DAYS_FULL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as const;
 
 export type NewExercise = { name: string; sets: string; reps: string; weight: string };
-export type NewWorkout = { name: string; day: string; exercises: Array<{ name: string; sets: number; reps: string; weight: number }> };
+export type NewWorkout = { name: string; day: string; exercises: { name: string; sets: number; reps: string; weight: number }[] };

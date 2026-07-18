@@ -1,0 +1,19 @@
+{
+  "bench": "Développé couché",
+  "squat": "Squat",
+  "deadlift": "Soulevé de terre",
+  "pullups": "Tractions",
+  "overhead": "Développé militaire",
+  "bulgarian": "Fente bulgare",
+  "rdl": "Soulevé de terre roumain",
+  "incline": "Développé incliné",
+  "dips": "Dips",
+  "row": "Rowing barre",
+  "curl": "Curl biceps",
+  "legpress": "Presse à cuisses",
+  "lunge": "Fentes",
+  "facepull": "Face pull",
+  "hipthrust": "Hip thrust",
+  "plank": "Planche",
+  "muscle_up": "Muscle up"
+}

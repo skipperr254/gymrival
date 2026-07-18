@@ -17,7 +17,13 @@
       "Bash(awk '$1 > 400 && $2 !~ /total/')",
       "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('nativewind:', p.dependencies.nativewind\\); console.log\\('expo:', p.dependencies.expo\\); console.log\\('react-native:', p.dependencies['react-native']\\); console.log\\('tailwindcss:', p.dependencies.tailwindcss || p.devDependencies?.tailwindcss\\);\")",
       "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(JSON.stringify\\(p.scripts,null,2\\)\\)\")",
-      "Bash(netstat -ano)"
+      "Bash(netstat -ano)",
+      "Bash(grep -oE \"\\(warning|error\\)\\\\s+.*\\(no-literal-string|no-unused-vars|exhaustive-deps|no-duplicates|array-type|no-explicit-any|[a-z-]+/[a-z-]+\\)$\")",
+      "Bash(grep -oE \"[a-z]+\\(/[a-z-]+|-[a-z-]+\\)+$\")",
+      "PowerShell(Get-NetTCPConnection *)",
+      "PowerShell(Get-Process *)",
+      "PowerShell(Stop-Process *)",
+      "Bash(git stash *)"
     ]
   },
   "enableAllProjectMcpServers": true,

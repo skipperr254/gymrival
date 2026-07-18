@@ -1,0 +1,47 @@
+{
+  "logSheet": {
+    "title": "ENREGISTRER UNE ACTIVITÉ",
+    "logPr": { "label": "Enregistrer un PR", "sub": "Enregistrer un nouveau record personnel" },
+    "checkin": { "label": "Check-in salle", "sub": "Enregistre ta présence à la salle" }
+  },
+  "step": {
+    "stepOf": "ÉTAPE {{step}} SUR 2",
+    "logYourPr": "Enregistre ton PR",
+    "addProof": "Ajouter une preuve"
+  },
+  "selectExercise": "SÉLECTIONNER UN EXERCICE",
+  "prWithValue": "PR  {{value}} {{unit}}",
+  "noPrYet": "Pas encore de PR",
+  "yourNewPr": "TON NOUVEAU PR",
+  "notHigherThanCurrent": "Pas supérieur à ton PR actuel ({{value}} {{unit}})",
+  "nextAddProof": "SUIVANT — AJOUTER UNE PREUVE",
+  "previousWithValue": "Précédent : {{value}} {{unit}}",
+  "firstPr": "Premier PR",
+  "xpWithVideo": "+100 XP",
+  "xpWithoutVideo": "+50 XP",
+  "withVideo": "Avec vidéo",
+  "withoutVideo": "Sans vidéo",
+  "savePr": "ENREGISTRER LE PR — {{xp}}",
+  "removeVideoSave": "Retirer la vidéo, enregistrer pour +50 XP",
+  "prSaved": "PR ENREGISTRÉ !",
+  "newBest": "NOUVEAU RECORD",
+  "uploadingVideoProof": "Envoi de la preuve vidéo…",
+  "videoProofSaved": "Preuve vidéo enregistrée",
+  "videoUploadFailed": "Échec de l'envoi de la vidéo — le PR est quand même enregistré",
+  "addedToLeaderboard": "Ajouté au classement",
+  "xpEarnedWithVideo": "+100 XP GAGNÉS",
+  "xpEarnedWithoutVideo": "+50 XP GAGNÉS",
+  "video": {
+    "readyLabel": "VIDÉO PRÊTE",
+    "addProofTitle": "AJOUTER UNE PREUVE VIDÉO",
+    "addProofSub": "Caméra ou galerie · 60 sec max",
+    "permissionNeededTitle": "Autorisation requise",
+    "permissionLibraryMsg": "Autorise l'accès à ta galerie photo pour joindre une vidéo.",
+    "permissionCameraMsg": "Autorise l'accès à la caméra pour filmer ta performance.",
+    "pickerTitle": "Ajouter une preuve vidéo",
+    "pickerMsg": "Filme ta performance ou choisis une vidéo existante (60 secondes max)",
+    "recordVideo": "Filmer une vidéo",
+    "chooseFromLibrary": "Choisir dans la galerie",
+    "cancel": "Annuler"
+  }
+}

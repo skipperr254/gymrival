@@ -1,0 +1,97 @@
+{
+  "header": {
+    "brand": "GYM RIVAL",
+    "pageLabel": "PROFIL"
+  },
+  "proUpsell": "PASSER À PRO — 4,99 €/MOIS",
+  "proActive": "MEMBRE PRO — APPUIE POUR DÉSACTIVER",
+  "details": {
+    "title": "MES INFOS",
+    "edit": "MODIFIER",
+    "gym": "SALLE",
+    "weight": "POIDS",
+    "height": "TAILLE",
+    "goal": "OBJECTIF",
+    "memberSince": "MEMBRE DEPUIS",
+    "motto": "DEVISE",
+    "notSet": "—"
+  },
+  "stats": {
+    "prs": "PR",
+    "friends": "AMIS",
+    "streak": "SÉRIE",
+    "level": "NIVEAU"
+  },
+  "bestPrs": "MEILLEURS PR",
+  "settings": {
+    "title": "PARAMÈTRES",
+    "notifications": "Notifications",
+    "notificationsSub": "Notifications push activées",
+    "privacy": "Confidentialité",
+    "privacySub": "Profil visible par les amis",
+    "darkMode": "Mode sombre",
+    "darkModeOn": "Activé",
+    "shareProfile": "Partager le profil",
+    "shareProfileSub": "Copier ton lien"
+  },
+  "logOut": "SE DÉCONNECTER",
+  "edit": {
+    "title": "MODIFIER LE PROFIL",
+    "fullName": "NOM COMPLET",
+    "fullNamePlaceholder": "Ton nom",
+    "username": "NOM D'UTILISATEUR",
+    "usernamePlaceholder": "@pseudo",
+    "bio": "BIO",
+    "bioPlaceholder": "Raconte ton histoire...",
+    "motto": "TA DEVISE",
+    "mottoPlaceholder": "Ex. No pain, no gain",
+    "gym": "SALLE",
+    "gymPlaceholder": "Ta salle",
+    "weight": "POIDS (kg)",
+    "height": "TAILLE (cm)",
+    "goal": "OBJECTIF",
+    "goalPlaceholder": "Ex. Prise de muscle",
+    "save": "ENREGISTRER LES MODIFICATIONS",
+    "invalidWeightTitle": "Poids invalide",
+    "invalidWeightMsg": "Merci d'entrer un poids valide en kg.",
+    "invalidHeightTitle": "Taille invalide",
+    "invalidHeightMsg": "Merci d'entrer une taille valide en cm.",
+    "saveErrorTitle": "Impossible d'enregistrer"
+  },
+  "badges": {
+    "title": "BADGES",
+    "earnedCount": "BADGES OBTENUS",
+    "earnedSection": "OBTENUS",
+    "lockedSection": "VERROUILLÉS",
+    "items": {
+      "firstPr": "Premier PR",
+      "sevenDayStreak": "Série de 7 jours",
+      "hundredKgBench": "Développé 100 kg",
+      "topThreeBoard": "Top 3 du classement",
+      "tenPrs": "10 PR",
+      "challengeWon": "Défi remporté",
+      "videoProof": "Preuve vidéo",
+      "twoHundredKgDeadlift": "Soulevé de terre 200 kg",
+      "thirtyDayStreak": "Série de 30 jours",
+      "hundredLikes": "100 likes"
+    },
+    "desc": {
+      "videoProof": "Envoie une vidéo pour débloquer",
+      "deadlift": "Encore 40 kg",
+      "streak30": "Encore 23 jours",
+      "likes100": "Encore 67 likes"
+    }
+  },
+  "prHistory": {
+    "title": "HISTORIQUE DES PR",
+    "best": "Meilleur : {{value}} {{unit}}",
+    "emptyTitle": "AUCUN PR POUR L'INSTANT",
+    "emptySub": "Enregistre ton premier PR pour commencer à suivre ta progression"
+  },
+  "notifications": {
+    "title": "NOTIFICATIONS",
+    "markAll": "TOUT MARQUER",
+    "emptyTitle": "TOUT EST À JOUR",
+    "emptySub": "Tu verras ici les messages, demandes d'ami et likes de PR."
+  }
+}

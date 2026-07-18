@@ -21,7 +21,7 @@ type NotificationType =
   | "pr_liked"
   | "friend_pr";
 
-type SupportedLocale = "en" | "nl" | "es" | "de" | "pt" | "ar";
+type SupportedLocale = "en" | "nl" | "es" | "de" | "pt" | "fr" | "ar";
 
 interface WebhookPayload {
   user_id: string;
@@ -74,6 +74,13 @@ const TEMPLATES: Record<SupportedLocale, Record<NotificationType, string>> = {
     pr_liked: "{{name}} gostou do teu PR de {{exercise}}{{value}}",
     friend_pr: "{{name}} acabou de alcançar um novo PR de {{exercise}}{{value}}",
   },
+  fr: {
+    new_message: "{{name}} t'a envoyé un message",
+    friend_request: "{{name}} t'a envoyé une demande d'ami",
+    friend_request_accepted: "{{name}} a accepté ta demande d'ami",
+    pr_liked: "{{name}} a aimé ton PR {{exercise}}{{value}}",
+    friend_pr: "{{name}} vient de réaliser un nouveau PR {{exercise}}{{value}}",
+  },
   ar: {
     new_message: "أرسل لك {{name}} رسالة",
     friend_request: "أرسل لك {{name}} طلب صداقة",
@@ -89,6 +96,7 @@ const SOMEONE: Record<SupportedLocale, string> = {
   es: "Alguien",
   de: "Jemand",
   pt: "Alguém",
+  fr: "Quelqu'un",
   ar: "شخص ما",
 };
 
@@ -99,6 +107,7 @@ const EXERCISE_NAMES: Record<SupportedLocale, Record<string, string>> = {
   es: { bench: "Press de Banca", squat: "Sentadilla", deadlift: "Peso Muerto", pullups: "Dominadas", overhead: "Press Militar", bulgarian: "Sentadilla Búlgara", rdl: "Peso Muerto Rumano", incline: "Press Inclinado", dips: "Fondos", row: "Remo con Barra", curl: "Curl de Bíceps", legpress: "Prensa de Piernas", lunge: "Zancadas", facepull: "Jalón de Cara", hipthrust: "Empuje de Cadera", plank: "Plancha", muscle_up: "Muscle Up" },
   de: { bench: "Bankdrücken", squat: "Kniebeuge", deadlift: "Kreuzheben", pullups: "Klimmzüge", overhead: "Schulterdrücken", bulgarian: "Bulgarische Split-Kniebeuge", rdl: "Rumänisches Kreuzheben", incline: "Schrägbankdrücken", dips: "Dips", row: "Langhantelrudern", curl: "Bizepscurl", legpress: "Beinpresse", lunge: "Ausfallschritte", facepull: "Face Pull", hipthrust: "Hüftstoßen", plank: "Unterarmstütz", muscle_up: "Muscle Up" },
   pt: { bench: "Supino", squat: "Agachamento", deadlift: "Levantamento Terra", pullups: "Barra Fixa", overhead: "Desenvolvimento Militar", bulgarian: "Agachamento Búlgaro", rdl: "Levantamento Terra Romeno", incline: "Supino Inclinado", dips: "Mergulho (Dips)", row: "Remada com Barra", curl: "Rosca Bíceps", legpress: "Leg Press", lunge: "Afundo", facepull: "Face Pull", hipthrust: "Elevação Pélvica", plank: "Prancha", muscle_up: "Muscle Up" },
+  fr: { bench: "Développé couché", squat: "Squat", deadlift: "Soulevé de terre", pullups: "Tractions", overhead: "Développé militaire", bulgarian: "Fente bulgare", rdl: "Soulevé de terre roumain", incline: "Développé incliné", dips: "Dips", row: "Rowing barre", curl: "Curl biceps", legpress: "Presse à cuisses", lunge: "Fentes", facepull: "Face pull", hipthrust: "Hip thrust", plank: "Planche", muscle_up: "Muscle up" },
   ar: { bench: "بنش برس", squat: "سكوات", deadlift: "الرفعة الميتة", pullups: "العقلة", overhead: "الضغط العلوي", bulgarian: "سكوات بلغاري", rdl: "الرفعة الميتة الرومانية", incline: "بنش مائل", dips: "متوازي", row: "التجديف بالبار", curl: "تمرين البايسبس", legpress: "ضغط الأرجل", lunge: "الاندفاع", facepull: "فيس بول", hipthrust: "دفع الورك", plank: "بلانك", muscle_up: "ماسل أب" },
 };
 

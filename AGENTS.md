@@ -521,7 +521,7 @@ Do not conflate this with a full "replay / highlight" feature — the v1 scope i
 
 ## Internationalization (i18n) Rules
 
-The app is fully internationalized via `i18next` + `react-i18next` + `expo-localization`. Every screen across all four tabs, the Auth flow, and the Log-a-PR flow is translated. Supported languages: **English, Dutch, Spanish, German, Portuguese, Arabic** — all six have complete, real translations (no stubs remaining) across every namespace. Arabic content is translated but the layout is not yet mirrored for RTL — see "Arabic / RTL" below.
+The app is fully internationalized via `i18next` + `react-i18next` + `expo-localization`. Every screen across all four tabs, the Auth flow, and the Log-a-PR flow is translated. Supported languages: **English, Dutch, Spanish, German, Portuguese, French, Arabic** — all seven have complete, real translations (no stubs remaining) across every namespace. Arabic content is translated but the layout is not yet mirrored for RTL — see "Arabic / RTL" below.
 
 ### The rule: never hardcode user-facing copy
 
@@ -531,7 +531,7 @@ Exception: brand wordmarks ("GYM"/"RIVAL"/"GYMRIVAL") are never translated.
 
 ### Namespaces
 
-Translation files live in `locales/<code>/<namespace>.json` (`code` = `en`, `nl`, `es`, `de`, `pt`, `ar`). One namespace file per feature area, mirroring the `app/(tabs)/<tab>` structure: `auth.json` (the whole `(auth)` stack), `common.json` (tab bar, shared settings/chart strings), `profile.json`, `train.json`, `progress.json`, `social.json` (feed/friends/messages/chat), `compete.json` (rivals/challenges/global), `logpr.json` (the Log-a-PR sheet + video upload), `notifications.json`, `exercises.json`. When you build a new feature, add its own namespace file (in all six language folders) rather than dumping keys into an existing namespace.
+Translation files live in `locales/<code>/<namespace>.json` (`code` = `en`, `nl`, `es`, `de`, `pt`, `fr`, `ar`). One namespace file per feature area, mirroring the `app/(tabs)/<tab>` structure: `auth.json` (the whole `(auth)` stack), `common.json` (tab bar, shared settings/chart strings), `profile.json`, `train.json`, `progress.json`, `social.json` (feed/friends/messages/chat), `compete.json` (rivals/challenges/global), `logpr.json` (the Log-a-PR sheet + video upload), `notifications.json`, `exercises.json`. When you build a new feature, add its own namespace file (in all seven language folders) rather than dumping keys into an existing namespace.
 
 Use `useTranslation('namespaceName')` in a screen/component and call `t('key.path')`, or use a fully-qualified `t('namespace:key.path')` when you need a namespace other than the hook's default (e.g. resolving exercise names via `t('exercises:' + key)`). For module-level constants that back JSX (tab configs, option lists) that can't call hooks, store the i18n **key path** on the object and resolve it with `t()` at render time inside the component — see `TABS`/`METRIC_OPTIONS`/`GLOBAL_STAT_BOXES` in `compete/index.tsx` for the pattern. For plain helper functions that aren't components (e.g. `metricLabel()`/`endsInLabel()` in `types/challenge.ts`), import the default `i18n` instance from `@/lib/i18n` and call `i18n.t(...)` directly instead of the `useTranslation` hook.
 

@@ -1,0 +1,24 @@
+{
+  "settings": {
+    "language": "Langue",
+    "languageAuto": "Suit la langue de l'appareil"
+  },
+  "actions": {
+    "back": "Retour",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "done": "Terminé"
+  },
+  "chart": {
+    "noData": "Aucune donnée pour l'instant"
+  },
+  "tabs": {
+    "compete": "Compétition",
+    "social": "Social",
+    "train": "Entraînement",
+    "profile": "Profil"
+  },
+  "accessibility": {
+    "logActivity": "Enregistrer une activité"
+  }
+}

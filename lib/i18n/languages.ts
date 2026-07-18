@@ -1,4 +1,4 @@
-export type LanguageCode = "en" | "nl" | "es" | "de" | "pt" | "ar";
+export type LanguageCode = "en" | "nl" | "es" | "de" | "pt" | "fr" | "ar";
 
 export interface LanguageOption {
   code: LanguageCode;
@@ -14,6 +14,7 @@ export const LANGUAGES: LanguageOption[] = [
   { code: "es", nativeName: "Español", available: true },
   { code: "de", nativeName: "Deutsch", available: true },
   { code: "pt", nativeName: "Português", available: true },
+  { code: "fr", nativeName: "Français", available: true },
   { code: "ar", nativeName: "العربية", available: true },
 ];
 
