@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { Tabs, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { CustomTabBar } from '@/components/ui/CustomTabBar';
-import { LogPRSheet } from '@/components/ui/LogPRSheet';
+import { LogPRSheet } from '@/components/features/logpr';
 import { LogSheet } from '@/components/ui/LogSheet';
 import { Routes } from '@/constants/routes';
 

@@ -12,7 +12,9 @@
       "Bash(tee tsc_final.log)",
       "Bash(node \"C:\\\\Users\\\\kanin\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-kanin-Desktop-Dev-clients-fiverr-nordinsell-mv-gymrival\\\\223e5737-37ed-48ae-ac96-783a22a560aa\\\\scratchpad\\\\check_lint.js\")",
       "Bash(grep -v \"\\\\.tsx:.*//\")",
-      "Bash(echo \"=== INSTALL EXIT: $? ===\")"
+      "Bash(echo \"=== INSTALL EXIT: $? ===\")",
+      "Bash(npx jest *)",
+      "Bash(awk '$1 > 400 && $2 !~ /total/')"
     ]
   },
   "enableAllProjectMcpServers": true,
