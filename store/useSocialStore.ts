@@ -545,6 +545,8 @@ export const useSocialStore = create<SocialState>((set, get) => ({
             id: row.id,
             pr_id: row.pr_id,
             user_id: row.user_id,
+            video_path: row.video_path,
+            thumbnail_path: row.thumbnail_path,
             video_url: getPRVideoPublicUrl(row.video_path),
             thumbnail_url: row.thumbnail_path
               ? getPRVideoPublicUrl(row.thumbnail_path)
@@ -586,6 +588,8 @@ export const useSocialStore = create<SocialState>((set, get) => ({
                 video: {
                   ...p.video,
                   status: row.status as PRVideoStatus,
+                  video_path: row.video_path,
+                  thumbnail_path: row.thumbnail_path,
                   // Re-compute URLs in case paths changed (shouldn't happen but be safe)
                   video_url: getPRVideoPublicUrl(row.video_path),
                   thumbnail_url: row.thumbnail_path

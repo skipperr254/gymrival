@@ -22,6 +22,8 @@ function mapFeedRow(row: any, currentUserId: string): FeedPost {
         id: videoRow.id,
         pr_id: row.id,
         user_id: videoRow.user_id,
+        video_path: videoRow.video_path,
+        thumbnail_path: videoRow.thumbnail_path ?? null,
         video_url: getPRVideoPublicUrl(videoRow.video_path),
         thumbnail_url: videoRow.thumbnail_path
           ? getPRVideoPublicUrl(videoRow.thumbnail_path)

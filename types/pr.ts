@@ -6,6 +6,10 @@ export interface PRVideo {
   id: string;
   pr_id: string;
   user_id: string;
+  /** Raw Storage path (bucket-relative) — needed to delete the object on retry */
+  video_path: string;
+  /** Raw Storage path (bucket-relative), null if no thumbnail was generated */
+  thumbnail_path: string | null;
   /** Full public URL — computed in the API layer from storage path */
   video_url: string;
   /** Full public URL or null if thumbnail generation failed */

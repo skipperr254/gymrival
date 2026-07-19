@@ -26,7 +26,8 @@
       "Bash(git stash *)",
       "Bash(git grep *)",
       "Bash(grep -v \"^.*//.*\")",
-      "Bash(timeout 60 grep -rn \"expo-image\\\\|from 'react-native'\" --include=\"*.tsx\" app components)"
+      "Bash(timeout 60 grep -rn \"expo-image\\\\|from 'react-native'\" --include=\"*.tsx\" app components)",
+      "WebSearch"
     ]
   },
   "enableAllProjectMcpServers": true,

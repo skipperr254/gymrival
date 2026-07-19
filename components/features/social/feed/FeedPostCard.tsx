@@ -1,10 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Flame, Heart, MapPin } from 'lucide-react-native';
+import { Flame, Heart, MapPin, VideoOff } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { formatDate, formatRelativeTime as formatRelativeTimeIntl } from '@/lib/i18n/format';
+import { deletePRVideoFiles, uploadPRVideo } from '@/lib/api';
+import {
+  pickVideoFromLibrary,
+  recordVideoFromCamera,
+  type PickVideoResult,
+} from '@/lib/media/pickVideoAsset';
 import type { FeedPost } from '@/types/social';
 import { FriendAvatar } from '../FriendAvatar';
 import { FeedStatVisual } from './FeedStatVisual';
@@ -31,10 +37,53 @@ function FeedPostCardInner({ post, userId, isActive, onToggleLike }: FeedPostCar
   const isMe = post.user_id === userId;
   const hasVideo = post.video?.status === 'ready';
   const isUploading = post.video?.status === 'uploading' && isMe;
+  const isFailed = post.video?.status === 'failed' && isMe;
 
   const displayName = post.author_name ?? post.author_username ?? t('athlete');
   const location = post.author_gym ?? t('gym');
   const timestamp = formatRelativeTime(post.created_at);
+
+  const [retryingVideo, setRetryingVideo] = useState(false);
+
+  const runVideoPick = useCallback(
+    async (
+      picker: () => Promise<PickVideoResult>,
+      permissionMsgKey: 'permissionLibraryMsg' | 'permissionCameraMsg'
+    ) => {
+      const result = await picker();
+      if (result.status === 'permission_denied') {
+        Alert.alert(t('logpr:video.permissionNeededTitle'), t(`logpr:video.${permissionMsgKey}`));
+        return;
+      }
+      if (result.status !== 'picked') return;
+
+      setRetryingVideo(true);
+      if (post.video) {
+        await deletePRVideoFiles(userId, post.id, post.video.video_path, post.video.thumbnail_path);
+      }
+      await uploadPRVideo(
+        userId,
+        post.id,
+        result.asset.uri,
+        result.asset.thumbnailUri || null,
+        result.asset.durationSec,
+        result.asset.fileSizeBytes,
+        result.asset.width,
+        result.asset.height
+      );
+      setRetryingVideo(false);
+    },
+    [post.id, post.video, userId, t]
+  );
+
+  const handleRetryVideo = useCallback(() => {
+    if (retryingVideo) return;
+    Alert.alert(t('logpr:video.pickerTitle'), t('logpr:video.pickerMsg'), [
+      { text: t('logpr:video.recordVideo'), onPress: () => runVideoPick(recordVideoFromCamera, 'permissionCameraMsg') },
+      { text: t('logpr:video.chooseFromLibrary'), onPress: () => runVideoPick(pickVideoFromLibrary, 'permissionLibraryMsg') },
+      { text: t('logpr:video.cancel'), style: 'cancel' },
+    ]);
+  }, [retryingVideo, runVideoPick, t]);
 
   // Preferred: stored video dimensions (captured at upload). Legacy rows have
   // null dimensions — fall back to measuring the thumbnail so old landscape
@@ -105,6 +154,24 @@ function FeedPostCardInner({ post, userId, isActive, onToggleLike }: FeedPostCar
               {t('videoUploading')}
             </Text>
           </View>
+        )}
+
+        {isFailed && (
+          <Pressable
+            onPress={handleRetryVideo}
+            disabled={retryingVideo}
+            className="absolute top-2.5 left-3 flex-row items-center gap-1.5 bg-black/60 rounded-full py-[5px] px-2.5"
+            style={({ pressed }) => pressed && !retryingVideo && { opacity: 0.7 }}
+          >
+            {retryingVideo ? (
+              <ActivityIndicator size="small" color="#666" style={styles.uploadSpinner} />
+            ) : (
+              <VideoOff size={11} strokeWidth={2} color="#666" />
+            )}
+            <Text className="font-heading text-[9px] text-[#666] tracking-[1.5px]">
+              {retryingVideo ? t('videoUploading') : `${t('videoFailed')} · ${t('retry')}`}
+            </Text>
+          </Pressable>
         )}
 
         {/* PR value overlay — video posts only, so it doesn't double with FeedStatVisual */}

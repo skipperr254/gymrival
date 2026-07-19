@@ -31,13 +31,13 @@ This section is the single source of truth for what is and is not in the v1 clie
 
 ### In v1
 
-- **Auth**: onboarding, sign-in, sign-up, email verify, profile setup, forgot password, reset password
-- **Compete tab**: Rivals (friends) leaderboard, Global leaderboard, Challenges, Challenge detail — all implemented and working
-- **Social tab**: Feed, Friends (dedicated screen at `social/friends.tsx` — currently a stub, will be made real in a later phase), Chat
-- **Train tab**: segmented screen with **Schedule**, **Gym Check-in**, and **Progress** (all three implemented and in scope for v1)
-- **Profile tab**: Profile, Edit, PR history, Badges, Notifications
-- **PR logging + PR video proof**
-- **Push notifications**
+- **Auth**: onboarding, sign-in, sign-up, email verify, profile setup, forgot password, reset password — all implemented
+- **Compete tab**: Rivals (friends) leaderboard, Challenges, Global leaderboard as three segmented tabs inside a single `compete/index.tsx` screen (not separate routes), plus a drill-down `compete/challenge/[id].tsx` detail screen — all implemented and working
+- **Social tab**: Feed (`social/index.tsx`, default), Friends (`social/friends.tsx` — real, not a stub: friends list, requests, search all wired to `useSocialStore`), Messages inbox (`social/messages.tsx`) + Chat (`social/chat/[userId].tsx`) — all implemented, including realtime presence and message delivery via `useChatStore`
+- **Train tab**: `train/index.tsx` is a segmented screen with **Schedule**, **Check-in**, and **Progress**. Gym Check-in *also* has its own dedicated route, `train/checkin.tsx` (used when the FAB's "Gym Check-in" action navigates there directly) — both surfaces render the same `CheckInView` component. All three segments implemented and in scope for v1.
+- **Profile tab**: Profile, Edit, PR history, Badges, Notifications, Language (`profile/language.tsx`) — all implemented. Note: **Badges is currently static/mock data** (`BADGES` array hardcoded in `badges.tsx`), not yet wired to a real earned-badge backend — don't assume badge state is dynamic or DB-backed unless you're the one wiring it up. The Profile screen's Pro/Upgrade toggle is a **dev-only mock**: `handleTogglePro` flips `profiles.is_pro` directly with no payment flow behind it (see Stripe note below).
+- **PR logging + PR video proof** — fully implemented (record/pick video, upload to `pr-videos` bucket, inline playback in feed + PR history)
+- **Push notifications** — fully implemented: token registration, realtime in-app notification list (`useNotificationStore`, paginated), and tap-to-route handling in `app/_layout.tsx` (a push tap routes to the relevant screen, e.g. Messages inbox or Social tab; see the "Deep links" deferred note below for how this differs from URL-based deep linking)
 - **FAB (center Log button)**: exactly **two** actions — **Log a PR** and **Gym Check-in**. Nothing else. Do not add Log Meal, Log Weight, or any other action.
 
 ### Deferred — not in v1, do not scaffold
@@ -48,10 +48,10 @@ This section is the single source of truth for what is and is not in the v1 clie
 - Weight log
 - Workout of the Day (WOD)
 - The old "schema" / program concept (superseded by the Schedule feature)
-- Stripe / in-app payments for Pro tier
+- Stripe / in-app payments for Pro tier — `profiles.is_pro` exists and the Profile screen has a working toggle button, but it's a dev/demo mock (`setProStatus` just flips the column); no Stripe integration, paywall, or purchase flow exists. Do not treat the toggle's presence as evidence payments are implemented.
 - Admin dashboard
-- Deep links
-- App Store / Play Store submission config
+- Deep links — no external URL scheme routing (e.g. `gymrival://pr/123` opened from outside the app) or share-link handling exists. Don't confuse this with the push-notification tap-to-route logic in `app/_layout.tsx`, which is a separate, narrower thing that's already built (routes an opened push to a screen, not an arbitrary URL to a screen).
+- App Store / Play Store submission config (`eas.json` has `development`/`preview`/`production` build profiles but only a stub `submit.production`)
 
 ---
 
@@ -65,7 +65,7 @@ This section is the single source of truth for what is and is not in the v1 clie
 | Styling           | NativeWind v5 + Tailwind CSS                        |
 | State             | Zustand                                             |
 | Persistence       | AsyncStorage                                        |
-| Auth              | Supabase Auth (email/password + OAuth)              |
+| Auth              | Supabase Auth (email/password only — no OAuth yet)  |
 | Database          | Supabase (Postgres + Row Level Security)            |
 | Realtime          | Supabase Realtime (leaderboard, chat)               |
 | Storage           | Supabase Storage (profile photos, PR video)         |
@@ -92,45 +92,60 @@ gymrival/
       forgot-password.tsx
       reset-password.tsx
     (tabs)/                   # Main authenticated tab navigator
-      _layout.tsx
+      _layout.tsx              # Tab bar + FAB LogSheet + LogPRSheet
       compete/
-        index.tsx             # Friends leaderboard (default)
-        global.tsx
-        challenges.tsx
-        challenge/[id].tsx
+        index.tsx             # Rivals / Challenges / Global — one screen, segmented tabs (not separate routes)
+        challenge/[id].tsx    # Challenge detail drill-down
       social/
         index.tsx             # Feed (default)
-        friends.tsx           # Dedicated Friends screen (stub → real in later phase)
-        messages.tsx
-        chat/[userId].tsx
+        friends.tsx           # Friends list, requests, search — fully real
+        messages.tsx          # Conversation inbox
+        chat/[userId].tsx     # 1:1 chat thread
       train/
-        index.tsx             # Segmented screen: Schedule | Check-in | (Progress — planned)
+        index.tsx             # Segmented screen: Schedule | Check-in | Progress
+        checkin.tsx           # Dedicated Check-in route (opened by the FAB)
       profile/
         index.tsx
         edit.tsx
         pr-history.tsx
-        badges.tsx
+        badges.tsx            # NOTE: static/mock badge data, not DB-backed yet
         notifications.tsx
-    _layout.tsx               # Root layout (auth gate)
+        language.tsx
+    _layout.tsx               # Root layout (auth gate, push registration + tap routing, i18n init)
   components/
-    ui/                       # Primitives used across the app
-    features/                 # Feature-specific components
+    ui/                       # Primitives used across the app (Button, Card, Avatar, LogSheet, CustomTabBar, ...)
+    features/                 # Feature-specific components, grouped by tab/feature
+      compete/                # RivalsContent, ChallengesContent, GlobalContent, ChallengeCard, ...
+      logpr/                  # LogPRSheet + its Step1/Step2/Step3
+      profile/                # Row helpers used by profile screens
+      progress/                # ProgressView, ProgressStats, charts, heatmap (Train > Progress segment)
+      social/
+        feed/                 # FeedPostCard, FeedVideo, FeedSkeleton, ...
+        friends/               # FriendsList, FriendsSearch, FriendRequests
+        chat/                  # MessageList, ChatAvatar
+      train/                  # ScheduleList, WorkoutDetail, CreateWorkoutSheet
+      CheckInView.tsx         # Shared by train/index.tsx (Check-in segment) and train/checkin.tsx
+      VideoUploadZone.tsx     # PR video proof capture/upload UI
   constants/
     theme.ts                  # All design tokens
     images.ts                 # Centralised image imports
     routes.ts                 # Route path constants
-  data/                       # Static/hardcoded content
-  hooks/                      # Custom React hooks
+  hooks/                      # Custom React hooks (e.g. useProgress)
   lib/                        # External service helpers
     supabase.ts
-    api.ts
+    api/                      # Supabase service layer, split by domain (profile, pr, feed, chat, friends,
+                               #   leaderboard, challenges, notifications, exercises), re-exported via api/index.ts
+    i18n/                      # i18next setup, language list, date/number formatters, language detector
+    media/                     # Video asset picking (pickVideoAsset.ts) for PR video proof
+    checkin.ts, train.ts, progress.ts, secureStorage.ts
   store/                      # Zustand stores
   types/                      # TypeScript interfaces and enums
   supabase/
-    migrations/               # SQL migration files
+    migrations/               # SQL migration files (36+ and growing — RLS hardening, realtime, XP triggers, etc.)
     functions/                # Edge Functions
       send-notification/
         index.ts
+  __tests__/                  # Jest unit tests (still thin — see "Tech-debt paydown status" below)
   assets/
     images/
     fonts/
@@ -140,13 +155,13 @@ gymrival/
 
 **`app/`** — Screens and layouts only. Screens compose components, call hooks and stores, and handle navigation. No large UI blocks or business logic inline.
 
-**`components/`** — Create a component only when it is reused in multiple places, it makes a screen significantly easier to read, or it represents a clear UI concept like `PRCard`, `LeaderboardRow`, `ChallengeCard`, or `BottomSheet`. Do not extract one-off UI too early. When unsure, ask: _should this be a component, or stay inline for now?_
+**`components/`** — Create a component only when it is reused in multiple places, it makes a screen significantly easier to read, or it represents a clear UI concept like `PRCard`, `LeaderboardRow`, `ChallengeCard`, or `BottomSheet`. Do not extract one-off UI too early. When unsure, ask: _should this be a component, or stay inline for now?_ In practice, `components/features/` is organized into one subfolder per tab/feature (`compete/`, `social/feed/`, `social/friends/`, `social/chat/`, `train/`, `logpr/`, `progress/`, `profile/`) — follow that grouping for new components rather than dropping files flat into `features/`.
 
 **`constants/theme.ts`** — Single source of truth for all design tokens. Every color, font size, spacing value, and border radius used in the app must come from here. Never hardcode a color hex value in a component.
 
-**`lib/`** — Helpers for Supabase, API calls, and other external services. Never expose secret keys here or anywhere in the mobile app bundle.
+**`lib/`** — Helpers for Supabase, API calls, and other external services. Never expose secret keys here or anywhere in the mobile app bundle. The Supabase service layer lives in `lib/api/`, split into one file per domain and re-exported from `lib/api/index.ts` — add new query/mutation functions to the relevant domain file (or create a new one) rather than growing a single flat `api.ts`.
 
-**`store/`** — Zustand stores only. One store per domain (auth, compete, social, train, profile, notifications).
+**`store/`** — Zustand stores only. One store per domain (auth, compete, social, chat, train, profile, notifications). Chat is its own store (`useChatStore`) separate from `useSocialStore`, even though both back the Social tab.
 
 **`supabase/`** — All backend code lives here alongside the app. Migrations go in `migrations/`, Edge Functions in `functions/`.
 
@@ -257,18 +272,11 @@ Screen files in `app/` are composition roots. They call hooks and stores, handle
 
 If a screen or component file exceeds **~400 lines**, that is a signal to extract sub-components into `components/features/` (feature-specific) or `components/ui/` (reusable primitives). New files should not be written past this limit without a stated reason.
 
-### Known tech debt (do not fix now)
+### Tech-debt paydown status
 
-Several existing files violate the guideline above — they are slated for a dedicated refactor phase:
+The screen files that used to badly violate the guideline above (`compete/index.tsx`, `social/index.tsx`, `LogPRSheet.tsx`, `train/index.tsx`) have already been through a dedicated refactor pass — they're now composition roots backed by extracted components (see the `components/features/` subfolders above) and all sit at or under ~415 lines. The largest files in the app today are `compete/challenge/[id].tsx` (~415 lines) and `profile/index.tsx` (~400 lines) — treat ~400 lines as a real ceiling to watch for, not a formality. A parallel NativeWind migration (StyleSheet → className for all new/touched code) is also done; a handful of files still use `StyleSheet.create` for the documented exceptions (SafeAreaView, Modal, Animated, etc. — see the exceptions table above), which is expected, not debt.
 
-| File                            | Approx. lines |
-| ------------------------------- | ------------- |
-| `compete/index.tsx`             | ~2292         |
-| `social/index.tsx`              | ~1747         |
-| `components/features/LogPRSheet.tsx` | ~1063    |
-| `train/index.tsx`               | ~985          |
-
-Do not let new code follow that pattern. Do not refactor these files unless explicitly asked.
+Remaining known gap: test coverage. `__tests__/` exists (Jest) but only covers `challenge.test.ts` and `format.test.ts` — most of the app has no automated tests yet.
 
 ---
 
@@ -386,10 +394,11 @@ Use Zustand for all global client state. Use local `useState` for temporary UI s
 | ---------------------- | -------------------------------------------------------- |
 | `useAuthStore`         | Current user, session, loading state                     |
 | `useCompeteStore`      | Selected exercise, leaderboard data, joined challenges   |
-| `useSocialStore`       | Feed posts, friends list, friend requests, conversations |
+| `useSocialStore`       | Feed posts, friends list, friend requests, feed realtime |
+| `useChatStore`         | Conversations, messages, presence heartbeat, chat realtime |
 | `useTrainStore`        | Workout state, check-ins, streak, active schedule        |
-| `useProfileStore`      | Profile data, PRs, badges, XP, level                     |
-| `useNotificationStore` | Notification list, unread count                          |
+| `useProfileStore`      | Profile data, best PRs, PR history (XP/level/streak live on `profile`, not tracked separately) |
+| `useNotificationStore` | Notification list (paginated), unread count, realtime subscription |
 
 Persist with AsyncStorage only where the data should survive an app restart (e.g. streak, selected exercise filter, onboarding completed flag).
 
@@ -407,11 +416,13 @@ Key type files:
 
 ```
 types/
-  user.ts
+  user.ts          # Profile (includes xp, level, streak, is_pro)
   pr.ts
   challenge.ts
-  workout.ts
+  compete.ts        # Leaderboard-specific types (Compete tab)
   social.ts
+  train.ts          # (not workout.ts — Schedule/Check-in/Progress live here)
+  progress.ts
   notification.ts
 ```
 
@@ -463,18 +474,20 @@ Current functions:
 
 ### Calling Edge Functions from the app
 
-Use the Supabase client's `functions.invoke()` method. Create a wrapper in `lib/api.ts` for each function call so screens never call `functions.invoke` directly.
+For a function the client needs to call directly, use the Supabase client's `functions.invoke()` method, wrapped in the relevant `lib/api/<domain>.ts` file so screens never call `functions.invoke` directly:
 
 ```ts
-// lib/api.ts
-export async function sendNotification(payload: NotificationPayload) {
-  const { data, error } = await supabase.functions.invoke("send-notification", {
+// lib/api/<domain>.ts
+export async function someEdgeFunctionCall(payload: SomePayload) {
+  const { data, error } = await supabase.functions.invoke("some-function", {
     body: payload,
   });
   if (error) throw error;
   return data;
 }
 ```
+
+`send-notification` specifically is **not** called this way — there is no client-side wrapper for it. It's invoked server-side by an `AFTER INSERT` trigger on the `notifications` table (via `pg_net`, see migration `028_push_notification_webhook.sql`), so the push composes using the *recipient's* stored language rather than whatever language the client that caused the notification happens to be running in. Do not add a client-side `sendNotification()`/`sendPushNotification()` wrapper — see the Internationalization section below for the full rationale.
 
 ---
 
@@ -485,7 +498,8 @@ Use Supabase Auth for all authentication. Do not build custom auth.
 Support:
 
 - Email/password sign up and sign in
-- OAuth (Apple, Google) via Expo AuthSession
+
+OAuth (Apple, Google) is **not implemented** — there's no `expo-auth-session` dependency and no OAuth code path in `useAuthStore` or the sign-in/sign-up screens, despite earlier plans to add it. Treat it as a future addition, not existing functionality; don't assume OAuth buttons or handlers exist anywhere in the auth flow.
 
 On sign up, create a corresponding row in a `profiles` table via a Supabase database trigger — do not do this in the client.
 
