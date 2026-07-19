@@ -1,7 +1,9 @@
 {
   "settings": {
     "language": "Language",
-    "languageAuto": "Following device language"
+    "languageAuto": "Following device language",
+    "languageErrorTitle": "Could not save language",
+    "languageErrorSub": "Your language choice didn't sync — check your connection and try again."
   },
   "actions": {
     "back": "Back",

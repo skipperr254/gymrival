@@ -19,6 +19,13 @@
   "yourPr": "TU PR",
   "feedEmptyTitle": "AÚN SIN ACTIVIDAD",
   "feedEmptySubtitle": "Añade amigos y empieza a registrar PRs para animar el feed.",
+  "retry": "REINTENTAR",
+  "videoLoadError": "No se pudo cargar el vídeo",
+  "loadErrorFriends": "No se pudieron cargar tus amigos",
+  "loadErrorRequests": "No se pudieron cargar las solicitudes",
+  "loadErrorSearch": "Error en la búsqueda",
+  "loadErrorMessages": "No se pudieron cargar tus mensajes",
+  "loadErrorFeed": "No se pudo cargar el feed",
   "allCaughtUp": "ESTÁS AL DÍA",
   "friendsSubTabs": {
     "friends": "AMIGOS",
@@ -54,6 +61,8 @@
   "chat": {
     "cantOpen": "NO SE PUEDE ABRIR EL CHAT",
     "errorSub": "Algo salió mal. Inténtalo de nuevo más tarde.",
+    "loadError": "No se pudieron cargar los mensajes",
+    "retry": "REINTENTAR",
     "online": "En línea",
     "offline": "Desconectado",
     "startOfConversation": "INICIO DE LA CONVERSACIÓN",

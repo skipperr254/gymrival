@@ -94,7 +94,7 @@ export function ScheduleList({ sessions, loading, onOpenDetail, onDelete, onNew 
             <Ionicons name="barbell" size={22} color={Colors.accent} />
           </View>
           <View className="flex-1">
-            <Text className="font-heading text-[17px] tracking-[2px] text-primary">
+            <Text className="font-heading text-[17px] tracking-[2px] text-primary" numberOfLines={1}>
               {s.name.toUpperCase()}
             </Text>
             <Text className="font-sans text-xs text-muted">

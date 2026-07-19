@@ -55,7 +55,7 @@ function PRGroup({ group }: { group: PRHistoryGroup }) {
 export default function PRHistoryScreen() {
   const { t } = useTranslation('profile');
   const { user } = useAuthStore();
-  const { prHistory, loadPRHistory, loading } = useProfileStore();
+  const { prHistory, loadPRHistory, prHistoryLoading } = useProfileStore();
 
   useEffect(() => {
     if (user?.id) loadPRHistory(user.id);
@@ -77,7 +77,7 @@ export default function PRHistoryScreen() {
         <View className="w-[30px]" />
       </View>
 
-      {loading ? (
+      {prHistoryLoading ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator color={Colors.accent} size="small" />
         </View>

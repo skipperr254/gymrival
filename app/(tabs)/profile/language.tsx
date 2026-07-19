@@ -1,4 +1,5 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { useState } from "react";
+import { View, Text, Pressable, StyleSheet, ActivityIndicator, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -12,13 +13,29 @@ export default function LanguageScreen() {
   const { t, i18n } = useTranslation("common");
   const { user } = useAuthStore();
   const languages = pickerLanguages();
+  // Re-entrancy guard — without it, tapping two different languages in
+  // quick succession could let two updateLanguage() calls resolve out of
+  // order, leaving the DB on a language different from the one displayed.
+  const [switching, setSwitching] = useState(false);
 
   const handleSelect = async (code: LanguageCode) => {
-    if (code === i18n.language) return;
+    if (code === i18n.language || switching) return;
+    const previousLanguage = i18n.language;
+    setSwitching(true);
     await i18n.changeLanguage(code);
     if (user?.id) {
-      await updateLanguage(user.id, code);
+      const { error } = await updateLanguage(user.id, code);
+      if (error) {
+        // profiles.language is the documented cross-device source of truth
+        // once explicitly set — leaving the UI on the new language while the
+        // write failed meant this device silently drifted from what every
+        // other device (and the next cold start's sync) would show. Revert
+        // instead of pretending the switch succeeded.
+        await i18n.changeLanguage(previousLanguage);
+        Alert.alert(t("settings.languageErrorTitle"), t("settings.languageErrorSub"));
+      }
     }
+    setSwitching(false);
   };
 
   return (
@@ -55,14 +72,19 @@ export default function LanguageScreen() {
               key={lang.code}
               className={`card-elevated flex-row items-center justify-between ${
                 isActive ? 'border-[1.5px] border-accent' : ''
-              }`}
+              } ${switching ? 'opacity-60' : ''}`}
               onPress={() => handleSelect(lang.code)}
+              disabled={switching}
             >
               <Text className="font-sans-medium text-base text-primary">
                 {lang.nativeName}
               </Text>
-              {isActive && (
-                <Ionicons name="checkmark-circle" size={22} color={Colors.accent} />
+              {isActive && switching ? (
+                <ActivityIndicator size="small" color={Colors.accent} />
+              ) : (
+                isActive && (
+                  <Ionicons name="checkmark-circle" size={22} color={Colors.accent} />
+                )
               )}
             </Pressable>
           );

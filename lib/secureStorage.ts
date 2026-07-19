@@ -13,6 +13,16 @@ import * as aesjs from "aes-js";
  * only lives in the OS-backed secure enclave.
  */
 class LargeSecureStore {
+  // A fresh random key per write is intentional, not incidental: CTR mode
+  // always starts from Counter(1), so reusing one key across two different
+  // plaintexts (e.g. two token refreshes) would reuse the same keystream and
+  // leak information via a classic two-time-pad XOR — rotating the key is
+  // what keeps that safe. The failure mode this couldn't handle was an app
+  // kill between the SecureStore key write and the AsyncStorage ciphertext
+  // write leaving the two desynced; decrypt() below now degrades that to "no
+  // session" instead of throwing, so a desynced write can no longer crash
+  // the app (see getSession().catch() in useAuthStore.ts) — it just costs
+  // the user a re-login, with no weakening of the encryption itself.
   private async encrypt(key: string, value: string): Promise<string> {
     const encryptionKey = crypto.getRandomValues(new Uint8Array(32));
     const cipher = new aesjs.ModeOfOperation.ctr(encryptionKey, new aesjs.Counter(1));
@@ -24,16 +34,26 @@ class LargeSecureStore {
   }
 
   private async decrypt(key: string, value: string): Promise<string | null> {
-    const encryptionKeyHex = await SecureStore.getItemAsync(key);
-    if (!encryptionKeyHex) return null;
+    try {
+      const encryptionKeyHex = await SecureStore.getItemAsync(key);
+      if (!encryptionKeyHex) return null;
 
-    const cipher = new aesjs.ModeOfOperation.ctr(
-      aesjs.utils.hex.toBytes(encryptionKeyHex),
-      new aesjs.Counter(1)
-    );
-    const decryptedBytes = cipher.decrypt(aesjs.utils.hex.toBytes(value));
+      const cipher = new aesjs.ModeOfOperation.ctr(
+        aesjs.utils.hex.toBytes(encryptionKeyHex),
+        new aesjs.Counter(1)
+      );
+      const decryptedBytes = cipher.decrypt(aesjs.utils.hex.toBytes(value));
 
-    return aesjs.utils.utf8.fromBytes(decryptedBytes);
+      return aesjs.utils.utf8.fromBytes(decryptedBytes);
+    } catch {
+      // Ciphertext doesn't match the key (a pre-existing corrupt entry from
+      // before this fix, or any other decrypt failure). Treat it as "no
+      // session" instead of throwing so callers like Supabase's getSession()
+      // never see an unhandled rejection — and clear the corrupt entry so it
+      // doesn't keep failing on every future launch.
+      await this.removeItem(key).catch(() => {});
+      return null;
+    }
   }
 
   async getItem(key: string): Promise<string | null> {

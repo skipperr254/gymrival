@@ -5,13 +5,15 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSocialStore } from '@/store/useSocialStore';
+import { ErrorState } from '@/components/ui';
 import { FriendAvatar } from '../FriendAvatar';
 
 /** The "Search" sub-tab: live user search + relationship-aware action buttons. */
 export function FriendsSearch() {
   const { t } = useTranslation('social');
   const userId = useAuthStore((s) => s.user?.id ?? '');
-  const { searchResults, searchLoading, search, sendRequest, acceptRequest } = useSocialStore();
+  const { searchResults, searchLoading, searchError, search, sendRequest, acceptRequest } =
+    useSocialStore();
 
   const [query, setQuery] = useState('');
 
@@ -60,6 +62,12 @@ export function FriendsSearch() {
 
       {searchLoading ? (
         <ActivityIndicator color="#404040" style={{ marginTop: 16 }} />
+      ) : searchError && searchResults.length === 0 ? (
+        <ErrorState
+          message={t('loadErrorSearch')}
+          retryLabel={t('retry')}
+          onRetry={() => search(userId, query)}
+        />
       ) : searchResults.length === 0 && query.length > 0 ? (
         <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
           <View className="w-14 h-14 rounded-full bg-[#242424] items-center justify-center mb-3.5">

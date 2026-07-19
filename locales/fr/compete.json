@@ -22,7 +22,9 @@
   "rivals": {
     "emptyTitle": "AUCUN RIVAL POUR L'INSTANT",
     "emptySub": "Ajoute des amis pour rivaliser au classement",
-    "footerNote": "BASÉ SUR LES RECORDS PERSONNELS"
+    "footerNote": "BASÉ SUR LES RECORDS PERSONNELS",
+    "loadError": "Impossible de charger le classement",
+    "retry": "RÉESSAYER"
   },
   "card": {
     "joined": "{{count}} inscrits",
@@ -60,6 +62,7 @@
   "challenges": {
     "loadError": "Impossible de charger les défis",
     "retry": "RÉESSAYER",
+    "invitationsLoadError": "Impossible de charger tes invitations",
     "pendingInvitations": "INVITATIONS EN ATTENTE",
     "activeChallenges": "DÉFIS ACTIFS",
     "friendChallenges": "DÉFIS ENTRE AMIS",
@@ -79,6 +82,7 @@
     "searchPlaceholder": "Rechercher par nom ou @pseudo...",
     "loadError": "Impossible de charger le classement",
     "retry": "RÉESSAYER",
+    "myRankLoadError": "Impossible de charger ton rang",
     "yourGlobalRank": "TON RANG MONDIAL",
     "unrankedTitle": "TU N'ES PAS CLASSÉ",
     "unrankedSub": "Enregistre un record au développé couché, squat et soulevé de terre pour rejoindre le classement mondial",
@@ -93,6 +97,9 @@
   "detail": {
     "heading": "DÉFI",
     "notFound": "Défi introuvable",
+    "loadError": "Impossible de charger ce défi",
+    "leaderboardError": "Impossible de charger le classement",
+    "retry": "RÉESSAYER",
     "endsIn": "SE TERMINE DANS",
     "participants": "PARTICIPANTS",
     "xpReward": "RÉCOMPENSE XP",

@@ -1,7 +1,9 @@
 {
   "settings": {
     "language": "Langue",
-    "languageAuto": "Suit la langue de l'appareil"
+    "languageAuto": "Suit la langue de l'appareil",
+    "languageErrorTitle": "Impossible d'enregistrer la langue",
+    "languageErrorSub": "Ton choix de langue ne s'est pas synchronisé — vérifie ta connexion et réessaie."
   },
   "actions": {
     "back": "Retour",

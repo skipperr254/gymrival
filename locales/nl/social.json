@@ -19,6 +19,13 @@
   "yourPr": "JOUW PR",
   "feedEmptyTitle": "NOG GEEN ACTIVITEIT",
   "feedEmptySubtitle": "Voeg vrienden toe en log PR's om de feed tot leven te brengen.",
+  "retry": "OPNIEUW",
+  "videoLoadError": "Kon video niet laden",
+  "loadErrorFriends": "Kon je vrienden niet laden",
+  "loadErrorRequests": "Kon verzoeken niet laden",
+  "loadErrorSearch": "Zoeken mislukt",
+  "loadErrorMessages": "Kon je berichten niet laden",
+  "loadErrorFeed": "Kon de feed niet laden",
   "allCaughtUp": "JE BENT HELEMAAL BIJ",
   "friendsSubTabs": {
     "friends": "VRIENDEN",
@@ -54,6 +61,8 @@
   "chat": {
     "cantOpen": "KAN CHAT NIET OPENEN",
     "errorSub": "Er is iets misgegaan. Probeer het later opnieuw.",
+    "loadError": "Kon berichten niet laden",
+    "retry": "OPNIEUW",
     "online": "Online",
     "offline": "Offline",
     "startOfConversation": "BEGIN VAN GESPREK",

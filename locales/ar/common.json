@@ -1,7 +1,9 @@
 {
   "settings": {
     "language": "اللغة",
-    "languageAuto": "اتباع لغة الجهاز"
+    "languageAuto": "اتباع لغة الجهاز",
+    "languageErrorTitle": "تعذّر حفظ اللغة",
+    "languageErrorSub": "لم تتم مزامنة اختيارك للغة — تحقق من اتصالك وحاول مرة أخرى."
   },
   "actions": {
     "back": "رجوع",

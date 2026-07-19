@@ -22,7 +22,9 @@
   "rivals": {
     "emptyTitle": "NOCH KEINE RIVALEN",
     "emptySub": "Füge Freunde hinzu, um in der Rangliste zu konkurrieren",
-    "footerNote": "BASIEREND AUF PERSÖNLICHEN REKORDEN"
+    "footerNote": "BASIEREND AUF PERSÖNLICHEN REKORDEN",
+    "loadError": "Rangliste konnte nicht geladen werden",
+    "retry": "ERNEUT VERSUCHEN"
   },
   "card": {
     "joined": "{{count}} beigetreten",
@@ -60,6 +62,7 @@
   "challenges": {
     "loadError": "Challenges konnten nicht geladen werden",
     "retry": "ERNEUT VERSUCHEN",
+    "invitationsLoadError": "Deine Einladungen konnten nicht geladen werden",
     "pendingInvitations": "AUSSTEHENDE EINLADUNGEN",
     "activeChallenges": "AKTIVE CHALLENGES",
     "friendChallenges": "FREUNDES-CHALLENGES",
@@ -79,6 +82,7 @@
     "searchPlaceholder": "Suche nach Name oder @benutzername...",
     "loadError": "Rangliste konnte nicht geladen werden",
     "retry": "ERNEUT VERSUCHEN",
+    "myRankLoadError": "Dein Rang konnte nicht geladen werden",
     "yourGlobalRank": "DEIN GLOBALER RANG",
     "unrankedTitle": "NOCH NICHT GERANKT",
     "unrankedSub": "Trage einen Bankdrücken-, Kniebeuge- und Kreuzheben-PR ein, um in die globale Rangliste aufzusteigen",
@@ -93,6 +97,9 @@
   "detail": {
     "heading": "CHALLENGE",
     "notFound": "Challenge nicht gefunden",
+    "loadError": "Diese Challenge konnte nicht geladen werden",
+    "leaderboardError": "Rangliste konnte nicht geladen werden",
+    "retry": "ERNEUT VERSUCHEN",
     "endsIn": "ENDET IN",
     "participants": "TEILNEHMER",
     "xpReward": "XP-BELOHNUNG",

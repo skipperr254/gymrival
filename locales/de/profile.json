@@ -3,6 +3,8 @@
     "brand": "GYM RIVAL",
     "pageLabel": "PROFIL"
   },
+  "loadErrorSub": "Dein Profil konnte nicht geladen werden. Überprüfe deine Verbindung und versuche es erneut.",
+  "retry": "ERNEUT VERSUCHEN",
   "proUpsell": "AUF PRO UPGRADEN — 4,99 €/MONAT",
   "proActive": "PRO-MITGLIED — ZUM DEAKTIVIEREN TIPPEN",
   "details": {
@@ -56,7 +58,9 @@
     "invalidWeightMsg": "Bitte gib ein gültiges Gewicht in kg ein.",
     "invalidHeightTitle": "Ungültige Größe",
     "invalidHeightMsg": "Bitte gib eine gültige Größe in cm ein.",
-    "saveErrorTitle": "Speichern fehlgeschlagen"
+    "saveErrorTitle": "Speichern fehlgeschlagen",
+    "usernameTakenError": "Dieser Benutzername ist bereits vergeben. Bitte wähle einen anderen.",
+    "saveErrorGeneric": "Etwas ist schiefgelaufen. Überprüfe deine Verbindung und versuche es erneut."
   },
   "badges": {
     "title": "ABZEICHEN",

@@ -7,13 +7,15 @@ import { Routes } from '@/constants/routes';
 import { formatNumber } from '@/lib/i18n/format';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSocialStore } from '@/store/useSocialStore';
+import { ErrorState } from '@/components/ui';
 import { FriendAvatar } from '../FriendAvatar';
 
 /** The "Friends" sub-tab: stat cards + the accepted-friends list. */
 export function FriendsList({ onFindAthletes }: { onFindAthletes: () => void }) {
   const { t } = useTranslation('social');
   const userId = useAuthStore((s) => s.user?.id ?? '');
-  const { friends, incomingRequests, friendsLoading, loadFriends, unfriend } = useSocialStore();
+  const { friends, incomingRequests, friendsLoading, friendsError, loadFriends, unfriend } =
+    useSocialStore();
 
   // Refresh on mount (mounting happens when this sub-tab becomes active)
   useEffect(() => {
@@ -43,6 +45,12 @@ export function FriendsList({ onFindAthletes }: { onFindAthletes: () => void }) 
         <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
           <ActivityIndicator color="#404040" />
         </View>
+      ) : friendsError && friends.length === 0 ? (
+        <ErrorState
+          message={t('loadErrorFriends')}
+          retryLabel={t('retry')}
+          onRetry={() => loadFriends(userId)}
+        />
       ) : friends.length === 0 ? (
         <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
           <View className="w-14 h-14 rounded-full bg-[#242424] items-center justify-center mb-3.5">

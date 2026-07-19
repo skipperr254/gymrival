@@ -24,6 +24,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
     leaderboards,
     pendingInvitations,
     loadingInvitations,
+    invitationsError,
     exercises,
     loadChallenges,
     loadLeaderboard,
@@ -33,6 +34,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
     respondToInvitation,
     createFriendChallenge,
     loadExercises,
+    subscribeToInvitationEvents,
   } = useCompeteStore();
 
   const { friends, loadFriends } = useSocialStore();
@@ -42,6 +44,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
   const [showModal,    setShowModal]    = useState(false);
   const [creating,     setCreating]     = useState(false);
   const [createError,  setCreateError]  = useState<string | null>(null);
+  const [actionError,  setActionError]  = useState<string | null>(null);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -58,17 +61,35 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
     });
   }, [challenges, leaderboards, loadLeaderboard, user?.id]);
 
+  // Live-update pending invitations while this tab is mounted — previously
+  // a new invite only appeared after a manual refresh or remount.
+  useEffect(() => {
+    if (!user?.id) return;
+    return subscribeToInvitationEvents(user.id);
+    // subscribeToInvitationEvents is a stable Zustand action
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
   const handleJoin = async (challengeId: string) => {
     if (!user?.id) return;
     setJoiningId(challengeId);
-    await joinChallenge(challengeId, user.id);
+    setActionError(null);
+    const { error } = await joinChallenge(challengeId, user.id);
     setJoiningId(null);
+    if (error) setActionError(error);
     onDetailChange?.();
   };
 
   const handleLeave = async (challengeId: string) => {
     if (!user?.id) return;
-    await leaveChallenge(challengeId, user.id);
+    // Same in-flight guard as handleJoin — without it, "Leave" stayed fully
+    // interactive during the request (no spinner, no disabling) and a rapid
+    // double-tap could fire two DELETE requests.
+    setJoiningId(challengeId);
+    setActionError(null);
+    const { error } = await leaveChallenge(challengeId, user.id);
+    setJoiningId(null);
+    if (error) setActionError(error);
     onDetailChange?.();
   };
 
@@ -77,8 +98,10 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
   ) => {
     if (!user?.id) return;
     setInvLoading(invId);
-    await respondToInvitation(invId, chalId, user.id, response);
+    setActionError(null);
+    const { error } = await respondToInvitation(invId, chalId, user.id, response);
     setInvLoading(null);
+    if (error) setActionError(error);
     onDetailChange?.();
   };
 
@@ -137,14 +160,34 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
     <>
       <View style={{ height: 16 }} />
 
+      {!!actionError && (
+        <View className="flex-row items-center gap-2 bg-[rgba(230,48,48,0.1)] rounded-[10px] p-3 mb-3">
+          <AlertCircle size={14} strokeWidth={2} color={Colors.accent} />
+          <Text className="font-sans text-[13px] text-accent flex-1">{actionError}</Text>
+        </View>
+      )}
+
       {/* ── Pending Invitations ─────────────────────────────────────── */}
-      {(pendingInvitations.length > 0 || loadingInvitations) && (
+      {(pendingInvitations.length > 0 || loadingInvitations || invitationsError) && (
         <>
           <Text className="font-heading text-[11px] tracking-[3px] text-[#555] mb-2.5">
             {t('challenges.pendingInvitations')}
           </Text>
           {loadingInvitations ? (
             <ActivityIndicator color={Colors.accent} style={{ marginBottom: 16 }} />
+          ) : invitationsError && pendingInvitations.length === 0 ? (
+            // A failed fetch previously just made this whole section vanish
+            // with no trace — indistinguishable from "no invitations".
+            <Pressable
+              onPress={() => user?.id && loadPendingInvitations(user.id)}
+              className="flex-row items-center gap-2 bg-[rgba(230,48,48,0.06)] border border-[rgba(230,48,48,0.2)] rounded-2xl py-3 px-4 mb-3.5"
+            >
+              <AlertCircle size={14} strokeWidth={2} color={Colors.accent} />
+              <Text className="font-sans text-[13px] text-[#b0b0b0] flex-1">
+                {t('challenges.invitationsLoadError')}
+              </Text>
+              <RefreshCw size={13} strokeWidth={2} color={Colors.accent} />
+            </Pressable>
           ) : (
             pendingInvitations.map(inv => (
               <InvitationCard

@@ -145,6 +145,7 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
               onChangeText={(v) => setNewWorkout((p) => ({ ...p, name: v }))}
               placeholder={t('workoutNamePlaceholder')}
               placeholderTextColor={Colors.muted}
+              maxLength={60}
             />
 
             {/* Day picker */}
@@ -182,6 +183,7 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
                 onChangeText={(v) => setNewEx((p) => ({ ...p, name: v }))}
                 placeholder={t('exerciseNamePlaceholder')}
                 placeholderTextColor={Colors.muted}
+                maxLength={60}
               />
               <View className="flex-row gap-2 mb-2.5">
                 {(

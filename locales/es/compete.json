@@ -22,7 +22,9 @@
   "rivals": {
     "emptyTitle": "AÚN SIN RIVALES",
     "emptySub": "Añade amigos para competir en la clasificación",
-    "footerNote": "BASADO EN RÉCORDS PERSONALES"
+    "footerNote": "BASADO EN RÉCORDS PERSONALES",
+    "loadError": "No se pudo cargar la clasificación",
+    "retry": "REINTENTAR"
   },
   "card": {
     "joined": "{{count}} inscritos",
@@ -60,6 +62,7 @@
   "challenges": {
     "loadError": "No se pudieron cargar los retos",
     "retry": "REINTENTAR",
+    "invitationsLoadError": "No se pudieron cargar tus invitaciones",
     "pendingInvitations": "INVITACIONES PENDIENTES",
     "activeChallenges": "RETOS ACTIVOS",
     "friendChallenges": "RETOS DE AMIGOS",
@@ -79,6 +82,7 @@
     "searchPlaceholder": "Busca por nombre o @usuario...",
     "loadError": "No se pudo cargar la clasificación",
     "retry": "REINTENTAR",
+    "myRankLoadError": "No se pudo cargar tu clasificación",
     "yourGlobalRank": "TU CLASIFICACIÓN GLOBAL",
     "unrankedTitle": "SIN CLASIFICAR",
     "unrankedSub": "Registra un PR de press de banca, sentadilla y peso muerto para entrar en la clasificación global",
@@ -93,6 +97,9 @@
   "detail": {
     "heading": "RETO",
     "notFound": "Reto no encontrado",
+    "loadError": "No se pudo cargar este reto",
+    "leaderboardError": "No se pudo cargar la clasificación",
+    "retry": "REINTENTAR",
     "endsIn": "TERMINA EN",
     "participants": "PARTICIPANTES",
     "xpReward": "RECOMPENSA XP",

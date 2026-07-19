@@ -4,26 +4,37 @@ import { DAY_SHORT } from '@/types/train';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Returns the Monday 00:00:00 and the following Monday 00:00:00 in local time. */
+/**
+ * Returns the Monday 00:00:00 and the following Monday 00:00:00, UTC.
+ *
+ * Deliberately UTC, not local time: fetchActiveCheckin/hasCheckinToday below
+ * and the award_checkin_xp / gym_checkin_day DB functions (migrations 017,
+ * 033) all define "day" as the UTC calendar day. Computing the streak's week
+ * boundary in local time instead meant a check-in near local midnight could
+ * be marked "today" in the streak UI while the DB trigger evaluated it
+ * against a different UTC day — the XP banner could contradict the streak
+ * display. Every day-boundary calculation in this file uses the same
+ * reference now.
+ */
 function getWeekBounds(): { start: Date; end: Date } {
   const now = new Date();
-  const jsDay = now.getDay(); // 0=Sun … 6=Sat
-  const daysFromMonday = jsDay === 0 ? 6 : jsDay - 1;
+  const utcDay = now.getUTCDay(); // 0=Sun … 6=Sat
+  const daysFromMonday = utcDay === 0 ? 6 : utcDay - 1;
   const monday = new Date(now);
-  monday.setDate(now.getDate() - daysFromMonday);
-  monday.setHours(0, 0, 0, 0);
+  monday.setUTCDate(now.getUTCDate() - daysFromMonday);
+  monday.setUTCHours(0, 0, 0, 0);
   const nextMonday = new Date(monday);
-  nextMonday.setDate(monday.getDate() + 7);
+  nextMonday.setUTCDate(monday.getUTCDate() + 7);
   return { start: monday, end: nextMonday };
 }
 
 /**
- * Maps a JS Date to a DayOfWeek index (0=Mon … 6=Sun).
+ * Maps a JS Date (UTC calendar day) to a DayOfWeek index (0=Mon … 6=Sun).
  * Mirrors the DayOfWeek convention used throughout the app.
  */
 function toDayIndex(date: Date): number {
-  const jsDay = date.getDay(); // 0=Sun … 6=Sat
-  return jsDay === 0 ? 6 : jsDay - 1;
+  const utcDay = date.getUTCDay(); // 0=Sun … 6=Sat
+  return utcDay === 0 ? 6 : utcDay - 1;
 }
 
 // ─── Gyms ─────────────────────────────────────────────────────────────────────
@@ -67,18 +78,26 @@ export async function fetchGymsWithTodayCount(): Promise<{
 // ─── Active check-in ──────────────────────────────────────────────────────────
 
 /**
- * Returns the current user's active (not checked-out) check-in if one exists,
- * or null if they haven't checked in yet.
+ * Returns the current user's check-in for today (UTC) if one exists, or null
+ * if they haven't checked in yet today. Scoped to the UTC calendar day to
+ * match gym_checkins_one_per_user_per_day (migration 033) and
+ * award_checkin_xp() — without this, yesterday's check-in row (checked_out_at
+ * is never set by the app; that flow is still deferred) would look "active"
+ * forever and permanently block today's check-in.
  */
 export async function fetchActiveCheckin(userId: string): Promise<{
   data: GymCheckin | null;
   error: string | null;
 }> {
+  const todayStart = new Date();
+  todayStart.setUTCHours(0, 0, 0, 0);
+
   const { data, error } = await supabase
     .from('gym_checkins')
     .select('id, user_id, gym_id, checked_in_at, checked_out_at, workout_log_id, xp_awarded, note, created_at')
     .eq('user_id', userId)
     .is('checked_out_at', null)
+    .gte('checked_in_at', todayStart.toISOString())
     .maybeSingle();
 
   if (error) return { data: null, error: error.message };
@@ -190,8 +209,9 @@ function buildEmptyStreak(): WeeklyStreakDay[] {
 // ─── Friends checked in ────────────────────────────────────────────────────────
 
 /**
- * Returns friends who checked in on the current local calendar day, joined
- * with their profile and gym name. Pass the current user's accepted friend IDs
+ * Returns friends who checked in on the current UTC calendar day (see
+ * getWeekBounds above for why UTC, not local time), joined with their
+ * profile and gym name. Pass the current user's accepted friend IDs
  * (available from useSocialStore) so we only query relevant users.
  *
  * The RLS policy allows reading accepted friends' check-ins, so passing
@@ -203,7 +223,7 @@ export async function fetchFriendsCheckedIn(
   if (friendIds.length === 0) return { data: [], error: null };
 
   const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
+  todayStart.setUTCHours(0, 0, 0, 0);
 
   const { data, error } = await supabase
     .from('gym_checkins')

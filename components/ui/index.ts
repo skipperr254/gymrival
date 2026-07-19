@@ -18,3 +18,6 @@ export type { SectionHeaderProps, SectionHeaderAction } from './SectionHeader';
 
 export { BottomSpacer } from './BottomSpacer';
 export type { BottomSpacerProps } from './BottomSpacer';
+
+export { ErrorState } from './ErrorState';
+export type { ErrorStateProps } from './ErrorState';

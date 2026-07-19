@@ -1,6 +1,6 @@
 import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { CheckCircle } from 'lucide-react-native';
+import { CheckCircle, AlertCircle } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import type { ExerciseType } from '@/types/pr';
@@ -21,6 +21,7 @@ interface Step2Props {
   prValue: string;
   currentPR: number | null;
   saving: boolean;
+  saveError: string | null;
   videoAsset: VideoAssetShape | null;
   onVideoSelected: (asset: VideoAssetShape) => void;
   onVideoRemoved: () => void;
@@ -29,7 +30,7 @@ interface Step2Props {
 }
 
 export function Step2({
-  selectedEx, prValue, currentPR, saving,
+  selectedEx, prValue, currentPR, saving, saveError,
   videoAsset, onVideoSelected, onVideoRemoved,
   onSave,
 }: Step2Props) {
@@ -96,6 +97,13 @@ export function Step2({
           disabled={saving}
         />
       </View>
+
+      {!!saveError && (
+        <View className="flex-row items-center gap-2 bg-[rgba(230,48,48,0.1)] rounded-[10px] p-3 mb-3">
+          <AlertCircle size={14} strokeWidth={2} color={Colors.accent} />
+          <Text className="font-sans text-[13px] text-accent flex-1">{saveError}</Text>
+        </View>
+      )}
 
       {/* Primary save button */}
       <Pressable

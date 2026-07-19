@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { setAudioModeAsync } from 'expo-audio';
 import { Image as ExpoImage } from 'expo-image';
 import { VideoView, useVideoPlayer } from 'expo-video';
-import { Clock, Maximize2, Volume2, VolumeX } from 'lucide-react-native';
+import { AlertCircle, Clock, Maximize2, RefreshCw, Volume2, VolumeX } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { useSocialStore } from '@/store/useSocialStore';
 
@@ -56,11 +56,24 @@ export function FeedVideo({ postId, videoUrl, thumbnailUrl, durationSec, isActiv
   // back to the thumbnail. Deactivation unmounts the surface and resets this,
   // so the poster correctly returns the next time the card becomes active.
   const [firstFrameRendered, setFirstFrameRendered] = useState(false);
+  // A broken video URL/format previously failed silently: firstFrameRendered
+  // just never became true, so the poster (or a plain dark box, with no
+  // thumbnail) stayed up forever with no indication anything was wrong and
+  // no way to retry.
+  const [hasError, setHasError] = useState(false);
 
   const player = useVideoPlayer(isActive ? videoUrl : null, (p) => {
     p.loop = true;
     p.muted = true;
   });
+
+  useEffect(() => {
+    const subscription = player.addListener('statusChange', ({ status }) => {
+      if (status === 'error') setHasError(true);
+      else if (status === 'readyToPlay') setHasError(false);
+    });
+    return () => subscription.remove();
+  }, [player]);
 
   useEffect(() => {
     try {
@@ -79,8 +92,19 @@ export function FeedVideo({ postId, videoUrl, thumbnailUrl, durationSec, isActiv
       }
     } else {
       setFirstFrameRendered(false);
+      setHasError(false);
     }
   }, [isActive, player]);
+
+  const handleRetry = () => {
+    setHasError(false);
+    try {
+      player.replace(videoUrl);
+    } catch {
+      // Retry attempt failed to even start — statusChange will fire 'error'
+      // again if the replace itself doesn't take.
+    }
+  };
 
   const handleTap = () => {
     if (!isActive) return;
@@ -125,6 +149,25 @@ export function FeedVideo({ postId, videoUrl, thumbnailUrl, durationSec, isActiv
         ) : (
           <View className="absolute inset-0 bg-[#080808]" />
         ))}
+
+      {/* Load-failure indicator with retry — otherwise a broken video just
+          looked like a permanently still thumbnail with no explanation */}
+      {isActive && hasError && (
+        <View className="absolute inset-0 items-center justify-center gap-2 bg-black/40">
+          <AlertCircle size={22} strokeWidth={1.8} color="#ccc" />
+          <Text className="font-sans text-xs text-[#ccc]">{t('videoLoadError')}</Text>
+          <Pressable
+            onPress={handleRetry}
+            accessibilityRole="button"
+            className="flex-row items-center gap-1.5 mt-1 py-1.5 px-3 rounded-full bg-black/60 border border-white/10"
+          >
+            <RefreshCw size={12} strokeWidth={2} color="#ccc" />
+            <Text className="font-heading text-[10px] tracking-[1px] text-[#ccc]">
+              {t('retry')}
+            </Text>
+          </Pressable>
+        </View>
+      )}
 
       {/* Duration badge — only meaningful while the poster is up */}
       {!firstFrameRendered && durationSec != null && durationSec > 0 && (

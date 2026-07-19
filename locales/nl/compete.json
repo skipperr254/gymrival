@@ -22,7 +22,9 @@
   "rivals": {
     "emptyTitle": "NOG GEEN RIVALEN",
     "emptySub": "Voeg vrienden toe om op het scorebord te strijden",
-    "footerNote": "GEBASEERD OP PERSOONLIJKE RECORDS"
+    "footerNote": "GEBASEERD OP PERSOONLIJKE RECORDS",
+    "loadError": "Kon ranglijst niet laden",
+    "retry": "OPNIEUW"
   },
   "card": {
     "joined": "{{count}} deelnemers",
@@ -60,6 +62,7 @@
   "challenges": {
     "loadError": "Kon challenges niet laden",
     "retry": "OPNIEUW",
+    "invitationsLoadError": "Kon je uitnodigingen niet laden",
     "pendingInvitations": "OPENSTAANDE UITNODIGINGEN",
     "activeChallenges": "ACTIEVE CHALLENGES",
     "friendChallenges": "VRIENDEN-CHALLENGES",
@@ -79,6 +82,7 @@
     "searchPlaceholder": "Zoek op naam of @gebruikersnaam...",
     "loadError": "Kon ranglijst niet laden",
     "retry": "OPNIEUW",
+    "myRankLoadError": "Kon je positie niet laden",
     "yourGlobalRank": "JOUW WERELDPOSITIE",
     "unrankedTitle": "NOG NIET GERANGSCHIKT",
     "unrankedSub": "Log een Bankdrukken-, Squat- en Deadlift-PR om op de wereldranglijst te komen",
@@ -93,6 +97,9 @@
   "detail": {
     "heading": "CHALLENGE",
     "notFound": "Challenge niet gevonden",
+    "loadError": "Kon deze challenge niet laden",
+    "leaderboardError": "Kon ranglijst niet laden",
+    "retry": "OPNIEUW",
     "endsIn": "EINDIGT OVER",
     "participants": "DEELNEMERS",
     "xpReward": "XP BELONING",

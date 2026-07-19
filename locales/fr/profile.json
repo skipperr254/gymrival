@@ -3,6 +3,8 @@
     "brand": "GYM RIVAL",
     "pageLabel": "PROFIL"
   },
+  "loadErrorSub": "Impossible de charger ton profil. Vérifie ta connexion et réessaie.",
+  "retry": "RÉESSAYER",
   "proUpsell": "PASSER À PRO — 4,99 €/MOIS",
   "proActive": "MEMBRE PRO — APPUIE POUR DÉSACTIVER",
   "details": {
@@ -56,7 +58,9 @@
     "invalidWeightMsg": "Merci d'entrer un poids valide en kg.",
     "invalidHeightTitle": "Taille invalide",
     "invalidHeightMsg": "Merci d'entrer une taille valide en cm.",
-    "saveErrorTitle": "Impossible d'enregistrer"
+    "saveErrorTitle": "Impossible d'enregistrer",
+    "usernameTakenError": "Ce nom d'utilisateur est déjà pris. Choisis-en un autre.",
+    "saveErrorGeneric": "Une erreur s'est produite. Vérifie ta connexion et réessaie."
   },
   "badges": {
     "title": "BADGES",

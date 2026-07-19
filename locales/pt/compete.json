@@ -22,7 +22,9 @@
   "rivals": {
     "emptyTitle": "AINDA SEM RIVAIS",
     "emptySub": "Adiciona amigos para competir na tabela classificativa",
-    "footerNote": "BASEADO EM RECORDES PESSOAIS"
+    "footerNote": "BASEADO EM RECORDES PESSOAIS",
+    "loadError": "Não foi possível carregar a classificação",
+    "retry": "TENTAR NOVAMENTE"
   },
   "card": {
     "joined": "{{count}} inscritos",
@@ -60,6 +62,7 @@
   "challenges": {
     "loadError": "Não foi possível carregar os desafios",
     "retry": "TENTAR NOVAMENTE",
+    "invitationsLoadError": "Não foi possível carregar os teus convites",
     "pendingInvitations": "CONVITES PENDENTES",
     "activeChallenges": "DESAFIOS ATIVOS",
     "friendChallenges": "DESAFIOS DE AMIGOS",
@@ -79,6 +82,7 @@
     "searchPlaceholder": "Pesquisa por nome ou @utilizador...",
     "loadError": "Não foi possível carregar a classificação",
     "retry": "TENTAR NOVAMENTE",
+    "myRankLoadError": "Não foi possível carregar a tua classificação",
     "yourGlobalRank": "A TUA CLASSIFICAÇÃO GLOBAL",
     "unrankedTitle": "AINDA SEM CLASSIFICAÇÃO",
     "unrankedSub": "Regista um PR de supino, agachamento e levantamento terra para entrares na classificação global",
@@ -93,6 +97,9 @@
   "detail": {
     "heading": "DESAFIO",
     "notFound": "Desafio não encontrado",
+    "loadError": "Não foi possível carregar este desafio",
+    "leaderboardError": "Não foi possível carregar a classificação",
+    "retry": "TENTAR NOVAMENTE",
     "endsIn": "TERMINA EM",
     "participants": "PARTICIPANTES",
     "xpReward": "RECOMPENSA XP",

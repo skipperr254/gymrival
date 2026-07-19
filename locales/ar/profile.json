@@ -3,6 +3,8 @@
     "brand": "GYM RIVAL",
     "pageLabel": "الملف الشخصي"
   },
+  "loadErrorSub": "تعذّر تحميل ملفك الشخصي. تحقق من اتصالك وحاول مرة أخرى.",
+  "retry": "إعادة المحاولة",
   "proUpsell": "الترقية إلى برو — 4.99€/شهر",
   "proActive": "عضو برو — اضغط للتعطيل",
   "details": {
@@ -56,7 +58,9 @@
     "invalidWeightMsg": "الرجاء إدخال وزن صالح بالكيلوغرام.",
     "invalidHeightTitle": "طول غير صالح",
     "invalidHeightMsg": "الرجاء إدخال طول صالح بالسنتيمتر.",
-    "saveErrorTitle": "تعذر الحفظ"
+    "saveErrorTitle": "تعذر الحفظ",
+    "usernameTakenError": "اسم المستخدم هذا مُستخدم بالفعل. الرجاء اختيار اسم آخر.",
+    "saveErrorGeneric": "حدث خطأ ما. تحقق من اتصالك وحاول مرة أخرى."
   },
   "badges": {
     "title": "الأوسمة",

@@ -1,6 +1,7 @@
 import type { RefObject } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, Pressable, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Colors } from '@/constants/theme';
 import type { Message } from '@/types/social';
 import { ChatAvatar } from './ChatAvatar';
 import { formatDateLabel, formatMessageTime } from './helpers';
@@ -21,6 +22,8 @@ interface MessageListProps {
   loadingOlderMessages: boolean;
   hasMoreMessages: boolean;
   messagesLoading: boolean;
+  messagesError: string | null;
+  onRetry: () => void;
   scrollRef: RefObject<ScrollView | null>;
   onScroll: (event: ScrollEvent) => void;
 }
@@ -33,6 +36,8 @@ export function MessageList({
   loadingOlderMessages,
   hasMoreMessages,
   messagesLoading,
+  messagesError,
+  onRetry,
   scrollRef,
   onScroll,
 }: MessageListProps) {
@@ -60,6 +65,12 @@ export function MessageList({
       keyboardShouldPersistTaps="handled"
       onScroll={onScroll}
       scrollEventThrottle={100}
+      // Without this, scrolling near the top to trigger loadOlderMessages
+      // prepends content above the current viewport with no scroll-offset
+      // compensation, causing a visible jump. Same fix the Feed FlatList
+      // already uses for the same class of problem (new content above the
+      // viewport) — see app/(tabs)/social/index.tsx.
+      maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
     >
       {/* Older messages loader */}
       {loadingOlderMessages && (
@@ -82,8 +93,26 @@ export function MessageList({
         </View>
       )}
 
+      {/* Load failure — distinct from a genuinely empty conversation so the
+          user has a way to recover instead of it silently looking brand-new */}
+      {!messagesLoading && messages.length === 0 && messagesError && (
+        <View className="items-center py-16 px-8 gap-3">
+          <Text className="font-sans text-sm text-[#888] text-center">
+            {t('chat.loadError')}
+          </Text>
+          <Pressable
+            onPress={onRetry}
+            className="flex-row items-center gap-1.5 py-2 px-4 rounded-[10px] border border-[#2a2a2a]"
+          >
+            <Text className="font-heading text-[11px] tracking-[2px]" style={{ color: Colors.accent }}>
+              {t('chat.retry')}
+            </Text>
+          </Pressable>
+        </View>
+      )}
+
       {/* Empty conversation */}
-      {!messagesLoading && messages.length === 0 && (
+      {!messagesLoading && messages.length === 0 && !messagesError && (
         <View className="items-center py-16 px-8">
           <Text className="font-sans text-sm text-[#484848] text-center">
             {t('chat.sayHello', { name: displayName })}

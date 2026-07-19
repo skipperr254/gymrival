@@ -7,6 +7,7 @@ import { Routes } from '@/constants/routes';
 import { formatDate, formatRelativeTime as formatRelativeTimeIntl } from '@/lib/i18n/format';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useChatStore } from '@/store/useChatStore';
+import { ErrorState } from '@/components/ui';
 import { FriendAvatar } from './FriendAvatar';
 
 function formatConvTime(iso: string | null): string {
@@ -25,6 +26,7 @@ export function MessagesContent() {
   const {
     conversations,
     conversationsLoading,
+    conversationsError,
     loadConversations,
     subscribeToInbox,
     startPresenceHeartbeat,
@@ -50,6 +52,16 @@ export function MessagesContent() {
       <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
         <ActivityIndicator color="#404040" />
       </View>
+    );
+  }
+
+  if (conversationsError && conversations.length === 0) {
+    return (
+      <ErrorState
+        message={t('loadErrorMessages')}
+        retryLabel={t('retry')}
+        onRetry={() => loadConversations(userId)}
+      />
     );
   }
 

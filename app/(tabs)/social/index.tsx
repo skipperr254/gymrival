@@ -18,6 +18,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useChatStore } from '@/store/useChatStore';
 import { useSocialStore } from '@/store/useSocialStore';
 import { FeedPostCard, FeedSkeleton, SocialHeader } from '@/components/features/social';
+import { ErrorState } from '@/components/ui';
 import type { FeedPost } from '@/types/social';
 
 export default function SocialScreen() {
@@ -26,6 +27,7 @@ export default function SocialScreen() {
 
   const feed = useSocialStore((s) => s.feed);
   const feedLoading = useSocialStore((s) => s.feedLoading);
+  const feedError = useSocialStore((s) => s.feedError);
   const feedLoadingMore = useSocialStore((s) => s.feedLoadingMore);
   const feedHasMore = useSocialStore((s) => s.feedHasMore);
   const feedParticipantIds = useSocialStore((s) => s.feedParticipantIds);
@@ -148,6 +150,14 @@ export default function SocialScreen() {
               <FeedSkeleton />
               <FeedSkeleton />
               <FeedSkeleton />
+            </View>
+          ) : feedError ? (
+            <View className="px-4">
+              <ErrorState
+                message={t('loadErrorFeed')}
+                retryLabel={t('retry')}
+                onRetry={() => userId && loadFeed(userId)}
+              />
             </View>
           ) : (
             <View className="items-center py-16 px-8">

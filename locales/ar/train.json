@@ -42,6 +42,10 @@
   "exercisesAdded_one": "تمرين واحد مضاف",
   "exercisesAdded_other": "{{count}} تمارين مضافة",
   "saveSchedule": "حفظ الجدول",
+  "saveErrorTitle": "تعذر الحفظ",
+  "saveScheduleError": "تعذّر حفظ هذا التمرين. تحقق من اتصالك وحاول مرة أخرى.",
+  "finishWorkoutError": "تعذّر حفظ تمرينك المكتمل. تحقق من اتصالك وحاول مرة أخرى.",
+  "deleteSessionError": "تعذّر حذف هذا التمرين. تحقق من اتصالك وحاول مرة أخرى.",
   "checkin": {
     "weeklyStreak": "التتابع الأسبوعي",
     "ofSevenDays": "/ 7 أيام",
@@ -57,6 +61,9 @@
     "xpEarned": "+25 نقطة خبرة",
     "undoCheckIn": "التراجع عن تسجيل الحضور",
     "friendsCheckedIn": "أصدقاء سجّلوا حضورهم",
-    "unknown": "غير معروف"
+    "unknown": "غير معروف",
+    "errorTitle": "حدث خطأ ما",
+    "checkinError": "تعذّر تسجيل حضورك. تحقق من اتصالك وحاول مرة أخرى.",
+    "undoError": "تعذّر التراجع عن تسجيل الحضور. تحقق من اتصالك وحاول مرة أخرى."
   }
 }

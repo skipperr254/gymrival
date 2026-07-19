@@ -19,6 +19,13 @@
   "yourPr": "TON PR",
   "feedEmptyTitle": "AUCUNE ACTIVITÉ POUR L'INSTANT",
   "feedEmptySubtitle": "Ajoute des amis et commence à enregistrer des PR pour animer le fil.",
+  "retry": "RÉESSAYER",
+  "videoLoadError": "Impossible de charger la vidéo",
+  "loadErrorFriends": "Impossible de charger tes amis",
+  "loadErrorRequests": "Impossible de charger les demandes",
+  "loadErrorSearch": "Échec de la recherche",
+  "loadErrorMessages": "Impossible de charger tes messages",
+  "loadErrorFeed": "Impossible de charger le fil",
   "allCaughtUp": "TU ES À JOUR",
   "friendsSubTabs": {
     "friends": "AMIS",
@@ -54,6 +61,8 @@
   "chat": {
     "cantOpen": "IMPOSSIBLE D'OUVRIR LE CHAT",
     "errorSub": "Une erreur s'est produite. Réessaie plus tard.",
+    "loadError": "Impossible de charger les messages",
+    "retry": "RÉESSAYER",
     "online": "En ligne",
     "offline": "Hors ligne",
     "startOfConversation": "DÉBUT DE LA CONVERSATION",

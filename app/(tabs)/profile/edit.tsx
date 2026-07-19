@@ -12,20 +12,17 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { Avatar } from '@/components/ui/Avatar';
+import type { Profile } from '@/types/user';
 
-export default function EditProfileScreen() {
-  const { t } = useTranslation('profile');
-  const { user } = useAuthStore();
-  const { profile, saving, updateProfile } = useProfileStore();
-
-  const [form, setForm] = useState({
+function buildFormFromProfile(profile: Profile | null) {
+  return {
     full_name: profile?.full_name ?? '',
     username: profile?.username ?? '',
     bio: profile?.bio ?? '',
@@ -34,7 +31,22 @@ export default function EditProfileScreen() {
     weight_kg: profile?.weight_kg != null ? String(profile.weight_kg) : '',
     height_cm: profile?.height_cm != null ? String(profile.height_cm) : '',
     goal: profile?.goal ?? '',
-  });
+  };
+}
+
+export default function EditProfileScreen() {
+  const { t } = useTranslation('profile');
+  const { user } = useAuthStore();
+  const { profile, saving, updateProfile } = useProfileStore();
+
+  const [form, setForm] = useState(() => buildFormFromProfile(profile));
+  // Snapshot of what the form looked like when this screen opened. handleSave
+  // diffs against this so it only sends fields the user actually touched —
+  // otherwise every save re-sent every field from this device's (possibly
+  // stale) copy, silently overwriting any change made elsewhere (another
+  // device, another session) to a field the user on this screen never
+  // touched. See audits/02-data-integrity.md finding #20.
+  const initialFormRef = useRef(form);
 
   const displayName = form.full_name || user?.email?.split('@')[0] || 'Athlete';
 
@@ -48,28 +60,53 @@ export default function EditProfileScreen() {
     const weight = form.weight_kg !== '' ? Number(form.weight_kg) : null;
     const height = form.height_cm !== '' ? Number(form.height_cm) : null;
 
-    if (form.weight_kg !== '' && (isNaN(weight!) || weight! <= 0)) {
+    // Upper bounds are plausibility checks, not precision limits — a typo
+    // like an extra digit (e.g. "7600" instead of "76") previously passed
+    // validation and would render as a nonsensical value in the profile card.
+    if (form.weight_kg !== '' && (isNaN(weight!) || weight! <= 0 || weight! > 500)) {
       Alert.alert(t('edit.invalidWeightTitle'), t('edit.invalidWeightMsg'));
       return;
     }
-    if (form.height_cm !== '' && (isNaN(height!) || height! <= 0)) {
+    if (form.height_cm !== '' && (isNaN(height!) || height! <= 0 || height! > 300)) {
       Alert.alert(t('edit.invalidHeightTitle'), t('edit.invalidHeightMsg'));
       return;
     }
 
-    const { error } = await updateProfile(user.id, {
-      full_name: form.full_name.trim() || null,
-      username: form.username.trim().replace(/^@/, '') || null,
-      bio: form.bio.trim() || null,
-      quote: form.quote.trim() || null,
-      gym: form.gym.trim() || null,
-      weight_kg: weight,
-      height_cm: height,
-      goal: form.goal.trim() || null,
-    });
+    const initial = initialFormRef.current;
+    const updates: Partial<{
+      full_name: string | null;
+      username: string | null;
+      bio: string | null;
+      quote: string | null;
+      gym: string | null;
+      weight_kg: number | null;
+      height_cm: number | null;
+      goal: string | null;
+    }> = {};
+
+    if (form.full_name !== initial.full_name) updates.full_name = form.full_name.trim() || null;
+    if (form.username !== initial.username) updates.username = form.username.trim().replace(/^@/, '') || null;
+    if (form.bio !== initial.bio) updates.bio = form.bio.trim() || null;
+    if (form.quote !== initial.quote) updates.quote = form.quote.trim() || null;
+    if (form.gym !== initial.gym) updates.gym = form.gym.trim() || null;
+    if (form.weight_kg !== initial.weight_kg) updates.weight_kg = weight;
+    if (form.height_cm !== initial.height_cm) updates.height_cm = height;
+    if (form.goal !== initial.goal) updates.goal = form.goal.trim() || null;
+
+    if (Object.keys(updates).length === 0) {
+      router.back();
+      return;
+    }
+
+    const { error, code } = await updateProfile(user.id, updates);
 
     if (error) {
-      Alert.alert(t('edit.saveErrorTitle'), error);
+      // Map known Postgres error codes to friendly, translated copy instead
+      // of showing the raw DB error text (e.g. a unique-constraint message
+      // naming the SQL constraint) directly to the user.
+      const message =
+        code === '23505' ? t('edit.usernameTakenError') : t('edit.saveErrorGeneric');
+      Alert.alert(t('edit.saveErrorTitle'), message);
     } else {
       router.back();
     }

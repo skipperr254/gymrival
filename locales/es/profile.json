@@ -3,6 +3,8 @@
     "brand": "GYM RIVAL",
     "pageLabel": "PERFIL"
   },
+  "loadErrorSub": "No se pudo cargar tu perfil. Comprueba tu conexión e inténtalo de nuevo.",
+  "retry": "REINTENTAR",
   "proUpsell": "HAZTE PRO — 4,99 €/MES",
   "proActive": "MIEMBRO PRO — TOCA PARA DESACTIVAR",
   "details": {
@@ -56,7 +58,9 @@
     "invalidWeightMsg": "Introduce un peso válido en kg.",
     "invalidHeightTitle": "Altura no válida",
     "invalidHeightMsg": "Introduce una altura válida en cm.",
-    "saveErrorTitle": "No se pudo guardar"
+    "saveErrorTitle": "No se pudo guardar",
+    "usernameTakenError": "Ese nombre de usuario ya está en uso. Elige otro.",
+    "saveErrorGeneric": "Algo salió mal. Comprueba tu conexión e inténtalo de nuevo."
   },
   "badges": {
     "title": "INSIGNIAS",

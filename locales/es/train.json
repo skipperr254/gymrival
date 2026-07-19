@@ -42,6 +42,10 @@
   "exercisesAdded_one": "{{count}} EJERCICIO AÑADIDO",
   "exercisesAdded_other": "{{count}} EJERCICIOS AÑADIDOS",
   "saveSchedule": "GUARDAR PLAN",
+  "saveErrorTitle": "No se pudo guardar",
+  "saveScheduleError": "No se pudo guardar este entrenamiento. Comprueba tu conexión e inténtalo de nuevo.",
+  "finishWorkoutError": "No se pudo guardar tu entrenamiento completado. Comprueba tu conexión e inténtalo de nuevo.",
+  "deleteSessionError": "No se pudo eliminar este entrenamiento. Comprueba tu conexión e inténtalo de nuevo.",
   "checkin": {
     "weeklyStreak": "RACHA SEMANAL",
     "ofSevenDays": "/ 7 días",
@@ -57,6 +61,9 @@
     "xpEarned": "+25 XP GANADOS",
     "undoCheckIn": "DESHACER CHECK-IN",
     "friendsCheckedIn": "AMIGOS REGISTRADOS",
-    "unknown": "Desconocido"
+    "unknown": "Desconocido",
+    "errorTitle": "Algo salió mal",
+    "checkinError": "No se pudo registrar tu check-in. Comprueba tu conexión e inténtalo de nuevo.",
+    "undoError": "No se pudo deshacer tu check-in. Comprueba tu conexión e inténtalo de nuevo."
   }
 }

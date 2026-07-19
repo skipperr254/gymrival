@@ -4,6 +4,7 @@ import {
   ScrollView,
   Pressable,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -30,7 +31,7 @@ import {
 export default function ProfileScreen() {
   const { t, i18n } = useTranslation(['common', 'profile']);
   const { user, signOut } = useAuthStore();
-  const { profile, bestPRs, prCount, loadProfile, loadBestPRs, setProStatus } =
+  const { profile, bestPRs, prCount, loading, error, loadProfile, loadBestPRs, setProStatus } =
     useProfileStore();
   const unreadCount = useNotificationStore((s) => s.unreadCount);
   const currentLanguageName =
@@ -72,6 +73,42 @@ export default function ProfileScreen() {
     { label: t('profile:stats.streak'), value: profile?.streak ?? 0, icon: 'flame-outline' as IoniconName },
     { label: t('profile:stats.level'), value: profile?.level ?? 1, icon: 'star-outline' as IoniconName },
   ];
+
+  // First load: distinguish "still loading" from a fresh account with no
+  // data yet — without this, a slow/failed fetch rendered the exact same
+  // fallback chain ('Athlete', all-zero stats, every detail "Not set") as a
+  // genuinely brand-new profile, with no indication anything was wrong.
+  if (loading && !profile) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator color={Colors.accent} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error && !profile) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
+        <View className="flex-1 items-center justify-center gap-3 px-8">
+          <Ionicons name="alert-circle-outline" size={26} color={Colors.accent} />
+          <Text className="font-sans text-sm text-[#555] text-center">
+            {t('profile:loadErrorSub')}
+          </Text>
+          <Pressable
+            onPress={() => user?.id && loadProfile(user.id)}
+            className="flex-row items-center gap-1.5 mt-1 bg-accent py-2.5 px-5 rounded-[10px]"
+          >
+            <Ionicons name="refresh" size={14} color="#fff" />
+            <Text className="font-heading text-xs tracking-[2px] text-white">
+              {t('profile:retry')}
+            </Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>

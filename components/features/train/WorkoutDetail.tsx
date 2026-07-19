@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
@@ -7,6 +7,7 @@ import type { TrainingSessionWithExercises } from '@/types/train';
 interface WorkoutDetailProps {
   session: TrainingSessionWithExercises;
   workoutStarted: boolean;
+  starting: boolean;
   completedSets: Record<string, boolean>;
   totalSets: number;
   doneSets: number;
@@ -20,6 +21,7 @@ interface WorkoutDetailProps {
 export function WorkoutDetail({
   session,
   workoutStarted,
+  starting,
   completedSets,
   totalSets,
   doneSets,
@@ -45,7 +47,7 @@ export function WorkoutDetail({
             <Ionicons name="barbell" size={26} color={Colors.accent} />
           </View>
           <View className="flex-1">
-            <Text className="font-heading text-2xl tracking-[3px] text-primary">
+            <Text className="font-heading text-2xl tracking-[3px] text-primary" numberOfLines={1}>
               {session.name.toUpperCase()}
             </Text>
             <Text className="font-sans text-xs text-secondary tracking-[2px]">
@@ -90,7 +92,7 @@ export function WorkoutDetail({
               />
             </View>
             <View className="flex-1">
-              <Text className="font-sans-semibold text-[15px] text-primary mb-0.5">
+              <Text className="font-sans-semibold text-[15px] text-primary mb-0.5" numberOfLines={1}>
                 {ex.exercise_name}
               </Text>
               <Text className="font-sans text-xs text-muted">
@@ -139,14 +141,23 @@ export function WorkoutDetail({
       {/* CTAs */}
       {!workoutStarted ? (
         <Pressable
-          className="flex-row items-center justify-center gap-2.5 bg-accent rounded-2xl h-[52px] mt-1.5"
-          style={({ pressed }) => pressed && { opacity: 0.85 }}
+          className={`flex-row items-center justify-center gap-2.5 bg-accent rounded-2xl h-[52px] mt-1.5 ${
+            starting ? 'opacity-70' : ''
+          }`}
+          style={({ pressed }) => pressed && !starting && { opacity: 0.85 }}
           onPress={onStart}
+          disabled={starting}
         >
-          <Ionicons name="flash" size={18} color={Colors.primary} />
-          <Text className="font-heading text-[15px] tracking-[3px] text-primary">
-            {t('startWorkout')}
-          </Text>
+          {starting ? (
+            <ActivityIndicator size="small" color={Colors.primary} />
+          ) : (
+            <>
+              <Ionicons name="flash" size={18} color={Colors.primary} />
+              <Text className="font-heading text-[15px] tracking-[3px] text-primary">
+                {t('startWorkout')}
+              </Text>
+            </>
+          )}
         </Pressable>
       ) : allDone ? (
         <View className="bg-[#0a1f0a] border border-[#1a3a1a] rounded-2xl p-6 items-center mt-1.5">

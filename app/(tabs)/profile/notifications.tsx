@@ -70,6 +70,12 @@ function notificationIcon(type: NotificationType): { name: IoniconName; color: s
       return { name: 'heart', color: Colors.accent };
     case 'friend_pr':
       return { name: 'trophy', color: Colors.warning };
+    default:
+      // A notification type the client doesn't recognize yet (e.g. a new
+      // type shipped server-side before this app version updated, or bad
+      // data) must not crash the whole screen — fall back to a generic icon,
+      // mirroring buildNotificationText's default case above.
+      return { name: 'notifications', color: Colors.hint };
   }
 }
 
@@ -176,7 +182,9 @@ export default function NotificationsScreen() {
     notifications,
     unreadCount,
     loading,
+    loadingMore,
     loadNotifications,
+    loadMoreNotifications,
     markRead,
     markAllRead,
   } = useNotificationStore();
@@ -188,6 +196,10 @@ export default function NotificationsScreen() {
   useEffect(() => {
     load();
   }, [load]);
+
+  const handleLoadMore = useCallback(() => {
+    if (user?.id) loadMoreNotifications(user.id);
+  }, [user?.id, loadMoreNotifications]);
 
   const handlePress = useCallback(
     async (n: AppNotification) => {
@@ -222,7 +234,11 @@ export default function NotificationsScreen() {
           </Text>
           {unreadCount > 0 && (
             <View className="bg-accent rounded-full min-w-[20px] h-5 items-center justify-center px-[5px]">
-              <Text className="font-sans-bold text-[11px] text-white">{unreadCount}</Text>
+              {/* Same cap as the tab-icon badge (app/(tabs)/profile/index.tsx)
+                  — this one previously rendered the raw number uncapped. */}
+              <Text className="font-sans-bold text-[11px] text-white">
+                {unreadCount > 9 ? '9+' : String(unreadCount)}
+              </Text>
             </View>
           )}
         </View>
@@ -263,6 +279,15 @@ export default function NotificationsScreen() {
               tintColor={Colors.accent}
               colors={[Colors.accent]}
             />
+          }
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loadingMore ? (
+              <View className="py-5">
+                <ActivityIndicator color={Colors.accent} size="small" />
+              </View>
+            ) : null
           }
           ListEmptyComponent={
             <View className="flex-1 items-center justify-center px-10 pt-20 gap-3">

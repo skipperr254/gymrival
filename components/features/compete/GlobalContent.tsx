@@ -173,6 +173,7 @@ export function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: (
     loadingMyRank,
     globalHasMore,
     globalError,
+    myRankError,
     loadGlobalLeaderboard,
     loadMoreGlobal,
     loadMyGlobalRank,
@@ -188,6 +189,12 @@ export function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: (
     loadGlobalLeaderboard(user.id, '');
     loadMyGlobalRank(user.id);
   }, [user?.id, loadGlobalLeaderboard, loadMyGlobalRank]);
+
+  // Cancel a pending debounced search on unmount (e.g. switching tabs) —
+  // otherwise it fires against the shared store after this screen is gone,
+  // and can race with a fresh unfiltered load if the user comes back before
+  // the 400ms delay elapses.
+  useEffect(() => () => clearTimeout(debounceRef.current), []);
 
   // Debounced search — new search resets to page 0
   const handleSearch = (text: string) => {
@@ -288,8 +295,10 @@ export function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: (
         </View>
       )}
 
-      {/* Unranked call-to-action when user has no big-3 PRs */}
-      {!isFirstLoad && !myGlobalRank && !loadingMyRank && !search && (
+      {/* Unranked call-to-action when user genuinely has no big-3 PRs — gated
+          on !myRankError so a failed fetch doesn't tell a ranked user
+          they're "unranked" (see also the myRankError block below). */}
+      {!isFirstLoad && !myGlobalRank && !loadingMyRank && !myRankError && !search && (
         <View className="items-center bg-[#1e1e1e] rounded-2xl py-8 px-5 gap-2 mt-4 mb-1 border border-[#2a2a2a]">
           <Trophy size={26} strokeWidth={1.4} color="#333" />
           <Text className="font-heading text-lg tracking-[2px] text-white mt-1">
@@ -298,6 +307,23 @@ export function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: (
           <Text className="font-sans text-[13px] text-[#555] text-center leading-5">
             {t('global.unrankedSub')}
           </Text>
+        </View>
+      )}
+
+      {/* myGlobalRank fetch failed — distinct from genuinely unranked */}
+      {!isFirstLoad && !myGlobalRank && !loadingMyRank && !!myRankError && !search && (
+        <View className="items-center bg-[rgba(230,48,48,0.06)] rounded-2xl border border-[rgba(230,48,48,0.2)] py-7 px-5 gap-2 mt-4 mb-1">
+          <AlertCircle size={22} strokeWidth={1.6} color={Colors.accent} />
+          <Text className="font-sans text-[13px] text-[#b0b0b0]">{t('global.myRankLoadError')}</Text>
+          <Pressable
+            onPress={() => user?.id && loadMyGlobalRank(user.id)}
+            className="flex-row items-center gap-1.5 mt-1 bg-accent py-2 px-4 rounded-[10px]"
+          >
+            <RefreshCw size={13} strokeWidth={2} color="#fff" />
+            <Text className="font-heading text-xs tracking-[2px] text-white">
+              {t('global.retry')}
+            </Text>
+          </Pressable>
         </View>
       )}
 

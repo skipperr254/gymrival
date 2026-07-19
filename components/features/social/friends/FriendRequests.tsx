@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSocialStore } from '@/store/useSocialStore';
+import { ErrorState } from '@/components/ui';
 import { FriendAvatar } from '../FriendAvatar';
 
 /** The "Requests" sub-tab: incoming (accept/decline) + outgoing (pending/cancel). */
@@ -16,6 +17,7 @@ export function FriendRequests() {
     incomingRequests,
     outgoingRequests,
     requestsLoading,
+    requestsError,
     loadRequests,
     acceptRequest,
     declineRequest,
@@ -34,6 +36,16 @@ export function FriendRequests() {
       <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
         <ActivityIndicator color="#404040" />
       </View>
+    );
+  }
+
+  if (requestsError && incomingRequests.length === 0 && outgoingRequests.length === 0) {
+    return (
+      <ErrorState
+        message={t('loadErrorRequests')}
+        retryLabel={t('retry')}
+        onRetry={() => loadRequests(userId)}
+      />
     );
   }
 

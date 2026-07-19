@@ -148,11 +148,25 @@ export default function ResetPasswordScreen() {
             </View>
           </View>
 
-          {/* Error */}
+          {/* Error — recovery tokens are short-lived, and this screen has no
+              back button; without an escape hatch, a user landing here with
+              an expired/invalid link was stuck reading an error with no way
+              forward short of an OS back gesture or force-closing the app. */}
           {error && (
-            <Text className="font-sans text-[13px] text-accent mt-4 text-center">
-              {error}
-            </Text>
+            <>
+              <Text className="font-sans text-[13px] text-accent mt-4 text-center">
+                {error}
+              </Text>
+              <Pressable
+                className="mt-2"
+                onPress={() => router.replace(Routes.forgotPassword)}
+                hitSlop={8}
+              >
+                <Text className="font-sans-medium text-[13px] text-secondary text-center underline">
+                  {t("resetPassword.requestNewLink")}
+                </Text>
+              </Pressable>
+            </>
           )}
 
           {/* CTA */}

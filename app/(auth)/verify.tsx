@@ -30,6 +30,7 @@ export default function VerifyScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendLoading, setResendLoading] = useState(false);
 
   const inputRef = useRef<TextInput>(null);
 
@@ -95,9 +96,14 @@ export default function VerifyScreen() {
   }, [code]);
 
   const handleResend = async () => {
-    if (resendCooldown > 0 || !email) return;
+    // The cooldown alone isn't enough — it's only set *after* the request
+    // resolves, so rapid taps before the first response lands could fire
+    // multiple concurrent resend calls. Disable immediately on tap instead.
+    if (resendCooldown > 0 || resendLoading || !email) return;
     setError(null);
+    setResendLoading(true);
     const { error } = await resendOtp(email, type!);
+    setResendLoading(false);
     if (error) {
       setError(error);
     } else {
@@ -195,11 +201,11 @@ export default function VerifyScreen() {
             <Pressable
               hitSlop={8}
               onPress={handleResend}
-              disabled={resendCooldown > 0}
+              disabled={resendCooldown > 0 || resendLoading}
             >
               <Text
                 className={`font-sans-semibold text-[14px] ${
-                  resendCooldown > 0 ? "text-muted" : "text-accent"
+                  resendCooldown > 0 || resendLoading ? "text-muted" : "text-accent"
                 }`}
               >
                 {" "}

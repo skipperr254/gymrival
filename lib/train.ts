@@ -188,6 +188,24 @@ export async function completeWorkout(
 }
 
 /**
+ * Delete an incomplete workout log — called when the user backs out of or
+ * explicitly cancels a started-but-unfinished workout. Without this, every
+ * abandoned workout (not just an explicit "Cancel") left a permanent
+ * is_complete=false row with no cleanup path.
+ */
+export async function deleteWorkoutLog(
+  workoutLogId: string
+): Promise<{ error: string | null }> {
+  const { error } = await supabase
+    .from('workout_logs')
+    .delete()
+    .eq('id', workoutLogId)
+    .eq('is_complete', false);
+
+  return { error: error?.message ?? null };
+}
+
+/**
  * Fetch completed workout logs for a user, newest-first.
  * Used by the AI Coach and future analytics screens.
  */

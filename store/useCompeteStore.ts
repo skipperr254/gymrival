@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { supabase } from "@/lib/supabase";
 import i18n from "@/lib/i18n";
 import type { ExerciseType } from "@/types/pr";
 import type { RivalEntry, GlobalLeaderboardEntry } from "@/types/compete";
@@ -24,6 +25,24 @@ import {
 
 const PAGE_SIZE = 50;
 
+// Monotonic request sequence numbers so an out-of-order (slower) response
+// can't overwrite state with stale data after a newer request has already
+// started — e.g. rapidly switching exercise chips in Rivals, or a "Load
+// More" response landing after a new search query's first-page response.
+let rivalsRequestSeq = 0;
+let globalRequestSeq = 0;
+
+// Realtime channel refs, same owner-aware cleanup pattern as
+// useSocialStore/useChatStore. Migration 018 explicitly enabled Realtime on
+// challenge_participants/challenge_invitations for exactly this purpose, but
+// nothing ever subscribed — a friend joining/leaving/scoring in a challenge
+// you're viewing, or a new invite arriving, only appeared after a manual
+// refresh or remount.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _challengeChannel: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _invitationsChannel: any = null;
+
 interface CompeteState {
   // ─── Exercises ──────────────────────────────────────────────────────────────
   exercises: ExerciseType[];
@@ -42,6 +61,7 @@ interface CompeteState {
   globalHasMore: boolean;
   globalOffset: number;
   globalError: string | null;
+  myRankError: string | null;
 
   // ─── Challenges ─────────────────────────────────────────────────────────────
   challenges: ChallengeWithStats[];
@@ -51,10 +71,14 @@ interface CompeteState {
   /** Leaderboard entries keyed by challenge id */
   leaderboards: Record<string, ChallengeLeaderboardEntry[]>;
   loadingLeaderboard: Record<string, boolean>;
+  /** Set (non-null) when the last fetch for a challenge id failed — lets the UI
+   * distinguish "network error" from "genuinely zero participants". */
+  leaderboardErrors: Record<string, string | null>;
 
   /** Pending challenge invitations for the current user */
   pendingInvitations: ChallengeInvitation[];
   loadingInvitations: boolean;
+  invitationsError: string | null;
 
   // ─── Shared ─────────────────────────────────────────────────────────────────
   error: string | null;
@@ -85,6 +109,15 @@ interface CompeteState {
     response: 'accepted' | 'declined',
   ) => Promise<{ error: string | null }>;
 
+  /** Live-updates a single challenge's leaderboard when any participant's
+   * score/membership changes. Call when a challenge detail screen mounts.
+   * Returns an unsubscribe function for useEffect cleanup. */
+  subscribeToChallengeEvents: (challengeId: string, userId: string) => () => void;
+
+  /** Live-updates pendingInvitations when a new invite arrives. Call while
+   * the Challenges tab is mounted. Returns an unsubscribe function. */
+  subscribeToInvitationEvents: (userId: string) => () => void;
+
   reset: () => void;
 }
 
@@ -103,6 +136,7 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
   globalHasMore: true,
   globalOffset: 0,
   globalError: null,
+  myRankError: null,
 
   challenges: [],
   loadingChallenges: false,
@@ -110,9 +144,11 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
 
   leaderboards: {},
   loadingLeaderboard: {},
+  leaderboardErrors: {},
 
   pendingInvitations: [],
   loadingInvitations: false,
+  invitationsError: null,
 
   error: null,
 
@@ -128,8 +164,12 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
   // ─── Rivals ─────────────────────────────────────────────────────────────────
 
   loadRivals: async (userId) => {
+    const seq = ++rivalsRequestSeq;
     set({ loadingRivals: true, error: null });
     const { data, error } = await fetchRivalsLeaderboard(userId, get().selectedExercise);
+    // A newer request (e.g. the user tapped a different exercise chip while
+    // this one was still in flight) already superseded this response.
+    if (seq !== rivalsRequestSeq) return;
     set({ rivals: data, loadingRivals: false, error });
   },
 
@@ -141,8 +181,11 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
   // ─── Global Leaderboard ─────────────────────────────────────────────────────
 
   loadGlobalLeaderboard: async (userId, search = "") => {
+    const seq = ++globalRequestSeq;
     set({ loadingGlobal: true, globalError: null });
     const { data, error } = await fetchGlobalLeaderboard(userId, search, PAGE_SIZE, 0);
+    // A newer search/page request already superseded this one.
+    if (seq !== globalRequestSeq) return;
     set({
       globalEntries: data,
       loadingGlobal: false,
@@ -156,8 +199,12 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
     const { loadingGlobal, globalHasMore, globalOffset } = get();
     if (loadingGlobal || !globalHasMore) return;
 
+    const seq = ++globalRequestSeq;
     set({ loadingGlobal: true });
     const { data, error } = await fetchGlobalLeaderboard(userId, search, PAGE_SIZE, globalOffset);
+    // A new search started while this page was loading — appending these
+    // results now would mix two different queries' rows together.
+    if (seq !== globalRequestSeq) return;
     set((state) => ({
       globalEntries: [...state.globalEntries, ...data],
       loadingGlobal: false,
@@ -168,9 +215,9 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
   },
 
   loadMyGlobalRank: async (userId) => {
-    set({ loadingMyRank: true });
-    const { data } = await fetchMyGlobalRank(userId);
-    set({ myGlobalRank: data, loadingMyRank: false });
+    set({ loadingMyRank: true, myRankError: null });
+    const { data, error } = await fetchMyGlobalRank(userId);
+    set({ myGlobalRank: data, loadingMyRank: false, myRankError: error });
   },
 
   // ─── Challenges ─────────────────────────────────────────────────────────────
@@ -190,6 +237,7 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
       leaderboards: error
         ? state.leaderboards
         : { ...state.leaderboards, [challengeId]: data },
+      leaderboardErrors: { ...state.leaderboardErrors, [challengeId]: error },
       loadingLeaderboard: { ...state.loadingLeaderboard, [challengeId]: false },
     }));
   },
@@ -233,6 +281,10 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
           ),
         },
       }));
+      // The filter above leaves gaps in the remaining entries' cached ranks
+      // (e.g. 1, 3, 4) until a full reload — refetch now instead of waiting
+      // for the next unrelated screen visit to fix the display.
+      await get().loadLeaderboard(challengeId, userId);
     }
     return result;
   },
@@ -247,9 +299,9 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
   },
 
   loadPendingInvitations: async (userId) => {
-    set({ loadingInvitations: true });
-    const { data } = await fetchPendingInvitations(userId);
-    set({ pendingInvitations: data, loadingInvitations: false });
+    set({ loadingInvitations: true, invitationsError: null });
+    const { data, error } = await fetchPendingInvitations(userId);
+    set({ pendingInvitations: data, loadingInvitations: false, invitationsError: error });
   },
 
   respondToInvitation: async (invitationId, challengeId, userId, response) => {
@@ -267,9 +319,81 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
     return result;
   },
 
+  // ─── Realtime ───────────────────────────────────────────────────────────────
+
+  subscribeToChallengeEvents: (challengeId, userId) => {
+    if (_challengeChannel) {
+      supabase.removeChannel(_challengeChannel);
+      _challengeChannel = null;
+    }
+
+    // Refetch on any change rather than patching individual rows client-side:
+    // challenge_leaderboard() computes RANK() OVER server-side, which isn't
+    // safe to replicate incrementally without risking the client's ranks
+    // drifting from the server's.
+    const refresh = () => get().loadLeaderboard(challengeId, userId);
+
+    const channel = supabase
+      .channel(`challenge-events-${challengeId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "challenge_participants",
+          filter: `challenge_id=eq.${challengeId}`,
+        },
+        refresh
+      )
+      .subscribe();
+
+    _challengeChannel = channel;
+
+    return () => {
+      supabase.removeChannel(channel);
+      if (_challengeChannel === channel) _challengeChannel = null;
+    };
+  },
+
+  subscribeToInvitationEvents: (userId) => {
+    if (_invitationsChannel) {
+      supabase.removeChannel(_invitationsChannel);
+      _invitationsChannel = null;
+    }
+
+    const channel = supabase
+      .channel(`challenge-invitations-${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "challenge_invitations",
+          filter: `invitee_id=eq.${userId}`,
+        },
+        () => get().loadPendingInvitations(userId)
+      )
+      .subscribe();
+
+    _invitationsChannel = channel;
+
+    return () => {
+      supabase.removeChannel(channel);
+      if (_invitationsChannel === channel) _invitationsChannel = null;
+    };
+  },
+
   // ─── Reset ──────────────────────────────────────────────────────────────────
 
-  reset: () =>
+  reset: () => {
+    if (_challengeChannel) {
+      supabase.removeChannel(_challengeChannel);
+      _challengeChannel = null;
+    }
+    if (_invitationsChannel) {
+      supabase.removeChannel(_invitationsChannel);
+      _invitationsChannel = null;
+    }
     set({
       exercises: [],
       selectedExercise: "bench",
@@ -283,13 +407,17 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
       globalHasMore: true,
       globalOffset: 0,
       globalError: null,
+      myRankError: null,
       error: null,
       challenges: [],
       loadingChallenges: false,
       challengesError: null,
       leaderboards: {},
       loadingLeaderboard: {},
+      leaderboardErrors: {},
       pendingInvitations: [],
       loadingInvitations: false,
-    }),
+      invitationsError: null,
+    });
+  },
 }));

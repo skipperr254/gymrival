@@ -9,6 +9,7 @@ import {
   Platform,
   StyleSheet,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ChevronLeft, ArrowUp, MessageCircle } from 'lucide-react-native';
@@ -18,6 +19,8 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useChatStore } from '@/store/useChatStore';
 import { fetchProfile } from '@/lib/api';
 import { ChatAvatar, MessageList } from '@/components/features/social/chat';
+
+const draftKey = (otherUserId: string) => `gymrival:chatDraft:${otherUserId}`;
 
 export default function ChatScreen() {
   const { t } = useTranslation('social');
@@ -29,6 +32,7 @@ export default function ChatScreen() {
   const {
     messages,
     messagesLoading,
+    messagesError,
     loadingOlderMessages,
     hasMoreMessages,
     conversations,
@@ -55,6 +59,29 @@ export default function ChatScreen() {
 
   const scrollRef = useRef<ScrollView>(null);
   const inputRef = useRef<TextInput>(null);
+  const draftSaveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // ── Draft persistence — survives the app being killed mid-compose ────────
+
+  useEffect(() => {
+    if (!otherUserId) return;
+    AsyncStorage.getItem(draftKey(otherUserId)).then((saved) => {
+      if (saved) setInput(saved);
+    });
+  }, [otherUserId]);
+
+  useEffect(() => {
+    if (!otherUserId) return;
+    clearTimeout(draftSaveTimer.current);
+    draftSaveTimer.current = setTimeout(() => {
+      if (input.trim()) {
+        AsyncStorage.setItem(draftKey(otherUserId), input).catch(() => {});
+      } else {
+        AsyncStorage.removeItem(draftKey(otherUserId)).catch(() => {});
+      }
+    }, 400);
+    return () => clearTimeout(draftSaveTimer.current);
+  }, [input, otherUserId]);
 
   // ── Resolve other user's profile ──────────────────────────────────────────
 
@@ -136,9 +163,10 @@ export default function ChatScreen() {
       if (!msg || !conversationId) return;
       sendMessage(conversationId, currentUserId, msg);
       setInput('');
+      if (otherUserId) AsyncStorage.removeItem(draftKey(otherUserId)).catch(() => {});
       inputRef.current?.focus();
     },
-    [input, conversationId, currentUserId, sendMessage]
+    [input, conversationId, currentUserId, sendMessage, otherUserId]
   );
 
   // ── Scroll tracking for "load more" ──────────────────────────────────────
@@ -250,6 +278,8 @@ export default function ChatScreen() {
         loadingOlderMessages={loadingOlderMessages}
         hasMoreMessages={hasMoreMessages}
         messagesLoading={messagesLoading}
+        messagesError={messagesError}
+        onRetry={() => conversationId && loadMessages(conversationId, currentUserId)}
         scrollRef={scrollRef}
         onScroll={handleScroll}
       />

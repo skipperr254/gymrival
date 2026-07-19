@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Dumbbell, Trophy } from 'lucide-react-native';
+import { AlertCircle, Dumbbell, RefreshCw, Trophy } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -17,6 +17,7 @@ export function RivalsContent() {
     rivals,
     loadingExercises,
     loadingRivals,
+    error,
     loadExercises,
     loadRivals,
     setSelectedExercise,
@@ -70,7 +71,23 @@ export function RivalsContent() {
         </View>
       )}
 
-      {!isLoading && rivals.length === 0 && (
+      {!isLoading && rivals.length === 0 && error && (
+        <View className="items-center bg-[rgba(230,48,48,0.06)] rounded-2xl border border-[rgba(230,48,48,0.2)] py-7 px-5 gap-2">
+          <AlertCircle size={22} strokeWidth={1.6} color={Colors.accent} />
+          <Text className="font-sans text-[13px] text-[#b0b0b0]">{t('rivals.loadError')}</Text>
+          <Pressable
+            onPress={() => user?.id && loadRivals(user.id)}
+            className="flex-row items-center gap-1.5 mt-1 bg-accent py-2 px-4 rounded-[10px]"
+          >
+            <RefreshCw size={13} strokeWidth={2} color="#fff" />
+            <Text className="font-heading text-xs tracking-[2px] text-white">
+              {t('rivals.retry')}
+            </Text>
+          </Pressable>
+        </View>
+      )}
+
+      {!isLoading && rivals.length === 0 && !error && (
         <View className="items-center bg-[#1e1e1e] rounded-2xl py-12 px-5 gap-2">
           <Trophy size={32} strokeWidth={1.4} color="#333" />
           <Text className="font-heading text-lg tracking-[2px] text-white">

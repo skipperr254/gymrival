@@ -21,11 +21,24 @@ function getAuthStorage() {
   return secureStorage;
 }
 
+const authStorage = getAuthStorage();
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    storage: getAuthStorage(),
+    storage: authStorage,
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
   },
 });
+
+// Mirrors supabase-js's own default storage-key derivation (project ref taken
+// from the URL host — see @supabase/supabase-js SupabaseClient.ts) so a caller
+// can force-clear a persisted session locally without going through
+// supabase.auth.signOut(), which always tries to invalidate the session on
+// the server first and skips clearing local storage if that call fails.
+const authStorageKey = `sb-${new URL(supabaseUrl).hostname.split(".")[0]}-auth-token`;
+
+export async function forceLocalSignOut(): Promise<void> {
+  await authStorage?.removeItem(authStorageKey);
+}

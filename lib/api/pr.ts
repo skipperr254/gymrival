@@ -211,6 +211,28 @@ export async function uploadPRVideo(
   return { prVideoId, error: null };
 }
 
+const STALE_UPLOAD_THRESHOLD_MINUTES = 15;
+
+/**
+ * Flips the current user's own `pr_videos` rows that have been stuck in
+ * `status = 'uploading'` for longer than a reasonable upload window to
+ * `'failed'`. uploadPRVideo() inserts the row before the actual Storage
+ * upload runs (so the owner's feed can show an "uploading" state); if the
+ * app is killed or the network drops mid-upload, nothing ever moves that
+ * row past 'uploading' — this reconciles it the next time the owner's own
+ * client is active, rather than leaving it stuck forever with no
+ * indication anything went wrong. Call once per session (see app/_layout.tsx).
+ */
+export async function reconcileStaleVideoUploads(userId: string): Promise<void> {
+  const staleBefore = new Date(Date.now() - STALE_UPLOAD_THRESHOLD_MINUTES * 60_000).toISOString();
+  await supabase
+    .from('pr_videos')
+    .update({ status: 'failed' })
+    .eq('user_id', userId)
+    .eq('status', 'uploading')
+    .lt('created_at', staleBefore);
+}
+
 /**
  * Delete a PR's video — removes the pr_videos row and both Storage files.
  * Called when a user removes their video or when the PR itself is deleted

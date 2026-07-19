@@ -3,6 +3,8 @@
     "brand": "GYM RIVAL",
     "pageLabel": "PROFIEL"
   },
+  "loadErrorSub": "Kon je profiel niet laden. Controleer je verbinding en probeer het opnieuw.",
+  "retry": "OPNIEUW",
   "proUpsell": "UPGRADE NAAR PRO — €4,99/MND",
   "proActive": "PRO-LID — TIK OM UIT TE SCHAKELEN",
   "details": {
@@ -56,7 +58,9 @@
     "invalidWeightMsg": "Voer een geldig gewicht in kg in.",
     "invalidHeightTitle": "Ongeldige lengte",
     "invalidHeightMsg": "Voer een geldige lengte in cm in.",
-    "saveErrorTitle": "Opslaan mislukt"
+    "saveErrorTitle": "Opslaan mislukt",
+    "usernameTakenError": "Die gebruikersnaam is al bezet. Kies een andere.",
+    "saveErrorGeneric": "Er is iets misgegaan. Controleer je verbinding en probeer het opnieuw."
   },
   "badges": {
     "title": "BADGES",

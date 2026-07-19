@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Pressable, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, Pressable, StyleSheet, ActivityIndicator, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Avatar } from '@/components/ui/Avatar';
@@ -51,13 +51,17 @@ export function CheckInView() {
 
   const handleConfirm = async () => {
     if (!user || !selectedGymId) return;
-    await performCheckin(user.id, selectedGymId);
+    const { error } = await performCheckin(user.id, selectedGymId);
     setSelectedGymId(null);
+    // Previously a failure just quietly left the gym list unchanged with no
+    // explanation — indistinguishable from the tap not registering at all.
+    if (error) Alert.alert(t('checkin.errorTitle'), t('checkin.checkinError'));
   };
 
   const handleUndo = async () => {
     if (!user) return;
-    await performUndoCheckin(user.id);
+    const { error } = await performUndoCheckin(user.id);
+    if (error) Alert.alert(t('checkin.errorTitle'), t('checkin.undoError'));
   };
 
   return (

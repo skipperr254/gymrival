@@ -1,7 +1,9 @@
 {
   "settings": {
     "language": "Taal",
-    "languageAuto": "Volgt apparaattaal"
+    "languageAuto": "Volgt apparaattaal",
+    "languageErrorTitle": "Kon taal niet opslaan",
+    "languageErrorSub": "Je taalkeuze is niet gesynchroniseerd — controleer je verbinding en probeer het opnieuw."
   },
   "actions": {
     "back": "Terug",

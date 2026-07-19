@@ -42,6 +42,10 @@
   "exercisesAdded_one": "{{count}} EXERCICE AJOUTÉ",
   "exercisesAdded_other": "{{count}} EXERCICES AJOUTÉS",
   "saveSchedule": "ENREGISTRER LE PROGRAMME",
+  "saveErrorTitle": "Impossible d'enregistrer",
+  "saveScheduleError": "Impossible d'enregistrer cet entraînement. Vérifie ta connexion et réessaie.",
+  "finishWorkoutError": "Impossible d'enregistrer ton entraînement terminé. Vérifie ta connexion et réessaie.",
+  "deleteSessionError": "Impossible de supprimer cet entraînement. Vérifie ta connexion et réessaie.",
   "checkin": {
     "weeklyStreak": "SÉRIE HEBDOMADAIRE",
     "ofSevenDays": "/ 7 jours",
@@ -57,6 +61,9 @@
     "xpEarned": "+25 XP GAGNÉS",
     "undoCheckIn": "ANNULER LE CHECK-IN",
     "friendsCheckedIn": "AMIS AYANT FAIT LEUR CHECK-IN",
-    "unknown": "Inconnu"
+    "unknown": "Inconnu",
+    "errorTitle": "Une erreur s'est produite",
+    "checkinError": "Impossible d'enregistrer ton check-in. Vérifie ta connexion et réessaie.",
+    "undoError": "Impossible d'annuler ton check-in. Vérifie ta connexion et réessaie."
   }
 }

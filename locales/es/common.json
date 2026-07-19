@@ -1,7 +1,9 @@
 {
   "settings": {
     "language": "Idioma",
-    "languageAuto": "Siguiendo el idioma del dispositivo"
+    "languageAuto": "Siguiendo el idioma del dispositivo",
+    "languageErrorTitle": "No se pudo guardar el idioma",
+    "languageErrorSub": "Tu elección de idioma no se sincronizó — comprueba tu conexión e inténtalo de nuevo."
   },
   "actions": {
     "back": "Atrás",

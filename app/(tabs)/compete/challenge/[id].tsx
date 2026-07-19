@@ -41,12 +41,16 @@ export default function ChallengeDetailScreen() {
   const { user } = useAuthStore();
   const {
     challenges,
+    challengesError,
+    loadingChallenges,
     leaderboards,
     loadingLeaderboard,
+    leaderboardErrors,
     loadChallenges,
     loadLeaderboard,
     joinChallenge,
     leaveChallenge,
+    subscribeToChallengeEvents,
   } = useCompeteStore();
 
   const [joining, setJoining] = useState(false);
@@ -56,12 +60,57 @@ export default function ChallengeDetailScreen() {
   const challenge: ChallengeWithStats | undefined = challenges.find(c => c.id === id);
   const entries: ChallengeLeaderboardEntry[] = leaderboards[id ?? ''] ?? [];
   const isLoadingBoard = !!loadingLeaderboard[id ?? ''];
+  const boardError = leaderboardErrors[id ?? ''] ?? null;
 
   useEffect(() => {
     if (!user?.id || !id) return;
     if (challenges.length === 0) loadChallenges(user.id);
     loadLeaderboard(id, user.id);
   }, [user?.id, id, challenges.length, loadChallenges, loadLeaderboard]);
+
+  // Live-update the leaderboard while this challenge is open — previously a
+  // friend joining/leaving/scoring only appeared after a manual refresh.
+  useEffect(() => {
+    if (!user?.id || !id) return;
+    return subscribeToChallengeEvents(id, user.id);
+    // subscribeToChallengeEvents is a stable Zustand action
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, id]);
+
+  // The list-fetch failed while we have nothing cached yet — without this,
+  // `challenge` stays undefined and `challenges.length` stays 0 forever, so
+  // neither the "not found" branch below nor the real content ever renders;
+  // the screen would be stuck on the skeleton indefinitely with no way out.
+  if (!challenge && challenges.length === 0 && !loadingChallenges && challengesError) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
+        <View className="flex-row items-center px-4 py-3">
+          <Pressable
+            onPress={() => router.back()}
+            className="p-1 mr-2"
+            style={({ pressed }) => pressed && { opacity: 0.6 }}
+          >
+            <ArrowLeft size={20} strokeWidth={2} color={Colors.accent} />
+          </Pressable>
+          <Text className="font-heading text-[22px] tracking-[3px] text-primary flex-1">
+            {t('detail.heading')}
+          </Text>
+          <View className="w-9" />
+        </View>
+        <View className="flex-1 items-center justify-center gap-2.5 px-8">
+          <AlertCircle size={26} strokeWidth={1.6} color={Colors.accent} />
+          <Text className="font-sans text-sm text-[#555] text-center">{t('detail.loadError')}</Text>
+          <Pressable
+            onPress={() => user?.id && loadChallenges(user.id)}
+            className="flex-row items-center gap-1.5 mt-1 py-2 px-4"
+          >
+            <RefreshCw size={12} strokeWidth={2} color={Colors.accent} />
+            <Text className="font-heading text-[11px] tracking-[2px] text-accent">{t('detail.retry')}</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   const handleJoin = async () => {
     if (!user?.id || !id) return;
@@ -251,7 +300,23 @@ export default function ChallengeDetailScreen() {
           </View>
         )}
 
-        {!isLoadingBoard && entries.length === 0 && (
+        {!isLoadingBoard && entries.length === 0 && boardError && (
+          <View className="items-center bg-surface rounded-2xl py-10 gap-1.5 mb-4">
+            <AlertCircle size={28} strokeWidth={1.4} color={Colors.accent} />
+            <Text className="font-heading text-base tracking-[2px] text-white">
+              {t('detail.leaderboardError')}
+            </Text>
+            <Pressable
+              onPress={() => user?.id && id && loadLeaderboard(id, user.id)}
+              className="flex-row items-center gap-1.5 mt-1 py-2 px-4"
+            >
+              <RefreshCw size={12} strokeWidth={2} color={Colors.accent} />
+              <Text className="font-heading text-[11px] tracking-[2px] text-accent">{t('detail.retry')}</Text>
+            </Pressable>
+          </View>
+        )}
+
+        {!isLoadingBoard && entries.length === 0 && !boardError && (
           <View className="items-center bg-surface rounded-2xl py-10 gap-1.5 mb-4">
             <Trophy size={28} strokeWidth={1.4} color="#333" />
             <Text className="font-heading text-base tracking-[2px] text-white">

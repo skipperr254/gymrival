@@ -19,6 +19,13 @@
   "yourPr": "رقمك القياسي",
   "feedEmptyTitle": "لا يوجد نشاط بعد",
   "feedEmptySubtitle": "أضف أصدقاء وابدأ بتسجيل أرقامك القياسية لتنشيط الخلاصة.",
+  "retry": "إعادة المحاولة",
+  "videoLoadError": "تعذّر تحميل الفيديو",
+  "loadErrorFriends": "تعذّر تحميل أصدقائك",
+  "loadErrorRequests": "تعذّر تحميل الطلبات",
+  "loadErrorSearch": "فشل البحث",
+  "loadErrorMessages": "تعذّر تحميل رسائلك",
+  "loadErrorFeed": "تعذّر تحميل الخلاصة",
   "allCaughtUp": "لقد اطّلعت على كل شيء",
   "friendsSubTabs": {
     "friends": "الأصدقاء",
@@ -54,6 +61,8 @@
   "chat": {
     "cantOpen": "تعذّر فتح الدردشة",
     "errorSub": "حدث خطأ ما. حاول مرة أخرى لاحقاً.",
+    "loadError": "تعذّر تحميل الرسائل",
+    "retry": "إعادة المحاولة",
     "online": "متصل",
     "offline": "غير متصل",
     "startOfConversation": "بداية المحادثة",

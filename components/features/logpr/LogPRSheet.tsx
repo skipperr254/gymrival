@@ -35,6 +35,12 @@ interface VideoAsset {
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SHEET_HEIGHT = SCREEN_HEIGHT * 0.9;
 
+// personal_records.value is NUMERIC(8,2) — a value at or beyond this silently
+// fails the save (surfaced now via saveError, but better to catch it before
+// the request). Comfortably below the column's real ~999999.99 ceiling; no
+// legitimate kg/reps/sec entry needs six digits.
+const MAX_PR_VALUE = 99999;
+
 interface Props {
   visible: boolean;
   onClose: () => void;
@@ -53,6 +59,7 @@ export function LogPRSheet({ visible, onClose }: Props) {
   const [prValue, setPrValue] = useState('');
   const [prMap, setPrMap] = useState<Record<string, number>>({});
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [savedValue, setSavedValue] = useState(0);
 
   // Video upload state
@@ -64,10 +71,21 @@ export function LogPRSheet({ visible, onClose }: Props) {
   const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
   const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const mountedRef = useRef(true);
+  // Bumped every time the sheet opens for a new PR. LogPRSheet is mounted
+  // once, persistently, at the tabs-layout level (it only toggles `visible`)
+  // — a video upload kicked off by handleSave() keeps running after the
+  // sheet auto-closes, and if the user reopens it for a second PR before
+  // that upload settles, its completion callback must not overwrite the new
+  // session's saving/video-upload UI state with the previous PR's result.
+  const sessionRef = useRef(0);
 
   const selectedEx = exercises.find(e => e.key === selectedExKey);
-  const numValue = parseInt(prValue, 10);
-  const isValidValue = !!prValue && !isNaN(numValue) && numValue > 0;
+  // parseFloat (not parseInt) — half-plate PR increments (e.g. 82.5kg) are
+  // extremely common in barbell training; truncating them would silently
+  // misrecord the user's actual result.
+  const numValue = parseFloat(prValue);
+  const isTooLarge = !isNaN(numValue) && numValue > MAX_PR_VALUE;
+  const isValidValue = !!prValue && !isNaN(numValue) && numValue > 0 && !isTooLarge;
   const currentPR = selectedExKey != null ? (prMap[selectedExKey] ?? null) : null;
   const isBelowCurrent = isValidValue && currentPR !== null && numValue <= currentPR;
   const canProceed = !!selectedExKey && isValidValue;
@@ -111,10 +129,12 @@ export function LogPRSheet({ visible, onClose }: Props) {
       clearTimeout(closeTimer.current);
       return;
     }
+    sessionRef.current += 1;
     setStep(1);
     setSelectedExKey(null);
     setPrValue('');
     setSaving(false);
+    setSaveError(null);
     setVideoAsset(null);
     setVideoUploading(false);
     setVideoUploadDone(false);
@@ -155,10 +175,20 @@ export function LogPRSheet({ visible, onClose }: Props) {
 
   const handleSave = useCallback(async () => {
     if (!user?.id || !selectedExKey || !selectedEx || !isValidValue) return;
+    const mySession = sessionRef.current;
     setSaving(true);
+    setSaveError(null);
     const { data: prData, error } = await logPersonalRecord(user.id, selectedExKey, numValue, selectedEx.unit);
+
+    // The sheet was closed and reopened for a different PR while this was in
+    // flight — don't let a stale response touch the new session's state.
+    if (sessionRef.current !== mySession) return;
+
     setSaving(false);
-    if (error || !prData) return;
+    if (error || !prData) {
+      setSaveError(error ?? t('saveError'));
+      return;
+    }
 
     setSavedValue(numValue);
     setStep(3);
@@ -174,7 +204,7 @@ export function LogPRSheet({ visible, onClose }: Props) {
       const uid = user.id;
       const pid = prData.id;
       const asset = videoAsset;
-      if (mountedRef.current) setVideoUploading(true);
+      if (mountedRef.current && sessionRef.current === mySession) setVideoUploading(true);
 
       const { error: uploadError } = await uploadPRVideo(
         uid,
@@ -187,7 +217,11 @@ export function LogPRSheet({ visible, onClose }: Props) {
         asset.height,
       );
 
-      if (mountedRef.current) {
+      // Same guard: the upload itself always completes and correctly tags
+      // `pid` regardless (that part can't cross-contaminate), but the UI
+      // feedback (spinner/"saved"/"failed") must only apply to whichever
+      // session is currently on screen.
+      if (mountedRef.current && sessionRef.current === mySession) {
         setVideoUploading(false);
         if (uploadError) {
           setVideoUploadFailed(true);
@@ -196,7 +230,7 @@ export function LogPRSheet({ visible, onClose }: Props) {
         }
       }
     }
-  }, [user?.id, selectedExKey, selectedEx, isValidValue, numValue, videoAsset, loadRivals, loadBestPRs, loadPRHistory, loadProfile]);
+  }, [user?.id, selectedExKey, selectedEx, isValidValue, numValue, videoAsset, loadRivals, loadBestPRs, loadPRHistory, loadProfile, t]);
 
   // Drag-to-dismiss on the handle
   const panResponder = useRef(
@@ -302,6 +336,7 @@ export function LogPRSheet({ visible, onClose }: Props) {
                   onChangePR={setPrValue}
                   currentPR={currentPR}
                   isBelowCurrent={isBelowCurrent}
+                  isTooLarge={isTooLarge}
                   selectedEx={selectedEx}
                   canProceed={canProceed}
                   onNext={() => setStep(2)}
@@ -314,6 +349,7 @@ export function LogPRSheet({ visible, onClose }: Props) {
                   prValue={prValue}
                   currentPR={currentPR}
                   saving={saving}
+                  saveError={saveError}
                   videoAsset={videoAsset}
                   onVideoSelected={setVideoAsset}
                   onVideoRemoved={() => setVideoAsset(null)}

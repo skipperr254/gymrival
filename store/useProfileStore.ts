@@ -13,6 +13,11 @@ interface ProfileState {
   prCount: number;
   prHistory: PRHistoryGroup[];
   loading: boolean;
+  /** Own flag for loadPRHistory — it previously had none, so pr-history.tsx's
+   * loading check (bound to the shared `loading`, only ever set by
+   * loadProfile) was already false by the time this screen opened, and it
+   * flashed the "No PRs yet" empty state before the real list arrived. */
+  prHistoryLoading: boolean;
   saving: boolean;
   error: string | null;
 
@@ -20,7 +25,7 @@ interface ProfileState {
   loadBestPRs: (userId: string) => Promise<void>;
   loadPRHistory: (userId: string) => Promise<void>;
   setProStatus: (userId: string, isPro: boolean) => Promise<void>;
-  updateProfile: (userId: string, data: ProfileUpdate) => Promise<{ error: string | null }>;
+  updateProfile: (userId: string, data: ProfileUpdate) => Promise<{ error: string | null; code: string | null }>;
   reset: () => void;
 }
 
@@ -30,6 +35,7 @@ export const useProfileStore = create<ProfileState>((set) => ({
   prCount: 0,
   prHistory: [],
   loading: false,
+  prHistoryLoading: false,
   saving: false,
   error: null,
 
@@ -45,8 +51,9 @@ export const useProfileStore = create<ProfileState>((set) => ({
   },
 
   loadPRHistory: async (userId) => {
+    set({ prHistoryLoading: true });
     const { data } = await fetchPRHistory(userId);
-    set({ prHistory: data });
+    set({ prHistory: data, prHistoryLoading: false });
   },
 
   setProStatus: async (userId, isPro) => {
@@ -60,7 +67,7 @@ export const useProfileStore = create<ProfileState>((set) => ({
 
   updateProfile: async (userId, data) => {
     set({ saving: true });
-    const { error } = await updateProfileApi(userId, data);
+    const { error, code } = await updateProfileApi(userId, data);
     if (!error) {
       set((state) => ({
         profile: state.profile ? { ...state.profile, ...data } : null,
@@ -69,8 +76,18 @@ export const useProfileStore = create<ProfileState>((set) => ({
     } else {
       set({ saving: false });
     }
-    return { error };
+    return { error, code };
   },
 
-  reset: () => set({ profile: null, bestPRs: [], prCount: 0, prHistory: [], loading: false, saving: false, error: null }),
+  reset: () =>
+    set({
+      profile: null,
+      bestPRs: [],
+      prCount: 0,
+      prHistory: [],
+      loading: false,
+      prHistoryLoading: false,
+      saving: false,
+      error: null,
+    }),
 }));

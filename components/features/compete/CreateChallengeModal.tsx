@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { View, Text, ScrollView, Pressable, TextInput, Modal, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Search, ChevronRight, Zap, AlertCircle, X } from 'lucide-react-native';
@@ -46,6 +46,11 @@ export function CreateChallengeModal({
   const [exercise, setExercise] = useState(exercises[0]?.key ?? 'bench');
   const [metric,   setMetric]   = useState<ChallengeMetric>('highest_pr');
   const [duration, setDuration] = useState(7);
+  // Tracks whether `exercise` is still the auto-picked default vs. something
+  // the user explicitly tapped, so a late-arriving exercise list (still
+  // loading when the modal opened) can adopt the real first exercise
+  // without ever overwriting an in-progress selection.
+  const exerciseAutoPicked = useRef(true);
 
   useEffect(() => {
     if (!visible) return;
@@ -54,6 +59,20 @@ export function CreateChallengeModal({
     setExercise(exercises[0]?.key ?? 'bench');
     setMetric('highest_pr');
     setDuration(7);
+    exerciseAutoPicked.current = true;
+    // Deliberately only `visible` — including `exercises` here meant the
+    // exercises list finishing its initial load *while the modal was
+    // already open* re-ran this whole reset, silently wiping out a friend/
+    // exercise/metric/duration the user had already picked (see the effect
+    // below for how the exercise default is instead kept in sync safely).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
+
+  // Adopts the real first exercise once the list finishes loading, but only
+  // while the user hasn't picked one themselves yet.
+  useEffect(() => {
+    if (!visible || exercises.length === 0 || !exerciseAutoPicked.current) return;
+    setExercise(exercises[0].key);
   }, [visible, exercises]);
 
   const filtered = query.trim()
@@ -174,7 +193,10 @@ export function CreateChallengeModal({
                 {exercises.map(ex => (
                   <Pressable
                     key={ex.key}
-                    onPress={() => setExercise(ex.key)}
+                    onPress={() => {
+                      exerciseAutoPicked.current = false;
+                      setExercise(ex.key);
+                    }}
                     className={`py-2 px-3 rounded-[10px] border-[1.5px] items-center justify-center ${
                       exercise === ex.key
                         ? 'border-accent bg-[rgba(230,48,48,0.1)]'

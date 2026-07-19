@@ -14,13 +14,14 @@ interface Step1Props {
   onChangePR: (v: string) => void;
   currentPR: number | null;
   isBelowCurrent: boolean;
+  isTooLarge: boolean;
   selectedEx: ExerciseType | undefined;
   canProceed: boolean;
   onNext: () => void;
   prMap: Record<string, number>;
 }
 
-export function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangePR, currentPR, isBelowCurrent, selectedEx, canProceed, onNext, prMap }: Step1Props) {
+export function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangePR, currentPR, isBelowCurrent, isTooLarge, selectedEx, canProceed, onNext, prMap }: Step1Props) {
   const { t } = useTranslation('logpr');
   return (
     <>
@@ -94,6 +95,14 @@ export function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangeP
               <AlertTriangle size={12} strokeWidth={2} color={Colors.warning} />
               <Text className="font-sans text-[11px] text-warning">
                 {t('notHigherThanCurrent', { value: currentPR, unit: selectedEx.unit })}
+              </Text>
+            </View>
+          )}
+          {isTooLarge && (
+            <View className="flex-row items-center gap-1.5 mt-2 px-1">
+              <AlertTriangle size={12} strokeWidth={2} color={Colors.warning} />
+              <Text className="font-sans text-[11px] text-warning">
+                {t('valueTooLarge')}
               </Text>
             </View>
           )}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Pressable, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -17,22 +17,47 @@ export default function TrainScreen() {
   const { t } = useTranslation('train');
   const user = useAuthStore((s) => s.user);
 
-  const { sessions, loading, addSession, removeSession, beginWorkout, finishWorkout, cancelWorkout } =
-    useTrainStore();
+  const {
+    sessions,
+    loading,
+    activeSessionId,
+    addSession,
+    removeSession,
+    beginWorkout,
+    finishWorkout,
+    cancelWorkout,
+    restoreActiveWorkout,
+  } = useTrainStore();
 
   const loadSessions = useTrainStore((s) => s.loadSessions);
 
   const [activeTab, setActiveTab] = useState<0 | 1 | 2>(0);
   const [selected, setSelected] = useState<TrainingSessionWithExercises | null>(null);
   const [workoutStarted, setWorkoutStarted] = useState(false);
+  const [startingWorkout, setStartingWorkout] = useState(false);
   const [completedSets, setCompletedSets] = useState<Record<string, boolean>>({});
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Load sessions on mount
+  // Load sessions on mount, and rehydrate any workout that was in progress
+  // when the app was last killed (see useTrainStore.restoreActiveWorkout).
   useEffect(() => {
-    if (user?.id) loadSessions(user.id);
+    if (!user?.id) return;
+    loadSessions(user.id);
+    restoreActiveWorkout();
   }, [user?.id]);
+
+  // Once both the session list and a restored in-progress workout are
+  // available, jump straight to that session's detail view instead of
+  // silently leaving the workout_log row active with no UI reflecting it.
+  useEffect(() => {
+    if (selected || !activeSessionId || sessions.length === 0) return;
+    const match = sessions.find((s) => s.id === activeSessionId);
+    if (match) {
+      setSelected(match);
+      setWorkoutStarted(true);
+    }
+  }, [activeSessionId, sessions, selected]);
 
   const totalSets = selected?.exercises.reduce((a, e) => a + e.sets, 0) ?? 0;
   const doneSets = Object.values(completedSets).filter(Boolean).length;
@@ -49,7 +74,7 @@ export default function TrainScreen() {
 
     const dayOfWeek = DAY_NAME_TO_INDEX[workout.day] ?? null;
 
-    await addSession(user.id, {
+    const newId = await addSession(user.id, {
       name: workout.name,
       day_of_week: dayOfWeek as DayOfWeek | null,
       exercises: workout.exercises.map((ex) => ({
@@ -62,12 +87,22 @@ export default function TrainScreen() {
     });
 
     setSaving(false);
-    setShowModal(false);
+    // Only close the sheet on success — otherwise a failed insert (dropped
+    // network, RLS/auth hiccup) looked identical to a successful save, with
+    // the workout silently never appearing in the schedule.
+    if (newId) {
+      setShowModal(false);
+    } else {
+      Alert.alert(t('saveErrorTitle'), t('saveScheduleError'));
+    }
   };
 
   const handleDeleteSession = async (id: string) => {
     if (selected?.id === id) goBack();
-    await removeSession(id);
+    const { error } = await removeSession(id);
+    // Previously this just quietly did nothing on failure — the workout
+    // stayed in the list with no indication the delete didn't take.
+    if (error) Alert.alert(t('saveErrorTitle'), t('deleteSessionError'));
   };
 
   const openDetail = (s: TrainingSessionWithExercises) => {
@@ -84,13 +119,23 @@ export default function TrainScreen() {
   };
 
   const handleStartWorkout = async () => {
-    if (!user?.id || !selected) return;
+    if (!user?.id || !selected || startingWorkout) return;
+    setStartingWorkout(true);
     await beginWorkout(user.id, selected);
+    setStartingWorkout(false);
     setWorkoutStarted(true);
   };
 
   const handleFinishWorkout = async () => {
-    await finishWorkout(doneSets);
+    const { error } = await finishWorkout(doneSets);
+    // Only navigate away on success — otherwise a failed completion write
+    // left the workout_log row permanently is_complete=false (no XP ever
+    // awarded) while the user was already shown the "WORKOUT DONE" screen
+    // and sent back to the schedule as if nothing was wrong.
+    if (error) {
+      Alert.alert(t('saveErrorTitle'), t('finishWorkoutError'));
+      return;
+    }
     goBack();
   };
 
@@ -160,6 +205,7 @@ export default function TrainScreen() {
             <WorkoutDetail
               session={selected}
               workoutStarted={workoutStarted}
+              starting={startingWorkout}
               completedSets={completedSets}
               totalSets={totalSets}
               doneSets={doneSets}

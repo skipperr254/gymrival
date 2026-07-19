@@ -8,12 +8,14 @@ type ProfileUpdate = Partial<
 export async function updateProfile(
   userId: string,
   data: ProfileUpdate
-): Promise<{ error: string | null }> {
+): Promise<{ error: string | null; code: string | null }> {
   const { error } = await supabase
     .from("profiles")
     .update(data)
     .eq("id", userId);
-  return { error: error?.message ?? null };
+  // `code` (e.g. Postgres '23505' unique-violation) lets callers map known
+  // failures to friendly copy instead of displaying the raw DB error text.
+  return { error: error?.message ?? null, code: error?.code ?? null };
 }
 
 // Excludes `email` and `expo_push_token` — the database grant no longer
