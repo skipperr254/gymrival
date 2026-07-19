@@ -139,11 +139,28 @@ function composeBody(
   return interpolate(TEMPLATES[locale][type], { name: actorName, exercise, value });
 }
 
+// Timing-safe string comparison — a plain `!==` short-circuits on the first
+// differing byte, which theoretically leaks how many leading characters of
+// PUSH_WEBHOOK_SECRET a guess got right via response-time measurement.
+function timingSafeEqual(a: string, b: string): boolean {
+  const enc = new TextEncoder();
+  const aBytes = enc.encode(a);
+  const bBytes = enc.encode(b);
+  // Compare against a fixed-length buffer so the loop always runs the same
+  // number of iterations regardless of which string (if either) is shorter.
+  const len = Math.max(aBytes.length, bBytes.length, 32);
+  let diff = aBytes.length ^ bBytes.length;
+  for (let i = 0; i < len; i++) {
+    diff |= (aBytes[i] ?? 0) ^ (bBytes[i] ?? 0);
+  }
+  return diff === 0;
+}
+
 Deno.serve(async (req: Request) => {
   try {
     const expectedSecret = Deno.env.get("PUSH_WEBHOOK_SECRET");
     const providedSecret = req.headers.get("x-webhook-secret");
-    if (!expectedSecret || providedSecret !== expectedSecret) {
+    if (!expectedSecret || !providedSecret || !timingSafeEqual(providedSecret, expectedSecret)) {
       return new Response(JSON.stringify({ error: "unauthorized" }), {
         status: 401,
         headers: { "Content-Type": "application/json" },

@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { clearPushToken } from "@/lib/api";
 import type { Session, User } from "@supabase/supabase-js";
 import { create } from "zustand";
 
@@ -113,6 +114,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   setPendingProfileSetup: (value) => set({ pendingProfileSetup: value }),
 
   signOut: async () => {
+    const userId = get().user?.id;
+    if (userId) {
+      // Best-effort — don't block sign-out on this. Unregister the device's
+      // push token so a shared/reused device stops receiving this account's
+      // notifications after a different user signs in.
+      await clearPushToken(userId).catch(() => {});
+    }
     await supabase.auth.signOut();
   },
 }));

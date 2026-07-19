@@ -16,12 +16,19 @@ export async function updateProfile(
   return { error: error?.message ?? null };
 }
 
+// Excludes `email` and `expo_push_token` — the database grant no longer
+// allows selecting either column (see migration 032). The signed-in user's
+// own email comes from the Supabase Auth session (`user.email`), never from
+// `profiles.email`; nothing in the UI needs to display a push token.
+const PROFILE_SELECT =
+  "id, avatar_url, username, full_name, gym, weight_kg, height_cm, goal, bio, quote, xp, level, is_pro, streak, friends_count, role, language, country_code, created_at, updated_at";
+
 export async function fetchProfile(
   userId: string
 ): Promise<{ data: Profile | null; error: string | null }> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("*")
+    .select(PROFILE_SELECT)
     .eq("id", userId)
     .single();
   return { data: data as Profile | null, error: error?.message ?? null };
@@ -69,6 +76,22 @@ export async function savePushToken(
   const { error } = await supabase
     .from('profiles')
     .update({ expo_push_token: token })
+    .eq('id', userId);
+  return { error: error?.message ?? null };
+}
+
+/**
+ * Unregister the device's push token on sign-out. Expo push tokens are
+ * device-scoped, not session-scoped — without this, a shared/reused device
+ * keeps receiving the signed-out account's push notifications (message
+ * previews, PR likes, etc.) after a different user signs in on it.
+ */
+export async function clearPushToken(
+  userId: string
+): Promise<{ error: string | null }> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ expo_push_token: null })
     .eq('id', userId);
   return { error: error?.message ?? null };
 }
