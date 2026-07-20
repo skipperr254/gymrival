@@ -49,9 +49,16 @@ interface Props {
 export function LogPRSheet({ visible, onClose }: Props) {
   const { t } = useTranslation('logpr');
   const insets = useSafeAreaInsets();
-  const { user } = useAuthStore();
-  const { exercises, loadExercises, loadRivals } = useCompeteStore();
-  const { loadBestPRs, loadProfile, loadPRHistory } = useProfileStore();
+  // Per-field selectors: this sheet is mounted permanently at the tabs-layout
+  // level, so a whole-store subscription re-rendered it (even while closed)
+  // on every compete/profile store change anywhere in the app.
+  const user = useAuthStore((s) => s.user);
+  const exercises = useCompeteStore((s) => s.exercises);
+  const loadExercises = useCompeteStore((s) => s.loadExercises);
+  const loadRivals = useCompeteStore((s) => s.loadRivals);
+  const loadBestPRs = useProfileStore((s) => s.loadBestPRs);
+  const loadProfile = useProfileStore((s) => s.loadProfile);
+  const loadPRHistory = useProfileStore((s) => s.loadPRHistory);
 
   const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);

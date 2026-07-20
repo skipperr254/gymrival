@@ -18,6 +18,7 @@ import { Routes } from '@/constants/routes';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
 import { formatDate, formatRelativeTime } from '@/lib/i18n/format';
+import { rtlIconFlip } from '@/lib/i18n/rtl';
 import type { AppNotification, NotificationType } from '@/types/notification';
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
@@ -225,7 +226,7 @@ export default function NotificationsScreen() {
           style={({ pressed }) => pressed && { opacity: 0.5 }}
           onPress={() => router.back()}
         >
-          <Ionicons name="chevron-back" size={22} color={Colors.primary} />
+          <Ionicons name="chevron-back" size={22} color={Colors.primary} style={rtlIconFlip} />
         </Pressable>
 
         <View className="flex-1 flex-row items-center justify-center gap-2">

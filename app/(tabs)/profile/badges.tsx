@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
+import { rtlIconFlip } from '@/lib/i18n/rtl';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -42,7 +43,7 @@ export default function BadgesScreen() {
           className="p-1 mr-2"
           style={({ pressed }) => pressed && { opacity: 0.5 }}
         >
-          <Ionicons name="arrow-back" size={22} color={Colors.accent} />
+          <Ionicons name="arrow-back" size={22} color={Colors.accent} style={rtlIconFlip} />
         </Pressable>
         <Text className="font-heading text-2xl text-primary tracking-[3px] flex-1">
           {t('badges.title')}

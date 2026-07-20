@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
+import { rtlIconFlip } from '@/lib/i18n/rtl';
 import { CheckInView } from '@/components/features/CheckInView';
 
 export default function CheckinScreen() {
@@ -17,7 +18,7 @@ export default function CheckinScreen() {
           style={({ pressed }) => pressed && { opacity: 0.5 }}
           onPress={() => router.back()}
         >
-          <Ionicons name="chevron-back" size={22} color={Colors.accent} />
+          <Ionicons name="chevron-back" size={22} color={Colors.accent} style={rtlIconFlip} />
         </Pressable>
         <View>
           <Text className="font-heading text-primary tracking-[4px] text-[26px] leading-7">

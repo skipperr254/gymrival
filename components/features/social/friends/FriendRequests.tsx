@@ -13,16 +13,16 @@ import { FriendAvatar } from '../FriendAvatar';
 export function FriendRequests() {
   const { t } = useTranslation('social');
   const userId = useAuthStore((s) => s.user?.id ?? '');
-  const {
-    incomingRequests,
-    outgoingRequests,
-    requestsLoading,
-    requestsError,
-    loadRequests,
-    acceptRequest,
-    declineRequest,
-    cancelRequest,
-  } = useSocialStore();
+  // Per-field selectors — a whole-store subscription re-rendered this list on
+  // every social-store change, including realtime feed like-events.
+  const incomingRequests = useSocialStore((s) => s.incomingRequests);
+  const outgoingRequests = useSocialStore((s) => s.outgoingRequests);
+  const requestsLoading = useSocialStore((s) => s.requestsLoading);
+  const requestsError = useSocialStore((s) => s.requestsError);
+  const loadRequests = useSocialStore((s) => s.loadRequests);
+  const acceptRequest = useSocialStore((s) => s.acceptRequest);
+  const declineRequest = useSocialStore((s) => s.declineRequest);
+  const cancelRequest = useSocialStore((s) => s.cancelRequest);
 
   // Refresh on mount (mounting happens when this sub-tab becomes active)
   useEffect(() => {

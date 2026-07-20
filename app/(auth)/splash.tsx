@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
+import { rtlIconFlip } from '@/lib/i18n/rtl';
 
 export default function SplashScreen() {
   const { t } = useTranslation('auth');
@@ -32,7 +33,7 @@ export default function SplashScreen() {
           <Text className="font-heading text-base text-primary tracking-[2px]">
             {t('splash.getStarted')}
           </Text>
-          <Ionicons name="arrow-forward" size={18} color={Colors.primary} />
+          <Ionicons name="arrow-forward" size={18} color={Colors.primary} style={rtlIconFlip} />
         </Pressable>
 
         <Pressable

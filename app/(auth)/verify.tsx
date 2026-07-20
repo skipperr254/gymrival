@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { Colors } from "@/constants/theme";
 import { Routes } from "@/constants/routes";
+import { rtlIconFlip } from "@/lib/i18n/rtl";
 import { useAuthStore } from "@/store/useAuthStore";
 
 const CODE_LENGTH = 8;
@@ -121,7 +122,7 @@ export default function VerifyScreen() {
         <View className="flex-1 px-5 pt-4 pb-10">
           {/* Back */}
           <Pressable onPress={() => router.back()} hitSlop={12} className="mb-9">
-            <Ionicons name="arrow-back" size={24} color={Colors.primary} />
+            <Ionicons name="arrow-back" size={24} color={Colors.primary} style={rtlIconFlip} />
           </Pressable>
 
           {/* Header */}

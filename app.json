@@ -68,6 +68,7 @@
       "typedRoutes": true
     },
     "extra": {
+      "supportsRTL": true,
       "router": {},
       "eas": {
         "projectId": "84714c52-f850-4b55-87c4-d93c230e89dd"

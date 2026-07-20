@@ -10,18 +10,18 @@ import { LeaderboardAvatar, MEDAL_COLORS } from './LeaderboardAvatar';
 
 export function RivalsContent() {
   const { t } = useTranslation('compete');
-  const { user } = useAuthStore();
-  const {
-    exercises,
-    selectedExercise,
-    rivals,
-    loadingExercises,
-    loadingRivals,
-    error,
-    loadExercises,
-    loadRivals,
-    setSelectedExercise,
-  } = useCompeteStore();
+  const user = useAuthStore((s) => s.user);
+  // Per-field selectors — avoids re-rendering this tab on unrelated compete
+  // store changes (global leaderboard pages, challenge loads, etc.)
+  const exercises = useCompeteStore((s) => s.exercises);
+  const selectedExercise = useCompeteStore((s) => s.selectedExercise);
+  const rivals = useCompeteStore((s) => s.rivals);
+  const loadingExercises = useCompeteStore((s) => s.loadingExercises);
+  const loadingRivals = useCompeteStore((s) => s.loadingRivals);
+  const error = useCompeteStore((s) => s.error);
+  const loadExercises = useCompeteStore((s) => s.loadExercises);
+  const loadRivals = useCompeteStore((s) => s.loadRivals);
+  const setSelectedExercise = useCompeteStore((s) => s.setSelectedExercise);
 
   useEffect(() => {
     if (!user?.id) return;

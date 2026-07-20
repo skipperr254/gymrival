@@ -12,8 +12,14 @@ import { FriendAvatar } from '../FriendAvatar';
 export function FriendsSearch() {
   const { t } = useTranslation('social');
   const userId = useAuthStore((s) => s.user?.id ?? '');
-  const { searchResults, searchLoading, searchError, search, sendRequest, acceptRequest } =
-    useSocialStore();
+  // Per-field selectors — a whole-store subscription re-rendered the search on
+  // every social-store change, including realtime feed like-events.
+  const searchResults = useSocialStore((s) => s.searchResults);
+  const searchLoading = useSocialStore((s) => s.searchLoading);
+  const searchError = useSocialStore((s) => s.searchError);
+  const search = useSocialStore((s) => s.search);
+  const sendRequest = useSocialStore((s) => s.sendRequest);
+  const acceptRequest = useSocialStore((s) => s.acceptRequest);
 
   const [query, setQuery] = useState('');
 

@@ -8,6 +8,7 @@ import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { formatDate } from '@/lib/i18n/format';
+import { rtlIconFlip } from '@/lib/i18n/rtl';
 import type { PRHistoryGroup } from '@/types/pr';
 
 function PRGroup({ group }: { group: PRHistoryGroup }) {
@@ -69,7 +70,7 @@ export default function PRHistoryScreen() {
           className="p-1 mr-2"
           style={({ pressed }) => pressed && { opacity: 0.5 }}
         >
-          <Ionicons name="arrow-back" size={22} color={Colors.accent} />
+          <Ionicons name="arrow-back" size={22} color={Colors.accent} style={rtlIconFlip} />
         </Pressable>
         <Text className="font-heading text-2xl text-primary tracking-[3px] flex-1">
           {t('prHistory.title')}

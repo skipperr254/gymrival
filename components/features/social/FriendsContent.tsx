@@ -10,7 +10,12 @@ type FriendsSubTab = 'list' | 'search' | 'requests';
 export function FriendsContent() {
   const { t } = useTranslation('social');
   const userId = useAuthStore((s) => s.user?.id ?? '');
-  const { incomingRequests, loadFriends, loadRequests, subscribeToFriendEvents } = useSocialStore();
+  // Per-field selectors — a whole-store subscription re-rendered this screen
+  // (and the active sub-tab under it) on every social-store change.
+  const incomingRequests = useSocialStore((s) => s.incomingRequests);
+  const loadFriends = useSocialStore((s) => s.loadFriends);
+  const loadRequests = useSocialStore((s) => s.loadRequests);
+  const subscribeToFriendEvents = useSocialStore((s) => s.subscribeToFriendEvents);
 
   const [subTab, setSubTab] = useState<FriendsSubTab>('list');
 

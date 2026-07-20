@@ -3,7 +3,10 @@
     "language": "Langue",
     "languageAuto": "Suit la langue de l'appareil",
     "languageErrorTitle": "Impossible d'enregistrer la langue",
-    "languageErrorSub": "Ton choix de langue ne s'est pas synchronisé — vérifie ta connexion et réessaie."
+    "languageErrorSub": "Ton choix de langue ne s'est pas synchronisé — vérifie ta connexion et réessaie.",
+    "languageConfirmTitle": "Changer de langue ?",
+    "languageConfirmSub": "L'application va redémarrer pour passer à {{language}}.",
+    "languageConfirmCta": "Changer"
   },
   "actions": {
     "back": "Retour",

@@ -3,7 +3,10 @@
     "language": "Taal",
     "languageAuto": "Volgt apparaattaal",
     "languageErrorTitle": "Kon taal niet opslaan",
-    "languageErrorSub": "Je taalkeuze is niet gesynchroniseerd — controleer je verbinding en probeer het opnieuw."
+    "languageErrorSub": "Je taalkeuze is niet gesynchroniseerd — controleer je verbinding en probeer het opnieuw.",
+    "languageConfirmTitle": "Taal wijzigen?",
+    "languageConfirmSub": "De app wordt opnieuw gestart om over te schakelen naar {{language}}.",
+    "languageConfirmCta": "Wijzigen"
   },
   "actions": {
     "back": "Terug",

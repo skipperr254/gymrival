@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Routes } from '@/constants/routes';
 import { formatDate, formatRelativeTime as formatRelativeTimeIntl } from '@/lib/i18n/format';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useChatStore } from '@/store/useChatStore';
+import { computeIsOnline, useChatStore } from '@/store/useChatStore';
 import { ErrorState } from '@/components/ui';
 import { FriendAvatar } from './FriendAvatar';
 
@@ -23,16 +23,18 @@ function formatConvTime(iso: string | null): string {
 export function MessagesContent() {
   const { t } = useTranslation('social');
   const userId = useAuthStore((s) => s.user?.id ?? '');
-  const {
-    conversations,
-    conversationsLoading,
-    conversationsError,
-    loadConversations,
-    subscribeToInbox,
-    startPresenceHeartbeat,
-    isOnline,
-    unreadCount,
-  } = useChatStore();
+  // Per-field selectors — a whole-store subscription re-rendered the inbox on
+  // every chat-store change (open-thread message traffic, etc.)
+  const conversations = useChatStore((s) => s.conversations);
+  const conversationsLoading = useChatStore((s) => s.conversationsLoading);
+  const conversationsError = useChatStore((s) => s.conversationsError);
+  const loadConversations = useChatStore((s) => s.loadConversations);
+  const subscribeToInbox = useChatStore((s) => s.subscribeToInbox);
+  const startPresenceHeartbeat = useChatStore((s) => s.startPresenceHeartbeat);
+  const unreadCount = useChatStore((s) => s.unreadCount);
+  // Subscribed (not read via getState) so online dots update when presence
+  // refreshes.
+  const presenceMap = useChatStore((s) => s.presenceMap);
 
   useEffect(() => {
     if (!userId) return;
@@ -99,7 +101,7 @@ export function MessagesContent() {
       <View className="mb-6">
         {conversations.map((conv) => {
           const name = conv.other_user.full_name ?? conv.other_user.username ?? t('athlete');
-          const online = isOnline(conv.other_user.id);
+          const online = computeIsOnline(presenceMap[conv.other_user.id] ?? null);
           const isFromMe = conv.last_message_sender_id === userId;
           const hasUnread =
             !isFromMe &&

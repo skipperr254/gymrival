@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
+import { rtlIconFlip } from '@/lib/i18n/rtl';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { CheckInView } from '@/components/features/CheckInView';
 import { ProgressView } from '@/components/features/progress/ProgressView';
@@ -157,7 +158,7 @@ export default function TrainScreen() {
                 style={({ pressed }) => pressed && { opacity: 0.5 }}
                 onPress={goBack}
               >
-                <Ionicons name="chevron-back" size={22} color={Colors.accent} />
+                <Ionicons name="chevron-back" size={22} color={Colors.accent} style={rtlIconFlip} />
               </Pressable>
               <View className="flex-1" />
             </>

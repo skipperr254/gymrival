@@ -27,7 +27,15 @@
       "Bash(git grep *)",
       "Bash(grep -v \"^.*//.*\")",
       "Bash(timeout 60 grep -rn \"expo-image\\\\|from 'react-native'\" --include=\"*.tsx\" app components)",
-      "WebSearch"
+      "WebSearch",
+      "PowerShell(npx expo lint 2>&1)",
+      "WebFetch(domain:docs.expo.dev)",
+      "Bash(node -p \"require\\('./node_modules/@formatjs/intl-relativetimeformat/package.json'\\).version\")",
+      "Bash(node -p \"JSON.stringify\\(require\\('./node_modules/@formatjs/intl-relativetimeformat/package.json'\\).exports, null, 2\\)\")",
+      "Bash(node -p \"require\\('./package.json'\\).dependencies['@formatjs/intl-relativetimeformat']\")",
+      "Bash(node -p \"require\\('./package.json'\\).dependencies['expo']\")",
+      "Bash(node -p \"require\\('./package.json'\\).dependencies['react-native']\")",
+      "Bash(node -e \"console.log\\(require\\('./package.json'\\).dependencies['@formatjs/intl-locale']\\)\")"
     ]
   },
   "enableAllProjectMcpServers": true,

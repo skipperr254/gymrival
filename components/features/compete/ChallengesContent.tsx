@@ -16,28 +16,29 @@ import { CreateChallengeModal } from './CreateChallengeModal';
 
 export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) {
   const { t } = useTranslation('compete');
-  const { user }    = useAuthStore();
-  const {
-    challenges,
-    loadingChallenges,
-    challengesError,
-    leaderboards,
-    pendingInvitations,
-    loadingInvitations,
-    invitationsError,
-    exercises,
-    loadChallenges,
-    loadLeaderboard,
-    joinChallenge,
-    leaveChallenge,
-    loadPendingInvitations,
-    respondToInvitation,
-    createFriendChallenge,
-    loadExercises,
-    subscribeToInvitationEvents,
-  } = useCompeteStore();
+  const user = useAuthStore((s) => s.user);
+  // Per-field selectors — avoids re-rendering this tab on unrelated compete
+  // store changes (rivals loads, global leaderboard pages, etc.)
+  const challenges = useCompeteStore((s) => s.challenges);
+  const loadingChallenges = useCompeteStore((s) => s.loadingChallenges);
+  const challengesError = useCompeteStore((s) => s.challengesError);
+  const leaderboards = useCompeteStore((s) => s.leaderboards);
+  const pendingInvitations = useCompeteStore((s) => s.pendingInvitations);
+  const loadingInvitations = useCompeteStore((s) => s.loadingInvitations);
+  const invitationsError = useCompeteStore((s) => s.invitationsError);
+  const exercises = useCompeteStore((s) => s.exercises);
+  const loadChallenges = useCompeteStore((s) => s.loadChallenges);
+  const loadLeaderboard = useCompeteStore((s) => s.loadLeaderboard);
+  const joinChallenge = useCompeteStore((s) => s.joinChallenge);
+  const leaveChallenge = useCompeteStore((s) => s.leaveChallenge);
+  const loadPendingInvitations = useCompeteStore((s) => s.loadPendingInvitations);
+  const respondToInvitation = useCompeteStore((s) => s.respondToInvitation);
+  const createFriendChallenge = useCompeteStore((s) => s.createFriendChallenge);
+  const loadExercises = useCompeteStore((s) => s.loadExercises);
+  const subscribeToInvitationEvents = useCompeteStore((s) => s.subscribeToInvitationEvents);
 
-  const { friends, loadFriends } = useSocialStore();
+  const friends = useSocialStore((s) => s.friends);
+  const loadFriends = useSocialStore((s) => s.loadFriends);
 
   const [joiningId,    setJoiningId]    = useState<string | null>(null);
   const [invLoading,   setInvLoading]   = useState<string | null>(null);

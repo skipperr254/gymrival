@@ -14,8 +14,14 @@ import { FriendAvatar } from '../FriendAvatar';
 export function FriendsList({ onFindAthletes }: { onFindAthletes: () => void }) {
   const { t } = useTranslation('social');
   const userId = useAuthStore((s) => s.user?.id ?? '');
-  const { friends, incomingRequests, friendsLoading, friendsError, loadFriends, unfriend } =
-    useSocialStore();
+  // Per-field selectors — a whole-store subscription re-rendered this list on
+  // every social-store change, including realtime feed like-events.
+  const friends = useSocialStore((s) => s.friends);
+  const incomingRequests = useSocialStore((s) => s.incomingRequests);
+  const friendsLoading = useSocialStore((s) => s.friendsLoading);
+  const friendsError = useSocialStore((s) => s.friendsError);
+  const loadFriends = useSocialStore((s) => s.loadFriends);
+  const unfriend = useSocialStore((s) => s.unfriend);
 
   // Refresh on mount (mounting happens when this sub-tab becomes active)
   useEffect(() => {

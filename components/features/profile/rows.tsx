@@ -1,5 +1,6 @@
 import { View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { rtlIconFlip } from '@/lib/i18n/rtl';
 import type { IoniconName } from './helpers';
 
 export function DetailRow({
@@ -66,7 +67,7 @@ export function SettingsRow({
         <Text className="font-sans-medium text-sm text-primary">{label}</Text>
         <Text className="font-sans text-[11px] text-[#606060] mt-px">{sub}</Text>
       </View>
-      <Ionicons name="chevron-forward" size={18} color='#404040' />
+      <Ionicons name="chevron-forward" size={18} color='#404040' style={rtlIconFlip} />
     </Pressable>
   );
 }

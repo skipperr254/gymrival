@@ -2,10 +2,14 @@ import { useState } from "react";
 import { View, Text, Pressable, StyleSheet, ActivityIndicator, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { reloadAppAsync } from "expo";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
 import { Colors } from "@/constants/theme";
 import { pickerLanguages, type LanguageCode } from "@/lib/i18n/languages";
+import { LANGUAGE_STORAGE_KEY } from "@/lib/i18n/languageDetector";
+import { applyLayoutDirection, rtlIconFlip } from "@/lib/i18n/rtl";
 import { useAuthStore } from "@/store/useAuthStore";
 import { updateLanguage } from "@/lib/api";
 
@@ -13,29 +17,49 @@ export default function LanguageScreen() {
   const { t, i18n } = useTranslation("common");
   const { user } = useAuthStore();
   const languages = pickerLanguages();
-  // Re-entrancy guard — without it, tapping two different languages in
-  // quick succession could let two updateLanguage() calls resolve out of
-  // order, leaving the DB on a language different from the one displayed.
+  // Covers the persist-then-reload window: guards double-taps and shows the
+  // full-screen loading overlay until reloadAppAsync tears the JS tree down.
   const [switching, setSwitching] = useState(false);
 
-  const handleSelect = async (code: LanguageCode) => {
-    if (code === i18n.language || switching) return;
-    const previousLanguage = i18n.language;
+  // Instead of switching i18n in place (which re-renders every mounted
+  // screen at once and still leaves locale-captured state stale), persist
+  // the choice and reload the JS bundle — the language detector picks it up
+  // at boot and the whole app starts in the new language. Persisting comes
+  // first: nothing has changed yet if the write fails, so there is no
+  // in-place switch to revert.
+  const applyLanguage = async (code: LanguageCode) => {
     setSwitching(true);
-    await i18n.changeLanguage(code);
     if (user?.id) {
       const { error } = await updateLanguage(user.id, code);
       if (error) {
-        // profiles.language is the documented cross-device source of truth
-        // once explicitly set — leaving the UI on the new language while the
-        // write failed meant this device silently drifted from what every
-        // other device (and the next cold start's sync) would show. Revert
-        // instead of pretending the switch succeeded.
-        await i18n.changeLanguage(previousLanguage);
+        setSwitching(false);
         Alert.alert(t("settings.languageErrorTitle"), t("settings.languageErrorSub"));
+        return;
       }
     }
-    setSwitching(false);
+    try {
+      await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, code);
+    } catch {
+      // Best-effort: for signed-in users the profiles.language sync in the
+      // root layout still applies the saved choice after the reload.
+    }
+    // Flip the native layout direction when crossing the LTR/RTL boundary —
+    // it only takes effect on the reload we're about to do anyway.
+    applyLayoutDirection(code);
+    await reloadAppAsync("language-changed");
+  };
+
+  const handleSelect = (code: LanguageCode) => {
+    if (code === i18n.language || switching) return;
+    const target = languages.find((l) => l.code === code);
+    Alert.alert(
+      t("settings.languageConfirmTitle"),
+      t("settings.languageConfirmSub", { language: target?.nativeName ?? code }),
+      [
+        { text: t("actions.cancel"), style: "cancel" },
+        { text: t("settings.languageConfirmCta"), onPress: () => applyLanguage(code) },
+      ]
+    );
   };
 
   return (
@@ -52,9 +76,9 @@ export default function LanguageScreen() {
           onPress={() => router.back()}
           hitSlop={8}
         >
-          <Ionicons name="chevron-back" size={22} color={Colors.primary} />
+          <Ionicons name="chevron-back" size={22} color={Colors.primary} style={rtlIconFlip} />
         </Pressable>
-        <Text className="flex-1 text-center font-heading text-xl text-primary tracking-[2px] -ml-9">
+        <Text className="flex-1 text-center font-heading text-xl text-primary tracking-[2px]">
           {t("settings.language").toUpperCase()}
         </Text>
         <View className="w-9" />
@@ -79,17 +103,19 @@ export default function LanguageScreen() {
               <Text className="font-sans-medium text-base text-primary">
                 {lang.nativeName}
               </Text>
-              {isActive && switching ? (
-                <ActivityIndicator size="small" color={Colors.accent} />
-              ) : (
-                isActive && (
-                  <Ionicons name="checkmark-circle" size={22} color={Colors.accent} />
-                )
+              {isActive && (
+                <Ionicons name="checkmark-circle" size={22} color={Colors.accent} />
               )}
             </Pressable>
           );
         })}
       </View>
+
+      {switching && (
+        <View className="absolute inset-0 z-10 items-center justify-center bg-[rgba(0,0,0,0.6)]">
+          <ActivityIndicator size="large" color={Colors.accent} />
+        </View>
+      )}
     </SafeAreaView>
   );
 }

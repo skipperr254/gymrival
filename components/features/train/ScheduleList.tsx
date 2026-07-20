@@ -2,6 +2,7 @@ import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
+import { rtlIconFlip } from '@/lib/i18n/rtl';
 import type { TrainingSessionWithExercises } from '@/types/train';
 import { DAYS_SHORT } from './constants';
 
@@ -109,7 +110,7 @@ export function ScheduleList({ sessions, loading, onOpenDetail, onDelete, onNew 
           >
             <Ionicons name="trash-outline" size={16} color="#ff6b6b" />
           </Pressable>
-          <Ionicons name="chevron-forward" size={18} color={Colors.muted} />
+          <Ionicons name="chevron-forward" size={18} color={Colors.muted} style={rtlIconFlip} />
         </Pressable>
       ))}
 

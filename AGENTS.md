@@ -579,9 +579,19 @@ The edge function embeds its own copy of the notification templates and exercise
 
 The webhook call requires a one-time manual setup (a shared secret in Supabase Vault + a matching edge function secret) documented at the top of migration `028`; until that's done, the trigger silently no-ops rather than failing.
 
-### Arabic / RTL (deferred)
+### Language switching (restart-based)
 
-Arabic has complete, real translations across every namespace and is selectable in the language picker today — but the app's layout is not RTL-aware (no `I18nManager.forceRTL`, no mirrored `flex-row`/icons/text-alignment). Selecting Arabic renders correct Arabic text in a left-to-right layout. Full RTL layout support is a deliberately separate, larger follow-up piece (it touches nearly every screen's layout, not just text) — do not attempt to bolt it on piecemeal; treat it as its own project.
+Changing language in Settings does **not** call `i18n.changeLanguage` on the live tree. The flow (`profile/language.tsx`): confirm dialog → persist to `profiles.language` and the detector's AsyncStorage key → `applyLayoutDirection()` → `reloadAppAsync()` (core `expo` package — works in dev and release). The app reboots behind the splash into the new language. This avoids the whole-app re-render burst of an in-place switch, guarantees locale-captured state can't go stale, and is what makes RTL switching possible at all. Don't reintroduce an in-place `changeLanguage` settings flow.
+
+### Arabic / RTL (implemented)
+
+The app is RTL-aware. The pieces, all in place:
+
+- `extra.supportsRTL: true` in `app.json` (+ the `expo-localization` plugin).
+- `lib/i18n/rtl.ts` — `applyLayoutDirection(lang)` aligns `I18nManager` (`allowRTL`/`forceRTL`) with the language and returns whether a reload is needed; called from the language-switch flow, at boot after `initI18n` (fresh install on an Arabic-locale device), and after the cross-device `profiles.language` sync in `app/_layout.tsx`.
+- RN mirrors flex layout, margins/paddings, absolute left/right, and text alignment automatically when `I18nManager.isRTL` is set — do not write `flex-row-reverse` or per-language layout branches.
+- What RN does **not** mirror: directional icon glyphs. Every chevron/arrow Ionicon carries `style={rtlIconFlip}` (from `lib/i18n/rtl.ts`) — apply it to any new directional icon you add; omit it for non-directional icons.
+- Caveats: `forceRTL` may not stick in Expo Go (dev-client/EAS builds honor it); Arabic renders Eastern Arabic numerals via `Intl` — that is correct localization, not a bug.
 
 ### Explicitly out of scope
 

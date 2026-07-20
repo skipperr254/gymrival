@@ -1,5 +1,13 @@
-import { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, TextInput, ActivityIndicator } from 'react-native';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import {
+  View,
+  Text,
+  Pressable,
+  TextInput,
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Dumbbell, Activity, Target, Trophy, Search, RefreshCw, AlertCircle } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
@@ -48,8 +56,13 @@ function GlobalEntrySkeleton() {
   );
 }
 
-/** A single global leaderboard card. */
-function GlobalEntryCard({
+/**
+ * A single global leaderboard card. Memoized so search keystrokes and other
+ * GlobalContent re-renders don't re-render every mounted card — with pages of
+ * 50 heavy cards (gradient + 3 stat boxes each) that re-render was the main
+ * source of typing lag on this tab.
+ */
+const GlobalEntryCard = React.memo(function GlobalEntryCard({
   entry,
   maxTotal,
 }: {
@@ -161,34 +174,40 @@ function GlobalEntryCard({
       </View>
     </View>
   );
-}
+});
 
-export function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: () => void }) {
+/**
+ * Global leaderboard tab. Owns its own virtualized FlatList (the search bar
+ * and status blocks live in the list header) — previously all loaded pages
+ * rendered unvirtualized inside the Compete screen's ScrollView, so every
+ * "Load More" permanently mounted 50 more cards.
+ */
+export function GlobalContent() {
   const { t } = useTranslation('compete');
-  const { user } = useAuthStore();
-  const {
-    globalEntries,
-    myGlobalRank,
-    loadingGlobal,
-    loadingMyRank,
-    globalHasMore,
-    globalError,
-    myRankError,
-    loadGlobalLeaderboard,
-    loadMoreGlobal,
-    loadMyGlobalRank,
-  } = useCompeteStore();
+  const userId = useAuthStore((s) => s.user?.id);
+
+  const globalEntries = useCompeteStore((s) => s.globalEntries);
+  const myGlobalRank = useCompeteStore((s) => s.myGlobalRank);
+  const loadingGlobal = useCompeteStore((s) => s.loadingGlobal);
+  const loadingMyRank = useCompeteStore((s) => s.loadingMyRank);
+  const globalHasMore = useCompeteStore((s) => s.globalHasMore);
+  const globalError = useCompeteStore((s) => s.globalError);
+  const myRankError = useCompeteStore((s) => s.myRankError);
+  const loadGlobalLeaderboard = useCompeteStore((s) => s.loadGlobalLeaderboard);
+  const loadMoreGlobal = useCompeteStore((s) => s.loadMoreGlobal);
+  const loadMyGlobalRank = useCompeteStore((s) => s.loadMyGlobalRank);
 
   const [search, setSearch] = useState('');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const listRef = useRef<FlatList<GlobalLeaderboardEntry>>(null);
   const isFirstLoad = globalEntries.length === 0 && loadingGlobal;
 
   // Initial load
   useEffect(() => {
-    if (!user?.id) return;
-    loadGlobalLeaderboard(user.id, '');
-    loadMyGlobalRank(user.id);
-  }, [user?.id, loadGlobalLeaderboard, loadMyGlobalRank]);
+    if (!userId) return;
+    loadGlobalLeaderboard(userId, '');
+    loadMyGlobalRank(userId);
+  }, [userId, loadGlobalLeaderboard, loadMyGlobalRank]);
 
   // Cancel a pending debounced search on unmount (e.g. switching tabs) —
   // otherwise it fires against the shared store after this screen is gone,
@@ -201,20 +220,20 @@ export function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: (
     setSearch(text);
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      if (user?.id) loadGlobalLeaderboard(user.id, text);
+      if (userId) loadGlobalLeaderboard(userId, text);
     }, 400);
   };
 
   const handleRefresh = () => {
-    if (!user?.id) return;
-    loadGlobalLeaderboard(user.id, search);
-    loadMyGlobalRank(user.id);
-    onRefreshScrollView?.();
+    if (!userId) return;
+    loadGlobalLeaderboard(userId, search);
+    loadMyGlobalRank(userId);
+    listRef.current?.scrollToOffset({ offset: 0, animated: false });
   };
 
   const handleLoadMore = () => {
-    if (user?.id && globalHasMore && !loadingGlobal) {
-      loadMoreGlobal(user.id, search);
+    if (userId && globalHasMore && !loadingGlobal) {
+      loadMoreGlobal(userId, search);
     }
   };
 
@@ -232,7 +251,16 @@ export function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: (
     ? globalEntries[0].total_kg
     : (myGlobalRank?.total_kg ?? 1);
 
-  return (
+  const renderItem = useCallback(
+    ({ item }: { item: GlobalLeaderboardEntry }) => (
+      <GlobalEntryCard entry={item} maxTotal={maxTotal} />
+    ),
+    [maxTotal]
+  );
+
+  // JSX elements (not inline component types) so React reconciles instead of
+  // remounting — remounting the header would dismiss the search keyboard.
+  const listHeader = (
     <>
       {/* Search bar */}
       <View className="relative mt-4 mb-1 justify-center">
@@ -278,13 +306,6 @@ export function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: (
         </View>
       )}
 
-      {/* Skeleton while first page loads */}
-      {isFirstLoad && (
-        <>
-          {[0, 1, 2, 3, 4].map(i => <GlobalEntrySkeleton key={i} />)}
-        </>
-      )}
-
       {/* Pinned "Your Rank" card — shown when user is outside the visible page */}
       {!isFirstLoad && showPinnedRank && (
         <View className="mb-1">
@@ -316,7 +337,7 @@ export function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: (
           <AlertCircle size={22} strokeWidth={1.6} color={Colors.accent} />
           <Text className="font-sans text-[13px] text-[#b0b0b0]">{t('global.myRankLoadError')}</Text>
           <Pressable
-            onPress={() => user?.id && loadMyGlobalRank(user.id)}
+            onPress={() => userId && loadMyGlobalRank(userId)}
             className="flex-row items-center gap-1.5 mt-1 bg-accent py-2 px-4 rounded-[10px]"
           >
             <RefreshCw size={13} strokeWidth={2} color="#fff" />
@@ -326,14 +347,17 @@ export function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: (
           </Pressable>
         </View>
       )}
+    </>
+  );
 
-      {/* Leaderboard entries */}
-      {!isFirstLoad && !globalError && globalEntries.map(entry => (
-        <GlobalEntryCard key={entry.user_id} entry={entry} maxTotal={maxTotal} />
-      ))}
-
+  const listEmpty = isFirstLoad ? (
+    <>
+      {[0, 1, 2, 3, 4].map(i => <GlobalEntrySkeleton key={i} />)}
+    </>
+  ) : (
+    <>
       {/* No search results */}
-      {!isFirstLoad && !loadingGlobal && !globalError && globalEntries.length === 0 && !!search && (
+      {!loadingGlobal && !globalError && !!search && (
         <View className="items-center bg-[#1e1e1e] rounded-2xl py-12 px-5 gap-2 mt-1.5">
           <Search size={32} strokeWidth={1.4} color="#555" />
           <Text className="font-heading text-lg tracking-[2px] text-white">
@@ -344,7 +368,7 @@ export function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: (
       )}
 
       {/* Empty leaderboard (no users have big-3 PRs yet) */}
-      {!isFirstLoad && !loadingGlobal && !globalError && globalEntries.length === 0 && !search && (
+      {!loadingGlobal && !globalError && !search && (
         <View className="items-center bg-[#1e1e1e] rounded-2xl py-12 px-5 gap-2 mt-1.5">
           <Trophy size={32} strokeWidth={1.4} color="#555" />
           <Text className="font-heading text-lg tracking-[2px] text-white">
@@ -353,7 +377,11 @@ export function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: (
           <Text className="font-sans text-[13px] text-[#555]">{t('global.noAthletesSub')}</Text>
         </View>
       )}
+    </>
+  );
 
+  const listFooter = (
+    <>
       {/* Load more */}
       {!isFirstLoad && globalHasMore && globalEntries.length > 0 && (
         <Pressable
@@ -390,4 +418,29 @@ export function GlobalContent({ onRefreshScrollView }: { onRefreshScrollView?: (
       </Text>
     </>
   );
+
+  return (
+    <FlatList
+      ref={listRef}
+      data={isFirstLoad || globalError ? [] : globalEntries}
+      keyExtractor={(entry) => entry.user_id}
+      renderItem={renderItem}
+      ListHeaderComponent={listHeader}
+      ListEmptyComponent={listEmpty}
+      ListFooterComponent={listFooter}
+      contentContainerStyle={styles.listContent}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+      windowSize={7}
+      maxToRenderPerBatch={8}
+      initialNumToRender={8}
+    />
+  );
 }
+
+const styles = StyleSheet.create({
+  listContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 96,
+  },
+});

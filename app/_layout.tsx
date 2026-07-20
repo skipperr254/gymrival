@@ -2,7 +2,9 @@ import "../global.css";
 
 import { useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
+import { reloadAppAsync } from "expo";
 import { Stack, useRouter, useSegments } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from "expo-splash-screen";
 import Constants, { ExecutionEnvironment } from "expo-constants";
 import { useFonts } from "expo-font";
@@ -20,6 +22,8 @@ import { savePushToken, getUserLanguage, reconcileStaleVideoUploads } from "@/li
 import { Routes } from "@/constants/routes";
 import i18n, { initI18n } from "@/lib/i18n";
 import { isSupportedLanguage } from "@/lib/i18n/languages";
+import { LANGUAGE_STORAGE_KEY } from "@/lib/i18n/languageDetector";
+import { applyLayoutDirection } from "@/lib/i18n/rtl";
 
 // Once a user has explicitly picked a language (profiles.language is set),
 // that choice is the cross-device source of truth and wins over whatever
@@ -28,6 +32,19 @@ async function syncProfileLanguage(userId: string) {
   const { data: language } = await getUserLanguage(userId);
   if (language && isSupportedLanguage(language) && language !== i18n.language) {
     await i18n.changeLanguage(language);
+    // Crossing the LTR/RTL boundary (e.g. first sign-in on a new device with
+    // an Arabic profile) needs a reload for the flipped layout to apply.
+    // Cache the language explicitly first so the post-reload detector reads
+    // the synced value deterministically instead of racing i18next's own
+    // fire-and-forget cacheUserLanguage write.
+    if (Platform.OS !== "web" && applyLayoutDirection(language)) {
+      try {
+        await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+      } catch {
+        // best-effort — worst case the sync runs once more after reload
+      }
+      reloadAppAsync("rtl-direction-sync");
+    }
   }
 }
 
@@ -137,12 +154,19 @@ export default function RootLayout() {
     DMSans_700Bold,
   });
 
-  const { session, initialized, pendingPasswordReset, pendingProfileSetup, initialize } =
-    useAuthStore();
+  // Per-field selectors — the root layout must not re-render on unrelated
+  // store changes (e.g. every realtime notification insert re-rendered the
+  // entire navigation tree when this subscribed to the whole store).
+  const session = useAuthStore((s) => s.session);
+  const initialized = useAuthStore((s) => s.initialized);
+  const pendingPasswordReset = useAuthStore((s) => s.pendingPasswordReset);
+  const pendingProfileSetup = useAuthStore((s) => s.pendingProfileSetup);
+  const initialize = useAuthStore((s) => s.initialize);
   const segments = useSegments();
   const router = useRouter();
   const startPresenceHeartbeat = useChatStore((s) => s.startPresenceHeartbeat);
-  const { loadNotifications, subscribeToNotifications } = useNotificationStore();
+  const loadNotifications = useNotificationStore((s) => s.loadNotifications);
+  const subscribeToNotifications = useNotificationStore((s) => s.subscribeToNotifications);
   const notifCleanupRef = useRef<(() => void) | null>(null);
   const [i18nReady, setI18nReady] = useState(false);
 
@@ -151,7 +175,17 @@ export default function RootLayout() {
   }, [initialize]);
 
   useEffect(() => {
-    initI18n().then(() => setI18nReady(true));
+    initI18n().then(() => {
+      // A fresh install on an Arabic-locale device detects `ar` before
+      // forceRTL has ever been called — reconcile and reload (behind the
+      // splash screen, which stays up until i18nReady). On later cold starts
+      // the persisted native direction already matches, so this no-ops.
+      if (Platform.OS !== "web" && applyLayoutDirection(i18n.language)) {
+        reloadAppAsync("rtl-direction-sync");
+        return;
+      }
+      setI18nReady(true);
+    });
   }, []);
 
   // Once signed in, an explicit language choice stored on the profile

@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
+import { rtlIconFlip } from '@/lib/i18n/rtl';
 
 const SHEET_HEIGHT = Dimensions.get('window').height;
 
@@ -84,7 +85,7 @@ export function LogSheet({ visible, onClose, onLogPR, onCheckIn }: Props) {
                 </Text>
                 <Text className="font-sans text-xs text-muted">{action.sub}</Text>
               </View>
-              <Ionicons name="chevron-forward" size={16} color={Colors.hint} />
+              <Ionicons name="chevron-forward" size={16} color={Colors.hint} style={rtlIconFlip} />
             </Pressable>
           ))}
         </Animated.View>

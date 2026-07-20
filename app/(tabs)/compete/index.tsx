@@ -65,15 +65,21 @@ export default function CompeteScreen() {
         </View>
       </View>
 
-      <ScrollView
-        ref={scrollRef}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {activeTab === 'rivals'     && <RivalsContent />}
-        {activeTab === 'challenges' && <ChallengesContent onDetailChange={scrollToTop} />}
-        {activeTab === 'global'     && <GlobalContent onRefreshScrollView={scrollToTop} />}
-      </ScrollView>
+      {/* Global owns its own virtualized FlatList (50-row pages must not be
+          mounted unvirtualized inside a ScrollView); the other two tabs are
+          short, bounded lists and keep the shared ScrollView. */}
+      {activeTab === 'global' ? (
+        <GlobalContent />
+      ) : (
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {activeTab === 'rivals' && <RivalsContent />}
+          {activeTab === 'challenges' && <ChallengesContent onDetailChange={scrollToTop} />}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
