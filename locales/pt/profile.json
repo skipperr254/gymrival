@@ -28,13 +28,24 @@
   "settings": {
     "title": "DEFINIÇÕES",
     "notifications": "Notificações",
-    "notificationsSub": "Notificações push ativadas",
-    "privacy": "Privacidade",
-    "privacySub": "Perfil visível para amigos",
-    "darkMode": "Modo escuro",
-    "darkModeOn": "Ativado",
+    "notificationsSub": "Gostos, mensagens e pedidos de amizade",
+    "changePassword": "Alterar palavra-passe",
+    "changePasswordSub": "Atualiza a palavra-passe da tua conta",
     "shareProfile": "Partilhar perfil",
-    "shareProfileSub": "Copiar o teu link"
+    "shareProfileSub": "Brevemente"
+  },
+  "changePassword": {
+    "title": "ALTERAR PALAVRA-PASSE",
+    "newPasswordLabel": "NOVA PALAVRA-PASSE",
+    "newPasswordPlaceholder": "Mín. 8 caracteres",
+    "passwordHint": "Usa 8 ou mais caracteres.",
+    "confirmPasswordLabel": "CONFIRMAR PALAVRA-PASSE",
+    "confirmPasswordPlaceholder": "Repete a tua palavra-passe",
+    "passwordMismatch": "As palavras-passe não coincidem.",
+    "submit": "ATUALIZAR PALAVRA-PASSE",
+    "successTitle": "Palavra-passe atualizada",
+    "successMsg": "A tua palavra-passe foi alterada.",
+    "errorTitle": "Não foi possível atualizar a palavra-passe"
   },
   "logOut": "TERMINAR SESSÃO",
   "edit": {
@@ -60,7 +71,15 @@
     "invalidHeightMsg": "Introduz uma altura válida em cm.",
     "saveErrorTitle": "Não foi possível guardar",
     "usernameTakenError": "Esse nome de utilizador já está em uso. Escolhe outro.",
-    "saveErrorGeneric": "Algo correu mal. Verifica a tua ligação e tenta novamente."
+    "saveErrorGeneric": "Algo correu mal. Verifica a tua ligação e tenta novamente.",
+    "changePhotoTitle": "Alterar foto",
+    "takePhoto": "Tirar foto",
+    "chooseFromLibrary": "Escolher da galeria",
+    "removePhoto": "Remover foto",
+    "photoPermissionTitle": "Permissão necessária",
+    "photoPermissionMsg": "Permite o acesso à tua câmara ou galeria de fotos para definir uma foto de perfil.",
+    "uploadErrorTitle": "Não foi possível carregar a foto",
+    "uploadErrorMsg": "Algo correu mal. Verifica a tua ligação e tenta novamente."
   },
   "badges": {
     "title": "INSÍGNIAS",

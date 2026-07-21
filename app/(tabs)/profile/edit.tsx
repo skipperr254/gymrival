@@ -13,13 +13,18 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useRef, useState } from 'react';
-import { Ionicons } from '@expo/vector-icons';
+import { Camera } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
-import { rtlIconFlip } from '@/lib/i18n/rtl';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { Avatar } from '@/components/ui/Avatar';
+import { BackButton } from '@/components/ui/BackButton';
+import {
+  pickAvatarFromLibrary,
+  takeAvatarPhoto,
+  type PickAvatarResult,
+} from '@/lib/media/pickAvatarAsset';
 import type { Profile } from '@/types/user';
 
 function buildFormFromProfile(profile: Profile | null) {
@@ -38,7 +43,7 @@ function buildFormFromProfile(profile: Profile | null) {
 export default function EditProfileScreen() {
   const { t } = useTranslation('profile');
   const { user } = useAuthStore();
-  const { profile, saving, updateProfile } = useProfileStore();
+  const { profile, saving, updateProfile, avatarUploading, uploadAvatar, removeAvatar } = useProfileStore();
 
   const [form, setForm] = useState(() => buildFormFromProfile(profile));
   // Snapshot of what the form looked like when this screen opened. handleSave
@@ -113,18 +118,39 @@ export default function EditProfileScreen() {
     }
   }
 
+  async function handlePickResult(result: PickAvatarResult) {
+    if (result.status === 'permission_denied') {
+      Alert.alert(t('edit.photoPermissionTitle'), t('edit.photoPermissionMsg'));
+      return;
+    }
+    if (result.status === 'canceled' || !user?.id) return;
+
+    const { error } = await uploadAvatar(user.id, result.asset.uri, result.asset.mimeType);
+    if (error) Alert.alert(t('edit.uploadErrorTitle'), t('edit.uploadErrorMsg'));
+  }
+
+  function handleChangePhoto() {
+    const options = [
+      { text: t('edit.takePhoto'), onPress: () => takeAvatarPhoto().then(handlePickResult) },
+      { text: t('edit.chooseFromLibrary'), onPress: () => pickAvatarFromLibrary().then(handlePickResult) },
+      ...(profile?.avatar_url
+        ? [{
+            text: t('edit.removePhoto'),
+            style: 'destructive' as const,
+            onPress: () => user?.id && removeAvatar(user.id),
+          }]
+        : []),
+      { text: t('common:cancel'), style: 'cancel' as const },
+    ];
+    Alert.alert(t('edit.changePhotoTitle'), undefined, options);
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
       {/* Header */}
       <View className="flex-row items-center px-4 py-3">
-        <Pressable
-          onPress={() => router.back()}
-          className="p-1 mr-2"
-          style={({ pressed }) => pressed && { opacity: 0.5 }}
-        >
-          <Ionicons name="arrow-back" size={22} color={Colors.accent} style={rtlIconFlip} />
-        </Pressable>
-        <Text className="font-heading text-2xl text-primary tracking-[3px] flex-1">
+        <BackButton />
+        <Text className="font-heading text-2xl text-primary tracking-[3px] flex-1 ml-1">
           {t('edit.title')}
         </Text>
         <View className="w-[30px]" />
@@ -140,12 +166,25 @@ export default function EditProfileScreen() {
           keyboardShouldPersistTaps="handled"
         >
           {/* Avatar */}
-          <View className="items-center mb-7 relative self-center">
-            <Avatar name={displayName} userId={user?.id ?? displayName} size="xl" />
+          <Pressable
+            className="items-center mb-7 relative self-center"
+            onPress={handleChangePhoto}
+            disabled={avatarUploading}
+            style={({ pressed }) => pressed && { opacity: 0.8 }}
+          >
+            <Avatar name={displayName} userId={user?.id ?? displayName} avatarUrl={profile?.avatar_url} size="xl" />
+            {avatarUploading && (
+              <View
+                className="absolute items-center justify-center rounded-full bg-black/50"
+                style={{ width: 72, height: 72 }}
+              >
+                <ActivityIndicator color={Colors.primary} />
+              </View>
+            )}
             <View className="absolute bottom-0 right-0 w-7 h-7 rounded-full items-center justify-center border-2 border-base bg-accent">
-              <Ionicons name="camera" size={12} color={Colors.primary} />
+              <Camera size={12} color={Colors.primary} />
             </View>
-          </View>
+          </Pressable>
 
           {/* Fields */}
           <Field

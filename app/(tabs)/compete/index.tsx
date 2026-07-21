@@ -31,7 +31,7 @@ export default function CompeteScreen() {
         <Text className="font-heading text-white tracking-[5px] text-[30px] leading-8">
           GYM RIVAL
         </Text>
-        <Text className="font-heading text-[11px] text-[#555] tracking-[4px] mt-1">
+        <Text className="font-heading text-[11px] text-muted tracking-[4px] mt-1">
           {t(currentTab.subtitleKey)}
         </Text>
 
@@ -50,11 +50,11 @@ export default function CompeteScreen() {
                 <TabIcon
                   size={13}
                   strokeWidth={isActive ? 2.2 : 1.8}
-                  color={isActive ? '#000' : '#555'}
+                  color={isActive ? '#000' : Colors.muted}
                 />
                 <Text
                   className={`font-heading text-[11px] tracking-[1.5px] ${
-                    isActive ? 'text-black' : 'text-[#555]'
+                    isActive ? 'text-black' : 'text-muted'
                   }`}
                 >
                   {t(tab.labelKey).toUpperCase()}

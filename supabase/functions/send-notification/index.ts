@@ -184,12 +184,18 @@ Deno.serve(async (req: Request) => {
 
     const { data: recipient, error: recipientErr } = await supabase
       .from("profiles")
-      .select("expo_push_token, language")
+      .select("expo_push_token, language, push_enabled")
       .eq("id", user_id)
       .single();
 
     if (recipientErr || !recipient?.expo_push_token) {
       return new Response(JSON.stringify({ sent: false, reason: "no_token" }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    if (recipient.push_enabled === false) {
+      return new Response(JSON.stringify({ sent: false, reason: "push_disabled" }), {
         headers: { "Content-Type": "application/json" },
       });
     }

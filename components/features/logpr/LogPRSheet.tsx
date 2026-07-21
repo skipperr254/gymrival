@@ -294,7 +294,7 @@ export function LogPRSheet({ visible, onClose }: Props) {
                   )}
                   <View>
                     {step < 3 && (
-                      <Text className="font-heading text-[9px] tracking-[2.5px] text-[#555] mb-[3px]">
+                      <Text className="font-heading text-[9px] tracking-[2.5px] text-muted mb-[3px]">
                         {t('step.stepOf', { step })}
                       </Text>
                     )}
@@ -317,10 +317,10 @@ export function LogPRSheet({ visible, onClose }: Props) {
               {step < 3 && (
                 <View className="flex-row gap-1.5">
                   <View
-                    className={`flex-1 h-[3px] rounded-full ${step >= 1 ? 'bg-accent' : 'bg-[#2a2a2a]'}`}
+                    className={`flex-1 h-[3px] rounded-full ${step >= 1 ? 'bg-accent' : 'bg-elevated'}`}
                   />
                   <View
-                    className={`flex-1 h-[3px] rounded-full ${step >= 2 ? 'bg-accent' : 'bg-[#2a2a2a]'}`}
+                    className={`flex-1 h-[3px] rounded-full ${step >= 2 ? 'bg-accent' : 'bg-elevated'}`}
                   />
                 </View>
               )}

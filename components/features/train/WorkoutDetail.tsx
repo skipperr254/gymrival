@@ -1,5 +1,5 @@
 import { View, Text, Pressable, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Dumbbell, Activity, Check, Zap, Trophy, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import type { TrainingSessionWithExercises } from '@/types/train';
@@ -44,7 +44,7 @@ export function WorkoutDetail({
       <View className="bg-black rounded-[20px] p-5 mb-3.5">
         <View className="flex-row items-center gap-3.5 mb-3">
           <View className="w-[50px] h-[50px] rounded-2xl bg-[rgba(230,48,48,0.12)] border border-[rgba(230,48,48,0.25)] items-center justify-center">
-            <Ionicons name="barbell" size={26} color={Colors.accent} />
+            <Dumbbell size={26} color={Colors.accent} />
           </View>
           <View className="flex-1">
             <Text className="font-heading text-2xl tracking-[3px] text-primary" numberOfLines={1}>
@@ -85,8 +85,7 @@ export function WorkoutDetail({
                   : 'bg-base border-default'
               }`}
             >
-              <Ionicons
-                name="pulse"
+              <Activity
                 size={18}
                 color={workoutStarted ? Colors.accent : Colors.muted}
               />
@@ -124,7 +123,7 @@ export function WorkoutDetail({
                     onPress={() => onToggleSet(i, j)}
                   >
                     {done ? (
-                      <Ionicons name="checkmark" size={14} color={Colors.accent} />
+                      <Check size={14} color={Colors.accent} />
                     ) : (
                       <Text className="font-heading text-[11px] tracking-[1px] text-muted">
                         {t('setNumber', { n: j + 1 })}
@@ -152,7 +151,7 @@ export function WorkoutDetail({
             <ActivityIndicator size="small" color={Colors.primary} />
           ) : (
             <>
-              <Ionicons name="flash" size={18} color={Colors.primary} />
+              <Zap size={18} color={Colors.primary} />
               <Text className="font-heading text-[15px] tracking-[3px] text-primary">
                 {t('startWorkout')}
               </Text>
@@ -161,7 +160,7 @@ export function WorkoutDetail({
         </Pressable>
       ) : allDone ? (
         <View className="bg-[#0a1f0a] border border-[#1a3a1a] rounded-2xl p-6 items-center mt-1.5">
-          <Ionicons name="trophy" size={42} color={Colors.success} style={{ marginBottom: 12 }} />
+          <Trophy size={42} color={Colors.success} style={{ marginBottom: 12 }} />
           <Text className="font-heading text-[22px] tracking-[3px] text-primary mb-1">
             {t('workoutDone')}
           </Text>
@@ -182,7 +181,7 @@ export function WorkoutDetail({
           style={({ pressed }) => pressed && { opacity: 0.75 }}
           onPress={onCancel}
         >
-          <Ionicons name="close" size={15} color={Colors.muted} />
+          <X size={15} color={Colors.muted} />
           <Text className="font-heading text-[13px] tracking-[2px] text-muted">
             {t('cancelWorkout')}
           </Text>

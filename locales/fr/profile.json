@@ -28,13 +28,24 @@
   "settings": {
     "title": "PARAMÈTRES",
     "notifications": "Notifications",
-    "notificationsSub": "Notifications push activées",
-    "privacy": "Confidentialité",
-    "privacySub": "Profil visible par les amis",
-    "darkMode": "Mode sombre",
-    "darkModeOn": "Activé",
+    "notificationsSub": "Mentions J'aime, messages et demandes d'ami",
+    "changePassword": "Modifier le mot de passe",
+    "changePasswordSub": "Mets à jour le mot de passe de ton compte",
     "shareProfile": "Partager le profil",
-    "shareProfileSub": "Copier ton lien"
+    "shareProfileSub": "Bientôt disponible"
+  },
+  "changePassword": {
+    "title": "MODIFIER LE MOT DE PASSE",
+    "newPasswordLabel": "NOUVEAU MOT DE PASSE",
+    "newPasswordPlaceholder": "Min. 8 caractères",
+    "passwordHint": "Utilise 8 caractères ou plus.",
+    "confirmPasswordLabel": "CONFIRMER LE MOT DE PASSE",
+    "confirmPasswordPlaceholder": "Répète ton mot de passe",
+    "passwordMismatch": "Les mots de passe ne correspondent pas.",
+    "submit": "METTRE À JOUR LE MOT DE PASSE",
+    "successTitle": "Mot de passe mis à jour",
+    "successMsg": "Ton mot de passe a été modifié.",
+    "errorTitle": "Impossible de mettre à jour le mot de passe"
   },
   "logOut": "SE DÉCONNECTER",
   "edit": {
@@ -60,7 +71,15 @@
     "invalidHeightMsg": "Merci d'entrer une taille valide en cm.",
     "saveErrorTitle": "Impossible d'enregistrer",
     "usernameTakenError": "Ce nom d'utilisateur est déjà pris. Choisis-en un autre.",
-    "saveErrorGeneric": "Une erreur s'est produite. Vérifie ta connexion et réessaie."
+    "saveErrorGeneric": "Une erreur s'est produite. Vérifie ta connexion et réessaie.",
+    "changePhotoTitle": "Changer la photo",
+    "takePhoto": "Prendre une photo",
+    "chooseFromLibrary": "Choisir dans la bibliothèque",
+    "removePhoto": "Supprimer la photo",
+    "photoPermissionTitle": "Autorisation requise",
+    "photoPermissionMsg": "Autorise l'accès à ton appareil photo ou à ta bibliothèque de photos pour définir une photo de profil.",
+    "uploadErrorTitle": "Impossible d'envoyer la photo",
+    "uploadErrorMsg": "Une erreur s'est produite. Vérifie ta connexion et réessaie."
   },
   "badges": {
     "title": "BADGES",

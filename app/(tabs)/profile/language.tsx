@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { View, Text, Pressable, StyleSheet, ActivityIndicator, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
+import { CheckCircle } from "lucide-react-native";
 import { reloadAppAsync } from "expo";
-import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
 import { Colors } from "@/constants/theme";
 import { pickerLanguages, type LanguageCode } from "@/lib/i18n/languages";
 import { LANGUAGE_STORAGE_KEY } from "@/lib/i18n/languageDetector";
-import { applyLayoutDirection, rtlIconFlip } from "@/lib/i18n/rtl";
+import { applyLayoutDirection } from "@/lib/i18n/rtl";
+import { BackButton } from "@/components/ui/BackButton";
 import { useAuthStore } from "@/store/useAuthStore";
 import { updateLanguage } from "@/lib/api";
 
@@ -71,13 +71,7 @@ export default function LanguageScreen() {
           borderBottomColor: Colors.borderDefault,
         }}
       >
-        <Pressable
-          className="w-9 h-9 items-center justify-center"
-          onPress={() => router.back()}
-          hitSlop={8}
-        >
-          <Ionicons name="chevron-back" size={22} color={Colors.primary} style={rtlIconFlip} />
-        </Pressable>
+        <BackButton />
         <Text className="flex-1 text-center font-heading text-xl text-primary tracking-[2px]">
           {t("settings.language").toUpperCase()}
         </Text>
@@ -104,7 +98,7 @@ export default function LanguageScreen() {
                 {lang.nativeName}
               </Text>
               {isActive && (
-                <Ionicons name="checkmark-circle" size={22} color={Colors.accent} />
+                <CheckCircle size={22} color={Colors.accent} />
               )}
             </Pressable>
           );

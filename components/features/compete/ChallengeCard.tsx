@@ -6,12 +6,13 @@ import {
   Clock, Gift, Users, Zap,
 } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Fonts } from '@/constants/theme';
+import { Fonts, MedalColors, Colors } from '@/constants/theme';
+import { getExerciseIcon } from '@/constants/exerciseIcons';
 import type { ChallengeWithStats } from '@/types/challenge';
 import { endsInLabel, formatChallengeScore, metricLabel } from '@/types/challenge';
-import { LeaderboardAvatar, MEDAL_COLORS } from './LeaderboardAvatar';
+import { Avatar } from '@/components/ui/Avatar';
 
-const CHALLENGE_COLOR = '#e63030';
+const CHALLENGE_COLOR = Colors.accent;
 
 export function ChallengeCard({
   ch,
@@ -22,7 +23,7 @@ export function ChallengeCard({
   joining,
 }: {
   ch: ChallengeWithStats;
-  topEntries: { user_id: string; full_name: string | null; username: string | null; score: number; is_me: boolean }[];
+  topEntries: { user_id: string; full_name: string | null; username: string | null; avatar_url: string | null; score: number; is_me: boolean }[];
   unit: string;
   onJoin: () => void;
   onLeave: () => void;
@@ -30,13 +31,14 @@ export function ChallengeCard({
 }) {
   const { t } = useTranslation('compete');
   const isFriend = ch.type === 'friend';
-  const color    = isFriend ? '#4a9eff' : CHALLENGE_COLOR;
-  const MetricIcon = ch.metric === 'most_improved' ? TrendingUp
+  const color    = isFriend ? Colors.friend : CHALLENGE_COLOR;
+  const MetricIcon = ch.exercise_key ? getExerciseIcon(ch.exercise_key)
+    : ch.metric === 'most_improved' ? TrendingUp
     : ch.metric === 'total_volume' ? Activity
     : Dumbbell;
 
   return (
-    <View className="bg-[#1e1e1e] rounded-2xl py-4 px-[18px] mb-3 border" style={{ borderColor: color + '22' }}>
+    <View className="bg-surface rounded-2xl py-4 px-[18px] mb-3 border" style={{ borderColor: color + '22' }}>
       <View className="flex-row items-start gap-3.5 mb-3.5">
         <View
           className="w-[46px] h-[46px] rounded-[13px] border items-center justify-center shrink-0"
@@ -54,18 +56,18 @@ export function ChallengeCard({
 
       <View className="flex-row gap-3.5 mb-3.5 flex-wrap">
         <View className="flex-row items-center gap-[5px]">
-          <Clock size={12} strokeWidth={1.8} color="#555" />
+          <Clock size={12} strokeWidth={1.8} color={Colors.muted} />
           <Text className="font-sans text-[11px] text-[#606060]">{endsInLabel(ch.ends_at)}</Text>
         </View>
         <View className="flex-row items-center gap-[5px]">
-          <Users size={12} strokeWidth={1.8} color="#555" />
+          <Users size={12} strokeWidth={1.8} color={Colors.muted} />
           <Text className="font-sans text-[11px] text-[#606060]">
             {t('card.joined', { count: ch.participant_count })}
           </Text>
         </View>
         {!!ch.prize_label && (
           <View className="flex-row items-center gap-[5px]">
-            <Gift size={12} strokeWidth={1.8} color="#555" />
+            <Gift size={12} strokeWidth={1.8} color={Colors.muted} />
             <Text className="font-sans text-[11px] text-[#606060]">{ch.prize_label}</Text>
           </View>
         )}
@@ -76,11 +78,11 @@ export function ChallengeCard({
         return (
           <View key={p.user_id} className="flex-row items-center gap-2.5 mb-[7px]">
             <View className="w-5 items-center">
-              <Trophy size={16} strokeWidth={1.8} color={MEDAL_COLORS[i]} />
+              <Trophy size={16} strokeWidth={1.8} color={MedalColors[i]} />
             </View>
-            <LeaderboardAvatar id={p.user_id} name={displayName} size={26} />
+            <Avatar userId={p.user_id} name={displayName} avatarUrl={p.avatar_url} size={26} />
             <Text
-              className="flex-1 font-sans text-[13px] text-[#b0b0b0]"
+              className="flex-1 font-sans text-[13px] text-secondary"
               style={p.is_me ? { color, fontFamily: Fonts.bodyMedium } : undefined}
             >
               {displayName}{p.is_me ? t('youSuffix') : ''}
@@ -90,7 +92,7 @@ export function ChallengeCard({
               style={p.is_me ? { color } : undefined}
             >
               {formatChallengeScore(p.score, ch.metric, unit)}{' '}
-              <Text className="font-sans text-[10px] text-[#555]">{unit.toUpperCase()}</Text>
+              <Text className="font-sans text-[10px] text-muted">{unit.toUpperCase()}</Text>
             </Text>
           </View>
         );
@@ -109,15 +111,15 @@ export function ChallengeCard({
       <View className="flex-row gap-2 mt-3.5">
         <Pressable onPress={ch.is_joined ? onLeave : onJoin} className="flex-1" disabled={joining}>
           {ch.is_joined ? (
-            <View className="flex-row items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#2a2a2a]">
-              <CheckCircle size={13} strokeWidth={2} color="#555" />
-              <Text className="font-heading text-xs tracking-[2px] text-[#555]">
+            <View className="flex-row items-center justify-center gap-1.5 py-2.5 rounded-xl bg-elevated">
+              <CheckCircle size={13} strokeWidth={2} color={Colors.muted} />
+              <Text className="font-heading text-xs tracking-[2px] text-muted">
                 {t('card.joinedBtn')}
               </Text>
             </View>
           ) : joining ? (
-            <View className="flex-row items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#2a2a2a]">
-              <ActivityIndicator size="small" color="#555" />
+            <View className="flex-row items-center justify-center gap-1.5 py-2.5 rounded-xl bg-elevated">
+              <ActivityIndicator size="small" color={Colors.muted} />
             </View>
           ) : (
             <LinearGradient
@@ -133,7 +135,7 @@ export function ChallengeCard({
                 borderRadius: 12,
               }}
             >
-              <Zap size={13} strokeWidth={2} color="#fff" />
+              <Zap size={13} strokeWidth={2} color={Colors.primary} />
               <Text className="font-heading text-xs tracking-[2px] text-white">
                 {t('card.joinBtn')}
               </Text>

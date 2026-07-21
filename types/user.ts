@@ -17,6 +17,7 @@ export interface Profile {
   role: 'user' | 'admin';
   /** Explicit language override picked in Settings. NULL = follow device locale. */
   language: string | null;
+  push_enabled: boolean;
   created_at: string;
   updated_at: string;
 }

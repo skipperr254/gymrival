@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { ChevronLeft } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { rtlIconFlip } from '@/lib/i18n/rtl';
@@ -158,7 +158,7 @@ export default function TrainScreen() {
                 style={({ pressed }) => pressed && { opacity: 0.5 }}
                 onPress={goBack}
               >
-                <Ionicons name="chevron-back" size={22} color={Colors.accent} style={rtlIconFlip} />
+                <ChevronLeft size={22} color={Colors.accent} style={rtlIconFlip} />
               </Pressable>
               <View className="flex-1" />
             </>

@@ -4,10 +4,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Search, ChevronRight, Zap, AlertCircle, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
+import { getExerciseIcon } from '@/constants/exerciseIcons';
 import type { ChallengeMetric } from '@/types/challenge';
 import type { FriendProfile } from '@/types/social';
 import type { ExerciseType } from '@/types/pr';
-import { LeaderboardAvatar } from './LeaderboardAvatar';
+import { Avatar } from '@/components/ui/Avatar';
 
 // Display text resolved via t() at render time — see labelKey usage below.
 const DURATION_OPTIONS = [
@@ -87,28 +88,29 @@ export function CreateChallengeModal({
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <View className="flex-1 bg-black/75 justify-end">
-        <View className="bg-[#1e1e1e] rounded-t-3xl p-6 pb-10 max-h-[92%]">
+        <View className="bg-surface rounded-t-3xl p-6 pb-10 max-h-[92%]">
           <View className="flex-row items-center mb-6">
             <Text className="font-heading text-xl tracking-[3px] text-white flex-1">
               {t('modal.title')}
             </Text>
             <Pressable onPress={onClose} className="p-1">
-              <X size={18} strokeWidth={2} color="#fff" />
+              <X size={18} strokeWidth={2} color={Colors.primary} />
             </Pressable>
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
 
             {/* ── Friend picker ────────────────────────────── */}
-            <Text className="font-heading text-[10px] tracking-[3px] text-[#555] mb-2.5">
+            <Text className="font-heading text-[10px] tracking-[3px] text-muted mb-2.5">
               {t('modal.challengeLabel')}
             </Text>
 
             {selected ? (
-              <View className="flex-row items-center gap-3 bg-[#252525] rounded-xl p-3 border border-[#2a2a2a] mb-1">
-                <LeaderboardAvatar
-                  id={selected.id}
+              <View className="flex-row items-center gap-3 bg-[#252525] rounded-xl p-3 border border-default mb-1">
+                <Avatar
+                  userId={selected.id}
                   name={selected.full_name ?? selected.username ?? '?'}
+                  avatarUrl={selected.avatar_url}
                   size={34}
                 />
                 <Text className="flex-1 font-sans-medium text-sm text-white" numberOfLines={1}>
@@ -129,14 +131,14 @@ export function CreateChallengeModal({
                   <Search
                     size={14}
                     strokeWidth={1.8}
-                    color="#555"
+                    color={Colors.muted}
                     style={{ position: 'absolute', left: 12, zIndex: 1 }}
                   />
                   <TextInput
                     value={query}
                     onChangeText={setQuery}
                     placeholder={t('modal.searchFriendsPlaceholder')}
-                    placeholderTextColor="#555"
+                    placeholderTextColor={Colors.muted}
                     className="bg-[#252525] rounded-xl border border-[#333] py-2.5 pl-9 pr-3.5 font-sans text-[13px] text-white"
                     autoCapitalize="none"
                     autoCorrect={false}
@@ -144,15 +146,15 @@ export function CreateChallengeModal({
                 </View>
 
                 {friends.length === 0 ? (
-                  <Text className="font-sans text-[13px] text-[#555] text-center py-4">
+                  <Text className="font-sans text-[13px] text-muted text-center py-4">
                     {t('modal.noFriends')}
                   </Text>
                 ) : filtered.length === 0 ? (
-                  <Text className="font-sans text-[13px] text-[#555] text-center py-4">
+                  <Text className="font-sans text-[13px] text-muted text-center py-4">
                     {t('modal.noMatchingFriends')}
                   </Text>
                 ) : (
-                  <View className="rounded-xl border border-[#2a2a2a] overflow-hidden mb-1">
+                  <View className="rounded-xl border border-default overflow-hidden mb-1">
                     {filtered.map((f, i) => {
                       const name = f.full_name ?? f.username ?? t('modal.friend');
                       return (
@@ -160,20 +162,20 @@ export function CreateChallengeModal({
                           key={f.id}
                           onPress={() => setSelected(f)}
                           className={`flex-row items-center gap-3 py-3 px-3 bg-[#252525] ${
-                            i > 0 ? 'border-t border-[#2a2a2a]' : ''
+                            i > 0 ? 'border-t border-default' : ''
                           }`}
-                          style={({ pressed }) => pressed && { backgroundColor: '#2a2a2a' }}
+                          style={({ pressed }) => pressed && { backgroundColor: Colors.elevated }}
                         >
-                          <LeaderboardAvatar id={f.id} name={name} size={34} />
+                          <Avatar userId={f.id} name={name} avatarUrl={f.avatar_url} size={34} />
                           <View className="flex-1">
                             <Text className="font-sans-medium text-[13px] text-white" numberOfLines={1}>
                               {name}
                             </Text>
                             {!!f.username && (
-                              <Text className="font-sans text-[11px] text-[#555]">{'@'}{f.username}</Text>
+                              <Text className="font-sans text-[11px] text-muted">{'@'}{f.username}</Text>
                             )}
                           </View>
-                          <ChevronRight size={14} strokeWidth={1.8} color="#555" />
+                          <ChevronRight size={14} strokeWidth={1.8} color={Colors.muted} />
                         </Pressable>
                       );
                     })}
@@ -185,38 +187,43 @@ export function CreateChallengeModal({
             <View style={{ height: 20 }} />
 
             {/* ── Exercise ─────────────────────────────────── */}
-            <Text className="font-heading text-[10px] tracking-[3px] text-[#555] mb-2.5">
+            <Text className="font-heading text-[10px] tracking-[3px] text-muted mb-2.5">
               {t('modal.exercise')}
             </Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
               <View className="flex-row gap-1.5 pb-1">
-                {exercises.map(ex => (
-                  <Pressable
-                    key={ex.key}
-                    onPress={() => {
-                      exerciseAutoPicked.current = false;
-                      setExercise(ex.key);
-                    }}
-                    className={`py-2 px-3 rounded-[10px] border-[1.5px] items-center justify-center ${
-                      exercise === ex.key
-                        ? 'border-accent bg-[rgba(230,48,48,0.1)]'
-                        : 'border-[#2a2a2a] bg-transparent'
-                    }`}
-                  >
-                    <Text
-                      className={`font-heading text-[10px] tracking-[1px] ${
-                        exercise === ex.key ? 'text-accent' : 'text-[#555]'
+                {exercises.map(ex => {
+                  const active = exercise === ex.key;
+                  const ExIcon = getExerciseIcon(ex.key);
+                  return (
+                    <Pressable
+                      key={ex.key}
+                      onPress={() => {
+                        exerciseAutoPicked.current = false;
+                        setExercise(ex.key);
+                      }}
+                      className={`flex-row items-center gap-1.5 py-2 px-3 rounded-[10px] border-[1.5px] justify-center ${
+                        active
+                          ? 'border-accent bg-[rgba(230,48,48,0.1)]'
+                          : 'border-default bg-transparent'
                       }`}
                     >
-                      {ex.label.toUpperCase()}
-                    </Text>
-                  </Pressable>
-                ))}
+                      <ExIcon size={12} strokeWidth={2} color={active ? Colors.accent : Colors.muted} />
+                      <Text
+                        className={`font-heading text-[10px] tracking-[1px] ${
+                          active ? 'text-accent' : 'text-muted'
+                        }`}
+                      >
+                        {ex.label.toUpperCase()}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
               </View>
             </ScrollView>
 
             {/* ── Metric ───────────────────────────────────── */}
-            <Text className="font-heading text-[10px] tracking-[3px] text-[#555] mb-2.5">
+            <Text className="font-heading text-[10px] tracking-[3px] text-muted mb-2.5">
               {t('modal.metric')}
             </Text>
             <View className="flex-row gap-2 mb-4">
@@ -227,12 +234,12 @@ export function CreateChallengeModal({
                   className={`flex-1 py-2 px-3 rounded-[10px] border-[1.5px] items-center justify-center ${
                     metric === opt.value
                       ? 'border-accent bg-[rgba(230,48,48,0.1)]'
-                      : 'border-[#2a2a2a] bg-transparent'
+                      : 'border-default bg-transparent'
                   }`}
                 >
                   <Text
                     className={`font-heading text-[10px] tracking-[1px] ${
-                      metric === opt.value ? 'text-accent' : 'text-[#555]'
+                      metric === opt.value ? 'text-accent' : 'text-muted'
                     }`}
                   >
                     {t(opt.labelKey).toUpperCase()}
@@ -242,7 +249,7 @@ export function CreateChallengeModal({
             </View>
 
             {/* ── Duration ─────────────────────────────────── */}
-            <Text className="font-heading text-[10px] tracking-[3px] text-[#555] mb-2.5">
+            <Text className="font-heading text-[10px] tracking-[3px] text-muted mb-2.5">
               {t('modal.duration')}
             </Text>
             <View className="flex-row gap-2 mb-7">
@@ -253,12 +260,12 @@ export function CreateChallengeModal({
                   className={`flex-1 py-2 px-3 rounded-[10px] border-[1.5px] items-center justify-center ${
                     duration === opt.days
                       ? 'border-accent bg-[rgba(230,48,48,0.1)]'
-                      : 'border-[#2a2a2a] bg-transparent'
+                      : 'border-default bg-transparent'
                   }`}
                 >
                   <Text
                     className={`font-heading text-[10px] tracking-[1px] ${
-                      duration === opt.days ? 'text-accent' : 'text-[#555]'
+                      duration === opt.days ? 'text-accent' : 'text-muted'
                     }`}
                   >
                     {t(opt.labelKey).toUpperCase()}
@@ -295,8 +302,8 @@ export function CreateChallengeModal({
                 }}
               >
                 {loading
-                  ? <ActivityIndicator size="small" color="#fff" />
-                  : <><Zap size={16} strokeWidth={2} color="#fff" /><Text className="font-heading text-sm tracking-[3px] text-white">{t('modal.sendChallenge')}</Text></>
+                  ? <ActivityIndicator size="small" color={Colors.primary} />
+                  : <><Zap size={16} strokeWidth={2} color={Colors.primary} /><Text className="font-heading text-sm tracking-[3px] text-white">{t('modal.sendChallenge')}</Text></>
                 }
               </LinearGradient>
             </Pressable>

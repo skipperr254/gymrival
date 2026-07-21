@@ -25,7 +25,6 @@ export interface PRVideo {
 export interface ExerciseType {
   key: string;
   label: string;
-  icon: string;
   unit: ExerciseUnit;
 }
 

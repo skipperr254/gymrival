@@ -30,6 +30,9 @@
   --color-warning: #ffaa00;
   --color-danger: #e63030;
 
+  /* ── Secondary accent (friend-vs-friend challenges) ── */
+  --color-friend: #4a9eff;
+
   /* ── Fonts ── */
   --font-display: "BebasNeue_400Regular";
   --font-body: "DMSans_400Regular";

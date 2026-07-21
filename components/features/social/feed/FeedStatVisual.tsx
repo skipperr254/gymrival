@@ -2,15 +2,17 @@ import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
+import { getExerciseIcon } from '@/constants/exerciseIcons';
 import type { FeedPost } from '@/types/social';
 
 /** The visual shown for a PR post with no attached video — full-bleed stat card. */
 export function FeedStatVisual({ post }: { post: FeedPost }) {
   const { t } = useTranslation('social');
+  const ExIcon = getExerciseIcon(post.exercise_key);
   return (
     <View className="flex-1 overflow-hidden">
       <LinearGradient
-        colors={['#141414', '#0d0808']}
+        colors={[Colors.base, '#0d0808']}
         style={StyleSheet.absoluteFill}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
@@ -24,9 +26,12 @@ export function FeedStatVisual({ post }: { post: FeedPost }) {
       />
       {/* Center content */}
       <View className="flex-1 items-center justify-center">
-        <Text className="font-heading text-xs text-[#666] tracking-[3px] mb-1.5">
-          {post.exercise_label.toUpperCase()}
-        </Text>
+        <View className="flex-row items-center gap-1.5 mb-1.5">
+          <ExIcon size={12} strokeWidth={2} color="#666" />
+          <Text className="font-heading text-xs text-[#666] tracking-[3px]">
+            {post.exercise_label.toUpperCase()}
+          </Text>
+        </View>
         <View className="flex-row items-end gap-1">
           <Text className="font-heading text-[54px] text-white tracking-[2px] leading-[56px]">
             {post.value}

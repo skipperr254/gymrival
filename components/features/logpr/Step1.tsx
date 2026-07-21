@@ -4,7 +4,7 @@ import { TrendingUp, AlertTriangle } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import type { ExerciseType } from '@/types/pr';
-import { getIcon } from './icons';
+import { getExerciseIcon } from '@/constants/exerciseIcons';
 
 interface Step1Props {
   exercises: ExerciseType[];
@@ -25,14 +25,14 @@ export function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangeP
   const { t } = useTranslation('logpr');
   return (
     <>
-      <Text className="font-heading text-[10px] tracking-[2.5px] text-[#555] mb-2.5">
+      <Text className="font-heading text-[10px] tracking-[2.5px] text-muted mb-2.5">
         {t('selectExercise')}
       </Text>
 
       <View className="flex-row flex-wrap gap-2 mb-5">
         {exercises.map(ex => {
           const active = selectedExKey === ex.key;
-          const ExIcon = getIcon(ex.key);
+          const ExIcon = getExerciseIcon(ex.key);
           const exPR = prMap[ex.key];
           return (
             <Pressable
@@ -57,7 +57,7 @@ export function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangeP
                 >
                   {ex.label}
                 </Text>
-                <Text className="font-sans text-[10px] text-[#555]">
+                <Text className="font-sans text-[10px] text-muted">
                   {exPR != null ? t('prWithValue', { value: exPR, unit: ex.unit }) : t('noPrYet')}
                 </Text>
               </View>
@@ -68,7 +68,7 @@ export function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangeP
 
       {selectedExKey && selectedEx && (
         <View className="mb-5">
-          <Text className="font-heading text-[10px] tracking-[2.5px] text-[#555] mb-2.5">
+          <Text className="font-heading text-[10px] tracking-[2.5px] text-muted mb-2.5">
             {t('yourNewPr')}
           </Text>
           <View
@@ -86,7 +86,7 @@ export function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangeP
               autoFocus
               className="flex-1 font-heading text-[42px] text-primary p-0"
             />
-            <Text className="font-heading text-base text-[#555] tracking-[1px]">
+            <Text className="font-heading text-base text-muted tracking-[1px]">
               {selectedEx.unit.toUpperCase()}
             </Text>
           </View>
@@ -131,11 +131,11 @@ export function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangeP
             <Text className="font-heading text-sm tracking-[2.5px] text-white">
               {t('nextAddProof')}
             </Text>
-            <TrendingUp size={16} strokeWidth={2} color="#fff" />
+            <TrendingUp size={16} strokeWidth={2} color={Colors.primary} />
           </LinearGradient>
         ) : (
-          <View className="flex-row items-center justify-center gap-2 rounded-2xl py-[17px] bg-[#2a2a2a]">
-            <Text className="font-heading text-sm tracking-[2.5px] text-[#555]">
+          <View className="flex-row items-center justify-center gap-2 rounded-2xl py-[17px] bg-elevated">
+            <Text className="font-heading text-sm tracking-[2.5px] text-muted">
               {t('nextAddProof')}
             </Text>
           </View>

@@ -6,6 +6,7 @@ import { Routes } from '@/constants/routes';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useChatStore } from '@/store/useChatStore';
 import { useSocialStore } from '@/store/useSocialStore';
+import { Colors } from '@/constants/theme';
 
 function IconBadge({ count }: { count: number }) {
   if (count <= 0) return null;
@@ -41,7 +42,7 @@ export function SocialHeader() {
           hitSlop={6}
           className="w-10 h-10 rounded-full bg-surface border border-default items-center justify-center"
         >
-          <Users size={18} strokeWidth={1.8} color="#b0b0b0" />
+          <Users size={18} strokeWidth={1.8} color={Colors.secondary} />
           <IconBadge count={pendingRequests} />
         </Pressable>
         <Pressable
@@ -51,7 +52,7 @@ export function SocialHeader() {
           hitSlop={6}
           className="w-10 h-10 rounded-full bg-surface border border-default items-center justify-center"
         >
-          <MessageCircle size={18} strokeWidth={1.8} color="#b0b0b0" />
+          <MessageCircle size={18} strokeWidth={1.8} color={Colors.secondary} />
           <IconBadge count={msgUnread} />
         </Pressable>
       </View>

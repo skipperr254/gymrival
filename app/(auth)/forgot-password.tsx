@@ -12,12 +12,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { Colors } from "@/constants/theme";
 import { Routes } from "@/constants/routes";
-import { rtlIconFlip } from "@/lib/i18n/rtl";
 import { useAuthStore } from "@/store/useAuthStore";
+import { BackButton } from "@/components/ui/BackButton";
 
 export default function ForgotPasswordScreen() {
   const { t } = useTranslation("auth");
@@ -56,13 +55,9 @@ export default function ForgotPasswordScreen() {
           showsVerticalScrollIndicator={false}
         >
           {/* Back */}
-          <Pressable
-            onPress={() => router.back()}
-            hitSlop={12}
-            className="mb-8"
-          >
-            <Ionicons name="arrow-back" size={24} color={Colors.primary} style={rtlIconFlip} />
-          </Pressable>
+          <View className="mb-8 self-start">
+            <BackButton />
+          </View>
 
           {/* Header */}
           <View className="mb-8">

@@ -1,16 +1,16 @@
-import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import {
+  Trophy, Flame, Dumbbell, Award, Medal, Zap, Video, Skull, Calendar, Heart,
+  type LucideIcon,
+} from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
-import { rtlIconFlip } from '@/lib/i18n/rtl';
-
-type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+import { BackButton } from '@/components/ui/BackButton';
 
 interface BadgeDef {
   id: number;
-  icon: IoniconName;
+  icon: LucideIcon;
   labelKey: string;
   earned: boolean;
   date?: string;
@@ -18,16 +18,16 @@ interface BadgeDef {
 }
 
 const BADGES: BadgeDef[] = [
-  { id: 1, icon: 'trophy', labelKey: 'badges.items.firstPr', earned: true, date: 'Jan 2024' },
-  { id: 2, icon: 'flame', labelKey: 'badges.items.sevenDayStreak', earned: true, date: 'Feb 2024' },
-  { id: 3, icon: 'barbell', labelKey: 'badges.items.hundredKgBench', earned: true, date: 'Mar 2024' },
-  { id: 4, icon: 'podium', labelKey: 'badges.items.topThreeBoard', earned: true, date: 'Apr 2024' },
-  { id: 5, icon: 'medal', labelKey: 'badges.items.tenPrs', earned: true, date: 'Apr 2024' },
-  { id: 6, icon: 'flash', labelKey: 'badges.items.challengeWon', earned: true, date: 'May 2024' },
-  { id: 7, icon: 'videocam', labelKey: 'badges.items.videoProof', earned: false, descKey: 'badges.desc.videoProof' },
-  { id: 8, icon: 'skull', labelKey: 'badges.items.twoHundredKgDeadlift', earned: false, descKey: 'badges.desc.deadlift' },
-  { id: 9, icon: 'calendar', labelKey: 'badges.items.thirtyDayStreak', earned: false, descKey: 'badges.desc.streak30' },
-  { id: 10, icon: 'heart', labelKey: 'badges.items.hundredLikes', earned: false, descKey: 'badges.desc.likes100' },
+  { id: 1, icon: Trophy, labelKey: 'badges.items.firstPr', earned: true, date: 'Jan 2024' },
+  { id: 2, icon: Flame, labelKey: 'badges.items.sevenDayStreak', earned: true, date: 'Feb 2024' },
+  { id: 3, icon: Dumbbell, labelKey: 'badges.items.hundredKgBench', earned: true, date: 'Mar 2024' },
+  { id: 4, icon: Award, labelKey: 'badges.items.topThreeBoard', earned: true, date: 'Apr 2024' },
+  { id: 5, icon: Medal, labelKey: 'badges.items.tenPrs', earned: true, date: 'Apr 2024' },
+  { id: 6, icon: Zap, labelKey: 'badges.items.challengeWon', earned: true, date: 'May 2024' },
+  { id: 7, icon: Video, labelKey: 'badges.items.videoProof', earned: false, descKey: 'badges.desc.videoProof' },
+  { id: 8, icon: Skull, labelKey: 'badges.items.twoHundredKgDeadlift', earned: false, descKey: 'badges.desc.deadlift' },
+  { id: 9, icon: Calendar, labelKey: 'badges.items.thirtyDayStreak', earned: false, descKey: 'badges.desc.streak30' },
+  { id: 10, icon: Heart, labelKey: 'badges.items.hundredLikes', earned: false, descKey: 'badges.desc.likes100' },
 ];
 
 export default function BadgesScreen() {
@@ -38,14 +38,8 @@ export default function BadgesScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
       <View className="flex-row items-center px-4 py-3">
-        <Pressable
-          onPress={() => router.back()}
-          className="p-1 mr-2"
-          style={({ pressed }) => pressed && { opacity: 0.5 }}
-        >
-          <Ionicons name="arrow-back" size={22} color={Colors.accent} style={rtlIconFlip} />
-        </Pressable>
-        <Text className="font-heading text-2xl text-primary tracking-[3px] flex-1">
+        <BackButton />
+        <Text className="font-heading text-2xl text-primary tracking-[3px] flex-1 ml-1">
           {t('badges.title')}
         </Text>
         <View className="w-[30px]" />
@@ -68,7 +62,7 @@ export default function BadgesScreen() {
           {earned.map((b) => (
             <View key={b.id} className="w-[30%] grow bg-surface rounded-2xl p-3.5 items-center gap-1.5">
               <View className="w-[52px] h-[52px] rounded-full items-center justify-center bg-[rgba(255,170,0,0.15)]">
-                <Ionicons name={b.icon} size={24} color={Colors.warning ?? '#ffaa00'} />
+                <b.icon size={24} color={Colors.warning} />
               </View>
               <Text className="font-sans-medium text-[12px] text-primary text-center">
                 {t(b.labelKey)}
@@ -89,7 +83,7 @@ export default function BadgesScreen() {
               className="w-[30%] grow bg-surface rounded-2xl p-3.5 items-center gap-1.5 opacity-50"
             >
               <View className="w-[52px] h-[52px] rounded-full items-center justify-center bg-elevated">
-                <Ionicons name={b.icon} size={24} color={Colors.hint} />
+                <b.icon size={24} color={Colors.hint} />
               </View>
               <Text className="font-sans-medium text-[12px] text-muted text-center">
                 {t(b.labelKey)}

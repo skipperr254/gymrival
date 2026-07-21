@@ -24,6 +24,7 @@
     "profile": "الملف الشخصي"
   },
   "accessibility": {
-    "logActivity": "تسجيل نشاط"
+    "logActivity": "تسجيل نشاط",
+    "back": "رجوع"
   }
 }

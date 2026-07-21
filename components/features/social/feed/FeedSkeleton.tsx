@@ -14,16 +14,16 @@ export function FeedSkeleton() {
         <View className="w-9 h-9 rounded-full bg-[#242424]" />
         <View className="flex-1 gap-2">
           <View className="h-3 w-[45%] rounded-md bg-[#242424]" />
-          <View className="h-2.5 w-[65%] rounded-md bg-[#1e1e1e]" />
+          <View className="h-2.5 w-[65%] rounded-md bg-surface" />
         </View>
-        <View className="w-10 h-6 rounded-lg bg-[#1e1e1e]" />
+        <View className="w-10 h-6 rounded-lg bg-surface" />
       </View>
       {/* Media */}
       <View className="bg-[#191919]" style={{ aspectRatio: DEFAULT_FEED_RATIO }} />
       {/* Action row */}
       <View className="flex-row items-center justify-between px-4 py-3">
         <View className="h-3.5 w-20 rounded-md bg-[#242424]" />
-        <View className="h-[34px] w-[90px] rounded-xl bg-[#1e1e1e]" />
+        <View className="h-[34px] w-[90px] rounded-xl bg-surface" />
       </View>
     </View>
   );

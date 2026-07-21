@@ -28,13 +28,24 @@
   "settings": {
     "title": "الإعدادات",
     "notifications": "الإشعارات",
-    "notificationsSub": "الإشعارات الفورية مفعّلة",
-    "privacy": "الخصوصية",
-    "privacySub": "الملف الشخصي مرئي للأصدقاء",
-    "darkMode": "الوضع الداكن",
-    "darkModeOn": "مفعّل",
+    "notificationsSub": "الإعجابات والرسائل وطلبات الصداقة",
+    "changePassword": "تغيير كلمة المرور",
+    "changePasswordSub": "تحديث كلمة مرور حسابك",
     "shareProfile": "مشاركة الملف الشخصي",
-    "shareProfileSub": "نسخ الرابط الخاص بك"
+    "shareProfileSub": "قريبًا"
+  },
+  "changePassword": {
+    "title": "تغيير كلمة المرور",
+    "newPasswordLabel": "كلمة المرور الجديدة",
+    "newPasswordPlaceholder": "٨ أحرف على الأقل",
+    "passwordHint": "استخدم ٨ أحرف أو أكثر.",
+    "confirmPasswordLabel": "تأكيد كلمة المرور",
+    "confirmPasswordPlaceholder": "أعد كتابة كلمة المرور",
+    "passwordMismatch": "كلمتا المرور غير متطابقتين.",
+    "submit": "تحديث كلمة المرور",
+    "successTitle": "تم تحديث كلمة المرور",
+    "successMsg": "تم تغيير كلمة المرور الخاصة بك.",
+    "errorTitle": "تعذّر تحديث كلمة المرور"
   },
   "logOut": "تسجيل الخروج",
   "edit": {
@@ -60,7 +71,15 @@
     "invalidHeightMsg": "الرجاء إدخال طول صالح بالسنتيمتر.",
     "saveErrorTitle": "تعذر الحفظ",
     "usernameTakenError": "اسم المستخدم هذا مُستخدم بالفعل. الرجاء اختيار اسم آخر.",
-    "saveErrorGeneric": "حدث خطأ ما. تحقق من اتصالك وحاول مرة أخرى."
+    "saveErrorGeneric": "حدث خطأ ما. تحقق من اتصالك وحاول مرة أخرى.",
+    "changePhotoTitle": "تغيير الصورة",
+    "takePhoto": "التقاط صورة",
+    "chooseFromLibrary": "الاختيار من المكتبة",
+    "removePhoto": "إزالة الصورة",
+    "photoPermissionTitle": "الإذن مطلوب",
+    "photoPermissionMsg": "اسمح بالوصول إلى الكاميرا أو مكتبة الصور لتعيين صورة شخصية.",
+    "uploadErrorTitle": "تعذر تحميل الصورة",
+    "uploadErrorMsg": "حدث خطأ ما. تحقق من اتصالك وحاول مرة أخرى."
   },
   "badges": {
     "title": "الأوسمة",

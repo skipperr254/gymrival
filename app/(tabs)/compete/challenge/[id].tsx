@@ -7,10 +7,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
-  ArrowLeft,
   Trophy,
   Clock,
   Gift,
@@ -25,6 +24,7 @@ import {
 } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
+import { getExerciseIcon } from '@/constants/exerciseIcons';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCompeteStore } from '@/store/useCompeteStore';
 import type { ChallengeWithStats, ChallengeLeaderboardEntry } from '@/types/challenge';
@@ -34,6 +34,7 @@ import {
   metricLabel,
 } from '@/types/challenge';
 import { ChallengeLeaderboardRow } from '@/components/features/compete/ChallengeLeaderboardRow';
+import { BackButton } from '@/components/ui/BackButton';
 
 export default function ChallengeDetailScreen() {
   const { t } = useTranslation('compete');
@@ -85,21 +86,15 @@ export default function ChallengeDetailScreen() {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
         <View className="flex-row items-center px-4 py-3">
-          <Pressable
-            onPress={() => router.back()}
-            className="p-1 mr-2"
-            style={({ pressed }) => pressed && { opacity: 0.6 }}
-          >
-            <ArrowLeft size={20} strokeWidth={2} color={Colors.accent} />
-          </Pressable>
-          <Text className="font-heading text-[22px] tracking-[3px] text-primary flex-1">
+          <BackButton />
+          <Text className="font-heading text-[22px] tracking-[3px] text-primary flex-1 ml-1">
             {t('detail.heading')}
           </Text>
           <View className="w-9" />
         </View>
         <View className="flex-1 items-center justify-center gap-2.5 px-8">
           <AlertCircle size={26} strokeWidth={1.6} color={Colors.accent} />
-          <Text className="font-sans text-sm text-[#555] text-center">{t('detail.loadError')}</Text>
+          <Text className="font-sans text-sm text-muted text-center">{t('detail.loadError')}</Text>
           <Pressable
             onPress={() => user?.id && loadChallenges(user.id)}
             className="flex-row items-center gap-1.5 mt-1 py-2 px-4"
@@ -134,30 +129,25 @@ export default function ChallengeDetailScreen() {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
         <View className="flex-row items-center px-4 py-3">
-          <Pressable
-            onPress={() => router.back()}
-            className="p-1 mr-2"
-            style={({ pressed }) => pressed && { opacity: 0.6 }}
-          >
-            <ArrowLeft size={20} strokeWidth={2} color={Colors.accent} />
-          </Pressable>
-          <Text className="font-heading text-[22px] tracking-[3px] text-primary flex-1">
+          <BackButton />
+          <Text className="font-heading text-[22px] tracking-[3px] text-primary flex-1 ml-1">
             {t('detail.heading')}
           </Text>
           <View className="w-9" />
         </View>
         <View className="flex-1 items-center justify-center gap-2.5">
           <AlertCircle size={26} strokeWidth={1.6} color={Colors.accent} />
-          <Text className="font-sans text-sm text-[#555]">{t('detail.notFound')}</Text>
+          <Text className="font-sans text-sm text-muted">{t('detail.notFound')}</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   const isFriend   = challenge?.type === 'friend';
-  const accentColor = isFriend ? '#4a9eff' : Colors.accent;
+  const accentColor = isFriend ? Colors.friend : Colors.accent;
 
-  const MetricIcon = challenge?.metric === 'most_improved' ? TrendingUp
+  const MetricIcon = challenge?.exercise_key ? getExerciseIcon(challenge.exercise_key)
+    : challenge?.metric === 'most_improved' ? TrendingUp
     : challenge?.metric === 'total_volume'  ? Activity
     : Dumbbell;
 
@@ -165,14 +155,8 @@ export default function ChallengeDetailScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
       {/* Header */}
       <View className="flex-row items-center px-4 py-3">
-        <Pressable
-          onPress={() => router.back()}
-          className="p-1 mr-2"
-          style={({ pressed }) => pressed && { opacity: 0.6 }}
-        >
-          <ArrowLeft size={20} strokeWidth={2} color={Colors.accent} />
-        </Pressable>
-        <Text className="font-heading text-[22px] tracking-[3px] text-primary flex-1">
+        <BackButton />
+        <Text className="font-heading text-[22px] tracking-[3px] text-primary flex-1 ml-1">
           {t('detail.heading')}
         </Text>
         <View className="w-9" />
@@ -202,7 +186,7 @@ export default function ChallengeDetailScreen() {
                 {challenge.description}
               </Text>
             )}
-            <Text className="font-sans text-[13px] leading-5 mb-1 text-[#555] mt-0.5">
+            <Text className="font-sans text-[13px] leading-5 mb-1 text-muted mt-0.5">
               {metricLabel(challenge.metric)}
             </Text>
 
@@ -213,7 +197,7 @@ export default function ChallengeDetailScreen() {
               >
                 <Gift size={15} strokeWidth={1.8} color={accentColor} />
                 <View>
-                  <Text className="font-heading text-[9px] text-[#555] tracking-[2px] mb-0.5">
+                  <Text className="font-heading text-[9px] text-muted tracking-[2px] mb-0.5">
                     {t('detail.prize')}
                   </Text>
                   <Text className="font-sans text-[13px]" style={{ color: accentColor }}>
@@ -225,9 +209,9 @@ export default function ChallengeDetailScreen() {
 
             <View className="flex-row gap-5 flex-wrap">
               <View className="flex-row items-center gap-2">
-                <Clock size={14} strokeWidth={1.8} color="#555" />
+                <Clock size={14} strokeWidth={1.8} color={Colors.muted} />
                 <View>
-                  <Text className="font-heading text-[9px] text-[#555] tracking-[2px]">
+                  <Text className="font-heading text-[9px] text-muted tracking-[2px]">
                     {t('detail.endsIn')}
                   </Text>
                   <Text className="font-heading text-lg text-primary">
@@ -236,9 +220,9 @@ export default function ChallengeDetailScreen() {
                 </View>
               </View>
               <View className="flex-row items-center gap-2">
-                <Users size={14} strokeWidth={1.8} color="#555" />
+                <Users size={14} strokeWidth={1.8} color={Colors.muted} />
                 <View>
-                  <Text className="font-heading text-[9px] text-[#555] tracking-[2px]">
+                  <Text className="font-heading text-[9px] text-muted tracking-[2px]">
                     {t('detail.participants')}
                   </Text>
                   <Text className="font-heading text-lg text-primary">
@@ -248,9 +232,9 @@ export default function ChallengeDetailScreen() {
               </View>
               {challenge.reward_xp > 0 && (
                 <View className="flex-row items-center gap-2">
-                  <Zap size={14} strokeWidth={1.8} color="#555" />
+                  <Zap size={14} strokeWidth={1.8} color={Colors.muted} />
                   <View>
-                    <Text className="font-heading text-[9px] text-[#555] tracking-[2px]">
+                    <Text className="font-heading text-[9px] text-muted tracking-[2px]">
                       {t('detail.xpReward')}
                     </Text>
                     <Text className="font-heading text-lg text-primary">
@@ -278,7 +262,7 @@ export default function ChallengeDetailScreen() {
           </View>
         ) : (
           // Skeleton while challenge loads
-          <View className="bg-surface rounded-[20px] p-5 mb-5 border h-[180px] opacity-40 border-[#2a2a2a]" />
+          <View className="bg-surface rounded-[20px] p-5 mb-5 border h-[180px] opacity-40 border-default" />
         )}
 
         {/* Error display */}
@@ -290,7 +274,7 @@ export default function ChallengeDetailScreen() {
         )}
 
         {/* Leaderboard */}
-        <Text className="font-heading text-[11px] tracking-[3px] text-[#555] mb-2.5">
+        <Text className="font-heading text-[11px] tracking-[3px] text-muted mb-2.5">
           {t('detail.leaderboard')}
         </Text>
 
@@ -322,7 +306,7 @@ export default function ChallengeDetailScreen() {
             <Text className="font-heading text-base tracking-[2px] text-white">
               {t('detail.noParticipants')}
             </Text>
-            <Text className="font-sans text-xs text-[#555]">{t('detail.beFirst')}</Text>
+            <Text className="font-sans text-xs text-muted">{t('detail.beFirst')}</Text>
           </View>
         )}
 
@@ -356,9 +340,9 @@ export default function ChallengeDetailScreen() {
             className="mt-2 mb-4 rounded-2xl overflow-hidden"
           >
             {challenge.is_joined ? (
-              <View className="flex-row items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#2a2a2a]">
-                <CheckCircle size={15} strokeWidth={2} color="#555" />
-                <Text className="font-heading text-[13px] tracking-[2px] text-[#555]">
+              <View className="flex-row items-center justify-center gap-2 py-3.5 rounded-2xl bg-elevated">
+                <CheckCircle size={15} strokeWidth={2} color={Colors.muted} />
+                <Text className="font-heading text-[13px] tracking-[2px] text-muted">
                   {t('detail.joinedTapToLeave')}
                 </Text>
               </View>
@@ -376,7 +360,7 @@ export default function ChallengeDetailScreen() {
                   borderRadius: 14,
                 }}
               >
-                <ActivityIndicator size="small" color="#fff" />
+                <ActivityIndicator size="small" color={Colors.primary} />
               </LinearGradient>
             ) : (
               <LinearGradient
@@ -392,7 +376,7 @@ export default function ChallengeDetailScreen() {
                   borderRadius: 14,
                 }}
               >
-                <Zap size={15} strokeWidth={2} color="#fff" />
+                <Zap size={15} strokeWidth={2} color={Colors.primary} />
                 <Text className="font-heading text-sm tracking-[3px] text-white">
                   {t('detail.joinChallenge')}
                 </Text>

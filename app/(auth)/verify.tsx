@@ -11,12 +11,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { Colors } from "@/constants/theme";
 import { Routes } from "@/constants/routes";
-import { rtlIconFlip } from "@/lib/i18n/rtl";
 import { useAuthStore } from "@/store/useAuthStore";
+import { BackButton } from "@/components/ui/BackButton";
 
 const CODE_LENGTH = 8;
 
@@ -121,9 +120,9 @@ export default function VerifyScreen() {
       >
         <View className="flex-1 px-5 pt-4 pb-10">
           {/* Back */}
-          <Pressable onPress={() => router.back()} hitSlop={12} className="mb-9">
-            <Ionicons name="arrow-back" size={24} color={Colors.primary} style={rtlIconFlip} />
-          </Pressable>
+          <View className="mb-9 self-start">
+            <BackButton />
+          </View>
 
           {/* Header */}
           <View className="mb-11">

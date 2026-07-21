@@ -1,6 +1,6 @@
 import { Routes } from "@/constants/routes";
 import { Colors } from "@/constants/theme";
-import { Ionicons } from "@expo/vector-icons";
+import { Trophy, Zap, Users, type LucideIcon } from "lucide-react-native";
 import { router } from "expo-router";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -15,10 +15,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-type IoniconName = React.ComponentProps<typeof Ionicons>["name"];
-
 interface Slide {
-  icon: IoniconName;
+  icon: LucideIcon;
   tagKey: string;
   titleKey: string;
   bodyKey: string;
@@ -26,19 +24,19 @@ interface Slide {
 
 const SLIDES: Slide[] = [
   {
-    icon: "trophy-outline",
+    icon: Trophy,
     tagKey: "onboarding.slide1.tag",
     titleKey: "onboarding.slide1.title",
     bodyKey: "onboarding.slide1.body",
   },
   {
-    icon: "flash-outline",
+    icon: Zap,
     tagKey: "onboarding.slide2.tag",
     titleKey: "onboarding.slide2.title",
     bodyKey: "onboarding.slide2.body",
   },
   {
-    icon: "people-outline",
+    icon: Users,
     tagKey: "onboarding.slide3.tag",
     titleKey: "onboarding.slide3.title",
     bodyKey: "onboarding.slide3.body",
@@ -104,7 +102,7 @@ export default function OnboardingScreen() {
             {/* Icon illustration */}
             <View className="w-55 h-55 rounded-[110px] border border-accent-ring items-center justify-center mb-11">
               <View className="w-43.5 h-43.5 rounded-[87px] bg-surface items-center justify-center">
-                <Ionicons name={slide.icon} size={76} color={Colors.accent} />
+                <slide.icon size={76} strokeWidth={1.4} color={Colors.accent} />
               </View>
             </View>
 

@@ -1,3 +1,2 @@
-export { DetailRow, SettingsRow } from './rows';
-export { getExerciseIcon, formatMemberSince, computeBarRatios } from './helpers';
-export type { IoniconName } from './helpers';
+export { DetailRow, SettingsRow, SettingsToggleRow } from './rows';
+export { formatMemberSince, computeBarRatios } from './helpers';

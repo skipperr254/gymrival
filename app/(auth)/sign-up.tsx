@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Eye, EyeOff } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import { Colors } from "@/constants/theme";
 import { Routes } from "@/constants/routes";
@@ -147,11 +147,11 @@ export default function SignUpScreen() {
                   onPress={() => setShowPassword((v) => !v)}
                   hitSlop={10}
                 >
-                  <Ionicons
-                    name={showPassword ? "eye-off-outline" : "eye-outline"}
-                    size={20}
-                    color={Colors.secondary}
-                  />
+                  {showPassword ? (
+                    <EyeOff size={20} color={Colors.secondary} />
+                  ) : (
+                    <Eye size={20} color={Colors.secondary} />
+                  )}
                 </Pressable>
               </View>
               <Text className="font-sans text-[12px] text-muted mt-1.5 ml-1">

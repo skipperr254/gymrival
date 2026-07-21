@@ -1,7 +1,7 @@
 import { View, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { ArrowRight } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
@@ -33,7 +33,7 @@ export default function SplashScreen() {
           <Text className="font-heading text-base text-primary tracking-[2px]">
             {t('splash.getStarted')}
           </Text>
-          <Ionicons name="arrow-forward" size={18} color={Colors.primary} style={rtlIconFlip} />
+          <ArrowRight size={18} color={Colors.primary} style={rtlIconFlip} />
         </Pressable>
 
         <Pressable

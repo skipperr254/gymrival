@@ -29,5 +29,7 @@ export const Routes = {
   profilePRHistory: '/(tabs)/profile/pr-history',
   profileBadges: '/(tabs)/profile/badges',
   profileLanguage: '/(tabs)/profile/language',
+  profileSettings: '/(tabs)/profile/settings',
+  profileChangePassword: '/(tabs)/profile/change-password',
   notifications: '/(tabs)/profile/notifications',
 } as const;

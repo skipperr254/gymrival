@@ -28,13 +28,24 @@
   "settings": {
     "title": "SETTINGS",
     "notifications": "Notifications",
-    "notificationsSub": "Push notifications on",
-    "privacy": "Privacy",
-    "privacySub": "Profile visible to friends",
-    "darkMode": "Dark mode",
-    "darkModeOn": "On",
+    "notificationsSub": "Likes, messages & friend requests",
+    "changePassword": "Change Password",
+    "changePasswordSub": "Update your account password",
     "shareProfile": "Share profile",
-    "shareProfileSub": "Copy your link"
+    "shareProfileSub": "Coming soon"
+  },
+  "changePassword": {
+    "title": "CHANGE PASSWORD",
+    "newPasswordLabel": "NEW PASSWORD",
+    "newPasswordPlaceholder": "Min. 8 characters",
+    "passwordHint": "Use 8 or more characters.",
+    "confirmPasswordLabel": "CONFIRM PASSWORD",
+    "confirmPasswordPlaceholder": "Repeat your password",
+    "passwordMismatch": "Passwords don't match.",
+    "submit": "UPDATE PASSWORD",
+    "successTitle": "Password updated",
+    "successMsg": "Your password has been changed.",
+    "errorTitle": "Could not update password"
   },
   "logOut": "LOG OUT",
   "edit": {
@@ -60,7 +71,15 @@
     "invalidHeightMsg": "Please enter a valid height in cm.",
     "saveErrorTitle": "Could not save",
     "usernameTakenError": "That username is already taken. Please choose another.",
-    "saveErrorGeneric": "Something went wrong. Check your connection and try again."
+    "saveErrorGeneric": "Something went wrong. Check your connection and try again.",
+    "changePhotoTitle": "Change photo",
+    "takePhoto": "Take Photo",
+    "chooseFromLibrary": "Choose from Library",
+    "removePhoto": "Remove Photo",
+    "photoPermissionTitle": "Permission needed",
+    "photoPermissionMsg": "Allow access to your camera or photo library to set a profile photo.",
+    "uploadErrorTitle": "Could not upload photo",
+    "uploadErrorMsg": "Something went wrong. Check your connection and try again."
   },
   "badges": {
     "title": "BADGES",

@@ -9,6 +9,7 @@ import {
 import { Video, Camera, X, Clock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { pickVideoFromLibrary, recordVideoFromCamera, type PickedVideoAsset } from '@/lib/media/pickVideoAsset';
+import { Colors } from '@/constants/theme';
 
 type VideoAsset = PickedVideoAsset;
 
@@ -76,7 +77,7 @@ export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabl
             className="w-7 h-7 rounded-full bg-black/70 items-center justify-center"
             hitSlop={8}
           >
-            <X size={14} strokeWidth={2.5} color="#fff" />
+            <X size={14} strokeWidth={2.5} color={Colors.primary} />
           </Pressable>
         </View>
         {/* Ready label */}
@@ -97,15 +98,15 @@ export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabl
         disabled ? 'opacity-40' : ''
       }`}
       style={({ pressed }) =>
-        pressed && !disabled ? { backgroundColor: '#1e1e1e', borderColor: '#3a3a3a' } : undefined
+        pressed && !disabled ? { backgroundColor: Colors.surface, borderColor: '#3a3a3a' } : undefined
       }
     >
       <View className="flex-row gap-3 mb-1">
-        <View className="w-10 h-10 rounded-xl bg-[#1e1e1e] items-center justify-center">
-          <Camera size={20} strokeWidth={1.6} color="#555" />
+        <View className="w-10 h-10 rounded-xl bg-surface items-center justify-center">
+          <Camera size={20} strokeWidth={1.6} color={Colors.muted} />
         </View>
-        <View className="w-10 h-10 rounded-xl bg-[#1e1e1e] items-center justify-center">
-          <Video size={20} strokeWidth={1.4} color="#555" />
+        <View className="w-10 h-10 rounded-xl bg-surface items-center justify-center">
+          <Video size={20} strokeWidth={1.4} color={Colors.muted} />
         </View>
       </View>
       <Text className="font-heading text-[11px] tracking-[2px] text-[#444]">

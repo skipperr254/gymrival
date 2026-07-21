@@ -28,13 +28,24 @@
   "settings": {
     "title": "EINSTELLUNGEN",
     "notifications": "Benachrichtigungen",
-    "notificationsSub": "Push-Benachrichtigungen an",
-    "privacy": "Datenschutz",
-    "privacySub": "Profil für Freunde sichtbar",
-    "darkMode": "Dunkler Modus",
-    "darkModeOn": "An",
+    "notificationsSub": "Likes, Nachrichten und Freundschaftsanfragen",
+    "changePassword": "Passwort ändern",
+    "changePasswordSub": "Aktualisiere dein Kontopasswort",
     "shareProfile": "Profil teilen",
-    "shareProfileSub": "Link kopieren"
+    "shareProfileSub": "Demnächst verfügbar"
+  },
+  "changePassword": {
+    "title": "PASSWORT ÄNDERN",
+    "newPasswordLabel": "NEUES PASSWORT",
+    "newPasswordPlaceholder": "Min. 8 Zeichen",
+    "passwordHint": "Verwende mindestens 8 Zeichen.",
+    "confirmPasswordLabel": "PASSWORT BESTÄTIGEN",
+    "confirmPasswordPlaceholder": "Passwort wiederholen",
+    "passwordMismatch": "Passwörter stimmen nicht überein.",
+    "submit": "PASSWORT AKTUALISIEREN",
+    "successTitle": "Passwort aktualisiert",
+    "successMsg": "Dein Passwort wurde geändert.",
+    "errorTitle": "Passwort konnte nicht aktualisiert werden"
   },
   "logOut": "ABMELDEN",
   "edit": {
@@ -60,7 +71,15 @@
     "invalidHeightMsg": "Bitte gib eine gültige Größe in cm ein.",
     "saveErrorTitle": "Speichern fehlgeschlagen",
     "usernameTakenError": "Dieser Benutzername ist bereits vergeben. Bitte wähle einen anderen.",
-    "saveErrorGeneric": "Etwas ist schiefgelaufen. Überprüfe deine Verbindung und versuche es erneut."
+    "saveErrorGeneric": "Etwas ist schiefgelaufen. Überprüfe deine Verbindung und versuche es erneut.",
+    "changePhotoTitle": "Foto ändern",
+    "takePhoto": "Foto aufnehmen",
+    "chooseFromLibrary": "Aus Mediathek wählen",
+    "removePhoto": "Foto entfernen",
+    "photoPermissionTitle": "Berechtigung erforderlich",
+    "photoPermissionMsg": "Erlaube den Zugriff auf deine Kamera oder Fotomediathek, um ein Profilfoto festzulegen.",
+    "uploadErrorTitle": "Foto konnte nicht hochgeladen werden",
+    "uploadErrorMsg": "Etwas ist schiefgelaufen. Überprüfe deine Verbindung und versuche es erneut."
   },
   "badges": {
     "title": "ABZEICHEN",

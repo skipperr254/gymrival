@@ -6,8 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSocialStore } from '@/store/useSocialStore';
-import { ErrorState } from '@/components/ui';
-import { FriendAvatar } from '../FriendAvatar';
+import { ErrorState, Avatar } from '@/components/ui';
 
 /** The "Requests" sub-tab: incoming (accept/decline) + outgoing (pending/cancel). */
 export function FriendRequests() {
@@ -34,7 +33,7 @@ export function FriendRequests() {
   if (requestsLoading) {
     return (
       <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
-        <ActivityIndicator color="#404040" />
+        <ActivityIndicator color={Colors.hint} />
       </View>
     );
   }
@@ -62,9 +61,10 @@ export function FriendRequests() {
               className="bg-[#1c1c1c] border border-[#242424] rounded-2xl p-4 mb-2.5"
             >
               <View className="flex-row items-center gap-3 mb-3.5">
-                <FriendAvatar
-                  id={req.user.id}
+                <Avatar
+                  userId={req.user.id}
                   name={req.user.full_name ?? req.user.username ?? '?'}
+                  avatarUrl={req.user.avatar_url}
                   size={46}
                 />
                 <View>
@@ -91,7 +91,7 @@ export function FriendRequests() {
                       borderRadius: 12,
                     }}
                   >
-                    <UserCheck size={14} strokeWidth={2} color="#fff" />
+                    <UserCheck size={14} strokeWidth={2} color={Colors.primary} />
                     <Text className="font-heading text-xs tracking-[2px] text-white">
                       {t('accept')}
                     </Text>
@@ -99,7 +99,7 @@ export function FriendRequests() {
                 </Pressable>
                 <Pressable
                   onPress={() => declineRequest(req.friendship_id)}
-                  className="flex-row items-center justify-center gap-[7px] py-[11px] rounded-xl bg-[#1a1a1a] border border-[#2a2a2a] flex-1"
+                  className="flex-row items-center justify-center gap-[7px] py-[11px] rounded-xl bg-[#1a1a1a] border border-default flex-1"
                 >
                   <X size={14} strokeWidth={2} color="#606060" />
                   <Text className="font-heading text-xs tracking-[2px] text-[#606060]">
@@ -126,9 +126,10 @@ export function FriendRequests() {
               key={req.friendship_id}
               className="flex-row items-center gap-3 bg-[#1c1c1c] border border-[#242424] rounded-2xl p-3.5 mb-2.5"
             >
-              <FriendAvatar
-                id={req.user.id}
+              <Avatar
+                userId={req.user.id}
                 name={req.user.full_name ?? req.user.username ?? '?'}
+                avatarUrl={req.user.avatar_url}
                 size={44}
               />
               <View className="flex-1">
@@ -146,7 +147,7 @@ export function FriendRequests() {
                 </Text>
                 <Pressable
                   onPress={() => cancelRequest(req.friendship_id)}
-                  className="w-[30px] h-[30px] rounded-full border border-[#2a2a2a] bg-[#1a1a1a] items-center justify-center ml-1"
+                  className="w-[30px] h-[30px] rounded-full border border-default bg-[#1a1a1a] items-center justify-center ml-1"
                 >
                   <X size={13} strokeWidth={2.5} color="#505050" />
                 </Pressable>
@@ -164,7 +165,7 @@ export function FriendRequests() {
           <Text className="font-heading text-[17px] tracking-[2px] text-white mb-1.5">
             {t('allClearTitle')}
           </Text>
-          <Text className="font-sans text-[13px] text-[#555] text-center">
+          <Text className="font-sans text-[13px] text-muted text-center">
             {t('allClearSub')}
           </Text>
         </View>

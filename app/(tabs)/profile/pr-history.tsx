@@ -1,22 +1,23 @@
 import { useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Trophy } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
+import { getExerciseIcon } from '@/constants/exerciseIcons';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { formatDate } from '@/lib/i18n/format';
-import { rtlIconFlip } from '@/lib/i18n/rtl';
+import { BackButton } from '@/components/ui/BackButton';
 import type { PRHistoryGroup } from '@/types/pr';
 
 function PRGroup({ group }: { group: PRHistoryGroup }) {
   const { t } = useTranslation('profile');
+  const ExIcon = getExerciseIcon(group.exercise.key);
   return (
     <View className="bg-surface rounded-2xl mb-3 overflow-hidden">
       <View className="flex-row items-center gap-2 bg-elevated py-3.5 px-4">
-        <Ionicons name="trophy" size={14} color={Colors.accent} />
+        <ExIcon size={14} color={Colors.accent} />
         <Text className="flex-1 font-heading text-[13px] text-primary tracking-[2px]">
           {group.exercise.label.toUpperCase()}
         </Text>
@@ -32,7 +33,7 @@ function PRGroup({ group }: { group: PRHistoryGroup }) {
         >
           {i === 0 ? (
             <View className="w-5 items-center">
-              <Ionicons name="trophy" size={12} color={Colors.warning ?? '#ffaa00'} />
+              <Trophy size={12} color={Colors.warning} />
             </View>
           ) : (
             <View className="w-5" />
@@ -65,14 +66,8 @@ export default function PRHistoryScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
       <View className="flex-row items-center px-4 py-3">
-        <Pressable
-          onPress={() => router.back()}
-          className="p-1 mr-2"
-          style={({ pressed }) => pressed && { opacity: 0.5 }}
-        >
-          <Ionicons name="arrow-back" size={22} color={Colors.accent} style={rtlIconFlip} />
-        </Pressable>
-        <Text className="font-heading text-2xl text-primary tracking-[3px] flex-1">
+        <BackButton />
+        <Text className="font-heading text-2xl text-primary tracking-[3px] flex-1 ml-1">
           {t('prHistory.title')}
         </Text>
         <View className="w-[30px]" />
@@ -84,7 +79,7 @@ export default function PRHistoryScreen() {
         </View>
       ) : prHistory.length === 0 ? (
         <View className="flex-1 items-center justify-center px-8 gap-2.5">
-          <Ionicons name="trophy-outline" size={40} color="#333" />
+          <Trophy size={40} strokeWidth={1.4} color="#333" />
           <Text className="font-heading text-xl tracking-[2px] text-primary">
             {t('prHistory.emptyTitle')}
           </Text>

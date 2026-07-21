@@ -27,7 +27,7 @@ export async function fetchBestPRs(
       .order("value", { ascending: false }),
     supabase
       .from("exercise_types")
-      .select("key, label, icon, unit"),
+      .select("key, label, unit"),
   ]);
 
   if (prsResult.error) {
@@ -87,7 +87,7 @@ export async function fetchPRHistory(
       .order("created_at", { ascending: false }),
     supabase
       .from("exercise_types")
-      .select("key, label, icon, unit"),
+      .select("key, label, unit"),
   ]);
 
   if (prsResult.error) return { data: [], error: prsResult.error.message };

@@ -1,8 +1,6 @@
 import { Stack } from 'expo-router';
-import { Colors } from '@/constants/theme';
+import { stackScreenOptions } from '@/constants/navigation';
 
 export default function ProfileLayout() {
-  return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: Colors.base } }} />
-  );
+  return <Stack screenOptions={stackScreenOptions} />;
 }

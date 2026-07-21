@@ -28,13 +28,24 @@
   "settings": {
     "title": "INSTELLINGEN",
     "notifications": "Meldingen",
-    "notificationsSub": "Pushmeldingen aan",
-    "privacy": "Privacy",
-    "privacySub": "Profiel zichtbaar voor vrienden",
-    "darkMode": "Donkere modus",
-    "darkModeOn": "Aan",
+    "notificationsSub": "Likes, berichten en vriendschapsverzoeken",
+    "changePassword": "Wachtwoord wijzigen",
+    "changePasswordSub": "Werk je accountwachtwoord bij",
     "shareProfile": "Profiel delen",
-    "shareProfileSub": "Kopieer je link"
+    "shareProfileSub": "Binnenkort beschikbaar"
+  },
+  "changePassword": {
+    "title": "WACHTWOORD WIJZIGEN",
+    "newPasswordLabel": "NIEUW WACHTWOORD",
+    "newPasswordPlaceholder": "Min. 8 tekens",
+    "passwordHint": "Gebruik 8 of meer tekens.",
+    "confirmPasswordLabel": "BEVESTIG WACHTWOORD",
+    "confirmPasswordPlaceholder": "Herhaal je wachtwoord",
+    "passwordMismatch": "Wachtwoorden komen niet overeen.",
+    "submit": "WACHTWOORD BIJWERKEN",
+    "successTitle": "Wachtwoord bijgewerkt",
+    "successMsg": "Je wachtwoord is gewijzigd.",
+    "errorTitle": "Wachtwoord kon niet worden bijgewerkt"
   },
   "logOut": "UITLOGGEN",
   "edit": {
@@ -60,7 +71,15 @@
     "invalidHeightMsg": "Voer een geldige lengte in cm in.",
     "saveErrorTitle": "Opslaan mislukt",
     "usernameTakenError": "Die gebruikersnaam is al bezet. Kies een andere.",
-    "saveErrorGeneric": "Er is iets misgegaan. Controleer je verbinding en probeer het opnieuw."
+    "saveErrorGeneric": "Er is iets misgegaan. Controleer je verbinding en probeer het opnieuw.",
+    "changePhotoTitle": "Foto wijzigen",
+    "takePhoto": "Foto maken",
+    "chooseFromLibrary": "Kiezen uit bibliotheek",
+    "removePhoto": "Foto verwijderen",
+    "photoPermissionTitle": "Toestemming nodig",
+    "photoPermissionMsg": "Geef toegang tot je camera of fotobibliotheek om een profielfoto in te stellen.",
+    "uploadErrorTitle": "Foto uploaden mislukt",
+    "uploadErrorMsg": "Er is iets misgegaan. Controleer je verbinding en probeer het opnieuw."
   },
   "badges": {
     "title": "BADGES",

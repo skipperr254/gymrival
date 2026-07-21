@@ -9,7 +9,7 @@ import { useCompeteStore } from '@/store/useCompeteStore';
 import { useSocialStore } from '@/store/useSocialStore';
 import type { ChallengeMetric } from '@/types/challenge';
 import { metricLabel } from '@/types/challenge';
-import { LeaderboardAvatar } from './LeaderboardAvatar';
+import { Avatar } from '@/components/ui/Avatar';
 import { ChallengeCard } from './ChallengeCard';
 import { InvitationCard } from './InvitationCard';
 import { CreateChallengeModal } from './CreateChallengeModal';
@@ -143,12 +143,12 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
     return (
       <View className="items-center bg-[rgba(230,48,48,0.06)] rounded-2xl border border-[rgba(230,48,48,0.2)] py-7 px-5 gap-2 mt-6">
         <AlertCircle size={22} strokeWidth={1.6} color={Colors.accent} />
-        <Text className="font-sans text-[13px] text-[#b0b0b0]">{t('challenges.loadError')}</Text>
+        <Text className="font-sans text-[13px] text-secondary">{t('challenges.loadError')}</Text>
         <Pressable
           onPress={() => user?.id && loadChallenges(user.id)}
           className="flex-row items-center gap-1.5 mt-1 bg-accent py-2 px-4 rounded-[10px]"
         >
-          <RefreshCw size={13} strokeWidth={2} color="#fff" />
+          <RefreshCw size={13} strokeWidth={2} color={Colors.primary} />
           <Text className="font-heading text-xs tracking-[2px] text-white">
             {t('challenges.retry')}
           </Text>
@@ -171,7 +171,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
       {/* ── Pending Invitations ─────────────────────────────────────── */}
       {(pendingInvitations.length > 0 || loadingInvitations || invitationsError) && (
         <>
-          <Text className="font-heading text-[11px] tracking-[3px] text-[#555] mb-2.5">
+          <Text className="font-heading text-[11px] tracking-[3px] text-muted mb-2.5">
             {t('challenges.pendingInvitations')}
           </Text>
           {loadingInvitations ? (
@@ -184,7 +184,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
               className="flex-row items-center gap-2 bg-[rgba(230,48,48,0.06)] border border-[rgba(230,48,48,0.2)] rounded-2xl py-3 px-4 mb-3.5"
             >
               <AlertCircle size={14} strokeWidth={2} color={Colors.accent} />
-              <Text className="font-sans text-[13px] text-[#b0b0b0] flex-1">
+              <Text className="font-sans text-[13px] text-secondary flex-1">
                 {t('challenges.invitationsLoadError')}
               </Text>
               <RefreshCw size={13} strokeWidth={2} color={Colors.accent} />
@@ -206,7 +206,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
       {/* ── Admin / Global Challenges ───────────────────────────────── */}
       {adminChallenges.length > 0 && (
         <>
-          <Text className="font-heading text-[11px] tracking-[3px] text-[#555] mb-2.5">
+          <Text className="font-heading text-[11px] tracking-[3px] text-muted mb-2.5">
             {t('challenges.activeChallenges')}
           </Text>
           {adminChallenges.map(ch => (
@@ -226,7 +226,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
       {/* ── Friend Challenges ───────────────────────────────────────── */}
       {friendChallenges.length > 0 && (
         <>
-          <Text className="font-heading text-[11px] tracking-[3px] text-[#555] mb-2.5">
+          <Text className="font-heading text-[11px] tracking-[3px] text-muted mb-2.5">
             {t('challenges.friendChallenges')}
           </Text>
           {friendChallenges.map(ch => (
@@ -245,40 +245,41 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
 
       {/* ── Empty state ─────────────────────────────────────────────── */}
       {!loadingChallenges && challenges.length === 0 && (
-        <View className="items-center bg-[#1e1e1e] rounded-2xl py-12 px-5 gap-2">
+        <View className="items-center bg-surface rounded-2xl py-12 px-5 gap-2">
           <Zap size={32} strokeWidth={1.4} color="#333" />
           <Text className="font-heading text-lg tracking-[2px] text-white">
             {t('challenges.emptyTitle')}
           </Text>
-          <Text className="font-sans text-[13px] text-[#555]">{t('challenges.emptySub')}</Text>
+          <Text className="font-sans text-[13px] text-muted">{t('challenges.emptySub')}</Text>
         </View>
       )}
 
       {/* ── Challenge a Friend ──────────────────────────────────────── */}
-      <View className="bg-[#1e1e1e] rounded-2xl py-4 px-[18px] mb-3 mt-1 border border-[#2a2a2a]">
+      <View className="bg-surface rounded-2xl py-4 px-[18px] mb-3 mt-1 border border-default">
         <View className="flex-row items-center gap-2.5 mb-1">
           <Swords size={17} strokeWidth={1.6} color={Colors.accent} />
           <Text className="font-heading text-sm tracking-[2px] text-white">
             {t('challenges.challengeFriendTitle')}
           </Text>
         </View>
-        <Text className="font-sans text-xs text-[#555] mb-3.5">
+        <Text className="font-sans text-xs text-muted mb-3.5">
           {t('challenges.challengeFriendSub')}
         </Text>
 
         {friends.length > 0 && (
           <View className="flex-row gap-2 mb-3.5 flex-wrap">
             {friends.slice(0, 6).map(f => (
-              <LeaderboardAvatar
+              <Avatar
                 key={f.id}
-                id={f.id}
+                userId={f.id}
                 name={f.full_name ?? f.username ?? '?'}
+                avatarUrl={f.avatar_url}
                 size={36}
               />
             ))}
             {friends.length > 6 && (
-              <View className="w-9 h-9 rounded-full bg-[#252525] border border-[#2a2a2a] items-center justify-center">
-                <Text className="font-heading text-[11px] text-[#555]">
+              <View className="w-9 h-9 rounded-full bg-[#252525] border border-default items-center justify-center">
+                <Text className="font-heading text-[11px] text-muted">
                   {t('challenges.moreCount', { count: friends.length - 6 })}
                 </Text>
               </View>

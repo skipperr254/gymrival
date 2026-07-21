@@ -12,7 +12,7 @@ import {
   type PickVideoResult,
 } from '@/lib/media/pickVideoAsset';
 import type { FeedPost } from '@/types/social';
-import { FriendAvatar } from '../FriendAvatar';
+import { Avatar } from '@/components/ui/Avatar';
 import { FeedStatVisual } from './FeedStatVisual';
 import { FeedVideo } from './FeedVideo';
 import { DEFAULT_FEED_RATIO, MAX_FEED_RATIO, MIN_FEED_RATIO, clampFeedRatio } from './feedMedia';
@@ -116,12 +116,12 @@ function FeedPostCardInner({ post, userId, isActive, onToggleLike }: FeedPostCar
     <View className="mb-3 border-b border-subtle">
       {/* ── Author row ── */}
       <View className="flex-row items-center gap-3 px-4 py-2.5">
-        <FriendAvatar id={post.user_id} name={displayName} size={36} />
+        <Avatar userId={post.user_id} name={displayName} avatarUrl={post.author_avatar_url} size={36} />
         <View className="flex-1">
           <Text className="font-sans-semibold text-sm text-white mb-0.5">{displayName}</Text>
           <View className="flex-row items-center gap-1">
-            <MapPin size={10} strokeWidth={2} color="#555" />
-            <Text className="font-sans text-[11px] text-[#555]">
+            <MapPin size={10} strokeWidth={2} color={Colors.muted} />
+            <Text className="font-sans text-[11px] text-muted">
               {location} · {timestamp}
             </Text>
           </View>
@@ -149,7 +149,7 @@ function FeedPostCardInner({ post, userId, isActive, onToggleLike }: FeedPostCar
 
         {isUploading && (
           <View className="absolute top-2.5 left-3 flex-row items-center gap-1.5 bg-black/60 rounded-full py-[5px] px-2.5">
-            <ActivityIndicator size="small" color="#555" style={styles.uploadSpinner} />
+            <ActivityIndicator size="small" color={Colors.muted} style={styles.uploadSpinner} />
             <Text className="font-heading text-[9px] text-[#666] tracking-[1.5px]">
               {t('videoUploading')}
             </Text>
@@ -207,7 +207,7 @@ function FeedPostCardInner({ post, userId, isActive, onToggleLike }: FeedPostCar
             className={`flex-row items-center gap-[7px] py-2 px-4 rounded-xl border-[1.5px] ${
               post.has_liked
                 ? 'border-[rgba(230,48,48,0.50)] bg-[rgba(230,48,48,0.08)]'
-                : 'border-[#2a2a2a] bg-[#242424]'
+                : 'border-default bg-[#242424]'
             }`}
           >
             <Heart
@@ -225,7 +225,7 @@ function FeedPostCardInner({ post, userId, isActive, onToggleLike }: FeedPostCar
             </Text>
           </Pressable>
         ) : (
-          <Text className="font-heading text-[11px] text-[#404040] tracking-[1px]">
+          <Text className="font-heading text-[11px] text-hint tracking-[1px]">
             {t('yourPr')}
           </Text>
         )}

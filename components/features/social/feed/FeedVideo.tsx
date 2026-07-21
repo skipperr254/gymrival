@@ -6,6 +6,7 @@ import { VideoView, useVideoPlayer } from 'expo-video';
 import { AlertCircle, Clock, Maximize2, RefreshCw, Volume2, VolumeX } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { useSocialStore } from '@/store/useSocialStore';
+import { Colors } from '@/constants/theme';
 
 interface Props {
   /** Used as expo-image recyclingKey so thumbnails don't flash stale content */
@@ -200,7 +201,7 @@ export function FeedVideo({ postId, videoUrl, thumbnailUrl, durationSec, isActiv
           {feedMuted ? (
             <VolumeX size={14} strokeWidth={2} color="rgba(255,255,255,0.75)" />
           ) : (
-            <Volume2 size={14} strokeWidth={2} color="#fff" />
+            <Volume2 size={14} strokeWidth={2} color={Colors.primary} />
           )}
         </View>
       )}

@@ -1,5 +1,5 @@
 import { View, Text, Pressable, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Dumbbell, Plus, Trash2, ChevronRight } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { rtlIconFlip } from '@/lib/i18n/rtl';
@@ -51,7 +51,7 @@ export function ScheduleList({ sessions, loading, onOpenDetail, onDelete, onNew 
                 }`}
               >
                 {has ? (
-                  <Ionicons name="barbell" size={14} color={Colors.primary} />
+                  <Dumbbell size={14} color={Colors.primary} />
                 ) : (
                   <View className="w-1 h-1 rounded-sm bg-[#333]" />
                 )}
@@ -78,7 +78,7 @@ export function ScheduleList({ sessions, loading, onOpenDetail, onDelete, onNew 
           style={({ pressed }) => pressed && { opacity: 0.7 }}
           onPress={onNew}
         >
-          <Ionicons name="add" size={14} color={Colors.accent} />
+          <Plus size={14} color={Colors.accent} />
           <Text className="font-heading text-[11px] tracking-[1.5px] text-accent">{t('new')}</Text>
         </Pressable>
       </View>
@@ -92,7 +92,7 @@ export function ScheduleList({ sessions, loading, onOpenDetail, onDelete, onNew 
           onPress={() => onOpenDetail(s)}
         >
           <View className="w-[46px] h-[46px] rounded-2xl bg-base items-center justify-center">
-            <Ionicons name="barbell" size={22} color={Colors.accent} />
+            <Dumbbell size={22} color={Colors.accent} />
           </View>
           <View className="flex-1">
             <Text className="font-heading text-[17px] tracking-[2px] text-primary" numberOfLines={1}>
@@ -108,18 +108,18 @@ export function ScheduleList({ sessions, loading, onOpenDetail, onDelete, onNew 
             onPress={() => onDelete(s.id)}
             hitSlop={8}
           >
-            <Ionicons name="trash-outline" size={16} color="#ff6b6b" />
+            <Trash2 size={16} color="#ff6b6b" />
           </Pressable>
-          <Ionicons name="chevron-forward" size={18} color={Colors.muted} style={rtlIconFlip} />
+          <ChevronRight size={18} color={Colors.muted} style={rtlIconFlip} />
         </Pressable>
       ))}
 
       {/* Empty state */}
       {!loading && sessions.length === 0 && (
         <View className="items-center p-10 bg-surface rounded-[20px] border-[1.5px] border-default border-dashed">
-          <Ionicons
-            name="barbell-outline"
+          <Dumbbell
             size={40}
+            strokeWidth={1.4}
             color={Colors.muted}
             style={{ opacity: 0.4, marginBottom: 14 }}
           />

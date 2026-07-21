@@ -3,7 +3,7 @@ import { View, Text, FlatList, ActivityIndicator, Pressable, StyleSheet } from '
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import type { Message } from '@/types/social';
-import { ChatAvatar } from './ChatAvatar';
+import { Avatar } from '@/components/ui/Avatar';
 import { formatDateLabel, formatMessageTime } from './helpers';
 
 /**
@@ -56,7 +56,7 @@ const DateDivider = React.memo(function DateDivider({ label }: { label: string }
   return (
     <View className="flex-row items-center gap-2.5 mb-1.5 mt-1.5">
       <View className="flex-1 h-px bg-surface" />
-      <Text className="font-heading text-[9px] text-[#404040] tracking-[1.5px]">{label}</Text>
+      <Text className="font-heading text-[9px] text-hint tracking-[1.5px]">{label}</Text>
       <View className="flex-1 h-px bg-surface" />
     </View>
   );
@@ -69,6 +69,7 @@ interface MessageRowProps {
   isLastInGroup: boolean;
   otherUserId: string;
   displayName: string;
+  otherAvatarUrl: string | null;
 }
 
 /**
@@ -83,6 +84,7 @@ const MessageRow = React.memo(function MessageRow({
   isLastInGroup,
   otherUserId,
   displayName,
+  otherAvatarUrl,
 }: MessageRowProps) {
   const { t } = useTranslation('social');
   return (
@@ -93,7 +95,7 @@ const MessageRow = React.memo(function MessageRow({
     >
       {!isMe &&
         (showAvatar ? (
-          <ChatAvatar userId={otherUserId} name={displayName} size={28} />
+          <Avatar userId={otherUserId} name={displayName} avatarUrl={otherAvatarUrl} size={28} />
         ) : (
           <View className="w-7 shrink-0" />
         ))}
@@ -116,11 +118,11 @@ const MessageRow = React.memo(function MessageRow({
         </View>
         {isLastInGroup && (
           <View className={`flex-row items-center gap-1.5 mt-0.5 ${isMe ? 'justify-end' : ''}`}>
-            <Text className="font-sans text-[10px] text-[#404040]">
+            <Text className="font-sans text-[10px] text-hint">
               {formatMessageTime(msg.created_at)}
             </Text>
             {isMe && (
-              <Text className="font-sans text-[10px] text-[#404040]">
+              <Text className="font-sans text-[10px] text-hint">
                 {msg.read_at ? t('chat.read') : t('chat.sent')}
               </Text>
             )}
@@ -136,6 +138,7 @@ interface MessageListProps {
   currentUserId: string;
   otherUserId: string;
   displayName: string;
+  otherAvatarUrl: string | null;
   loadingOlderMessages: boolean;
   hasMoreMessages: boolean;
   messagesLoading: boolean;
@@ -150,6 +153,7 @@ function MessageListInner({
   currentUserId,
   otherUserId,
   displayName,
+  otherAvatarUrl,
   loadingOlderMessages,
   hasMoreMessages,
   messagesLoading,
@@ -173,9 +177,10 @@ function MessageListInner({
           isLastInGroup={item.isLastInGroup}
           otherUserId={otherUserId}
           displayName={displayName}
+          otherAvatarUrl={otherAvatarUrl}
         />
       ),
-    [currentUserId, otherUserId, displayName]
+    [currentUserId, otherUserId, displayName, otherAvatarUrl]
   );
 
   // Empty/loading/error states are rendered outside the FlatList: an
@@ -184,7 +189,7 @@ function MessageListInner({
   if (messagesLoading) {
     return (
       <View className="flex-1 items-center justify-center py-12">
-        <ActivityIndicator color="#404040" />
+        <ActivityIndicator color={Colors.hint} />
       </View>
     );
   }
@@ -198,7 +203,7 @@ function MessageListInner({
           </Text>
           <Pressable
             onPress={onRetry}
-            className="flex-row items-center gap-1.5 py-2 px-4 rounded-[10px] border border-[#2a2a2a]"
+            className="flex-row items-center gap-1.5 py-2 px-4 rounded-[10px] border border-default"
           >
             <Text
               className="font-heading text-[11px] tracking-[2px]"
@@ -238,7 +243,7 @@ function MessageListInner({
       initialNumToRender={20}
       ListFooterComponent={
         loadingOlderMessages ? (
-          <ActivityIndicator color="#404040" style={styles.olderSpinner} />
+          <ActivityIndicator color={Colors.hint} style={styles.olderSpinner} />
         ) : !hasMoreMessages ? (
           <View className="flex-row items-center gap-2.5 mb-2">
             <Text className="font-heading text-[9px] text-[#333] tracking-[2px]">

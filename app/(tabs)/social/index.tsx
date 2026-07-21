@@ -162,12 +162,12 @@ export default function SocialScreen() {
           ) : (
             <View className="items-center py-16 px-8">
               <View className="w-16 h-16 rounded-full bg-surface border border-default items-center justify-center mb-4">
-                <Dumbbell size={28} strokeWidth={1.4} color="#404040" />
+                <Dumbbell size={28} strokeWidth={1.4} color={Colors.hint} />
               </View>
               <Text className="font-heading text-lg tracking-[2px] text-white mb-2">
                 {t('feedEmptyTitle')}
               </Text>
-              <Text className="font-sans text-[13px] text-[#555] text-center leading-5">
+              <Text className="font-sans text-[13px] text-muted text-center leading-5">
                 {t('feedEmptySubtitle')}
               </Text>
             </View>

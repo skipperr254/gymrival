@@ -13,7 +13,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { X, Plus, Activity, Check } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { DAYS_FULL, type NewWorkout, type NewExercise } from './constants';
@@ -131,7 +131,7 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
                 style={({ pressed }) => pressed && { opacity: 0.6 }}
                 onPress={onClose}
               >
-                <Ionicons name="close" size={15} color={Colors.secondary} />
+                <X size={15} color={Colors.secondary} />
               </Pressable>
             </View>
 
@@ -216,7 +216,7 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
                 onPress={addExercise}
                 disabled={!canAddEx}
               >
-                <Ionicons name="add" size={14} color={canAddEx ? Colors.primary : Colors.muted} />
+                <Plus size={14} color={canAddEx ? Colors.primary : Colors.muted} />
                 <Text
                   className={`font-heading text-xs tracking-[2px] ${
                     canAddEx ? 'text-primary' : 'text-muted'
@@ -239,7 +239,7 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
                     className="flex-row items-center gap-2.5 bg-base rounded-xl py-2.5 px-3.5 mb-2"
                   >
                     <View className="w-7 h-7 rounded-lg bg-surface items-center justify-center">
-                      <Ionicons name="pulse" size={14} color={Colors.muted} />
+                      <Activity size={14} color={Colors.muted} />
                     </View>
                     <View className="flex-1">
                       <Text className="font-sans-semibold text-[13px] text-primary">{ex.name}</Text>
@@ -259,7 +259,7 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
                       hitSlop={8}
                       style={({ pressed }) => ({ opacity: pressed ? 1 : 0.5 })}
                     >
-                      <Ionicons name="close" size={14} color="#ff6b6b" />
+                      <X size={14} color="#ff6b6b" />
                     </Pressable>
                   </View>
                 ))}
@@ -279,7 +279,7 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
                 <ActivityIndicator size="small" color={Colors.primary} />
               ) : (
                 <>
-                  <Ionicons name="checkmark" size={17} color={canSave ? Colors.primary : Colors.muted} />
+                  <Check size={17} color={canSave ? Colors.primary : Colors.muted} />
                   <Text
                     className={`font-heading text-[15px] tracking-[3px] ${
                       canSave ? 'text-primary' : 'text-muted'

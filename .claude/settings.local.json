@@ -35,7 +35,17 @@
       "Bash(node -p \"require\\('./package.json'\\).dependencies['@formatjs/intl-relativetimeformat']\")",
       "Bash(node -p \"require\\('./package.json'\\).dependencies['expo']\")",
       "Bash(node -p \"require\\('./package.json'\\).dependencies['react-native']\")",
-      "Bash(node -e \"console.log\\(require\\('./package.json'\\).dependencies['@formatjs/intl-locale']\\)\")"
+      "Bash(node -e \"console.log\\(require\\('./package.json'\\).dependencies['@formatjs/intl-locale']\\)\")",
+      "Bash(node -p \"JSON.stringify\\(require\\('./node_modules/@formatjs/intl-relativetimeformat/package.json'\\).dependencies, null, 2\\)\")",
+      "Bash(node -p \"JSON.stringify\\(require\\('./node_modules/@formatjs/intl-locale/package.json'\\).exports, null, 2\\)\")",
+      "Bash(sed 's/\\\\.tsx\\\\?$//')",
+      "Bash(grep -iE '^\\(dumbbell|weight|anchor|flame|zap|trending-up|trending-down|activity|target|timer|repeat|repeat-2|arrow-up-circle|arrow-down-circle|chevrons-up|chevrons-down|person-standing|bar-chart-2|bar-chart-3|layers|mountain|footprints|swords|shield|move|rotate-cw|gauge|crosshair|star|award|medal|flag|waves|circle-dot|triangle|arrow-big-up|arrow-big-down|shrink|expand|move-vertical|move-horizontal|split|shuffle|corner-right-down|corner-left-down\\)\\\\.tsx?$')",
+      "Bash(sed 's/\\\\.mjs$//')",
+      "Bash(grep -iE '^\\(dumbbell|weight|anchor|flame|zap|trending-up|trending-down|activity|target|timer|repeat|repeat-2|arrow-up-circle|arrow-down-circle|chevrons-up|chevrons-down|person-standing|bar-chart-2|bar-chart-3|layers|mountain|footprints|swords|shield|move|rotate-cw|gauge|crosshair|star|award|medal|flag|waves|circle-dot|triangle|shrink|expand|move-vertical|move-horizontal|split|shuffle|corner-right-down|corner-left-down|hand|hand-metal|orbit|infinity|waypoints|link|link-2|milestone|flame-kindling|construction\\)\\\\.mjs$')",
+      "Bash(npx eas-cli *)",
+      "Bash(xargs grep -l \"FormData\")",
+      "Bash(node *)",
+      "Bash(awk '{print $5, $9}')"
     ]
   },
   "enableAllProjectMcpServers": true,

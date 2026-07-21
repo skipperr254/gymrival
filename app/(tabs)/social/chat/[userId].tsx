@@ -2,20 +2,21 @@ import { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
-  Pressable,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router, useLocalSearchParams } from 'expo-router';
-import { ChevronLeft, MessageCircle } from 'lucide-react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { MessageCircle } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { computeIsOnline, useChatStore } from '@/store/useChatStore';
 import { fetchProfile } from '@/lib/api';
-import { ChatAvatar, ChatInputBar, MessageList } from '@/components/features/social/chat';
+import { ChatInputBar, MessageList } from '@/components/features/social/chat';
+import { Avatar } from '@/components/ui/Avatar';
+import { BackButton } from '@/components/ui/BackButton';
 
 export default function ChatScreen() {
   const { t } = useTranslation('social');
@@ -47,6 +48,7 @@ export default function ChatScreen() {
     id: string;
     full_name: string | null;
     username: string | null;
+    avatar_url: string | null;
     level: number;
   } | null>(null);
 
@@ -72,6 +74,7 @@ export default function ChatScreen() {
           id: data.id,
           full_name: data.full_name,
           username: data.username,
+          avatar_url: data.avatar_url,
           level: data.level ?? 1,
         });
       }
@@ -147,20 +150,14 @@ export default function ChatScreen() {
           className="flex-row items-center gap-3 px-4 py-3 bg-[#1a1a1a]"
           style={{ borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#242424' }}
         >
-          <Pressable
-            onPress={() => router.back()}
-            className="w-9 h-9 rounded-full border border-[#2a2a2a] bg-[#242424] items-center justify-center shrink-0"
-            style={({ pressed }) => pressed && { opacity: 0.6 }}
-          >
-            <ChevronLeft size={18} strokeWidth={2} color="#888" />
-          </Pressable>
+          <BackButton />
         </View>
         <View className="flex-1 items-center justify-center gap-3 px-8 -mt-[60px]">
           <MessageCircle size={32} strokeWidth={1.4} color="#333" />
           <Text className="font-heading text-lg tracking-[2px] text-white">
             {t('chat.cantOpen')}
           </Text>
-          <Text className="font-sans text-[13px] text-[#555] text-center">
+          <Text className="font-sans text-[13px] text-muted text-center">
             {t('chat.errorSub')}
           </Text>
         </View>
@@ -181,16 +178,10 @@ export default function ChatScreen() {
         className="flex-row items-center gap-3 px-4 py-3 bg-[#1a1a1a]"
         style={{ borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#242424' }}
       >
-        <Pressable
-          onPress={() => router.back()}
-          className="w-9 h-9 rounded-full border border-[#2a2a2a] bg-[#242424] items-center justify-center shrink-0"
-          style={({ pressed }) => pressed && { opacity: 0.6 }}
-        >
-          <ChevronLeft size={18} strokeWidth={2} color="#888" />
-        </Pressable>
+        <BackButton />
 
         {otherUserId ? (
-          <ChatAvatar userId={otherUserId} name={displayName} size={40} online={online} />
+          <Avatar userId={otherUserId} name={displayName} avatarUrl={otherUser?.avatar_url} size={40} online={online} />
         ) : (
           <View className="w-10 h-10 rounded-full bg-[#242424]" />
         )}
@@ -221,6 +212,7 @@ export default function ChatScreen() {
           currentUserId={currentUserId}
           otherUserId={otherUserId ?? ''}
           displayName={displayName}
+          otherAvatarUrl={otherUser?.avatar_url ?? null}
           loadingOlderMessages={loadingOlderMessages}
           hasMoreMessages={hasMoreMessages}
           messagesLoading={messagesLoading}

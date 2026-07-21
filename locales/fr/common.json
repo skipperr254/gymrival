@@ -24,6 +24,7 @@
     "profile": "Profil"
   },
   "accessibility": {
-    "logActivity": "Enregistrer une activité"
+    "logActivity": "Enregistrer une activité",
+    "back": "Retour"
   }
 }

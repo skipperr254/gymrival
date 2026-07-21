@@ -24,6 +24,7 @@
     "profile": "Profil"
   },
   "accessibility": {
-    "logActivity": "Aktivität protokollieren"
+    "logActivity": "Aktivität protokollieren",
+    "back": "Zurück"
   }
 }

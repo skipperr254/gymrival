@@ -4,7 +4,7 @@ import { Trophy, Zap, VideoOff } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import type { ExerciseType } from '@/types/pr';
-import { getIcon } from './icons';
+import { getExerciseIcon } from '@/constants/exerciseIcons';
 
 interface Step3Props {
   exercise: ExerciseType;
@@ -17,7 +17,7 @@ interface Step3Props {
 
 export function Step3({ exercise, savedValue, hasVideo, videoUploading, videoUploadDone, videoUploadFailed }: Step3Props) {
   const { t } = useTranslation('logpr');
-  const ExIcon = getIcon(exercise.key);
+  const ExIcon = getExerciseIcon(exercise.key);
   const xpEarned = hasVideo && videoUploadDone ? t('xpEarnedWithVideo') : t('xpEarnedWithoutVideo');
 
   return (
@@ -29,9 +29,9 @@ export function Step3({ exercise, savedValue, hasVideo, videoUploading, videoUpl
           style={{ width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center' }}
         >
           {videoUploading ? (
-            <ActivityIndicator size="large" color="#fff" />
+            <ActivityIndicator size="large" color={Colors.primary} />
           ) : (
-            <Trophy size={36} strokeWidth={1.4} color="#fff" />
+            <Trophy size={36} strokeWidth={1.4} color={Colors.primary} />
           )}
         </LinearGradient>
       </View>
@@ -49,7 +49,7 @@ export function Step3({ exercise, savedValue, hasVideo, videoUploading, videoUpl
             {exercise.label.toUpperCase()}
           </Text>
         </View>
-        <Text className="font-heading text-[9px] tracking-[3px] text-[#555] mb-1">
+        <Text className="font-heading text-[9px] tracking-[3px] text-muted mb-1">
           {t('newBest')}
         </Text>
         <View className="flex-row items-end gap-1.5">
@@ -63,8 +63,8 @@ export function Step3({ exercise, savedValue, hasVideo, videoUploading, videoUpl
         <View className="flex-row items-center gap-[7px] mb-3.5">
           {videoUploading && (
             <>
-              <ActivityIndicator size="small" color="#555" />
-              <Text className="font-sans text-[11px] text-[#555]">{t('uploadingVideoProof')}</Text>
+              <ActivityIndicator size="small" color={Colors.muted} />
+              <Text className="font-sans text-[11px] text-muted">{t('uploadingVideoProof')}</Text>
             </>
           )}
           {videoUploadDone && (
@@ -75,8 +75,8 @@ export function Step3({ exercise, savedValue, hasVideo, videoUploading, videoUpl
           )}
           {videoUploadFailed && (
             <>
-              <VideoOff size={13} strokeWidth={2} color="#555" />
-              <Text className="font-sans text-[11px] text-[#555]">{t('videoUploadFailed')}</Text>
+              <VideoOff size={13} strokeWidth={2} color={Colors.muted} />
+              <Text className="font-sans text-[11px] text-muted">{t('videoUploadFailed')}</Text>
             </>
           )}
         </View>
@@ -84,7 +84,7 @@ export function Step3({ exercise, savedValue, hasVideo, videoUploading, videoUpl
 
       <View className="flex-row items-center gap-2">
         <Zap size={13} strokeWidth={2} color={Colors.accent} />
-        <Text className="font-sans text-xs text-[#555]">{t('addedToLeaderboard')}</Text>
+        <Text className="font-sans text-xs text-muted">{t('addedToLeaderboard')}</Text>
         <Zap size={13} strokeWidth={2} color={Colors.accent} />
       </View>
     </View>

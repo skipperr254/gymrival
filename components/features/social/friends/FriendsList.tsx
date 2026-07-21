@@ -7,8 +7,8 @@ import { Routes } from '@/constants/routes';
 import { formatNumber } from '@/lib/i18n/format';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSocialStore } from '@/store/useSocialStore';
-import { ErrorState } from '@/components/ui';
-import { FriendAvatar } from '../FriendAvatar';
+import { ErrorState, Avatar } from '@/components/ui';
+import { Colors } from '@/constants/theme';
 
 /** The "Friends" sub-tab: stat cards + the accepted-friends list. */
 export function FriendsList({ onFindAthletes }: { onFindAthletes: () => void }) {
@@ -49,7 +49,7 @@ export function FriendsList({ onFindAthletes }: { onFindAthletes: () => void }) 
 
       {friendsLoading ? (
         <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
-          <ActivityIndicator color="#404040" />
+          <ActivityIndicator color={Colors.hint} />
         </View>
       ) : friendsError && friends.length === 0 ? (
         <ErrorState
@@ -60,12 +60,12 @@ export function FriendsList({ onFindAthletes }: { onFindAthletes: () => void }) 
       ) : friends.length === 0 ? (
         <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
           <View className="w-14 h-14 rounded-full bg-[#242424] items-center justify-center mb-3.5">
-            <Users size={24} strokeWidth={1.5} color="#404040" />
+            <Users size={24} strokeWidth={1.5} color={Colors.hint} />
           </View>
           <Text className="font-heading text-[17px] tracking-[2px] text-white mb-1.5">
             {t('noFriendsTitle')}
           </Text>
-          <Text className="font-sans text-[13px] text-[#555] text-center mb-[18px]">
+          <Text className="font-sans text-[13px] text-muted text-center mb-[18px]">
             {t('noFriendsSub')}
           </Text>
           <Pressable onPress={onFindAthletes} className="bg-accent rounded-[10px] py-2.5 px-5">
@@ -80,9 +80,10 @@ export function FriendsList({ onFindAthletes }: { onFindAthletes: () => void }) 
             key={friend.id}
             className="flex-row items-center gap-3 bg-[#1c1c1c] border border-[#242424] rounded-2xl p-3.5 mb-2.5"
           >
-            <FriendAvatar
-              id={friend.id}
+            <Avatar
+              userId={friend.id}
               name={friend.full_name ?? friend.username ?? '?'}
+              avatarUrl={friend.avatar_url}
               size={46}
             />
             <View className="flex-1">
@@ -108,13 +109,13 @@ export function FriendsList({ onFindAthletes }: { onFindAthletes: () => void }) 
             <View className="flex-row gap-2">
               <Pressable
                 onPress={() => router.push(Routes.chat(friend.id) as never)}
-                className="w-[34px] h-[34px] rounded-full border border-[#2a2a2a] bg-[#1a1a1a] items-center justify-center"
+                className="w-[34px] h-[34px] rounded-full border border-default bg-[#1a1a1a] items-center justify-center"
               >
                 <MessageCircle size={15} strokeWidth={2} color="#505050" />
               </Pressable>
               <Pressable
                 onPress={() => unfriend(friend.friendship_id)}
-                className="w-[34px] h-[34px] rounded-full border border-[#2a2a2a] bg-[#1a1a1a] items-center justify-center"
+                className="w-[34px] h-[34px] rounded-full border border-default bg-[#1a1a1a] items-center justify-center"
               >
                 <UserX size={15} strokeWidth={2} color="#505050" />
               </Pressable>

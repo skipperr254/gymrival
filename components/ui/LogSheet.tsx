@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { View, Text, Pressable, Modal, Animated, Easing, StyleSheet, Dimensions } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Trophy, MapPin, ChevronRight, type LucideIcon } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
@@ -15,13 +15,11 @@ interface Props {
   onCheckIn: () => void;
 }
 
-type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
-
 export function LogSheet({ visible, onClose, onLogPR, onCheckIn }: Props) {
   const { t } = useTranslation('logpr');
-  const ACTIONS: { id: string; icon: IoniconName; label: string; sub: string }[] = [
-    { id: 'pr', icon: 'trophy', label: t('logSheet.logPr.label'), sub: t('logSheet.logPr.sub') },
-    { id: 'checkin', icon: 'location', label: t('logSheet.checkin.label'), sub: t('logSheet.checkin.sub') },
+  const ACTIONS: { id: string; icon: LucideIcon; label: string; sub: string }[] = [
+    { id: 'pr', icon: Trophy, label: t('logSheet.logPr.label'), sub: t('logSheet.logPr.sub') },
+    { id: 'checkin', icon: MapPin, label: t('logSheet.checkin.label'), sub: t('logSheet.checkin.sub') },
   ];
   const insets = useSafeAreaInsets();
   const [mounted, setMounted] = useState(false);
@@ -77,7 +75,7 @@ export function LogSheet({ visible, onClose, onLogPR, onCheckIn }: Props) {
               }}
             >
               <View className="w-12 h-12 rounded-[14px] bg-[#1a1a1a] items-center justify-center shrink-0">
-                <Ionicons name={action.icon} size={24} color={Colors.primary} />
+                <action.icon size={24} color={Colors.primary} />
               </View>
               <View className="flex-1">
                 <Text className="font-sans-semibold text-base text-primary mb-0.5">
@@ -85,7 +83,7 @@ export function LogSheet({ visible, onClose, onLogPR, onCheckIn }: Props) {
                 </Text>
                 <Text className="font-sans text-xs text-muted">{action.sub}</Text>
               </View>
-              <Ionicons name="chevron-forward" size={16} color={Colors.hint} style={rtlIconFlip} />
+              <ChevronRight size={16} color={Colors.hint} style={rtlIconFlip} />
             </Pressable>
           ))}
         </Animated.View>

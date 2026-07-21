@@ -1,7 +1,7 @@
 import { Routes } from "@/constants/routes";
 import { Colors } from "@/constants/theme";
 import { useAuthStore } from "@/store/useAuthStore";
-import { Ionicons } from "@expo/vector-icons";
+import { Eye, EyeOff } from "lucide-react-native";
 import { router } from "expo-router";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -137,11 +137,11 @@ export default function SignInScreen() {
                   onPress={() => setShowPassword((v) => !v)}
                   hitSlop={10}
                 >
-                  <Ionicons
-                    name={showPassword ? "eye-off-outline" : "eye-outline"}
-                    size={20}
-                    color={Colors.secondary}
-                  />
+                  {showPassword ? (
+                    <EyeOff size={20} color={Colors.secondary} />
+                  ) : (
+                    <Eye size={20} color={Colors.secondary} />
+                  )}
                 </Pressable>
               </View>
             </View>

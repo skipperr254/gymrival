@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, ActivityIndicator, ScrollView, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Flame, Check, MapPin, Users, CheckCircle, Zap, Clock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Avatar } from '@/components/ui/Avatar';
 import { Colors } from '@/constants/theme';
@@ -45,7 +45,7 @@ export function CheckInView() {
   const streakMotivation =
     streak >= 5 ? t('checkin.machine') : streak >= 3 ? t('checkin.keepItUp') : t('checkin.stayStrong');
   const streakMotivationColor =
-    streak >= 5 ? Colors.accent : streak >= 3 ? '#ff8c00' : '#555555';
+    streak >= 5 ? Colors.accent : streak >= 3 ? '#ff8c00' : Colors.muted;
 
   const confirmedGym = gyms.find((g) => g.id === activeCheckin?.gym_id);
 
@@ -83,7 +83,7 @@ export function CheckInView() {
             </View>
           </View>
           <View className="items-center gap-1.5 pt-1">
-            <Ionicons name="flame" size={36} color={flameColor} />
+            <Flame size={36} color={flameColor} />
             <Text
               className="font-heading text-[10px] tracking-[2px]"
               style={{ color: streakMotivationColor }}
@@ -107,14 +107,14 @@ export function CheckInView() {
                 className={`w-[34px] h-[34px] rounded-full items-center justify-center ${
                   d.checked
                     ? 'bg-accent border-0'
-                    : 'bg-white/[0.06] border border-[#2a2a2a]'
+                    : 'bg-white/[0.06] border border-default'
                 }`}
               >
-                {d.checked && <Ionicons name="checkmark" size={14} color="#fff" />}
+                {d.checked && <Check size={14} color={Colors.primary} />}
               </View>
               <Text
                 className={`font-heading text-[9px] tracking-[1px] ${
-                  d.checked ? 'text-accent' : 'text-[#555555]'
+                  d.checked ? 'text-accent' : 'text-muted'
                 }`}
               >
                 {t(`days.short.${d.dayIndex}`)}
@@ -132,7 +132,7 @@ export function CheckInView() {
       ) : !activeCheckin ? (
         <View className="bg-surface rounded-[20px] py-[18px] px-5 mb-3.5 border-[1.5px] border-default">
           <View className="flex-row items-center gap-2 mb-3.5">
-            <Ionicons name="location" size={16} color={Colors.accent} />
+            <MapPin size={16} color={Colors.accent} />
             <Text className="font-heading text-[13px] tracking-[3px] text-primary">
               {t('checkin.checkInNow')}
             </Text>
@@ -169,10 +169,9 @@ export function CheckInView() {
                           : 'bg-surface border-default'
                       }`}
                     >
-                      <Ionicons
-                        name="location"
+                      <MapPin
                         size={18}
-                        color={isSelected ? Colors.accent : '#555555'}
+                        color={isSelected ? Colors.accent : Colors.muted}
                       />
                     </View>
                     <View className="flex-1">
@@ -188,7 +187,7 @@ export function CheckInView() {
                           <Text className="font-sans text-[11px] text-[#606060]">{gym.city}</Text>
                         ) : null}
                         <View className="flex-row items-center gap-1">
-                          <Ionicons name="people" size={11} color="#606060" />
+                          <Users size={11} color="#606060" />
                           <Text className="font-sans text-[11px] text-[#606060]">
                             {t('checkin.hereToday', { count: gym.today_count })}
                           </Text>
@@ -196,7 +195,7 @@ export function CheckInView() {
                       </View>
                     </View>
                     {isSelected && (
-                      <Ionicons name="checkmark" size={18} color={Colors.accent} />
+                      <Check size={18} color={Colors.accent} />
                     )}
                   </Pressable>
                 );
@@ -213,13 +212,12 @@ export function CheckInView() {
             disabled={selectedGymId === null || checkinLoading}
           >
             {checkinLoading ? (
-              <ActivityIndicator size="small" color="#fff" />
+              <ActivityIndicator size="small" color={Colors.primary} />
             ) : (
               <>
-                <Ionicons
-                  name="checkmark-circle"
+                <CheckCircle
                   size={17}
-                  color={selectedGymId !== null ? '#fff' : '#444444'}
+                  color={selectedGymId !== null ? Colors.primary : '#444444'}
                 />
                 <Text
                   className={`font-heading text-sm tracking-[3px] ${
@@ -236,7 +234,7 @@ export function CheckInView() {
         /* ── Confirmed State ── */
         <View className="bg-[#0a1f0a] border border-[#1a3a1a] rounded-[20px] py-6 px-5 mb-3.5 items-center">
           <View className="w-16 h-16 rounded-full bg-[rgba(76,175,80,0.12)] border border-[rgba(76,175,80,0.3)] items-center justify-center mb-3.5">
-            <Ionicons name="checkmark-circle" size={32} color="#4caf50" />
+            <CheckCircle size={32} color="#4caf50" />
           </View>
           <Text className="font-heading text-[22px] tracking-[3px] text-primary mb-1">
             {t('checkin.checkedIn')}
@@ -246,7 +244,7 @@ export function CheckInView() {
           </Text>
           {lastCheckinXpAwarded && (
             <View className="flex-row items-center gap-1.5 mb-[18px]">
-              <Ionicons name="flash" size={13} color="#4caf50" />
+              <Zap size={13} color="#4caf50" />
               <Text className="font-sans text-[11px] text-[#4caf50] tracking-[1px]">
                 {t('checkin.xpEarned')}
               </Text>
@@ -273,7 +271,7 @@ export function CheckInView() {
       {friendsCheckedIn.length > 0 && (
         <View className="bg-surface rounded-[20px] py-[18px] px-5 border-[1.5px] border-default">
           <View className="flex-row items-center gap-2 mb-3.5">
-            <Ionicons name="people" size={15} color={Colors.accent} />
+            <Users size={15} color={Colors.accent} />
             <Text className="font-heading text-[13px] tracking-[3px] text-primary">
               {t('checkin.friendsCheckedIn')}
             </Text>
@@ -289,6 +287,7 @@ export function CheckInView() {
               <Avatar
                 name={friend.full_name ?? friend.username ?? '?'}
                 userId={friend.user_id}
+                avatarUrl={friend.avatar_url}
                 size="md"
               />
               <View className="flex-1">
@@ -296,12 +295,12 @@ export function CheckInView() {
                   {friend.full_name ?? friend.username ?? t('checkin.unknown')}
                 </Text>
                 <View className="flex-row items-center gap-1.5">
-                  <Ionicons name="location" size={11} color="#606060" />
+                  <MapPin size={11} color="#606060" />
                   <Text className="font-sans text-[11px] text-[#606060]">{friend.gym_name}</Text>
                 </View>
               </View>
               <View className="flex-row items-center gap-1.5">
-                <Ionicons name="time-outline" size={11} color="#505050" />
+                <Clock size={11} color="#505050" />
                 <Text className="font-sans text-[10px] text-[#505050] tracking-[1px]">
                   {formatRelativeTime(friend.checked_in_at)}
                 </Text>

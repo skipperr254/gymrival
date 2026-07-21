@@ -59,7 +59,7 @@ export function FriendsContent() {
           >
             <Text
               className={`font-heading text-[11px] tracking-[1.5px] ${
-                subTab === tab.key ? 'text-black' : 'text-[#555]'
+                subTab === tab.key ? 'text-black' : 'text-muted'
               }`}
             >
               {tab.label}

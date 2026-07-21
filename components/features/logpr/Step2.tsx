@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import type { ExerciseType } from '@/types/pr';
 import { VideoUploadZone } from '@/components/features/VideoUploadZone';
-import { getIcon } from './icons';
+import { getExerciseIcon } from '@/constants/exerciseIcons';
 
 export interface VideoAssetShape {
   uri: string;
@@ -35,7 +35,7 @@ export function Step2({
   onSave,
 }: Step2Props) {
   const { t } = useTranslation('logpr');
-  const ExIcon = getIcon(selectedEx.key);
+  const ExIcon = getExerciseIcon(selectedEx.key);
   const hasVideo = !!videoAsset;
   const xpLabel = hasVideo ? t('xpWithVideo') : t('xpWithoutVideo');
 
@@ -48,7 +48,7 @@ export function Step2({
             <ExIcon size={14} strokeWidth={1.8} color="#888" />
             <Text className="font-sans-medium text-[13px] text-[#999]">{selectedEx.label}</Text>
           </View>
-          <Text className="font-sans text-[11px] text-[#555]">
+          <Text className="font-sans text-[11px] text-muted">
             {currentPR != null ? t('previousWithValue', { value: currentPR, unit: selectedEx.unit }) : t('firstPr')}
           </Text>
         </View>
@@ -72,7 +72,7 @@ export function Step2({
           >
             {t('xpWithVideo')}
           </Text>
-          <Text className="font-sans text-[10px] text-[#555]">{t('withVideo')}</Text>
+          <Text className="font-sans text-[10px] text-muted">{t('withVideo')}</Text>
         </View>
         <View
           className={`flex-1 rounded-xl py-2.5 items-center gap-[3px] border ${
@@ -84,7 +84,7 @@ export function Step2({
           >
             {t('xpWithoutVideo')}
           </Text>
-          <Text className="font-sans text-[10px] text-[#555]">{t('withoutVideo')}</Text>
+          <Text className="font-sans text-[10px] text-muted">{t('withoutVideo')}</Text>
         </View>
       </View>
 
@@ -126,10 +126,10 @@ export function Step2({
           }}
         >
           {saving ? (
-            <ActivityIndicator size="small" color="#fff" />
+            <ActivityIndicator size="small" color={Colors.primary} />
           ) : (
             <>
-              <CheckCircle size={16} strokeWidth={2} color="#fff" />
+              <CheckCircle size={16} strokeWidth={2} color={Colors.primary} />
               <Text className="font-heading text-sm tracking-[2.5px] text-white">
                 {t('savePr', { xp: xpLabel })}
               </Text>
@@ -145,7 +145,7 @@ export function Step2({
           className="items-center py-3"
           style={({ pressed }) => pressed && { opacity: 0.6 }}
         >
-          <Text className="font-sans text-[13px] text-[#555]">{t('removeVideoSave')}</Text>
+          <Text className="font-sans text-[13px] text-muted">{t('removeVideoSave')}</Text>
         </Pressable>
       )}
     </>

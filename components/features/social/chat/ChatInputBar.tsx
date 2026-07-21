@@ -82,7 +82,7 @@ function ChatInputBarInner({
           <Pressable
             key={i}
             onPress={() => handleSend(q)}
-            className="py-1.5 px-3.5 rounded-full border border-[#2a2a2a] bg-[#1c1c1c]"
+            className="py-1.5 px-3.5 rounded-full border border-default bg-[#1c1c1c]"
             style={({ pressed }) => pressed && { opacity: 0.7 }}
           >
             <Text className="font-sans text-xs text-[#888]">{q}</Text>
@@ -92,7 +92,7 @@ function ChatInputBarInner({
 
       {/* Input bar */}
       <View className="flex-row items-end gap-2 px-4 pt-2.5" style={{ paddingBottom: bottomPad }}>
-        <View className="flex-1 flex-row items-end bg-[#1c1c1c] border-[1.5px] border-[#2a2a2a] rounded-[22px] pl-4 pr-1 py-1">
+        <View className="flex-1 flex-row items-end bg-[#1c1c1c] border-[1.5px] border-default rounded-[22px] pl-4 pr-1 py-1">
           <TextInput
             ref={inputRef}
             value={input}
@@ -115,7 +115,7 @@ function ChatInputBarInner({
             <ArrowUp
               size={16}
               strokeWidth={2.5}
-              color={input.trim() && canSend ? '#fff' : '#404040'}
+              color={input.trim() && canSend ? Colors.primary : Colors.hint}
             />
           </Pressable>
         </View>

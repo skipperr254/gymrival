@@ -24,6 +24,7 @@
     "profile": "Profile"
   },
   "accessibility": {
-    "logActivity": "Log activity"
+    "logActivity": "Log activity",
+    "back": "Back"
   }
 }

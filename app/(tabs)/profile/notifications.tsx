@@ -8,7 +8,10 @@ import {
   RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import {
+  MessageCircle, UserPlus, Users, Heart, Trophy, Bell, BellOff,
+  type LucideIcon,
+} from 'lucide-react-native';
 import { router } from 'expo-router';
 import { useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,8 +20,9 @@ import { Colors } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
+import { BackButton } from '@/components/ui/BackButton';
 import { formatDate, formatRelativeTime } from '@/lib/i18n/format';
-import { rtlIconFlip } from '@/lib/i18n/rtl';
+import { Avatar } from '@/components/ui/Avatar';
 import type { AppNotification, NotificationType } from '@/types/notification';
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
@@ -57,46 +61,25 @@ function buildNotificationText(n: AppNotification, t: TFunction): string {
   }
 }
 
-type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
-
-function notificationIcon(type: NotificationType): { name: IoniconName; color: string } {
+function notificationIcon(type: NotificationType): { icon: LucideIcon; color: string } {
   switch (type) {
     case 'new_message':
-      return { name: 'chatbubble', color: '#4A9EFF' };
+      return { icon: MessageCircle, color: Colors.friend };
     case 'friend_request':
-      return { name: 'person-add', color: Colors.success };
+      return { icon: UserPlus, color: Colors.success };
     case 'friend_request_accepted':
-      return { name: 'people', color: Colors.success };
+      return { icon: Users, color: Colors.success };
     case 'pr_liked':
-      return { name: 'heart', color: Colors.accent };
+      return { icon: Heart, color: Colors.accent };
     case 'friend_pr':
-      return { name: 'trophy', color: Colors.warning };
+      return { icon: Trophy, color: Colors.warning };
     default:
       // A notification type the client doesn't recognize yet (e.g. a new
       // type shipped server-side before this app version updated, or bad
       // data) must not crash the whole screen — fall back to a generic icon,
       // mirroring buildNotificationText's default case above.
-      return { name: 'notifications', color: Colors.hint };
+      return { icon: Bell, color: Colors.hint };
   }
-}
-
-function actorInitial(n: AppNotification): string {
-  const name = n.actor_name ?? n.actor_username ?? '?';
-  return name.charAt(0).toUpperCase();
-}
-
-// Deterministic color from actor_id (matches FriendAvatar pattern in social screen)
-const AVATAR_COLORS = [
-  '#e63030', '#ff6b35', '#f7c948', '#00cc44',
-  '#4A9EFF', '#a855f7', '#ec4899', '#14b8a6',
-];
-function avatarColor(id: string | null): string {
-  if (!id) return AVATAR_COLORS[0];
-  let hash = 0;
-  for (let i = 0; i < id.length; i++) {
-    hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
-  }
-  return AVATAR_COLORS[hash % AVATAR_COLORS.length];
 }
 
 function handleNotificationPress(n: AppNotification) {
@@ -126,8 +109,7 @@ function NotificationItem({
 }) {
   const { t } = useTranslation();
   const isUnread = !item.read_at;
-  const icon = notificationIcon(item.type as NotificationType);
-  const bgColor = avatarColor(item.actor_id);
+  const notifIcon = notificationIcon(item.type as NotificationType);
 
   return (
     <Pressable
@@ -141,18 +123,18 @@ function NotificationItem({
       {isUnread && <View className="absolute left-0 top-0 bottom-0 w-[3px] bg-accent rounded-r-[2px]" />}
 
       {/* Avatar */}
-      <View
-        className="w-[46px] h-[46px] rounded-full items-center justify-center border shrink-0"
-        style={{ backgroundColor: bgColor + '30', borderColor: bgColor + '50' }}
-      >
-        <Text className="font-heading text-lg" style={{ color: bgColor }}>
-          {actorInitial(item)}
-        </Text>
+      <View style={{ position: 'relative' }}>
+        <Avatar
+          userId={item.actor_id ?? undefined}
+          name={item.actor_name ?? item.actor_username ?? '?'}
+          avatarUrl={item.actor_avatar_url}
+          size={46}
+        />
         <View
           className="absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] rounded-full items-center justify-center border-2 border-base"
-          style={{ backgroundColor: icon.color }}
+          style={{ backgroundColor: notifIcon.color }}
         >
-          <Ionicons name={icon.name} size={9} color="#fff" />
+          <notifIcon.icon size={9} color={Colors.primary} />
         </View>
       </View>
 
@@ -221,13 +203,7 @@ export default function NotificationsScreen() {
         className="flex-row items-center px-4 py-3.5"
         style={{ borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: Colors.borderDefault }}
       >
-        <Pressable
-          className="w-9 h-9 items-center justify-center"
-          style={({ pressed }) => pressed && { opacity: 0.5 }}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="chevron-back" size={22} color={Colors.primary} style={rtlIconFlip} />
-        </Pressable>
+        <BackButton />
 
         <View className="flex-1 flex-row items-center justify-center gap-2">
           <Text className="font-heading text-xl text-primary tracking-[2px]">
@@ -293,7 +269,7 @@ export default function NotificationsScreen() {
           ListEmptyComponent={
             <View className="flex-1 items-center justify-center px-10 pt-20 gap-3">
               <View className="w-[72px] h-[72px] rounded-full items-center justify-center bg-surface mb-1">
-                <Ionicons name="notifications-off-outline" size={40} color={Colors.hint} />
+                <BellOff size={40} color={Colors.hint} />
               </View>
               <Text className="font-heading text-2xl text-primary tracking-[2px]">
                 {t('notifications.emptyTitle')}

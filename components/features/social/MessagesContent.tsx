@@ -7,8 +7,8 @@ import { Routes } from '@/constants/routes';
 import { formatDate, formatRelativeTime as formatRelativeTimeIntl } from '@/lib/i18n/format';
 import { useAuthStore } from '@/store/useAuthStore';
 import { computeIsOnline, useChatStore } from '@/store/useChatStore';
-import { ErrorState } from '@/components/ui';
-import { FriendAvatar } from './FriendAvatar';
+import { ErrorState, Avatar } from '@/components/ui';
+import { Colors } from '@/constants/theme';
 
 function formatConvTime(iso: string | null): string {
   if (!iso) return '';
@@ -52,7 +52,7 @@ export function MessagesContent() {
   if (conversationsLoading && conversations.length === 0) {
     return (
       <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
-        <ActivityIndicator color="#404040" />
+        <ActivityIndicator color={Colors.hint} />
       </View>
     );
   }
@@ -71,12 +71,12 @@ export function MessagesContent() {
     return (
       <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
         <View className="w-14 h-14 rounded-full bg-[#242424] items-center justify-center mb-3.5">
-          <MessageCircle size={24} strokeWidth={1.5} color="#404040" />
+          <MessageCircle size={24} strokeWidth={1.5} color={Colors.hint} />
         </View>
         <Text className="font-heading text-[17px] tracking-[2px] text-white mb-1.5">
           {t('noMessagesTitle')}
         </Text>
-        <Text className="font-sans text-[13px] text-[#555] text-center">
+        <Text className="font-sans text-[13px] text-muted text-center">
           {t('noMessagesSub')}
         </Text>
       </View>
@@ -115,7 +115,7 @@ export function MessagesContent() {
               className="flex-row items-center gap-[13px] py-[13px] px-3 rounded-2xl"
               style={({ pressed }) => pressed && { backgroundColor: '#1c1c1c' }}
             >
-              <FriendAvatar id={conv.other_user.id} name={name} size={50} online={online} />
+              <Avatar userId={conv.other_user.id} name={name} avatarUrl={conv.other_user.avatar_url} size={50} online={online} />
               <View className="flex-1 min-w-0">
                 <View className="flex-row justify-between items-baseline mb-[3px]">
                   <Text
