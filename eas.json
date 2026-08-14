@@ -22,6 +22,12 @@
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "ascApiKeyPath": "./AuthKey_D8X5LC5B4K.p8",
+        "ascApiKeyId": "D8X5LC5B4K",
+        "ascApiKeyIssuerId": "36567d31-f738-4369-b20d-6263a51f03a0"
+      }
+    }
   }
 }
