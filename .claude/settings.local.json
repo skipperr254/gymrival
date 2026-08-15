@@ -45,7 +45,16 @@
       "Bash(npx eas-cli *)",
       "Bash(xargs grep -l \"FormData\")",
       "Bash(node *)",
-      "Bash(awk '{print $5, $9}')"
+      "Bash(awk '{print $5, $9}')",
+      "PowerShell(eas *)",
+      "PowerShell(eas env:list *)",
+      "PowerShell(eas build *)",
+      "WebFetch(domain:github.com)",
+      "Bash(npx eas *)",
+      "Bash(echo \"=== exit: $? ===\")",
+      "Bash(echo \"tsc exit: $?\")",
+      "Bash(git add *)",
+      "Bash(git commit -m '@ *)"
     ]
   },
   "enableAllProjectMcpServers": true,

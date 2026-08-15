@@ -1,5 +1,15 @@
-import { useRef, useEffect, useState } from 'react';
-import { View, Text, Pressable, Modal, Animated, Easing, StyleSheet, Dimensions } from 'react-native';
+import { useRef, useEffect, useState, useCallback } from 'react';
+import {
+  View,
+  Text,
+  Pressable,
+  Modal,
+  Animated,
+  Easing,
+  StyleSheet,
+  Dimensions,
+  Platform,
+} from 'react-native';
 import { Trophy, MapPin, ChevronRight, type LucideIcon } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -8,14 +18,28 @@ import { rtlIconFlip } from '@/lib/i18n/rtl';
 
 const SHEET_HEIGHT = Dimensions.get('window').height;
 
+// iOS keeps a Modal's host view mounted until the OS reports the dismissal
+// back through onDismiss. If that report never arrives we still have to let
+// the parent proceed, or a queued action is stranded and the FAB appears dead.
+const DISMISS_CONFIRM_TIMEOUT_MS = 400;
+
 interface Props {
   visible: boolean;
   onClose: () => void;
   onLogPR: () => void;
   onCheckIn: () => void;
+  /**
+   * Fired once the sheet is fully gone — not when `visible` flips, but when
+   * the exit animation has finished AND (on iOS) UIKit has confirmed the
+   * modal's view controller is dismissed. The parent chains the next sheet or
+   * a navigation off this: presenting a second modal while this one is still
+   * up is silently dropped by UIKit and leaves the app untappable.
+   * See the note in app/(tabs)/_layout.tsx.
+   */
+  onClosed?: () => void;
 }
 
-export function LogSheet({ visible, onClose, onLogPR, onCheckIn }: Props) {
+export function LogSheet({ visible, onClose, onClosed, onLogPR, onCheckIn }: Props) {
   const { t } = useTranslation('logpr');
   const ACTIONS: { id: string; icon: LucideIcon; label: string; sub: string }[] = [
     { id: 'pr', icon: Trophy, label: t('logSheet.logPr.label'), sub: t('logSheet.logPr.sub') },
@@ -25,8 +49,34 @@ export function LogSheet({ visible, onClose, onLogPR, onCheckIn }: Props) {
   const [mounted, setMounted] = useState(false);
   const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
 
+  // Latest `visible`, readable from an animation callback that may resolve
+  // after the prop has already changed again.
+  const visibleRef = useRef(visible);
+  // `onClosed` read through a ref so the effect below doesn't need it as a
+  // dependency (and so a re-render mid-close can't call a stale copy).
+  const onClosedRef = useRef(onClosed);
+  onClosedRef.current = onClosed;
+  // Starts true so the initial `visible === false` render isn't treated as a
+  // close. Set false on every open, back to true once the close is reported —
+  // which guarantees onClosed fires exactly once per open→close cycle.
+  const closeReported = useRef(true);
+  const dismissTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  const reportClosed = useCallback(() => {
+    clearTimeout(dismissTimeout.current);
+    if (closeReported.current) return;
+    closeReported.current = true;
+    onClosedRef.current?.();
+  }, []);
+
+  useEffect(() => () => clearTimeout(dismissTimeout.current), []);
+
   useEffect(() => {
+    visibleRef.current = visible;
+
     if (visible) {
+      closeReported.current = false;
+      clearTimeout(dismissTimeout.current);
       setMounted(true);
       translateY.setValue(SHEET_HEIGHT);
       const raf = requestAnimationFrame(() => {
@@ -38,20 +88,43 @@ export function LogSheet({ visible, onClose, onLogPR, onCheckIn }: Props) {
         }).start();
       });
       return () => cancelAnimationFrame(raf);
-    } else {
-      Animated.timing(translateY, {
-        toValue: SHEET_HEIGHT,
-        duration: 240,
-        easing: Easing.in(Easing.cubic),
-        useNativeDriver: true,
-      }).start(({ finished }) => {
-        if (finished) setMounted(false);
-      });
     }
-  }, [visible, translateY]);
+
+    // Never opened (first render with visible=false) — nothing to tear down.
+    if (closeReported.current) return;
+
+    Animated.timing(translateY, {
+      toValue: SHEET_HEIGHT,
+      duration: 240,
+      easing: Easing.in(Easing.cubic),
+      useNativeDriver: true,
+    }).start(() => {
+      // Deliberately not gated on `finished`: an interrupted exit animation
+      // used to leave `mounted` true forever, and a transparent modal that
+      // never unmounts is itself enough to make iOS stop accepting touches.
+      // The reopen case is handled by re-reading `visible` instead.
+      if (visibleRef.current) return;
+      setMounted(false);
+
+      if (Platform.OS === 'ios') {
+        // Wait for the real dismissal (handleDismiss below); fall back to the
+        // timeout so a missed callback can't strand the parent's next step.
+        dismissTimeout.current = setTimeout(reportClosed, DISMISS_CONFIRM_TIMEOUT_MS);
+      } else {
+        // Android has no onDismiss — the Dialog is gone as soon as it unmounts.
+        reportClosed();
+      }
+    });
+  }, [visible, translateY, reportClosed]);
 
   return (
-    <Modal visible={mounted} transparent animationType="none" onRequestClose={onClose}>
+    <Modal
+      visible={mounted}
+      transparent
+      animationType="none"
+      onRequestClose={onClose}
+      onDismiss={reportClosed}
+    >
       <View className="flex-1 bg-black/70 justify-end">
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
         <Animated.View
@@ -68,8 +141,10 @@ export function LogSheet({ visible, onClose, onLogPR, onCheckIn }: Props) {
               key={action.id}
               className="flex-row items-center gap-3.5 bg-[#222] rounded-2xl py-3.5 px-4 mb-2"
               style={({ pressed }) => pressed && { opacity: 0.7 }}
+              // Only signals intent — the parent closes this sheet first and
+              // runs the action once the dismissal is confirmed. Opening the
+              // next sheet from here is what froze iOS.
               onPress={() => {
-                onClose();
                 if (action.id === 'pr') onLogPR();
                 else onCheckIn();
               }}

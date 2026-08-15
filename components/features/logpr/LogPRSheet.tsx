@@ -78,6 +78,9 @@ export function LogPRSheet({ visible, onClose }: Props) {
   const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
   const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const mountedRef = useRef(true);
+  // Latest `visible`, readable from an exit animation callback that can
+  // resolve after the prop has already flipped back — see the effect below.
+  const visibleRef = useRef(visible);
   // Bumped every time the sheet opens for a new PR. LogPRSheet is mounted
   // once, persistently, at the tabs-layout level (it only toggles `visible`)
   // — a video upload kicked off by handleSave() keeps running after the
@@ -99,6 +102,8 @@ export function LogPRSheet({ visible, onClose }: Props) {
 
   // Animate sheet in when visible becomes true
   useEffect(() => {
+    visibleRef.current = visible;
+
     if (visible) {
       setMounted(true);
       translateY.setValue(SHEET_HEIGHT);
@@ -118,8 +123,16 @@ export function LogPRSheet({ visible, onClose }: Props) {
         duration: 260,
         easing: Easing.in(Easing.cubic),
         useNativeDriver: true,
-      }).start(({ finished }) => {
-        if (finished) setMounted(false);
+      }).start(() => {
+        // Deliberately not gated on `finished`. Any interruption — a reopen,
+        // the value being reset, the native driver dropping the animation
+        // while the modal is mid-transition — left `mounted` stuck true, and
+        // a transparent Modal that never unmounts is exactly what makes iOS
+        // stop responding to touches (it stays an overFullScreen view
+        // controller sitting over the app). Re-read `visible` instead, so a
+        // reopen still wins the race.
+        if (visibleRef.current) return;
+        setMounted(false);
       });
     }
   }, [visible, translateY]);
