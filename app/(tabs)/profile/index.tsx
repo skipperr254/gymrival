@@ -22,6 +22,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
 import { Avatar } from '@/components/ui/Avatar';
+import { AppHeader } from '@/components/ui';
 import {
   DetailRow,
   formatMemberSince,
@@ -68,6 +69,36 @@ export default function ProfileScreen() {
     { label: t('profile:stats.level'), value: profile?.level ?? 1, icon: Star },
   ];
 
+  const headerRight = (
+    <>
+      <Pressable
+        className="w-9 h-9 rounded-[10px] bg-surface items-center justify-center"
+        style={({ pressed }) => pressed && { opacity: 0.5 }}
+        onPress={() => router.push(Routes.notifications as never)}
+      >
+        <Bell
+          size={18}
+          color={unreadCount > 0 ? Colors.accent : '#909090'}
+          fill={unreadCount > 0 ? Colors.accent : 'none'}
+        />
+        {unreadCount > 0 && (
+          <View className="absolute -top-1 -right-1 bg-accent rounded-full min-w-[16px] h-4 items-center justify-center px-[3px] border-[1.5px] border-base">
+            <Text className="font-sans-bold text-[9px] text-white">
+              {unreadCount > 9 ? '9+' : String(unreadCount)}
+            </Text>
+          </View>
+        )}
+      </Pressable>
+      <Pressable
+        className="w-9 h-9 rounded-[10px] bg-surface items-center justify-center"
+        style={({ pressed }) => pressed && { opacity: 0.5 }}
+        onPress={() => router.push(Routes.profileSettings as never)}
+      >
+        <Settings size={18} color="#909090" />
+      </Pressable>
+    </>
+  );
+
   // First load: distinguish "still loading" from a fresh account with no
   // data yet — without this, a slow/failed fetch rendered the exact same
   // fallback chain ('Athlete', all-zero stats, every detail "Not set") as a
@@ -75,6 +106,7 @@ export default function ProfileScreen() {
   if (loading && !profile) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
+        <AppHeader right={headerRight} />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator color={Colors.accent} />
         </View>
@@ -85,6 +117,7 @@ export default function ProfileScreen() {
   if (error && !profile) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
+        <AppHeader right={headerRight} />
         <View className="flex-1 items-center justify-center gap-3 px-8">
           <AlertCircle size={26} color={Colors.accent} />
           <Text className="font-sans text-sm text-muted text-center">
@@ -106,49 +139,11 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
+      <AppHeader right={headerRight} />
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* ── Header ────────────────────────────────────────── */}
-        <View className="flex-row items-end justify-between mb-1">
-          <View>
-            <Text className="font-heading text-primary tracking-[4px] text-[26px] leading-7">
-              {t('profile:header.brand')}
-            </Text>
-            <Text className="font-heading text-[11px] text-[#606060] tracking-[2px] mt-0.5">
-              {t('profile:header.pageLabel')}
-            </Text>
-          </View>
-          <View className="flex-row items-center gap-2">
-            <Pressable
-              className="w-9 h-9 rounded-[10px] bg-surface items-center justify-center"
-              style={({ pressed }) => pressed && { opacity: 0.5 }}
-              onPress={() => router.push(Routes.notifications as never)}
-            >
-              <Bell
-                size={18}
-                color={unreadCount > 0 ? Colors.accent : '#909090'}
-                fill={unreadCount > 0 ? Colors.accent : 'none'}
-              />
-              {unreadCount > 0 && (
-                <View className="absolute -top-1 -right-1 bg-accent rounded-full min-w-[16px] h-4 items-center justify-center px-[3px] border-[1.5px] border-base">
-                  <Text className="font-sans-bold text-[9px] text-white">
-                    {unreadCount > 9 ? '9+' : String(unreadCount)}
-                  </Text>
-                </View>
-              )}
-            </Pressable>
-            <Pressable
-              className="w-9 h-9 rounded-[10px] bg-surface items-center justify-center"
-              style={({ pressed }) => pressed && { opacity: 0.5 }}
-              onPress={() => router.push(Routes.profileSettings as never)}
-            >
-              <Settings size={18} color="#909090" />
-            </Pressable>
-          </View>
-        </View>
-
         {/* ── Profile Card ──────────────────────────────────── */}
         <LinearGradient
           colors={['#1a0000', '#2a0a0a']}
@@ -328,7 +323,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 16,
-    paddingTop: 10,
+    paddingTop: 2,
     paddingBottom: 100,
     gap: 14,
   },

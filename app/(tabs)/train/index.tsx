@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, StyleSheet, Alert } from 'react-native';
+import { View, ScrollView, Pressable, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { rtlIconFlip } from '@/lib/i18n/rtl';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
+import { AppHeader } from '@/components/ui';
 import { CheckInView } from '@/components/features/CheckInView';
 import { ProgressView } from '@/components/features/progress/ProgressView';
 import { ScheduleList, WorkoutDetail, CreateWorkoutSheet } from '@/components/features/train';
@@ -150,29 +151,19 @@ export default function TrainScreen() {
     <>
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
         {/* Header */}
-        <View className="flex-row items-end justify-between px-4 pt-2.5 mb-1">
-          {selected ? (
-            <>
-              <Pressable
-                className="p-1"
-                style={({ pressed }) => pressed && { opacity: 0.5 }}
-                onPress={goBack}
-              >
-                <ChevronLeft size={22} color={Colors.accent} style={rtlIconFlip} />
-              </Pressable>
-              <View className="flex-1" />
-            </>
-          ) : (
-            <View>
-              <Text className="font-heading text-primary tracking-[4px] text-[26px] leading-7">
-                {t('header.brand')}
-              </Text>
-              <Text className="font-heading text-[11px] text-[#606060] tracking-[2px] mt-0.5">
-                {activeTab === 0 ? t('header.schedule') : activeTab === 1 ? t('header.checkin') : t('header.progress')}
-              </Text>
-            </View>
-          )}
-        </View>
+        {selected ? (
+          <View className="flex-row items-center px-4 pt-2.5 mb-1">
+            <Pressable
+              className="p-1"
+              style={({ pressed }) => pressed && { opacity: 0.5 }}
+              onPress={goBack}
+            >
+              <ChevronLeft size={22} color={Colors.accent} style={rtlIconFlip} />
+            </Pressable>
+          </View>
+        ) : (
+          <AppHeader />
+        )}
 
         {/* Tab switcher — only visible at top level */}
         {!selected && (

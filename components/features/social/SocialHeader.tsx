@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useChatStore } from '@/store/useChatStore';
 import { useSocialStore } from '@/store/useSocialStore';
 import { Colors } from '@/constants/theme';
+import { AppHeader } from '@/components/ui';
 
 function IconBadge({ count }: { count: number }) {
   if (count <= 0) return null;
@@ -30,32 +31,31 @@ export function SocialHeader() {
   const pendingRequests = useSocialStore((s) => s.incomingRequests.length);
 
   return (
-    <View className="flex-row items-center justify-between pt-4 pb-2 px-4">
-      <Text className="font-heading text-white tracking-[5px] text-[24px] leading-7">
-        GYM RIVAL
-      </Text>
-      <View className="flex-row items-center gap-2.5">
-        <Pressable
-          onPress={() => router.push(Routes.socialFriends as never)}
-          accessibilityRole="button"
-          accessibilityLabel={t('headerFriends')}
-          hitSlop={6}
-          className="w-10 h-10 rounded-full bg-surface border border-default items-center justify-center"
-        >
-          <Users size={18} strokeWidth={1.8} color={Colors.secondary} />
-          <IconBadge count={pendingRequests} />
-        </Pressable>
-        <Pressable
-          onPress={() => router.push(Routes.socialMessages as never)}
-          accessibilityRole="button"
-          accessibilityLabel={t('headerMessages')}
-          hitSlop={6}
-          className="w-10 h-10 rounded-full bg-surface border border-default items-center justify-center"
-        >
-          <MessageCircle size={18} strokeWidth={1.8} color={Colors.secondary} />
-          <IconBadge count={msgUnread} />
-        </Pressable>
-      </View>
-    </View>
+    <AppHeader
+      right={
+        <>
+          <Pressable
+            onPress={() => router.push(Routes.socialFriends as never)}
+            accessibilityRole="button"
+            accessibilityLabel={t('headerFriends')}
+            hitSlop={6}
+            className="w-10 h-10 rounded-full bg-surface border border-default items-center justify-center"
+          >
+            <Users size={18} strokeWidth={1.8} color={Colors.secondary} />
+            <IconBadge count={pendingRequests} />
+          </Pressable>
+          <Pressable
+            onPress={() => router.push(Routes.socialMessages as never)}
+            accessibilityRole="button"
+            accessibilityLabel={t('headerMessages')}
+            hitSlop={6}
+            className="w-10 h-10 rounded-full bg-surface border border-default items-center justify-center"
+          >
+            <MessageCircle size={18} strokeWidth={1.8} color={Colors.secondary} />
+            <IconBadge count={msgUnread} />
+          </Pressable>
+        </>
+      }
+    />
   );
 }

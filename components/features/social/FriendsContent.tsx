@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSocialStore } from '@/store/useSocialStore';
+import { SegmentedControl } from '@/components/ui';
 import { FriendsList, FriendsSearch, FriendRequests } from './friends';
 
 type FriendsSubTab = 'list' | 'search' | 'requests';
@@ -45,27 +46,17 @@ export function FriendsContent() {
     },
   ];
 
+  const subTabIndex = subTabs.findIndex((tab) => tab.key === subTab);
+
   return (
     <>
       {/* Sub-tab segmented control */}
-      <View className="flex-row bg-[#1c1c1c] rounded-xl p-1 mb-[18px] gap-1">
-        {subTabs.map((tab) => (
-          <Pressable
-            key={tab.key}
-            onPress={() => setSubTab(tab.key)}
-            className={`flex-1 items-center justify-center py-2 rounded-lg ${
-              subTab === tab.key ? 'bg-white' : ''
-            }`}
-          >
-            <Text
-              className={`font-heading text-[11px] tracking-[1.5px] ${
-                subTab === tab.key ? 'text-black' : 'text-muted'
-              }`}
-            >
-              {tab.label}
-            </Text>
-          </Pressable>
-        ))}
+      <View className="mb-[18px]">
+        <SegmentedControl
+          options={subTabs.map((tab) => tab.label)}
+          selectedIndex={subTabIndex}
+          onChange={(index) => setSubTab(subTabs[index].key)}
+        />
       </View>
 
       {subTab === 'list' && <FriendsList onFindAthletes={() => setSubTab('search')} />}

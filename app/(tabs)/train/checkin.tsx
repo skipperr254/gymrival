@@ -9,16 +9,12 @@ export default function CheckinScreen() {
   const { t } = useTranslation('train');
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
-      <View className="flex-row items-end gap-3 px-4 pt-2.5 mb-3.5">
+      <View className="flex-row items-center px-4 py-3">
         <BackButton />
-        <View>
-          <Text className="font-heading text-primary tracking-[4px] text-[26px] leading-7">
-            {t('header.brand')}
-          </Text>
-          <Text className="font-heading text-[11px] text-[#606060] tracking-[2px] mt-0.5">
-            {t('header.checkin')}
-          </Text>
-        </View>
+        <Text className="font-heading text-[22px] tracking-[3px] text-primary flex-1 ml-1">
+          {t('header.checkin')}
+        </Text>
+        <View className="w-9" />
       </View>
 
       <ScrollView
