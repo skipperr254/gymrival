@@ -8,7 +8,8 @@
   "tabs": {
     "schedule": "PLAN",
     "checkin": "CHECK-IN",
-    "progress": "PROGRESO"
+    "progress": "PROGRESO",
+    "nutrition": "NUTRICIÓN"
   },
   "days": {
     "full": { "0": "Lunes", "1": "Martes", "2": "Miércoles", "3": "Jueves", "4": "Viernes", "5": "Sábado", "6": "Domingo" },

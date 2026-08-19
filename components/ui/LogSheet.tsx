@@ -10,7 +10,7 @@ import {
   Dimensions,
   Platform,
 } from 'react-native';
-import { Trophy, MapPin, ChevronRight, type LucideIcon } from 'lucide-react-native';
+import { Trophy, MapPin, Utensils, ChevronRight, type LucideIcon } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
@@ -28,6 +28,7 @@ interface Props {
   onClose: () => void;
   onLogPR: () => void;
   onCheckIn: () => void;
+  onLogMeal: () => void;
   /**
    * Fired once the sheet is fully gone — not when `visible` flips, but when
    * the exit animation has finished AND (on iOS) UIKit has confirmed the
@@ -39,11 +40,12 @@ interface Props {
   onClosed?: () => void;
 }
 
-export function LogSheet({ visible, onClose, onClosed, onLogPR, onCheckIn }: Props) {
+export function LogSheet({ visible, onClose, onClosed, onLogPR, onCheckIn, onLogMeal }: Props) {
   const { t } = useTranslation('logpr');
   const ACTIONS: { id: string; icon: LucideIcon; label: string; sub: string }[] = [
     { id: 'pr', icon: Trophy, label: t('logSheet.logPr.label'), sub: t('logSheet.logPr.sub') },
     { id: 'checkin', icon: MapPin, label: t('logSheet.checkin.label'), sub: t('logSheet.checkin.sub') },
+    { id: 'meal', icon: Utensils, label: t('logSheet.logMeal.label'), sub: t('logSheet.logMeal.sub') },
   ];
   const insets = useSafeAreaInsets();
   const [mounted, setMounted] = useState(false);
@@ -146,7 +148,8 @@ export function LogSheet({ visible, onClose, onClosed, onLogPR, onCheckIn }: Pro
               // next sheet from here is what froze iOS.
               onPress={() => {
                 if (action.id === 'pr') onLogPR();
-                else onCheckIn();
+                else if (action.id === 'checkin') onCheckIn();
+                else onLogMeal();
               }}
             >
               <View className="w-12 h-12 rounded-[14px] bg-[#1a1a1a] items-center justify-center shrink-0">

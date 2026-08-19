@@ -13,7 +13,25 @@ import {
 } from "@/lib/api";
 
 type ProfileUpdate = Partial<
-  Pick<Profile, "username" | "full_name" | "height_cm" | "weight_kg" | "gym" | "goal" | "bio" | "quote">
+  Pick<
+    Profile,
+    | "username"
+    | "full_name"
+    | "height_cm"
+    | "weight_kg"
+    | "gym"
+    | "goal"
+    | "bio"
+    | "quote"
+    | "age"
+    | "sex"
+    | "activity_level"
+    | "diet_goal"
+    | "target_calories"
+    | "target_protein_g"
+    | "target_carbs_g"
+    | "target_fat_g"
+  >
 >;
 
 interface ProfileState {

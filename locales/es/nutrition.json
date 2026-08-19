@@ -1,0 +1,75 @@
+{
+  "editGoals": "Editar objetivos nutricionales",
+  "setGoalsTitle": "DEFINE TUS OBJETIVOS",
+  "setGoalsSub": "Cuéntanos un poco sobre ti para obtener objetivos personalizados de calorías y macros",
+  "summary": {
+    "calories": "CALORÍAS",
+    "remaining": "{{value}} restantes",
+    "protein": "PROTEÍNA",
+    "carbs": "CARBOHIDRATOS",
+    "fat": "GRASA"
+  },
+  "mealTypes": {
+    "breakfast": "Desayuno",
+    "lunch": "Almuerzo",
+    "dinner": "Cena",
+    "snack": "Snack"
+  },
+  "mealSection": {
+    "calorieCount": "{{value}} kcal",
+    "empty": "Nada registrado todavía",
+    "deleteTitle": "¿Eliminar entrada?",
+    "deleteMessage": "¿Eliminar {{name}} del registro de hoy?",
+    "cancel": "Cancelar",
+    "delete": "Eliminar"
+  },
+  "logSheet": {
+    "titleSelect": "Registrar Comida",
+    "titleDetails": "Detalles de la Comida",
+    "addNewFood": "Añadir Nuevo Alimento",
+    "myFoods": "MIS ALIMENTOS",
+    "searchFoods": "Buscar en tus alimentos",
+    "noFoodsYet": "Aún no has guardado ningún alimento",
+    "noSearchResults": "Ningún alimento coincide con tu búsqueda",
+    "macroSummary": "{{calories}} kcal · P {{protein}}g · C {{carbs}}g · G {{fat}}g",
+    "servings": "PORCIONES",
+    "foodName": "NOMBRE DEL ALIMENTO",
+    "foodNamePlaceholder": "ej. Pechuga de Pollo a la Parrilla",
+    "calories": "CALORÍAS",
+    "protein": "PROTEÍNA (G)",
+    "carbs": "CARBOHIDRATOS (G)",
+    "fat": "GRASA (G)",
+    "servingLabelPlaceholder": "Tamaño de la porción (ej. 1 taza, 100g)",
+    "saveToMyFoods": "Guardar en Mis Alimentos para registrar más rápido después",
+    "mealType": "TIPO DE COMIDA",
+    "saving": "GUARDANDO…",
+    "logIt": "REGISTRAR",
+    "mealLogged": "¡COMIDA REGISTRADA!",
+    "addedToMeal": "Añadido a {{meal}}"
+  },
+  "goalsForm": {
+    "headerTitle": "OBJETIVOS NUTRICIONALES",
+    "bodyStats": "DATOS CORPORALES",
+    "weightKg": "PESO (KG)",
+    "heightCm": "ALTURA (CM)",
+    "age": "EDAD",
+    "sex": "SEXO",
+    "sexOptions": { "male": "Hombre", "female": "Mujer" },
+    "activityLevel": "NIVEL DE ACTIVIDAD",
+    "activityOptions": {
+      "sedentary": "Sedentario",
+      "light": "Ligero",
+      "moderate": "Moderado",
+      "active": "Activo",
+      "very_active": "Muy activo"
+    },
+    "dietGoal": "OBJETIVO",
+    "dietGoalOptions": { "lose": "Perder peso", "maintain": "Mantener", "gain": "Ganar peso" },
+    "calculatedPreview": "OBJETIVO DIARIO CALCULADO",
+    "customizeTargets": "Personalizar objetivos manualmente",
+    "saving": "GUARDANDO…",
+    "saveGoals": "GUARDAR OBJETIVOS",
+    "saveErrorTitle": "Algo salió mal",
+    "saveError": "No se pudieron guardar tus objetivos. Comprueba tu conexión e inténtalo de nuevo."
+  }
+}

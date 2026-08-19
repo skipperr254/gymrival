@@ -7,6 +7,7 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { AppHeader, BackButton } from '@/components/ui';
 import { CheckInView } from '@/components/features/CheckInView';
 import { ProgressView } from '@/components/features/progress/ProgressView';
+import { NutritionView } from '@/components/features/nutrition';
 import { ScheduleList, WorkoutDetail, CreateWorkoutSheet } from '@/components/features/train';
 import { DAY_NAME_TO_INDEX, type DayOfWeek, type TrainingSessionWithExercises } from '@/types/train';
 import type { NewWorkout } from '@/components/features/train/constants';
@@ -31,7 +32,7 @@ export default function TrainScreen() {
 
   const loadSessions = useTrainStore((s) => s.loadSessions);
 
-  const [activeTab, setActiveTab] = useState<0 | 1 | 2>(0);
+  const [activeTab, setActiveTab] = useState<0 | 1 | 2 | 3>(0);
   const [selected, setSelected] = useState<TrainingSessionWithExercises | null>(null);
   const [workoutStarted, setWorkoutStarted] = useState(false);
   const [startingWorkout, setStartingWorkout] = useState(false);
@@ -161,9 +162,9 @@ export default function TrainScreen() {
         {!selected && (
           <View className="px-4 pb-2.5">
             <SegmentedControl
-              options={[t('tabs.schedule'), t('tabs.checkin'), t('tabs.progress')]}
+              options={[t('tabs.schedule'), t('tabs.checkin'), t('tabs.progress'), t('tabs.nutrition')]}
               selectedIndex={activeTab}
-              onChange={(i) => setActiveTab(i as 0 | 1 | 2)}
+              onChange={(i) => setActiveTab(i as 0 | 1 | 2 | 3)}
             />
           </View>
         )}
@@ -173,7 +174,9 @@ export default function TrainScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {!selected && activeTab === 2 ? (
+          {!selected && activeTab === 3 ? (
+            <NutritionView />
+          ) : !selected && activeTab === 2 ? (
             <ProgressView />
           ) : !selected && activeTab === 1 ? (
             <CheckInView />

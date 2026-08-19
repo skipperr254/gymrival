@@ -2,7 +2,8 @@
   "logSheet": {
     "title": "ACTIVITEIT LOGGEN",
     "logPr": { "label": "Log een PR", "sub": "Leg een nieuw persoonlijk record vast" },
-    "checkin": { "label": "Gym Check-in", "sub": "Check in bij je sportschool" }
+    "checkin": { "label": "Gym Check-in", "sub": "Check in bij je sportschool" },
+    "logMeal": { "label": "Log een maaltijd", "sub": "Volg calorieën en macro's" }
   },
   "step": {
     "stepOf": "STAP {{step}} VAN 2",

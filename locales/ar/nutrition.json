@@ -1,0 +1,75 @@
+{
+  "editGoals": "تعديل أهداف التغذية",
+  "setGoalsTitle": "حدّد أهدافك",
+  "setGoalsSub": "أخبرنا قليلاً عن نفسك للحصول على أهداف مخصصة للسعرات الحرارية والعناصر الغذائية",
+  "summary": {
+    "calories": "السعرات الحرارية",
+    "remaining": "{{value}} متبقية",
+    "protein": "البروتين",
+    "carbs": "الكربوهيدرات",
+    "fat": "الدهون"
+  },
+  "mealTypes": {
+    "breakfast": "الإفطار",
+    "lunch": "الغداء",
+    "dinner": "العشاء",
+    "snack": "وجبة خفيفة"
+  },
+  "mealSection": {
+    "calorieCount": "{{value}} سعرة حرارية",
+    "empty": "لم يتم تسجيل شيء بعد",
+    "deleteTitle": "حذف العنصر؟",
+    "deleteMessage": "هل تريد حذف {{name}} من سجل اليوم؟",
+    "cancel": "إلغاء",
+    "delete": "حذف"
+  },
+  "logSheet": {
+    "titleSelect": "تسجيل وجبة",
+    "titleDetails": "تفاصيل الوجبة",
+    "addNewFood": "إضافة طعام جديد",
+    "myFoods": "أطعمتي",
+    "searchFoods": "ابحث في أطعمتك",
+    "noFoodsYet": "لم تحفظ أي أطعمة بعد",
+    "noSearchResults": "لا توجد أطعمة مطابقة لبحثك",
+    "macroSummary": "{{calories}} سعرة · بروتين {{protein}}غ · كربوهيدرات {{carbs}}غ · دهون {{fat}}غ",
+    "servings": "الحصص",
+    "foodName": "اسم الطعام",
+    "foodNamePlaceholder": "مثال: صدر دجاج مشوي",
+    "calories": "السعرات الحرارية",
+    "protein": "البروتين (غ)",
+    "carbs": "الكربوهيدرات (غ)",
+    "fat": "الدهون (غ)",
+    "servingLabelPlaceholder": "حجم الحصة (مثال: كوب واحد، 100غ)",
+    "saveToMyFoods": "احفظ في أطعمتي للتسجيل السريع لاحقاً",
+    "mealType": "نوع الوجبة",
+    "saving": "جارٍ الحفظ…",
+    "logIt": "تسجيل",
+    "mealLogged": "تم تسجيل الوجبة!",
+    "addedToMeal": "أُضيفت إلى {{meal}}"
+  },
+  "goalsForm": {
+    "headerTitle": "أهداف التغذية",
+    "bodyStats": "بيانات الجسم",
+    "weightKg": "الوزن (كغ)",
+    "heightCm": "الطول (سم)",
+    "age": "العمر",
+    "sex": "الجنس",
+    "sexOptions": { "male": "ذكر", "female": "أنثى" },
+    "activityLevel": "مستوى النشاط",
+    "activityOptions": {
+      "sedentary": "خامل",
+      "light": "نشاط خفيف",
+      "moderate": "نشاط متوسط",
+      "active": "نشط",
+      "very_active": "نشط جداً"
+    },
+    "dietGoal": "الهدف",
+    "dietGoalOptions": { "lose": "إنقاص الوزن", "maintain": "الحفاظ على الوزن", "gain": "زيادة الوزن" },
+    "calculatedPreview": "الهدف اليومي المحسوب",
+    "customizeTargets": "تخصيص الأهداف يدوياً",
+    "saving": "جارٍ الحفظ…",
+    "saveGoals": "حفظ الأهداف",
+    "saveErrorTitle": "حدث خطأ ما",
+    "saveError": "تعذّر حفظ أهدافك. تحقق من اتصالك وحاول مرة أخرى."
+  }
+}

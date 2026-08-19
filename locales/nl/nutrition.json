@@ -1,0 +1,75 @@
+{
+  "editGoals": "Voedingsdoelen bewerken",
+  "setGoalsTitle": "STEL JE DOELEN IN",
+  "setGoalsSub": "Vertel ons iets over jezelf voor persoonlijke calorie- en macrodoelen",
+  "summary": {
+    "calories": "CALORIEËN",
+    "remaining": "{{value}} over",
+    "protein": "EIWIT",
+    "carbs": "KOOLHYDRATEN",
+    "fat": "VET"
+  },
+  "mealTypes": {
+    "breakfast": "Ontbijt",
+    "lunch": "Lunch",
+    "dinner": "Diner",
+    "snack": "Snack"
+  },
+  "mealSection": {
+    "calorieCount": "{{value}} kcal",
+    "empty": "Nog niets gelogd",
+    "deleteTitle": "Item verwijderen?",
+    "deleteMessage": "{{name}} verwijderen uit het logboek van vandaag?",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen"
+  },
+  "logSheet": {
+    "titleSelect": "Maaltijd Loggen",
+    "titleDetails": "Maaltijdgegevens",
+    "addNewFood": "Nieuw Voedingsmiddel Toevoegen",
+    "myFoods": "MIJN VOEDING",
+    "searchFoods": "Zoek in je voeding",
+    "noFoodsYet": "Je hebt nog geen voedingsmiddelen opgeslagen",
+    "noSearchResults": "Geen voedingsmiddelen gevonden",
+    "macroSummary": "{{calories}} kcal · E {{protein}}g · K {{carbs}}g · V {{fat}}g",
+    "servings": "PORTIES",
+    "foodName": "NAAM",
+    "foodNamePlaceholder": "bijv. Gegrilde Kipfilet",
+    "calories": "CALORIEËN",
+    "protein": "EIWIT (G)",
+    "carbs": "KOOLHYDRATEN (G)",
+    "fat": "VET (G)",
+    "servingLabelPlaceholder": "Portiegrootte (bijv. 1 kop, 100g)",
+    "saveToMyFoods": "Opslaan bij Mijn Voeding voor snel loggen later",
+    "mealType": "MAALTIJDTYPE",
+    "saving": "OPSLAAN…",
+    "logIt": "LOGGEN",
+    "mealLogged": "MAALTIJD GELOGD!",
+    "addedToMeal": "Toegevoegd aan {{meal}}"
+  },
+  "goalsForm": {
+    "headerTitle": "VOEDINGSDOELEN",
+    "bodyStats": "LICHAAMSGEGEVENS",
+    "weightKg": "GEWICHT (KG)",
+    "heightCm": "LENGTE (CM)",
+    "age": "LEEFTIJD",
+    "sex": "GESLACHT",
+    "sexOptions": { "male": "Man", "female": "Vrouw" },
+    "activityLevel": "ACTIVITEITSNIVEAU",
+    "activityOptions": {
+      "sedentary": "Zittend",
+      "light": "Licht actief",
+      "moderate": "Matig actief",
+      "active": "Actief",
+      "very_active": "Zeer actief"
+    },
+    "dietGoal": "DOEL",
+    "dietGoalOptions": { "lose": "Afvallen", "maintain": "Behouden", "gain": "Aankomen" },
+    "calculatedPreview": "BEREKEND DAGELIJKS DOEL",
+    "customizeTargets": "Doelen handmatig aanpassen",
+    "saving": "OPSLAAN…",
+    "saveGoals": "DOELEN OPSLAAN",
+    "saveErrorTitle": "Er is iets misgegaan",
+    "saveError": "Kon je doelen niet opslaan. Controleer je verbinding en probeer het opnieuw."
+  }
+}

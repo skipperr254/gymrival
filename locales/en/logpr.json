@@ -2,7 +2,8 @@
   "logSheet": {
     "title": "LOG ACTIVITY",
     "logPr": { "label": "Log a PR", "sub": "Record a new personal record" },
-    "checkin": { "label": "Gym Check-in", "sub": "Check in to your gym" }
+    "checkin": { "label": "Gym Check-in", "sub": "Check in to your gym" },
+    "logMeal": { "label": "Log a Meal", "sub": "Track calories and macros" }
   },
   "step": {
     "stepOf": "STEP {{step}} OF 2",

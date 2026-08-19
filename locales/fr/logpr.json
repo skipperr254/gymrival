@@ -2,7 +2,8 @@
   "logSheet": {
     "title": "ENREGISTRER UNE ACTIVITÉ",
     "logPr": { "label": "Enregistrer un PR", "sub": "Enregistrer un nouveau record personnel" },
-    "checkin": { "label": "Check-in salle", "sub": "Enregistre ta présence à la salle" }
+    "checkin": { "label": "Check-in salle", "sub": "Enregistre ta présence à la salle" },
+    "logMeal": { "label": "Enregistrer un repas", "sub": "Suis tes calories et macros" }
   },
   "step": {
     "stepOf": "ÉTAPE {{step}} SUR 2",

@@ -2,7 +2,8 @@
   "logSheet": {
     "title": "AKTIVITÄT PROTOKOLLIEREN",
     "logPr": { "label": "PR protokollieren", "sub": "Erfasse einen neuen persönlichen Rekord" },
-    "checkin": { "label": "Gym Check-in", "sub": "Im Studio einchecken" }
+    "checkin": { "label": "Gym Check-in", "sub": "Im Studio einchecken" },
+    "logMeal": { "label": "Mahlzeit protokollieren", "sub": "Kalorien und Makros verfolgen" }
   },
   "step": {
     "stepOf": "SCHRITT {{step}} VON 2",

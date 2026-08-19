@@ -22,6 +22,7 @@ export const Routes = {
   // Train tab
   train: '/(tabs)/train',
   trainCheckin: '/(stack)/checkin',
+  nutritionGoals: '/(stack)/nutrition-goals',
 
   // Profile tab
   profile: '/(tabs)/profile',

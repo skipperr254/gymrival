@@ -3,6 +3,7 @@ import { Tabs, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { CustomTabBar } from '@/components/ui/CustomTabBar';
 import { LogPRSheet } from '@/components/features/logpr';
+import { LogFoodSheet } from '@/components/features/nutrition';
 import { LogSheet } from '@/components/ui/LogSheet';
 import { Routes } from '@/constants/routes';
 
@@ -10,6 +11,7 @@ export default function TabsLayout() {
   const { t } = useTranslation('common');
   const [logSheetVisible, setLogSheetVisible] = useState(false);
   const [logPRSheetVisible, setLogPRSheetVisible] = useState(false);
+  const [logFoodSheetVisible, setLogFoodSheetVisible] = useState(false);
 
   // The Log sheet and the Log-PR sheet are both React Native <Modal>s, and on
   // iOS each one is a UIViewController presented on the same parent. UIKit
@@ -25,7 +27,7 @@ export default function TabsLayout() {
   // Fix: never have two sheets open at once. Closing the Log sheet records
   // what it was about to do, and that runs only once the dismissal is
   // confirmed (see LogSheet's onClosed).
-  const pendingAction = useRef<'logPR' | 'checkin' | null>(null);
+  const pendingAction = useRef<'logPR' | 'checkin' | 'meal' | null>(null);
 
   const openLogSheet = useCallback(() => setLogSheetVisible(true), []);
 
@@ -44,6 +46,11 @@ export default function TabsLayout() {
     setLogSheetVisible(false);
   }, []);
 
+  const handleLogMeal = useCallback(() => {
+    pendingAction.current = 'meal';
+    setLogSheetVisible(false);
+  }, []);
+
   // Runs once the Log sheet is fully gone — safe to present the next modal or
   // push a route. Navigating while a modal is mid-dismissal has the same class
   // of problem on iOS, so Check-in is sequenced through here too.
@@ -54,10 +61,13 @@ export default function TabsLayout() {
       setLogPRSheetVisible(true);
     } else if (action === 'checkin') {
       router.push(Routes.trainCheckin);
+    } else if (action === 'meal') {
+      setLogFoodSheetVisible(true);
     }
   }, []);
 
   const closeLogPR = useCallback(() => setLogPRSheetVisible(false), []);
+  const closeLogFood = useCallback(() => setLogFoodSheetVisible(false), []);
 
   return (
     <>
@@ -78,8 +88,10 @@ export default function TabsLayout() {
         onClosed={handleLogSheetClosed}
         onLogPR={handleLogPR}
         onCheckIn={handleCheckIn}
+        onLogMeal={handleLogMeal}
       />
       <LogPRSheet visible={logPRSheetVisible} onClose={closeLogPR} />
+      <LogFoodSheet visible={logFoodSheetVisible} initialMealType="breakfast" onClose={closeLogFood} />
     </>
   );
 }

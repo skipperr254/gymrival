@@ -9,6 +9,7 @@ import { useSocialStore } from "@/store/useSocialStore";
 import { useChatStore } from "@/store/useChatStore";
 import { useTrainStore } from "@/store/useTrainStore";
 import { useNotificationStore } from "@/store/useNotificationStore";
+import { useNutritionStore } from "@/store/useNutritionStore";
 
 // Not sensitive (just booleans marking "mid onboarding step"), so plain
 // AsyncStorage is fine — this only needs to survive an app kill, not resist
@@ -38,6 +39,7 @@ export function resetDomainStores() {
   useChatStore.getState().reset();
   useTrainStore.getState().reset();
   useNotificationStore.getState().reset();
+  useNutritionStore.getState().reset();
 }
 
 interface AuthState {

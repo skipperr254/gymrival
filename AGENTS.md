@@ -20,6 +20,7 @@ v1 core features:
 - Social feed (PR posts, likes, friend activity)
 - Friends system and in-app chat
 - Gym check-ins with weekly streak tracking
+- Nutrition tracking (meal logging, calorie/macro targets)
 - Push notifications
 - Onboarding, sign up, and sign in flows
 
@@ -34,16 +35,15 @@ This section is the single source of truth for what is and is not in the v1 clie
 - **Auth**: onboarding, sign-in, sign-up, email verify, profile setup, forgot password, reset password — all implemented
 - **Compete tab**: Rivals (friends) leaderboard, Challenges, Global leaderboard as three segmented tabs inside a single `compete/index.tsx` screen (not separate routes), plus a drill-down `compete/challenge/[id].tsx` detail screen — all implemented and working
 - **Social tab**: Feed (`social/index.tsx`, default), Friends (`social/friends.tsx` — real, not a stub: friends list, requests, search all wired to `useSocialStore`), Messages inbox (`social/messages.tsx`) + Chat (`social/chat/[userId].tsx`) — all implemented, including realtime presence and message delivery via `useChatStore`
-- **Train tab**: `train/index.tsx` is a segmented screen with **Schedule**, **Check-in**, and **Progress**. Gym Check-in *also* has its own dedicated route, `train/checkin.tsx` (used when the FAB's "Gym Check-in" action navigates there directly) — both surfaces render the same `CheckInView` component. All three segments implemented and in scope for v1.
+- **Train tab**: `train/index.tsx` is a segmented screen with **Schedule**, **Check-in**, **Progress**, and **Nutrition**. Gym Check-in *also* has its own dedicated route, `train/checkin.tsx` (used when the FAB's "Gym Check-in" action navigates there directly) — both surfaces render the same `CheckInView` component. All four segments implemented and in scope for v1. Nutrition: meal logging (manual entry + a reusable "My Foods" list, no third-party food database/barcode scanning) with calorie/macro targets calculated via a Mifflin-St Jeor TDEE formula from profile fields (`age`, `sex`, `activity_level`, `diet_goal`, `weight_kg`, `height_cm`), user-overridable via `profiles.target_calories`/`target_protein_g`/`target_carbs_g`/`target_fat_g`. Goals are set/edited on the dedicated `nutrition-goals` stack route. Not part of the XP/leaderboard economy — it's a wellness feature, not a competitive one.
 - **Profile tab**: Profile, Edit, PR history, Badges, Notifications, Language (`profile/language.tsx`) — all implemented. Note: **Badges is currently static/mock data** (`BADGES` array hardcoded in `badges.tsx`), not yet wired to a real earned-badge backend — don't assume badge state is dynamic or DB-backed unless you're the one wiring it up. The Profile screen's Pro/Upgrade toggle is a **dev-only mock**: `handleTogglePro` flips `profiles.is_pro` directly with no payment flow behind it (see Stripe note below).
 - **PR logging + PR video proof** — fully implemented (record/pick video, upload to `pr-videos` bucket, inline playback in feed + PR history)
 - **Push notifications** — fully implemented: token registration, realtime in-app notification list (`useNotificationStore`, paginated), and tap-to-route handling in `app/_layout.tsx` (a push tap routes to the relevant screen, e.g. Messages inbox or Social tab; see the "Deep links" deferred note below for how this differs from URL-based deep linking)
-- **FAB (center Log button)**: exactly **two** actions — **Log a PR** and **Gym Check-in**. Nothing else. Do not add Log Meal, Log Weight, or any other action.
+- **FAB (center Log button)**: exactly **three** actions — **Log a PR**, **Gym Check-in**, and **Log a Meal**. Nothing else. Do not add Log Weight or any other action.
 
 ### Deferred — not in v1, do not scaffold
 
 - AI Coach (the `ai-coach` edge function does not exist; do not create it or any UI for it)
-- Macros / calorie tracking
 - Body scan / progress photos
 - Weight log
 - Workout of the Day (WOD)
@@ -399,6 +399,7 @@ Use Zustand for all global client state. Use local `useState` for temporary UI s
 | `useTrainStore`        | Workout state, check-ins, streak, active schedule        |
 | `useProfileStore`      | Profile data, best PRs, PR history (XP/level/streak live on `profile`, not tracked separately) |
 | `useNotificationStore` | Notification list (paginated), unread count, realtime subscription |
+| `useNutritionStore`    | My Foods list, today's meal logs                          |
 
 Persist with AsyncStorage only where the data should survive an app restart (e.g. streak, selected exercise filter, onboarding completed flag).
 
@@ -424,6 +425,7 @@ types/
   train.ts          # (not workout.ts — Schedule/Check-in/Progress live here)
   progress.ts
   notification.ts
+  nutrition.ts       # Food, MealLog, targets/TDEE-input types (Train > Nutrition segment)
 ```
 
 Use path aliases. Configure `@/` to resolve to the project root in both `tsconfig.json` and `babel.config.js`.
@@ -545,7 +547,7 @@ Exception: brand wordmarks ("GYM"/"RIVAL"/"GYMRIVAL") are never translated.
 
 ### Namespaces
 
-Translation files live in `locales/<code>/<namespace>.json` (`code` = `en`, `nl`, `es`, `de`, `pt`, `fr`, `ar`). One namespace file per feature area, mirroring the `app/(tabs)/<tab>` structure: `auth.json` (the whole `(auth)` stack), `common.json` (tab bar, shared settings/chart strings), `profile.json`, `train.json`, `progress.json`, `social.json` (feed/friends/messages/chat), `compete.json` (rivals/challenges/global), `logpr.json` (the Log-a-PR sheet + video upload), `notifications.json`, `exercises.json`. When you build a new feature, add its own namespace file (in all seven language folders) rather than dumping keys into an existing namespace.
+Translation files live in `locales/<code>/<namespace>.json` (`code` = `en`, `nl`, `es`, `de`, `pt`, `fr`, `ar`). One namespace file per feature area, mirroring the `app/(tabs)/<tab>` structure: `auth.json` (the whole `(auth)` stack), `common.json` (tab bar, shared settings/chart strings), `profile.json`, `train.json`, `progress.json`, `social.json` (feed/friends/messages/chat), `compete.json` (rivals/challenges/global), `logpr.json` (the Log-a-PR sheet + video upload), `notifications.json`, `exercises.json`, `nutrition.json` (Train > Nutrition segment: daily summary, meal sections, log-food sheet, goals form). When you build a new feature, add its own namespace file (in all seven language folders) rather than dumping keys into an existing namespace.
 
 Use `useTranslation('namespaceName')` in a screen/component and call `t('key.path')`, or use a fully-qualified `t('namespace:key.path')` when you need a namespace other than the hook's default (e.g. resolving exercise names via `t('exercises:' + key)`). For module-level constants that back JSX (tab configs, option lists) that can't call hooks, store the i18n **key path** on the object and resolve it with `t()` at render time inside the component — see `TABS`/`METRIC_OPTIONS`/`GLOBAL_STAT_BOXES` in `compete/index.tsx` for the pattern. For plain helper functions that aren't components (e.g. `metricLabel()`/`endsInLabel()` in `types/challenge.ts`), import the default `i18n` instance from `@/lib/i18n` and call `i18n.t(...)` directly instead of the `useTranslation` hook.
 

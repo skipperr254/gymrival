@@ -1,0 +1,75 @@
+{
+  "editGoals": "Edit nutrition goals",
+  "setGoalsTitle": "SET YOUR GOALS",
+  "setGoalsSub": "Tell us a bit about yourself to get personalized calorie and macro targets",
+  "summary": {
+    "calories": "CALORIES",
+    "remaining": "{{value}} left",
+    "protein": "PROTEIN",
+    "carbs": "CARBS",
+    "fat": "FAT"
+  },
+  "mealTypes": {
+    "breakfast": "Breakfast",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "snack": "Snack"
+  },
+  "mealSection": {
+    "calorieCount": "{{value}} kcal",
+    "empty": "Nothing logged yet",
+    "deleteTitle": "Remove entry?",
+    "deleteMessage": "Remove {{name}} from today's log?",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "logSheet": {
+    "titleSelect": "Log a Meal",
+    "titleDetails": "Meal Details",
+    "addNewFood": "Add New Food",
+    "myFoods": "MY FOODS",
+    "searchFoods": "Search your foods",
+    "noFoodsYet": "You haven't saved any foods yet",
+    "noSearchResults": "No foods match your search",
+    "macroSummary": "{{calories}} kcal · P {{protein}}g · C {{carbs}}g · F {{fat}}g",
+    "servings": "SERVINGS",
+    "foodName": "FOOD NAME",
+    "foodNamePlaceholder": "e.g. Grilled Chicken Breast",
+    "calories": "CALORIES",
+    "protein": "PROTEIN (G)",
+    "carbs": "CARBS (G)",
+    "fat": "FAT (G)",
+    "servingLabelPlaceholder": "Serving size (e.g. 1 cup, 100g)",
+    "saveToMyFoods": "Save to My Foods for quick logging later",
+    "mealType": "MEAL TYPE",
+    "saving": "SAVING…",
+    "logIt": "LOG IT",
+    "mealLogged": "MEAL LOGGED!",
+    "addedToMeal": "Added to {{meal}}"
+  },
+  "goalsForm": {
+    "headerTitle": "NUTRITION GOALS",
+    "bodyStats": "BODY STATS",
+    "weightKg": "WEIGHT (KG)",
+    "heightCm": "HEIGHT (CM)",
+    "age": "AGE",
+    "sex": "SEX",
+    "sexOptions": { "male": "Male", "female": "Female" },
+    "activityLevel": "ACTIVITY LEVEL",
+    "activityOptions": {
+      "sedentary": "Sedentary",
+      "light": "Light",
+      "moderate": "Moderate",
+      "active": "Active",
+      "very_active": "Very Active"
+    },
+    "dietGoal": "GOAL",
+    "dietGoalOptions": { "lose": "Lose Weight", "maintain": "Maintain", "gain": "Gain Weight" },
+    "calculatedPreview": "CALCULATED DAILY TARGET",
+    "customizeTargets": "Customize targets manually",
+    "saving": "SAVING…",
+    "saveGoals": "SAVE GOALS",
+    "saveErrorTitle": "Something went wrong",
+    "saveError": "Could not save your goals. Check your connection and try again."
+  }
+}

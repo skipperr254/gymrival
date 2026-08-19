@@ -2,7 +2,8 @@
   "logSheet": {
     "title": "REGISTRAR ACTIVIDAD",
     "logPr": { "label": "Registrar un PR", "sub": "Registra un nuevo récord personal" },
-    "checkin": { "label": "Check-in de Gimnasio", "sub": "Regístrate en tu gimnasio" }
+    "checkin": { "label": "Check-in de Gimnasio", "sub": "Regístrate en tu gimnasio" },
+    "logMeal": { "label": "Registrar una comida", "sub": "Controla calorías y macros" }
   },
   "step": {
     "stepOf": "PASO {{step}} DE 2",

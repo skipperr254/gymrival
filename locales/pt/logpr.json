@@ -2,7 +2,8 @@
   "logSheet": {
     "title": "REGISTAR ATIVIDADE",
     "logPr": { "label": "Registar um PR", "sub": "Regista um novo recorde pessoal" },
-    "checkin": { "label": "Check-in de Ginásio", "sub": "Faz check-in no teu ginásio" }
+    "checkin": { "label": "Check-in de Ginásio", "sub": "Faz check-in no teu ginásio" },
+    "logMeal": { "label": "Registar uma refeição", "sub": "Acompanha calorias e macros" }
   },
   "step": {
     "stepOf": "PASSO {{step}} DE 2",
