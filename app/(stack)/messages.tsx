@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useChatStore } from '@/store/useChatStore';
-import { MessagesContent, SocialSubHeader } from '@/components/features/social';
+import { MessagesContent } from '@/components/features/social';
+import { DetailHeader } from '@/components/ui/DetailHeader';
 
 export default function MessagesScreen() {
   const { t } = useTranslation('social');
@@ -22,7 +23,7 @@ export default function MessagesScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <SocialSubHeader title={t('messagesTitle')} />
+      <DetailHeader title={t('messagesTitle')} />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}

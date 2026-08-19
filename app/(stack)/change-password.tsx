@@ -17,7 +17,7 @@ import { Eye, EyeOff } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
-import { BackButton } from '@/components/ui/BackButton';
+import { DetailHeader } from '@/components/ui/DetailHeader';
 
 export default function ChangePasswordScreen() {
   const { t } = useTranslation('profile');
@@ -55,13 +55,7 @@ export default function ChangePasswordScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
-      <View className="flex-row items-center px-4 py-3">
-        <BackButton />
-        <Text className="font-heading text-2xl text-primary tracking-[3px] flex-1 ml-1">
-          {t('changePassword.title')}
-        </Text>
-        <View className="w-[30px]" />
-      </View>
+      <DetailHeader title={t('changePassword.title')} />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}

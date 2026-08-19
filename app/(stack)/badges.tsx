@@ -6,7 +6,7 @@ import {
 } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
-import { BackButton } from '@/components/ui/BackButton';
+import { DetailHeader } from '@/components/ui/DetailHeader';
 
 interface BadgeDef {
   id: number;
@@ -37,13 +37,7 @@ export default function BadgesScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
-      <View className="flex-row items-center px-4 py-3">
-        <BackButton />
-        <Text className="font-heading text-2xl text-primary tracking-[3px] flex-1 ml-1">
-          {t('badges.title')}
-        </Text>
-        <View className="w-[30px]" />
-      </View>
+      <DetailHeader title={t('badges.title')} />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* Summary */}

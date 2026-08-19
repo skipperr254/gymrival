@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
-import { View, ScrollView, Pressable, StyleSheet, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
-import { rtlIconFlip } from '@/lib/i18n/rtl';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
-import { AppHeader } from '@/components/ui';
+import { AppHeader, BackButton } from '@/components/ui';
 import { CheckInView } from '@/components/features/CheckInView';
 import { ProgressView } from '@/components/features/progress/ProgressView';
 import { ScheduleList, WorkoutDetail, CreateWorkoutSheet } from '@/components/features/train';
@@ -152,14 +150,8 @@ export default function TrainScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
         {/* Header */}
         {selected ? (
-          <View className="flex-row items-center px-4 pt-2.5 mb-1">
-            <Pressable
-              className="p-1"
-              style={({ pressed }) => pressed && { opacity: 0.5 }}
-              onPress={goBack}
-            >
-              <ChevronLeft size={22} color={Colors.accent} style={rtlIconFlip} />
-            </Pressable>
+          <View className="px-4 pt-2.5 mb-1">
+            <BackButton onPress={goBack} />
           </View>
         ) : (
           <AppHeader />

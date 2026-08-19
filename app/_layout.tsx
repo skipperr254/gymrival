@@ -20,6 +20,7 @@ import { useChatStore } from "@/store/useChatStore";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { savePushToken, getUserLanguage, reconcileStaleVideoUploads } from "@/lib/api";
 import { Routes } from "@/constants/routes";
+import { stackScreenOptions } from "@/constants/navigation";
 import i18n, { initI18n } from "@/lib/i18n";
 import { isSupportedLanguage } from "@/lib/i18n/languages";
 import { LANGUAGE_STORAGE_KEY } from "@/lib/i18n/languageDetector";
@@ -276,16 +277,32 @@ export default function RootLayout() {
     if (!initialized || (!fontsLoaded && !fontError) || !i18nReady) return;
 
     const inAuthGroup = segments[0] === "(auth)";
-    const inTabsGroup = segments[0] === "(tabs)";
+    // "(stack)" holds every drill-down screen pushed on top of the tab
+    // navigator (chat, challenge detail, settings, ...) — it's just as much
+    // a signed-in-only area as "(tabs)" itself, so a session lost while
+    // sitting on one of those screens must redirect too.
+    const inAuthenticatedGroup = segments[0] === "(tabs)" || segments[0] === "(stack)";
 
     if (session && inAuthGroup && !pendingPasswordReset && !pendingProfileSetup) {
       router.replace(Routes.compete);
-    } else if (!session && inTabsGroup) {
+    } else if (!session && inAuthenticatedGroup) {
       router.replace(Routes.splash as any);
     }
   }, [session, initialized, segments, pendingPasswordReset, pendingProfileSetup, fontsLoaded, fontError, i18nReady, router]);
 
   if ((!fontsLoaded && !fontError) || !initialized || !i18nReady) return null;
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      {/* The push from a tab into a drill-down screen is a cross-group
+          transition — (tabs) to (stack) — handled by THIS root stack, not
+          (stack)/_layout.tsx's own nested Stack (that one only governs
+          navigation between screens already inside the group). Without this
+          explicit override the transition silently fell back to each
+          platform's raw native-stack default: a fine slide on iOS, but an
+          Android default that reads as a fade, not the WhatsApp-style slide
+          both platforms should have. */}
+      <Stack.Screen name="(stack)" options={stackScreenOptions} />
+    </Stack>
+  );
 }

@@ -8,7 +8,7 @@ import { getExerciseIcon } from '@/constants/exerciseIcons';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { formatDate } from '@/lib/i18n/format';
-import { BackButton } from '@/components/ui/BackButton';
+import { DetailHeader } from '@/components/ui/DetailHeader';
 import type { PRHistoryGroup } from '@/types/pr';
 
 function PRGroup({ group }: { group: PRHistoryGroup }) {
@@ -65,13 +65,7 @@ export default function PRHistoryScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
-      <View className="flex-row items-center px-4 py-3">
-        <BackButton />
-        <Text className="font-heading text-2xl text-primary tracking-[3px] flex-1 ml-1">
-          {t('prHistory.title')}
-        </Text>
-        <View className="w-[30px]" />
-      </View>
+      <DetailHeader title={t('prHistory.title')} />
 
       {prHistoryLoading ? (
         <View className="flex-1 items-center justify-center">

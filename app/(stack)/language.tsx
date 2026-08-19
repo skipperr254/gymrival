@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, Pressable, StyleSheet, ActivityIndicator, Alert } from "react-native";
+import { View, Text, Pressable, ActivityIndicator, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CheckCircle } from "lucide-react-native";
 import { reloadAppAsync } from "expo";
@@ -9,7 +9,7 @@ import { Colors } from "@/constants/theme";
 import { pickerLanguages, type LanguageCode } from "@/lib/i18n/languages";
 import { LANGUAGE_STORAGE_KEY } from "@/lib/i18n/languageDetector";
 import { applyLayoutDirection } from "@/lib/i18n/rtl";
-import { BackButton } from "@/components/ui/BackButton";
+import { DetailHeader } from "@/components/ui/DetailHeader";
 import { useAuthStore } from "@/store/useAuthStore";
 import { updateLanguage } from "@/lib/api";
 
@@ -64,19 +64,7 @@ export default function LanguageScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={["top"]}>
-      <View
-        className="flex-row items-center px-4 py-3.5"
-        style={{
-          borderBottomWidth: StyleSheet.hairlineWidth,
-          borderBottomColor: Colors.borderDefault,
-        }}
-      >
-        <BackButton />
-        <Text className="flex-1 text-center font-heading text-xl text-primary tracking-[2px]">
-          {t("settings.language").toUpperCase()}
-        </Text>
-        <View className="w-9" />
-      </View>
+      <DetailHeader title={t("settings.language").toUpperCase()} />
 
       <Text className="font-sans text-[13px] text-muted px-4 pt-4 pb-1">
         {t("settings.languageAuto")}

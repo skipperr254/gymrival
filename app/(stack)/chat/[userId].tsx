@@ -4,7 +4,6 @@ import {
   Text,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
@@ -16,7 +15,7 @@ import { computeIsOnline, useChatStore } from '@/store/useChatStore';
 import { fetchProfile } from '@/lib/api';
 import { ChatInputBar, MessageList } from '@/components/features/social/chat';
 import { Avatar } from '@/components/ui/Avatar';
-import { BackButton } from '@/components/ui/BackButton';
+import { DetailHeader } from '@/components/ui/DetailHeader';
 
 export default function ChatScreen() {
   const { t } = useTranslation('social');
@@ -146,12 +145,7 @@ export default function ChatScreen() {
   if (initError) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
-        <View
-          className="flex-row items-center gap-3 px-4 py-3 bg-[#1a1a1a]"
-          style={{ borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#242424' }}
-        >
-          <BackButton />
-        </View>
+        <DetailHeader />
         <View className="flex-1 items-center justify-center gap-3 px-8 -mt-[60px]">
           <MessageCircle size={32} strokeWidth={1.4} color="#333" />
           <Text className="font-heading text-lg tracking-[2px] text-white">
@@ -173,33 +167,29 @@ export default function ChatScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
-      {/* Header */}
-      <View
-        className="flex-row items-center gap-3 px-4 py-3 bg-[#1a1a1a]"
-        style={{ borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#242424' }}
-      >
-        <BackButton />
+      <DetailHeader>
+        <View className="flex-row items-center gap-3">
+          {otherUserId ? (
+            <Avatar userId={otherUserId} name={displayName} avatarUrl={otherUser?.avatar_url} size={40} online={online} />
+          ) : (
+            <View className="w-10 h-10 rounded-full bg-[#242424]" />
+          )}
 
-        {otherUserId ? (
-          <Avatar userId={otherUserId} name={displayName} avatarUrl={otherUser?.avatar_url} size={40} online={online} />
-        ) : (
-          <View className="w-10 h-10 rounded-full bg-[#242424]" />
-        )}
-
-        <View className="flex-1">
-          <Text className="font-sans-semibold text-[15px] text-white" numberOfLines={1}>
-            {displayName}
-          </Text>
-          <Text
-            className={`font-sans text-[11px] mt-px ${
-              online ? 'text-success' : 'text-[#505050]'
-            }`}
-          >
-            {online ? t('chat.online') : t('chat.offline')}
-            {otherUser ? `  ·  ${t('lvl', { level: otherUser.level })}` : ''}
-          </Text>
+          <View className="flex-1">
+            <Text className="font-sans-semibold text-[15px] text-white" numberOfLines={1}>
+              {displayName}
+            </Text>
+            <Text
+              className={`font-sans text-[11px] mt-px ${
+                online ? 'text-success' : 'text-[#505050]'
+              }`}
+            >
+              {online ? t('chat.online') : t('chat.offline')}
+              {otherUser ? `  ·  ${t('lvl', { level: otherUser.level })}` : ''}
+            </Text>
+          </View>
         </View>
-      </View>
+      </DetailHeader>
 
       {/* KeyboardAvoidingView wraps messages + input so the scroll area
           compresses correctly when the keyboard opens */}

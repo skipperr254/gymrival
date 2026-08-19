@@ -20,7 +20,7 @@ import { Colors } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
-import { BackButton } from '@/components/ui/BackButton';
+import { DetailHeader } from '@/components/ui/DetailHeader';
 import { formatDate, formatRelativeTime } from '@/lib/i18n/format';
 import { Avatar } from '@/components/ui/Avatar';
 import type { AppNotification, NotificationType } from '@/types/notification';
@@ -198,20 +198,27 @@ export default function NotificationsScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
-      {/* Header */}
-      <View
-        className="flex-row items-center px-4 py-3.5"
-        style={{ borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: Colors.borderDefault }}
+      <DetailHeader
+        right={
+          unreadCount > 0 ? (
+            <Pressable
+              style={({ pressed }) => pressed && { opacity: 0.5 }}
+              onPress={handleMarkAll}
+            >
+              <Text className="font-heading text-[11px] text-accent tracking-[1px]">
+                {t('notifications.markAll')}
+              </Text>
+            </Pressable>
+          ) : undefined
+        }
       >
-        <BackButton />
-
-        <View className="flex-1 flex-row items-center justify-center gap-2">
+        <View className="flex-row items-center justify-center gap-2">
           <Text className="font-heading text-xl text-primary tracking-[2px]">
             {t('notifications.title')}
           </Text>
           {unreadCount > 0 && (
             <View className="bg-accent rounded-full min-w-[20px] h-5 items-center justify-center px-[5px]">
-              {/* Same cap as the tab-icon badge (app/(tabs)/profile/index.tsx)
+              {/* Same cap as the tab-icon badge (app/(tabs)/profile.tsx)
                   — this one previously rendered the raw number uncapped. */}
               <Text className="font-sans-bold text-[11px] text-white">
                 {unreadCount > 9 ? '9+' : String(unreadCount)}
@@ -219,21 +226,7 @@ export default function NotificationsScreen() {
             </View>
           )}
         </View>
-
-        {unreadCount > 0 ? (
-          <Pressable
-            className="w-[68px] items-end"
-            style={({ pressed }) => pressed && { opacity: 0.5 }}
-            onPress={handleMarkAll}
-          >
-            <Text className="font-heading text-[11px] text-accent tracking-[1px]">
-              {t('notifications.markAll')}
-            </Text>
-          </Pressable>
-        ) : (
-          <View className="w-[68px] items-end" />
-        )}
-      </View>
+      </DetailHeader>
 
       {loading && notifications.length === 0 ? (
         <View className="flex-1 items-center justify-center">

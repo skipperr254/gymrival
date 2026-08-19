@@ -7,6 +7,7 @@ import {
 } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Fonts, MedalColors, Colors } from '@/constants/theme';
+import { Routes } from '@/constants/routes';
 import { getExerciseIcon } from '@/constants/exerciseIcons';
 import type { ChallengeWithStats } from '@/types/challenge';
 import { endsInLabel, formatChallengeScore, metricLabel } from '@/types/challenge';
@@ -143,7 +144,7 @@ export function ChallengeCard({
           )}
         </Pressable>
         <Pressable
-          onPress={() => router.push(`/(tabs)/compete/challenge/${ch.id}` as any)}
+          onPress={() => router.push(Routes.challengeDetail(ch.id) as never)}
           className="flex-1 flex-row items-center justify-center gap-1.5 py-2.5 rounded-xl border-[1.5px] bg-transparent"
           style={{ borderColor: color + '44' }}
         >

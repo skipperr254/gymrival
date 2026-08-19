@@ -11,25 +11,25 @@ export const Routes = {
 
   // Compete tab
   compete: '/(tabs)/compete',
-  challengeDetail: (id: string) => `/(tabs)/compete/challenge/${id}`,
+  challengeDetail: (id: string) => `/(stack)/challenge/${id}`,
 
   // Social tab
   social: '/(tabs)/social',
-  socialFriends: '/(tabs)/social/friends',
-  socialMessages: '/(tabs)/social/messages',
-  chat: (userId: string) => `/(tabs)/social/chat/${userId}`,
+  socialFriends: '/(stack)/friends',
+  socialMessages: '/(stack)/messages',
+  chat: (userId: string) => `/(stack)/chat/${userId}`,
 
   // Train tab
   train: '/(tabs)/train',
-  trainCheckin: '/(tabs)/train/checkin',
+  trainCheckin: '/(stack)/checkin',
 
   // Profile tab
   profile: '/(tabs)/profile',
-  profileEdit: '/(tabs)/profile/edit',
-  profilePRHistory: '/(tabs)/profile/pr-history',
-  profileBadges: '/(tabs)/profile/badges',
-  profileLanguage: '/(tabs)/profile/language',
-  profileSettings: '/(tabs)/profile/settings',
-  profileChangePassword: '/(tabs)/profile/change-password',
-  notifications: '/(tabs)/profile/notifications',
+  profileEdit: '/(stack)/edit-profile',
+  profilePRHistory: '/(stack)/pr-history',
+  profileBadges: '/(stack)/badges',
+  profileLanguage: '/(stack)/language',
+  profileSettings: '/(stack)/settings',
+  profileChangePassword: '/(stack)/change-password',
+  notifications: '/(stack)/notifications',
 } as const;

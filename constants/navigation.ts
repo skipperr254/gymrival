@@ -1,14 +1,18 @@
 /**
- * Shared native-stack transition config. Android's native-stack default
- * animation is a fade/scale that reads as a "flash" compared to iOS's native
- * slide — force the same slide-from-right on both platforms so drill-down
- * navigation feels intentional everywhere in the app.
+ * Shared native-stack transition config for the root-level `(stack)` group
+ * (every drill-down/full-screen route pushed on top of the tab navigator).
+ * iOS uses the true native-stack default push — the same transition UIKit
+ * itself uses (parallax + dim on the outgoing screen, interactive
+ * swipe-back) — so it matches native apps' feel exactly. Android has no
+ * equivalent "default push" convention to lose, so it keeps an explicit
+ * slide.
  */
+import { Platform } from 'react-native';
 import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import { Colors } from '@/constants/theme';
 
 export const stackScreenOptions: NativeStackNavigationOptions = {
   headerShown: false,
   contentStyle: { backgroundColor: Colors.base },
-  animation: 'slide_from_right',
+  animation: Platform.OS === 'ios' ? 'default' : 'slide_from_right',
 };

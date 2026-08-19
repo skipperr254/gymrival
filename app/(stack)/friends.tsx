@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSocialStore } from '@/store/useSocialStore';
-import { FriendsContent, SocialSubHeader } from '@/components/features/social';
+import { FriendsContent } from '@/components/features/social';
+import { DetailHeader } from '@/components/ui/DetailHeader';
 
 export default function FriendsScreen() {
   const { t } = useTranslation('social');
@@ -23,7 +24,7 @@ export default function FriendsScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <SocialSubHeader title={t('friendsTitle')} />
+      <DetailHeader title={t('friendsTitle')} />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}

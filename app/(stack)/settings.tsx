@@ -9,7 +9,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { LANGUAGES } from '@/lib/i18n/languages';
 import { SettingsRow, SettingsToggleRow } from '@/components/features/profile';
-import { BackButton } from '@/components/ui/BackButton';
+import { DetailHeader } from '@/components/ui/DetailHeader';
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation(['common', 'profile']);
@@ -33,19 +33,7 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
-      <View
-        className="flex-row items-center px-4 py-3.5"
-        style={{
-          borderBottomWidth: StyleSheet.hairlineWidth,
-          borderBottomColor: Colors.borderDefault,
-        }}
-      >
-        <BackButton />
-        <Text className="flex-1 text-center font-heading text-xl text-primary tracking-[2px]">
-          {t('profile:settings.title')}
-        </Text>
-        <View className="w-9" />
-      </View>
+      <DetailHeader title={t('profile:settings.title')} />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View className="bg-surface rounded-[20px] overflow-hidden">

@@ -34,7 +34,7 @@ import {
   metricLabel,
 } from '@/types/challenge';
 import { ChallengeLeaderboardRow } from '@/components/features/compete/ChallengeLeaderboardRow';
-import { BackButton } from '@/components/ui/BackButton';
+import { DetailHeader } from '@/components/ui/DetailHeader';
 
 export default function ChallengeDetailScreen() {
   const { t } = useTranslation('compete');
@@ -85,13 +85,7 @@ export default function ChallengeDetailScreen() {
   if (!challenge && challenges.length === 0 && !loadingChallenges && challengesError) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
-        <View className="flex-row items-center px-4 py-3">
-          <BackButton />
-          <Text className="font-heading text-[22px] tracking-[3px] text-primary flex-1 ml-1">
-            {t('detail.heading')}
-          </Text>
-          <View className="w-9" />
-        </View>
+        <DetailHeader title={t('detail.heading')} />
         <View className="flex-1 items-center justify-center gap-2.5 px-8">
           <AlertCircle size={26} strokeWidth={1.6} color={Colors.accent} />
           <Text className="font-sans text-sm text-muted text-center">{t('detail.loadError')}</Text>
@@ -128,13 +122,7 @@ export default function ChallengeDetailScreen() {
   if (!challenge && challenges.length > 0) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
-        <View className="flex-row items-center px-4 py-3">
-          <BackButton />
-          <Text className="font-heading text-[22px] tracking-[3px] text-primary flex-1 ml-1">
-            {t('detail.heading')}
-          </Text>
-          <View className="w-9" />
-        </View>
+        <DetailHeader title={t('detail.heading')} />
         <View className="flex-1 items-center justify-center gap-2.5">
           <AlertCircle size={26} strokeWidth={1.6} color={Colors.accent} />
           <Text className="font-sans text-sm text-muted">{t('detail.notFound')}</Text>
@@ -153,14 +141,7 @@ export default function ChallengeDetailScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
-      {/* Header */}
-      <View className="flex-row items-center px-4 py-3">
-        <BackButton />
-        <Text className="font-heading text-[22px] tracking-[3px] text-primary flex-1 ml-1">
-          {t('detail.heading')}
-        </Text>
-        <View className="w-9" />
-      </View>
+      <DetailHeader title={t('detail.heading')} />
 
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}
