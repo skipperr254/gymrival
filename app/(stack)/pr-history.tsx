@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator, Alert, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Trophy } from 'lucide-react-native';
+import { Trash2, Trophy } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { getExerciseIcon } from '@/constants/exerciseIcons';
@@ -11,7 +11,13 @@ import { formatDate } from '@/lib/i18n/format';
 import { DetailHeader } from '@/components/ui/DetailHeader';
 import type { PRHistoryGroup } from '@/types/pr';
 
-function PRGroup({ group }: { group: PRHistoryGroup }) {
+interface PRGroupProps {
+  group: PRHistoryGroup;
+  deletingId: string | null;
+  onDelete: (prId: string) => void;
+}
+
+function PRGroup({ group, deletingId, onDelete }: PRGroupProps) {
   const { t } = useTranslation('profile');
   const ExIcon = getExerciseIcon(group.exercise.key);
   return (
@@ -48,6 +54,19 @@ function PRGroup({ group }: { group: PRHistoryGroup }) {
           >
             {entry.value} {entry.unit}
           </Text>
+          <Pressable
+            onPress={() => onDelete(entry.id)}
+            disabled={deletingId === entry.id}
+            hitSlop={8}
+            accessibilityLabel={t('prHistory.deleteA11y')}
+            style={({ pressed }) => pressed && { opacity: 0.7 }}
+          >
+            {deletingId === entry.id ? (
+              <ActivityIndicator size="small" color={Colors.muted} />
+            ) : (
+              <Trash2 size={14} strokeWidth={2} color={Colors.muted} />
+            )}
+          </Pressable>
         </View>
       ))}
     </View>
@@ -57,11 +76,32 @@ function PRGroup({ group }: { group: PRHistoryGroup }) {
 export default function PRHistoryScreen() {
   const { t } = useTranslation('profile');
   const { user } = useAuthStore();
-  const { prHistory, loadPRHistory, prHistoryLoading } = useProfileStore();
+  const { prHistory, loadPRHistory, prHistoryLoading, deletePR } = useProfileStore();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user?.id) loadPRHistory(user.id);
   }, [user?.id, loadPRHistory]);
+
+  const handleDelete = useCallback(
+    (prId: string) => {
+      Alert.alert(t('prHistory.deleteConfirmTitle'), t('prHistory.deleteConfirmMsg'), [
+        {
+          text: t('prHistory.deleteConfirmCta'),
+          style: 'destructive',
+          onPress: async () => {
+            if (!user?.id) return;
+            setDeletingId(prId);
+            const { error } = await deletePR(user.id, prId);
+            setDeletingId(null);
+            if (error) Alert.alert(t('prHistory.deleteErrorTitle'), t('prHistory.deleteErrorMsg'));
+          },
+        },
+        { text: t('common:actions.cancel'), style: 'cancel' },
+      ]);
+    },
+    [user?.id, deletePR, t]
+  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
@@ -84,7 +124,12 @@ export default function PRHistoryScreen() {
       ) : (
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           {prHistory.map((group) => (
-            <PRGroup key={group.exercise.key} group={group} />
+            <PRGroup
+              key={group.exercise.key}
+              group={group}
+              deletingId={deletingId}
+              onDelete={handleDelete}
+            />
           ))}
         </ScrollView>
       )}

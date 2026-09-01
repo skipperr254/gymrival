@@ -169,8 +169,7 @@ export function LogPRSheet({ visible, onClose }: Props) {
     }
   }, [visible, user?.id, loadExercises]);
 
-  // Auto-close logic:
-  // • No video — close after 2.8 s (original behaviour)
+  // Auto-close logic — every PR now has a video attached:
   // • Video uploading — wait; close 1.5 s after upload completes
   // • Video failed — close after 3.5 s so user sees the error
   // • Safety net — always close after 15 s maximum
@@ -179,10 +178,7 @@ export function LogPRSheet({ visible, onClose }: Props) {
       clearTimeout(closeTimer.current);
       return;
     }
-    if (!videoAsset) {
-      // No video: original 2.8 s close
-      closeTimer.current = setTimeout(onClose, 2800);
-    } else if (videoUploadDone) {
+    if (videoUploadDone) {
       closeTimer.current = setTimeout(onClose, 1500);
     } else if (videoUploadFailed) {
       closeTimer.current = setTimeout(onClose, 3500);
@@ -191,10 +187,10 @@ export function LogPRSheet({ visible, onClose }: Props) {
       closeTimer.current = setTimeout(onClose, 15000);
     }
     return () => clearTimeout(closeTimer.current);
-  }, [step, onClose, videoAsset, videoUploadDone, videoUploadFailed]);
+  }, [step, onClose, videoUploadDone, videoUploadFailed]);
 
   const handleSave = useCallback(async () => {
-    if (!user?.id || !selectedExKey || !selectedEx || !isValidValue) return;
+    if (!user?.id || !selectedExKey || !selectedEx || !isValidValue || !videoAsset) return;
     const mySession = sessionRef.current;
     setSaving(true);
     setSaveError(null);
@@ -219,35 +215,33 @@ export function LogPRSheet({ visible, onClose }: Props) {
     loadPRHistory(user.id);
     loadProfile(user.id);
 
-    // If a video was attached, upload it now (continues even if sheet closes)
-    if (videoAsset && user.id && prData.id) {
-      const uid = user.id;
-      const pid = prData.id;
-      const asset = videoAsset;
-      if (mountedRef.current && sessionRef.current === mySession) setVideoUploading(true);
+    // Upload the (required) video now — continues even if the sheet closes
+    const uid = user.id;
+    const pid = prData.id;
+    const asset = videoAsset;
+    if (mountedRef.current && sessionRef.current === mySession) setVideoUploading(true);
 
-      const { error: uploadError } = await uploadPRVideo(
-        uid,
-        pid,
-        asset.uri,
-        asset.thumbnailUri || null,
-        asset.durationSec,
-        asset.fileSizeBytes,
-        asset.width,
-        asset.height,
-      );
+    const { error: uploadError } = await uploadPRVideo(
+      uid,
+      pid,
+      asset.uri,
+      asset.thumbnailUri || null,
+      asset.durationSec,
+      asset.fileSizeBytes,
+      asset.width,
+      asset.height,
+    );
 
-      // Same guard: the upload itself always completes and correctly tags
-      // `pid` regardless (that part can't cross-contaminate), but the UI
-      // feedback (spinner/"saved"/"failed") must only apply to whichever
-      // session is currently on screen.
-      if (mountedRef.current && sessionRef.current === mySession) {
-        setVideoUploading(false);
-        if (uploadError) {
-          setVideoUploadFailed(true);
-        } else {
-          setVideoUploadDone(true);
-        }
+    // Same guard: the upload itself always completes and correctly tags
+    // `pid` regardless (that part can't cross-contaminate), but the UI
+    // feedback (spinner/"saved"/"failed") must only apply to whichever
+    // session is currently on screen.
+    if (mountedRef.current && sessionRef.current === mySession) {
+      setVideoUploading(false);
+      if (uploadError) {
+        setVideoUploadFailed(true);
+      } else {
+        setVideoUploadDone(true);
       }
     }
   }, [user?.id, selectedExKey, selectedEx, isValidValue, numValue, videoAsset, loadRivals, loadBestPRs, loadPRHistory, loadProfile, t]);
@@ -381,7 +375,6 @@ export function LogPRSheet({ visible, onClose }: Props) {
                 <Step3
                   exercise={selectedEx}
                   savedValue={savedValue}
-                  hasVideo={!!videoAsset}
                   videoUploading={videoUploading}
                   videoUploadDone={videoUploadDone}
                   videoUploadFailed={videoUploadFailed}

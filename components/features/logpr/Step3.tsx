@@ -9,16 +9,14 @@ import { getExerciseIcon } from '@/constants/exerciseIcons';
 interface Step3Props {
   exercise: ExerciseType;
   savedValue: number;
-  hasVideo: boolean;
   videoUploading: boolean;
   videoUploadDone: boolean;
   videoUploadFailed: boolean;
 }
 
-export function Step3({ exercise, savedValue, hasVideo, videoUploading, videoUploadDone, videoUploadFailed }: Step3Props) {
+export function Step3({ exercise, savedValue, videoUploading, videoUploadDone, videoUploadFailed }: Step3Props) {
   const { t } = useTranslation('logpr');
   const ExIcon = getExerciseIcon(exercise.key);
-  const xpEarned = hasVideo && videoUploadDone ? t('xpEarnedWithVideo') : t('xpEarnedWithoutVideo');
 
   return (
     <View className="items-center pt-6 pb-4">
@@ -39,7 +37,7 @@ export function Step3({ exercise, savedValue, hasVideo, videoUploading, videoUpl
       <Text className="font-heading text-[32px] tracking-[4px] text-primary mb-1.5">
         {t('prSaved')}
       </Text>
-      <Text className="font-heading text-[15px] tracking-[2px] text-accent mb-6">{xpEarned}</Text>
+      <Text className="font-heading text-[15px] tracking-[2px] text-accent mb-6">{t('xpEarned')}</Text>
 
       {/* PR card */}
       <View className="w-full bg-[rgba(230,48,48,0.06)] border border-[rgba(230,48,48,0.22)] rounded-2xl py-5 px-6 items-center mb-5 gap-1">
@@ -59,28 +57,26 @@ export function Step3({ exercise, savedValue, hasVideo, videoUploading, videoUpl
       </View>
 
       {/* Video upload status row */}
-      {hasVideo && (
-        <View className="flex-row items-center gap-[7px] mb-3.5">
-          {videoUploading && (
-            <>
-              <ActivityIndicator size="small" color={Colors.muted} />
-              <Text className="font-sans text-[11px] text-muted">{t('uploadingVideoProof')}</Text>
-            </>
-          )}
-          {videoUploadDone && (
-            <>
-              <Zap size={13} strokeWidth={2} color={Colors.success} />
-              <Text className="font-sans text-[11px] text-success">{t('videoProofSaved')}</Text>
-            </>
-          )}
-          {videoUploadFailed && (
-            <>
-              <VideoOff size={13} strokeWidth={2} color={Colors.muted} />
-              <Text className="font-sans text-[11px] text-muted">{t('videoUploadFailed')}</Text>
-            </>
-          )}
-        </View>
-      )}
+      <View className="flex-row items-center gap-[7px] mb-3.5">
+        {videoUploading && (
+          <>
+            <ActivityIndicator size="small" color={Colors.muted} />
+            <Text className="font-sans text-[11px] text-muted">{t('uploadingVideoProof')}</Text>
+          </>
+        )}
+        {videoUploadDone && (
+          <>
+            <Zap size={13} strokeWidth={2} color={Colors.success} />
+            <Text className="font-sans text-[11px] text-success">{t('videoProofSaved')}</Text>
+          </>
+        )}
+        {videoUploadFailed && (
+          <>
+            <VideoOff size={13} strokeWidth={2} color={Colors.muted} />
+            <Text className="font-sans text-[11px] text-muted">{t('videoUploadFailed')}</Text>
+          </>
+        )}
+      </View>
 
       <View className="flex-row items-center gap-2">
         <Zap size={13} strokeWidth={2} color={Colors.accent} />

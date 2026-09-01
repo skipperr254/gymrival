@@ -104,16 +104,11 @@ export async function fetchProfile(
   return { data: data as Profile | null, error: error?.message ?? null };
 }
 
-export async function togglePro(
-  userId: string,
-  isPro: boolean
-): Promise<{ error: string | null }> {
-  const { error } = await supabase
-    .from("profiles")
-    .update({ is_pro: isPro })
-    .eq("id", userId);
-  return { error: error?.message ?? null };
-}
+// togglePro() used to live here. It is gone on purpose: migration 044 revoked
+// the client's UPDATE grant on `profiles.is_pro`, so the call could only ever
+// fail now. Pro is derived from `public.subscriptions`, which only the billing
+// webhook (service role) may write — read it with fetchSubscription() in
+// lib/api/billing.ts, or useEntitlement() from a component.
 
 /** Fetch just the user's stored language preference — used at app boot, before the full profile is needed. */
 export async function getUserLanguage(

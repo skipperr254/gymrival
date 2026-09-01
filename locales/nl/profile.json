@@ -109,7 +109,13 @@
     "title": "PR-GESCHIEDENIS",
     "best": "Beste: {{value}} {{unit}}",
     "emptyTitle": "NOG GEEN PR'S",
-    "emptySub": "Log je eerste PR om je voortgang bij te houden"
+    "emptySub": "Log je eerste PR om je voortgang bij te houden",
+    "deleteA11y": "PR verwijderen",
+    "deleteConfirmTitle": "Deze PR verwijderen?",
+    "deleteConfirmMsg": "Dit verwijdert hem uit je geschiedenis, de feed en de ranglijsten. Dit kan niet ongedaan worden gemaakt.",
+    "deleteConfirmCta": "Verwijderen",
+    "deleteErrorTitle": "PR kon niet worden verwijderd",
+    "deleteErrorMsg": "Er is iets misgegaan. Probeer het opnieuw."
   },
   "notifications": {
     "title": "MELDINGEN",

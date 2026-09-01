@@ -17,6 +17,14 @@
   "like": "GEFÄLLT MIR",
   "liked": "GEFÄLLT DIR",
   "yourPr": "DEIN PR",
+  "deletePr": {
+    "action": "PR löschen",
+    "confirmTitle": "Diesen PR löschen?",
+    "confirmMsg": "Er wird aus dem Feed, deinem PR-Verlauf und den Ranglisten entfernt. Das kann nicht rückgängig gemacht werden.",
+    "confirmCta": "Löschen",
+    "errorTitle": "PR konnte nicht gelöscht werden",
+    "errorMsg": "Etwas ist schiefgelaufen. Versuch es erneut."
+  },
   "feedEmptyTitle": "NOCH KEINE AKTIVITÄT",
   "feedEmptySubtitle": "Füge Freunde hinzu und protokolliere PRs, damit der Feed lebendig wird.",
   "retry": "ERNEUT VERSUCHEN",

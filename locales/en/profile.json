@@ -109,7 +109,13 @@
     "title": "PR HISTORY",
     "best": "Best: {{value}} {{unit}}",
     "emptyTitle": "NO PRs YET",
-    "emptySub": "Log your first PR to start tracking your progress"
+    "emptySub": "Log your first PR to start tracking your progress",
+    "deleteA11y": "Delete PR",
+    "deleteConfirmTitle": "Delete this PR?",
+    "deleteConfirmMsg": "This removes it from your history, the feed, and leaderboards. This can't be undone.",
+    "deleteConfirmCta": "Delete",
+    "deleteErrorTitle": "Couldn't delete PR",
+    "deleteErrorMsg": "Something went wrong. Try again."
   },
   "notifications": {
     "title": "NOTIFICATIONS",

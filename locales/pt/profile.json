@@ -109,7 +109,13 @@
     "title": "HISTÓRICO DE PRs",
     "best": "Melhor: {{value}} {{unit}}",
     "emptyTitle": "AINDA SEM PRs",
-    "emptySub": "Regista o teu primeiro PR para começar a acompanhar o teu progresso"
+    "emptySub": "Regista o teu primeiro PR para começar a acompanhar o teu progresso",
+    "deleteA11y": "Eliminar PR",
+    "deleteConfirmTitle": "Eliminar este PR?",
+    "deleteConfirmMsg": "Isto remove-o do teu histórico, do feed e das classificações. Esta ação não pode ser desfeita.",
+    "deleteConfirmCta": "Eliminar",
+    "deleteErrorTitle": "Não foi possível eliminar o PR",
+    "deleteErrorMsg": "Algo correu mal. Tenta novamente."
   },
   "notifications": {
     "title": "NOTIFICAÇÕES",

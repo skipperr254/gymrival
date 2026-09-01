@@ -109,7 +109,13 @@
     "title": "PR-VERLAUF",
     "best": "Beste: {{value}} {{unit}}",
     "emptyTitle": "NOCH KEINE PRs",
-    "emptySub": "Trage deinen ersten PR ein, um deinen Fortschritt zu verfolgen"
+    "emptySub": "Trage deinen ersten PR ein, um deinen Fortschritt zu verfolgen",
+    "deleteA11y": "PR löschen",
+    "deleteConfirmTitle": "Diesen PR löschen?",
+    "deleteConfirmMsg": "Er wird aus deinem Verlauf, dem Feed und den Ranglisten entfernt. Das kann nicht rückgängig gemacht werden.",
+    "deleteConfirmCta": "Löschen",
+    "deleteErrorTitle": "PR konnte nicht gelöscht werden",
+    "deleteErrorMsg": "Etwas ist schiefgelaufen. Versuch es erneut."
   },
   "notifications": {
     "title": "BENACHRICHTIGUNGEN",

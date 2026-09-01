@@ -17,6 +17,14 @@
   "like": "AIMER",
   "liked": "AIMÉ",
   "yourPr": "TON PR",
+  "deletePr": {
+    "action": "Supprimer le PR",
+    "confirmTitle": "Supprimer ce PR ?",
+    "confirmMsg": "Il sera retiré du fil d'actualité, de ton historique de PR et des classements. Cette action est irréversible.",
+    "confirmCta": "Supprimer",
+    "errorTitle": "Impossible de supprimer le PR",
+    "errorMsg": "Une erreur s'est produite. Réessaie."
+  },
   "feedEmptyTitle": "AUCUNE ACTIVITÉ POUR L'INSTANT",
   "feedEmptySubtitle": "Ajoute des amis et commence à enregistrer des PR pour animer le fil.",
   "retry": "RÉESSAYER",

@@ -36,7 +36,7 @@ This section is the single source of truth for what is and is not in the v1 clie
 - **Compete tab**: Rivals (friends) leaderboard, Challenges, Global leaderboard as three segmented tabs inside a single `compete/index.tsx` screen (not separate routes), plus a drill-down `compete/challenge/[id].tsx` detail screen — all implemented and working
 - **Social tab**: Feed (`social/index.tsx`, default), Friends (`social/friends.tsx` — real, not a stub: friends list, requests, search all wired to `useSocialStore`), Messages inbox (`social/messages.tsx`) + Chat (`social/chat/[userId].tsx`) — all implemented, including realtime presence and message delivery via `useChatStore`
 - **Train tab**: `train/index.tsx` is a segmented screen with **Schedule**, **Check-in**, **Progress**, and **Nutrition**. Gym Check-in *also* has its own dedicated route, `train/checkin.tsx` (used when the FAB's "Gym Check-in" action navigates there directly) — both surfaces render the same `CheckInView` component. All four segments implemented and in scope for v1. Nutrition: meal logging (manual entry + a reusable "My Foods" list, no third-party food database/barcode scanning) with calorie/macro targets calculated via a Mifflin-St Jeor TDEE formula from profile fields (`age`, `sex`, `activity_level`, `diet_goal`, `weight_kg`, `height_cm`), user-overridable via `profiles.target_calories`/`target_protein_g`/`target_carbs_g`/`target_fat_g`. Goals are set/edited on the dedicated `nutrition-goals` stack route. Not part of the XP/leaderboard economy — it's a wellness feature, not a competitive one.
-- **Profile tab**: Profile, Edit, PR history, Badges, Notifications, Language (`profile/language.tsx`) — all implemented. Note: **Badges is currently static/mock data** (`BADGES` array hardcoded in `badges.tsx`), not yet wired to a real earned-badge backend — don't assume badge state is dynamic or DB-backed unless you're the one wiring it up. The Profile screen's Pro/Upgrade toggle is a **dev-only mock**: `handleTogglePro` flips `profiles.is_pro` directly with no payment flow behind it (see Stripe note below).
+- **Profile tab**: Profile, Edit, PR history, Badges, Notifications, Language (`profile/language.tsx`) — all implemented. Note: **Badges is currently static/mock data** (`BADGES` array hardcoded in `badges.tsx`), not yet wired to a real earned-badge backend — don't assume badge state is dynamic or DB-backed unless you're the one wiring it up. The Profile screen's Pro/Upgrade card is **paywall trigger #8**: in a release build it calls `showPaywall({ trigger: 'upgrade_card' })` (a no-op until Phase 2 mounts a PaywallProvider); in `__DEV__` it toggles a purely local entitlement override for exercising gates. It can no longer write `profiles.is_pro` — see the monetization note below.
 - **PR logging + PR video proof** — fully implemented (record/pick video, upload to `pr-videos` bucket, inline playback in feed + PR history)
 - **Push notifications** — fully implemented: token registration, realtime in-app notification list (`useNotificationStore`, paginated), and tap-to-route handling in `app/_layout.tsx` (a push tap routes to the relevant screen, e.g. Messages inbox or Social tab; see the "Deep links" deferred note below for how this differs from URL-based deep linking)
 - **FAB (center Log button)**: exactly **three** actions — **Log a PR**, **Gym Check-in**, and **Log a Meal**. Nothing else. Do not add Log Weight or any other action.
@@ -48,7 +48,7 @@ This section is the single source of truth for what is and is not in the v1 clie
 - Weight log
 - Workout of the Day (WOD)
 - The old "schema" / program concept (superseded by the Schedule feature)
-- Stripe / in-app payments for Pro tier — `profiles.is_pro` exists and the Profile screen has a working toggle button, but it's a dev/demo mock (`setProStatus` just flips the column); no Stripe integration, paywall, or purchase flow exists. Do not treat the toggle's presence as evidence payments are implemented.
+- In-app purchases / paywall UI — **in progress**, see the Monetization section below. Phase 0 (the server-owned entitlement spine) has landed; RevenueCat, the paywall and the feature gates have not. Nothing charges money yet, and no feature is actually gated yet.
 - Admin dashboard
 - Deep links — no external URL scheme routing (e.g. `gymrival://pr/123` opened from outside the app) or share-link handling exists. Don't confuse this with the push-notification tap-to-route logic in `app/_layout.tsx`, which is a separate, narrower thing that's already built (routes an opened push to a screen, not an arbitrary URL to a screen).
 - App Store / Play Store submission config (`eas.json` has `development`/`preview`/`production` build profiles but only a stub `submit.production`)
@@ -400,6 +400,7 @@ Use Zustand for all global client state. Use local `useState` for temporary UI s
 | `useProfileStore`      | Profile data, best PRs, PR history (XP/level/streak live on `profile`, not tracked separately) |
 | `useNotificationStore` | Notification list (paginated), unread count, realtime subscription |
 | `useNutritionStore`    | My Foods list, today's meal logs                          |
+| `useEntitlementStore`  | Pro entitlement (server row, device receipt, cached tier) — read it via `useEntitlement()` |
 
 Persist with AsyncStorage only where the data should survive an app restart (e.g. streak, selected exercise filter, onboarding completed flag).
 
@@ -490,6 +491,40 @@ export async function someEdgeFunctionCall(payload: SomePayload) {
 ```
 
 `send-notification` specifically is **not** called this way — there is no client-side wrapper for it. It's invoked server-side by an `AFTER INSERT` trigger on the `notifications` table (via `pg_net`, see migration `028_push_notification_webhook.sql`), so the push composes using the *recipient's* stored language rather than whatever language the client that caused the notification happens to be running in. Do not add a client-side `sendNotification()`/`sendPushNotification()` wrapper — see the Internationalization section below for the full rationale.
+
+---
+
+## Monetization & Entitlements
+
+GymRival is freemium: a real, permanently useful free tier plus a **Pro** subscription. Payments run through **RevenueCat**, but deliberately behind an abstraction — swapping providers must cost one adapter file, not a rewrite.
+
+### Status
+
+Phase 0 (the entitlement spine) has landed. Phases 1–5 have not. Concretely: nothing charges money, no feature is gated yet, and `getBillingProvider()` still returns the no-op adapter in every environment. Do not assume a purchase flow exists.
+
+### The rules that must not be broken
+
+**1. `profiles.is_pro` is server-owned.** Migration `044_billing_entitlement_spine.sql` revoked the client's UPDATE grant on that column. It is written *only* by the `tr_subscriptions_sync_is_pro` trigger, which mirrors `public.subscriptions`. Never re-grant it, and never add a client-side write path to it.
+
+**2. `public.subscriptions` is the single source of truth.** One row per user, provider-agnostic on purpose. A user may `SELECT` their own row; no INSERT/UPDATE/DELETE grant exists for `authenticated` at all — only the service role (the billing webhook edge function) writes it. `public.billing_events` is the idempotency ledger behind that webhook: service-role only, RLS on with zero policies, and its `event_id` PK is what dedupes a provider's retries.
+
+**3. Read Pro state with `useEntitlement()`, never `profile.is_pro`.** The hook unions the server row, the store SDK's device receipt, and a persisted last-known tier, so a fresh purchase doesn't look broken for the seconds a webhook takes and a cold start doesn't flash free-tier UI at a subscriber. `profile.is_pro` is the RLS mirror — correct, but it lags and isn't loaded on every screen.
+
+**4. Gate features by name, from `constants/entitlements.ts`.** `useProGate('publishPR')` returns `{ allowed, locked, requestUpgrade, run }`. Nothing checks a boolean inline. That file is also where the free-tier limits and the never-gated list live.
+
+**5. Client gates are affordances, not enforcement.** Every gate must land twice — an RLS policy or RPC check server-side, and a legible lock client-side that taps through to the paywall. A patched client must gain nothing.
+
+**6. One file may import the billing SDK.** `lib/billing/<vendor>.ts` — nothing else, ever. No vendor type (`CustomerInfo`, `PurchasesPackage`, …) escapes it; the app only sees `Offering`, `Plan`, `PurchaseOutcome`, `EntitlementSnapshot` from `lib/billing/types.ts`. We also do **not** use `react-native-purchases-ui` — the paywall is our own component and prices come from the offering's `priceString`, never hardcoded.
+
+**7. Never gate Nutrition, Schedule, Check-in or Progress.** Not even a nag. That is the daily-habit half of the app and the reason a free user opens it tomorrow.
+
+**8. The paywall has exactly one mount point**, in the root layout, reached via `showPaywall({ trigger })` from `lib/billing/paywall.ts`. It is summonable from inside `LogPRSheet`, which is itself a modal — see the long comment in `app/(tabs)/_layout.tsx` about UIKit silently refusing to present a second modal over a live one. Never mount a paywall `<Modal>` at a call site.
+
+Every `showPaywall` call passes the trigger that opened it, so conversion can be attributed per placement.
+
+### Testing Pro locally
+
+The Profile screen's Pro card toggles a `__DEV__`-only local override (`useEntitlementStore.setDevOverride`). It writes nothing to the server, so it exercises client affordances only. To test a **server-enforced** gate, insert a `provider: 'manual'` row into `subscriptions` with the service role — the trigger flips `is_pro` for you, and deleting the row revokes it.
 
 ---
 

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Platform,
   RefreshControl,
@@ -34,6 +35,7 @@ export default function SocialScreen() {
   const loadFeed = useSocialStore((s) => s.loadFeed);
   const loadMoreFeed = useSocialStore((s) => s.loadMoreFeed);
   const toggleLike = useSocialStore((s) => s.toggleLike);
+  const deleteFeedPost = useSocialStore((s) => s.deleteFeedPost);
   const subscribeToFeedEvents = useSocialStore((s) => s.subscribeToFeedEvents);
   const loadRequests = useSocialStore((s) => s.loadRequests);
   const subscribeToFriendEvents = useSocialStore((s) => s.subscribeToFriendEvents);
@@ -106,6 +108,15 @@ export default function SocialScreen() {
     [userId, toggleLike]
   );
 
+  const handleDeletePost = useCallback(
+    async (postId: string) => {
+      if (!userId) return;
+      const { error } = await deleteFeedPost(userId, postId);
+      if (error) Alert.alert(t('deletePr.errorTitle'), t('deletePr.errorMsg'));
+    },
+    [userId, deleteFeedPost, t]
+  );
+
   const renderItem = useCallback(
     ({ item }: { item: FeedPost }) => (
       <FeedPostCard
@@ -113,9 +124,10 @@ export default function SocialScreen() {
         userId={userId}
         isActive={item.id === activePostId}
         onToggleLike={handleToggleLike}
+        onDelete={handleDeletePost}
       />
     ),
-    [userId, activePostId, handleToggleLike]
+    [userId, activePostId, handleToggleLike, handleDeletePost]
   );
 
   return (

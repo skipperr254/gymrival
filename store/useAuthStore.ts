@@ -10,6 +10,8 @@ import { useChatStore } from "@/store/useChatStore";
 import { useTrainStore } from "@/store/useTrainStore";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { useNutritionStore } from "@/store/useNutritionStore";
+import { useEntitlementStore, clearEntitlementCache } from "@/store/useEntitlementStore";
+import { getBillingProvider } from "@/lib/billing";
 
 // Not sensitive (just booleans marking "mid onboarding step"), so plain
 // AsyncStorage is fine — this only needs to survive an app kill, not resist
@@ -40,6 +42,10 @@ export function resetDomainStores() {
   useTrainStore.getState().reset();
   useNotificationStore.getState().reset();
   useNutritionStore.getState().reset();
+  // Entitlement is per-account. Leaving it behind would show a signed-out
+  // device — or the next account to sign in on it — the previous user's Pro UI
+  // until the server answered.
+  useEntitlementStore.getState().reset();
 }
 
 interface AuthState {
@@ -227,6 +233,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // push token so a shared/reused device stops receiving this account's
       // notifications after a different user signs in.
       await clearPushToken(userId).catch(() => {});
+      // Drop the persisted tier so a cold start after sign-out can't replay
+      // this account's Pro state, and hand the billing SDK back to an
+      // anonymous id so a later purchase on this device isn't attributed here.
+      await clearEntitlementCache(userId).catch(() => {});
+      await getBillingProvider().signOut().catch(() => {});
     }
     const { error } = await supabase.auth.signOut();
     if (error) {

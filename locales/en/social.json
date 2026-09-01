@@ -17,6 +17,14 @@
   "like": "LIKE",
   "liked": "LIKED",
   "yourPr": "YOUR PR",
+  "deletePr": {
+    "action": "Delete PR",
+    "confirmTitle": "Delete this PR?",
+    "confirmMsg": "This removes it from the feed, your PR history, and leaderboards. This can't be undone.",
+    "confirmCta": "Delete",
+    "errorTitle": "Couldn't delete PR",
+    "errorMsg": "Something went wrong. Try again."
+  },
   "feedEmptyTitle": "NO ACTIVITY YET",
   "feedEmptySubtitle": "Add friends and start logging PRs to see the feed come alive.",
   "retry": "RETRY",

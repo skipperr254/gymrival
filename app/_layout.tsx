@@ -1,7 +1,7 @@
 import "../global.css";
 
 import { useEffect, useRef, useState } from "react";
-import { Platform } from "react-native";
+import { AppState, Platform } from "react-native";
 import { reloadAppAsync } from "expo";
 import { Stack, useRouter, useSegments } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -18,6 +18,8 @@ import {
 import { resetDomainStores, useAuthStore } from "@/store/useAuthStore";
 import { useChatStore } from "@/store/useChatStore";
 import { useNotificationStore } from "@/store/useNotificationStore";
+import { useEntitlementStore } from "@/store/useEntitlementStore";
+import { getBillingProvider } from "@/lib/billing";
 import { savePushToken, getUserLanguage, reconcileStaleVideoUploads } from "@/lib/api";
 import { Routes } from "@/constants/routes";
 import { stackScreenOptions } from "@/constants/navigation";
@@ -168,6 +170,8 @@ export default function RootLayout() {
   const startPresenceHeartbeat = useChatStore((s) => s.startPresenceHeartbeat);
   const loadNotifications = useNotificationStore((s) => s.loadNotifications);
   const subscribeToNotifications = useNotificationStore((s) => s.subscribeToNotifications);
+  const loadEntitlement = useEntitlementStore((s) => s.load);
+  const refreshEntitlement = useEntitlementStore((s) => s.refresh);
   const notifCleanupRef = useRef<(() => void) | null>(null);
   const [i18nReady, setI18nReady] = useState(false);
 
@@ -224,6 +228,42 @@ export default function RootLayout() {
       notifCleanupRef.current = null;
     };
   }, [session?.user?.id, loadNotifications, subscribeToNotifications]);
+
+  // ── Entitlement ────────────────────────────────────────────────────────────
+  // Configure the billing SDK and resolve who is Pro. `load` replays the
+  // persisted tier first so a paying subscriber never sees a flash of free-tier
+  // UI at cold start, then confirms against `public.subscriptions`.
+  //
+  // Until Phase 1 the provider is the no-op adapter, so `configure`/`identify`
+  // do nothing and the server row is the only source of Pro — which is exactly
+  // how the grandfathered `manual` grants resolve.
+  useEffect(() => {
+    const userId = session?.user?.id;
+    const billing = getBillingProvider();
+
+    billing.configure(userId ?? null).catch(() => {});
+    if (!userId) return;
+
+    billing.identify(userId).catch(() => {});
+    loadEntitlement(userId);
+
+    const unsubscribe = billing.onEntitlementChange((snapshot) => {
+      useEntitlementStore.getState().setDeviceSnapshot(snapshot);
+    });
+    return unsubscribe;
+  }, [session?.user?.id, loadEntitlement]);
+
+  // A subscription can start, lapse or be cancelled while the app is
+  // backgrounded — including from the OS settings screen, which never notifies
+  // us. Re-reading on foreground is the cheap way to stay honest without
+  // holding a realtime channel per user just for billing.
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (state) => {
+      const userId = useAuthStore.getState().user?.id;
+      if (state === "active" && userId) refreshEntitlement(userId);
+    });
+    return () => subscription.remove();
+  }, [refreshEntitlement]);
 
   // Register device push token — silently skipped in Expo Go
   useEffect(() => {

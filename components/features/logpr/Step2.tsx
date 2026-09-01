@@ -37,7 +37,6 @@ export function Step2({
   const { t } = useTranslation('logpr');
   const ExIcon = getExerciseIcon(selectedEx.key);
   const hasVideo = !!videoAsset;
-  const xpLabel = hasVideo ? t('xpWithVideo') : t('xpWithoutVideo');
 
   return (
     <>
@@ -60,36 +59,15 @@ export function Step2({
         </View>
       </View>
 
-      {/* XP indicators — active state follows video selection */}
-      <View className="flex-row gap-2 mb-4">
-        <View
-          className={`flex-1 rounded-xl py-2.5 items-center gap-[3px] border ${
-            hasVideo ? 'bg-[#1a1a1a] border-[#333]' : 'bg-transparent border-[#222]'
-          }`}
-        >
-          <Text
-            className={`font-heading text-[13px] tracking-[1px] ${hasVideo ? 'text-accent' : 'text-[#444]'}`}
-          >
-            {t('xpWithVideo')}
-          </Text>
-          <Text className="font-sans text-[10px] text-muted">{t('withVideo')}</Text>
-        </View>
-        <View
-          className={`flex-1 rounded-xl py-2.5 items-center gap-[3px] border ${
-            !hasVideo ? 'bg-[#1a1a1a] border-[#333]' : 'bg-transparent border-[#222]'
-          }`}
-        >
-          <Text
-            className={`font-heading text-[13px] tracking-[1px] ${!hasVideo ? 'text-accent' : 'text-[#444]'}`}
-          >
-            {t('xpWithoutVideo')}
-          </Text>
-          <Text className="font-sans text-[10px] text-muted">{t('withoutVideo')}</Text>
-        </View>
+      {/* XP reward indicator */}
+      <View className="flex-row justify-center rounded-xl py-2.5 mb-4 border bg-[#1a1a1a] border-[#333]">
+        <Text className="font-heading text-[13px] tracking-[1px] text-accent">
+          {t('xpReward')}
+        </Text>
       </View>
 
-      {/* Video upload zone */}
-      <View className="mb-4">
+      {/* Video upload zone — required, PR can't be saved without it */}
+      <View className="mb-2">
         <VideoUploadZone
           asset={videoAsset}
           onVideoSelected={onVideoSelected}
@@ -98,6 +76,12 @@ export function Step2({
         />
       </View>
 
+      {!hasVideo && (
+        <Text className="font-sans text-[11px] text-muted text-center mb-3">
+          {t('video.requiredHint')}
+        </Text>
+      )}
+
       {!!saveError && (
         <View className="flex-row items-center gap-2 bg-[rgba(230,48,48,0.1)] rounded-[10px] p-3 mb-3">
           <AlertCircle size={14} strokeWidth={2} color={Colors.accent} />
@@ -105,11 +89,11 @@ export function Step2({
         </View>
       )}
 
-      {/* Primary save button */}
+      {/* Primary save button — disabled until a video is attached */}
       <Pressable
         onPress={onSave}
-        disabled={saving}
-        style={({ pressed }) => [pressed && { opacity: 0.85 }]}
+        disabled={saving || !hasVideo}
+        style={({ pressed }) => [(pressed && hasVideo) && { opacity: 0.85 }, !hasVideo && { opacity: 0.4 }]}
       >
         <LinearGradient
           colors={[Colors.accent, Colors.accentDark]}
@@ -131,23 +115,12 @@ export function Step2({
             <>
               <CheckCircle size={16} strokeWidth={2} color={Colors.primary} />
               <Text className="font-heading text-sm tracking-[2.5px] text-white">
-                {t('savePr', { xp: xpLabel })}
+                {t('savePr')}
               </Text>
             </>
           )}
         </LinearGradient>
       </Pressable>
-
-      {hasVideo && (
-        <Pressable
-          onPress={onVideoRemoved}
-          disabled={saving}
-          className="items-center py-3"
-          style={({ pressed }) => pressed && { opacity: 0.6 }}
-        >
-          <Text className="font-sans text-[13px] text-muted">{t('removeVideoSave')}</Text>
-        </Pressable>
-      )}
     </>
   );
 }

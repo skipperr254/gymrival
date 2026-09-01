@@ -5,7 +5,7 @@ import {
   fetchProfile,
   fetchBestPRs,
   fetchPRHistory,
-  togglePro as toggleProApi,
+  deletePersonalRecord,
   updateProfile as updateProfileApi,
   uploadAvatar as uploadAvatarApi,
   removeAvatar as removeAvatarApi,
@@ -52,7 +52,16 @@ interface ProfileState {
   loadProfile: (userId: string) => Promise<void>;
   loadBestPRs: (userId: string) => Promise<void>;
   loadPRHistory: (userId: string) => Promise<void>;
-  setProStatus: (userId: string, isPro: boolean) => Promise<void>;
+  /**
+   * Deletes a PR the user owns. The XP/level clawback happens server-side
+   * (delete_personal_record RPC), so on success this just re-fetches the
+   * profile, best-PRs, and history rather than hand-patching every derived
+   * aggregate (best-per-exercise, distinct-exercise count) locally.
+   */
+  deletePR: (userId: string, prId: string) => Promise<{ error: string | null }>;
+  // No setProStatus: `is_pro` is server-owned as of migration 044 and mirrors
+  // `public.subscriptions`. Read Pro state with useEntitlement(), never from
+  // `profile.is_pro` — see store/useEntitlementStore.ts.
   setPushEnabled: (userId: string, enabled: boolean) => Promise<{ error: string | null }>;
   updateProfile: (userId: string, data: ProfileUpdate) => Promise<{ error: string | null; code: string | null }>;
   uploadAvatar: (userId: string, imageUri: string, mimeType: string) => Promise<{ error: string | null }>;
@@ -60,7 +69,7 @@ interface ProfileState {
   reset: () => void;
 }
 
-export const useProfileStore = create<ProfileState>((set) => ({
+export const useProfileStore = create<ProfileState>((set, get) => ({
   profile: null,
   bestPRs: [],
   prCount: 0,
@@ -88,13 +97,16 @@ export const useProfileStore = create<ProfileState>((set) => ({
     set({ prHistory: data, prHistoryLoading: false });
   },
 
-  setProStatus: async (userId, isPro) => {
-    const { error } = await toggleProApi(userId, isPro);
+  deletePR: async (userId, prId) => {
+    const { error } = await deletePersonalRecord(prId);
     if (!error) {
-      set((state) => ({
-        profile: state.profile ? { ...state.profile, is_pro: isPro } : null,
-      }));
+      await Promise.all([
+        get().loadProfile(userId),
+        get().loadBestPRs(userId),
+        get().loadPRHistory(userId),
+      ]);
     }
+    return { error };
   },
 
   setPushEnabled: async (userId, enabled) => {

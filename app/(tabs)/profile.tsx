@@ -21,6 +21,9 @@ import { Routes } from '@/constants/routes';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
+import { useEntitlementStore } from '@/store/useEntitlementStore';
+import { useEntitlement } from '@/hooks/useEntitlement';
+import { showPaywall } from '@/lib/billing';
 import { Avatar } from '@/components/ui/Avatar';
 import { AppHeader } from '@/components/ui';
 import {
@@ -33,9 +36,12 @@ import { getExerciseIcon } from '@/constants/exerciseIcons';
 export default function ProfileScreen() {
   const { t } = useTranslation(['common', 'profile']);
   const { user } = useAuthStore();
-  const { profile, bestPRs, prCount, loading, error, loadProfile, loadBestPRs, setProStatus } =
+  const { profile, bestPRs, prCount, loading, error, loadProfile, loadBestPRs } =
     useProfileStore();
   const unreadCount = useNotificationStore((s) => s.unreadCount);
+  const { isPro } = useEntitlement();
+  const devOverride = useEntitlementStore((s) => s.devOverride);
+  const setDevOverride = useEntitlementStore((s) => s.setDevOverride);
 
   const displayName =
     profile?.full_name ??
@@ -52,9 +58,22 @@ export default function ProfileScreen() {
     loadBestPRs(user.id);
   }, [user?.id, loadProfile, loadBestPRs]);
 
-  const handleTogglePro = async () => {
-    if (!user?.id || !profile) return;
-    await setProStatus(user.id, !profile.is_pro);
+  // Paywall trigger #8 — the standing upgrade card. Low pressure, always
+  // available, catches users who decide on their own schedule.
+  //
+  // This used to flip `profiles.is_pro` straight from the client, which
+  // migration 044 now forbids. In a dev build the same control instead toggles
+  // a purely local override so gates can be exercised without a sandbox
+  // purchase — it writes nothing to the server, so server-enforced gates
+  // (Phase 3) still see the real tier. To test those, insert a
+  // `provider: 'manual'` row in `subscriptions` with the service role.
+  const handleProPress = () => {
+    if (__DEV__) {
+      setDevOverride(!devOverride);
+      return;
+    }
+    if (isPro) return; // Phase 2 routes this to Settings → Subscription.
+    showPaywall({ trigger: 'upgrade_card' });
   };
 
   const barRatios = computeBarRatios(bestPRs);
@@ -208,10 +227,10 @@ export default function ProfileScreen() {
         </LinearGradient>
 
         {/* ── Upgrade / Pro status ──────────────────────────── */}
-        {!profile?.is_pro ? (
+        {!isPro ? (
           <Pressable
             style={({ pressed }) => [pressed && { opacity: 0.82 }]}
-            onPress={handleTogglePro}
+            onPress={handleProPress}
           >
             <LinearGradient
               colors={[Colors.accent, Colors.accentDark]}
@@ -229,7 +248,7 @@ export default function ProfileScreen() {
           <Pressable
             className="flex-row items-center justify-center gap-2 bg-surface rounded-2xl h-[52px] border border-success"
             style={({ pressed }) => pressed && { opacity: 0.82 }}
-            onPress={handleTogglePro}
+            onPress={handleProPress}
           >
             <CheckCircle size={18} color={Colors.success} />
             <Text className="font-heading text-base text-success tracking-[1.5px]">

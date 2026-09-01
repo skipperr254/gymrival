@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Flame, Heart, MapPin, VideoOff } from 'lucide-react-native';
+import { Flame, Heart, MapPin, Trash2, VideoOff } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { formatDate, formatRelativeTime as formatRelativeTimeIntl } from '@/lib/i18n/format';
@@ -30,9 +30,11 @@ interface FeedPostCardProps {
   /** True when this post owns the feed's single autoplay video slot */
   isActive: boolean;
   onToggleLike: (postId: string) => void;
+  /** Called after the owner confirms retracting their own PR from the feed. */
+  onDelete: (postId: string) => void;
 }
 
-function FeedPostCardInner({ post, userId, isActive, onToggleLike }: FeedPostCardProps) {
+function FeedPostCardInner({ post, userId, isActive, onToggleLike, onDelete }: FeedPostCardProps) {
   const { t } = useTranslation('social');
   const isMe = post.user_id === userId;
   const hasVideo = post.video?.status === 'ready';
@@ -75,6 +77,13 @@ function FeedPostCardInner({ post, userId, isActive, onToggleLike }: FeedPostCar
     },
     [post.id, post.video, userId, t]
   );
+
+  const handleDeletePress = useCallback(() => {
+    Alert.alert(t('deletePr.confirmTitle'), t('deletePr.confirmMsg'), [
+      { text: t('deletePr.confirmCta'), style: 'destructive', onPress: () => onDelete(post.id) },
+      { text: t('common:actions.cancel'), style: 'cancel' },
+    ]);
+  }, [post.id, onDelete, t]);
 
   const handleRetryVideo = useCallback(() => {
     if (retryingVideo) return;
@@ -225,9 +234,19 @@ function FeedPostCardInner({ post, userId, isActive, onToggleLike }: FeedPostCar
             </Text>
           </Pressable>
         ) : (
-          <Text className="font-heading text-[11px] text-hint tracking-[1px]">
-            {t('yourPr')}
-          </Text>
+          <View className="flex-row items-center gap-3">
+            <Text className="font-heading text-[11px] text-hint tracking-[1px]">
+              {t('yourPr')}
+            </Text>
+            <Pressable
+              onPress={handleDeletePress}
+              hitSlop={8}
+              accessibilityLabel={t('deletePr.action')}
+              style={({ pressed }) => pressed && { opacity: 0.7 }}
+            >
+              <Trash2 size={14} strokeWidth={2} color={Colors.muted} />
+            </Pressable>
+          </View>
         )}
       </View>
     </View>

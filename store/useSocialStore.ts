@@ -13,9 +13,11 @@ import {
   fetchSingleFeedPost,
   likePR,
   unlikePR,
+  deletePersonalRecord,
   getPRVideoPublicUrl,
   FEED_PAGE_SIZE,
 } from "@/lib/api";
+import { useProfileStore } from "@/store/useProfileStore";
 import type { FriendProfile, FriendRequest, UserSearchResult, FeedPost } from "@/types/social";
 import type { PRVideo, PRVideoStatus } from "@/types/pr";
 
@@ -104,9 +106,19 @@ interface SocialState {
   toggleLike: (userId: string, prId: string) => Promise<void>;
 
   /**
+   * Optimistically removes a post the user owns from the feed, then deletes
+   * it server-side. On failure the post is restored. Also refreshes the
+   * profile store (XP/level clawback happens server-side) and the owner's
+   * PR History / best-PRs, since a post can be deleted from the feed without
+   * ever visiting those screens.
+   */
+  deleteFeedPost: (userId: string, prId: string) => Promise<{ error: string | null }>;
+
+  /**
    * Opens Supabase Realtime channels for:
    *   - pr_likes INSERT/DELETE  → live like count + has_liked updates
    *   - personal_records INSERT → prepend new posts from friends (and self)
+   *   - personal_records DELETE → drop a retracted PR from the feed live
    *
    * Returns an unsubscribe function for useEffect cleanup.
    * Tears down any previous subscription automatically (StrictMode safe).
@@ -441,6 +453,39 @@ export const useSocialStore = create<SocialState>((set, get) => ({
     }
   },
 
+  deleteFeedPost: async (userId, prId) => {
+    const post = get().feed.find((p) => p.id === prId);
+    if (!post) return { error: null };
+
+    set((s) => ({ feed: s.feed.filter((p) => p.id !== prId) }));
+
+    const { error } = await deletePersonalRecord(prId);
+
+    if (error) {
+      // Restore in its original position rather than re-prepending, in case
+      // other posts arrived (via realtime) while the delete was in flight.
+      set((s) => {
+        if (s.feed.some((p) => p.id === prId)) return s;
+        const idx = s.feed.findIndex((p) => p.created_at < post.created_at);
+        const feed = [...s.feed];
+        feed.splice(idx === -1 ? feed.length : idx, 0, post);
+        return { feed };
+      });
+      return { error };
+    }
+
+    // XP clawback happens server-side — refresh the profile, and PR History
+    // / best-PRs since the user may not revisit those screens this session.
+    const profileStore = useProfileStore.getState();
+    await Promise.all([
+      profileStore.loadProfile(userId),
+      profileStore.loadBestPRs(userId),
+      profileStore.loadPRHistory(userId),
+    ]);
+
+    return { error: null };
+  },
+
   subscribeToFeedEvents: (userId, participantIds) => {
     if (_feedChannel) {
       supabase.removeChannel(_feedChannel);
@@ -521,6 +566,21 @@ export const useSocialStore = create<SocialState>((set, get) => ({
             // via an optimistic local state update elsewhere
             feed: [post, ...s.feed.filter((p) => p.id !== post.id)],
           }));
+        }
+      )
+
+      // ── PR retracted (by its owner, from any surface/session) ───────────────
+      // REPLICA IDENTITY FULL on personal_records (migration 012) guarantees
+      // payload.old carries the full row. This is a no-op when the delete
+      // originated on this device (deleteFeedPost already removed it
+      // optimistically), and is what removes a friend's retracted PR live.
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "personal_records" },
+        (payload) => {
+          const old = payload.old as { id?: string };
+          if (!old.id) return;
+          set((s) => ({ feed: s.feed.filter((p) => p.id !== old.id) }));
         }
       )
 

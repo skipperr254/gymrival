@@ -17,6 +17,14 @@
   "like": "LIKE",
   "liked": "GELIKED",
   "yourPr": "JOUW PR",
+  "deletePr": {
+    "action": "PR verwijderen",
+    "confirmTitle": "Deze PR verwijderen?",
+    "confirmMsg": "Dit verwijdert hem uit de feed, je PR-geschiedenis en de ranglijsten. Dit kan niet ongedaan worden gemaakt.",
+    "confirmCta": "Verwijderen",
+    "errorTitle": "PR kon niet worden verwijderd",
+    "errorMsg": "Er is iets misgegaan. Probeer het opnieuw."
+  },
   "feedEmptyTitle": "NOG GEEN ACTIVITEIT",
   "feedEmptySubtitle": "Voeg vrienden toe en log PR's om de feed tot leven te brengen.",
   "retry": "OPNIEUW",

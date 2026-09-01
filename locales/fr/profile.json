@@ -109,7 +109,13 @@
     "title": "HISTORIQUE DES PR",
     "best": "Meilleur : {{value}} {{unit}}",
     "emptyTitle": "AUCUN PR POUR L'INSTANT",
-    "emptySub": "Enregistre ton premier PR pour commencer à suivre ta progression"
+    "emptySub": "Enregistre ton premier PR pour commencer à suivre ta progression",
+    "deleteA11y": "Supprimer le PR",
+    "deleteConfirmTitle": "Supprimer ce PR ?",
+    "deleteConfirmMsg": "Il sera retiré de ton historique, du fil d'actualité et des classements. Cette action est irréversible.",
+    "deleteConfirmCta": "Supprimer",
+    "deleteErrorTitle": "Impossible de supprimer le PR",
+    "deleteErrorMsg": "Une erreur s'est produite. Réessaie."
   },
   "notifications": {
     "title": "NOTIFICATIONS",

@@ -17,6 +17,14 @@
   "like": "ME GUSTA",
   "liked": "TE GUSTA",
   "yourPr": "TU PR",
+  "deletePr": {
+    "action": "Eliminar PR",
+    "confirmTitle": "¿Eliminar este PR?",
+    "confirmMsg": "Se eliminará del feed, de tu historial de PRs y de las clasificaciones. No se puede deshacer.",
+    "confirmCta": "Eliminar",
+    "errorTitle": "No se pudo eliminar el PR",
+    "errorMsg": "Algo salió mal. Inténtalo de nuevo."
+  },
   "feedEmptyTitle": "AÚN SIN ACTIVIDAD",
   "feedEmptySubtitle": "Añade amigos y empieza a registrar PRs para animar el feed.",
   "retry": "REINTENTAR",

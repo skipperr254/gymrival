@@ -14,3 +14,4 @@ export * from "./leaderboard";
 export * from "./challenges";
 export * from "./notifications";
 export * from "./nutrition";
+export * from "./billing";

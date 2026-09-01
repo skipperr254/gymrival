@@ -234,6 +234,36 @@ export async function reconcileStaleVideoUploads(userId: string): Promise<void> 
 }
 
 /**
+ * Delete a PR the current user owns — retracts it from the social feed, PR
+ * History, and both leaderboards (all query personal_records live, so the
+ * row going away is the whole fix). The delete_personal_record RPC (migration
+ * 046) does the DB side atomically: XP clawback, dangling-notification
+ * cleanup, active-challenge score recompute, then the row delete itself
+ * (which cascades pr_videos/pr_likes). It hands back the video's Storage
+ * paths so this function can remove the actual files — SQL can't touch the
+ * Storage backend directly, only the metadata row.
+ */
+export async function deletePersonalRecord(
+  prId: string
+): Promise<{ error: string | null }> {
+  const { data, error } = await supabase
+    .rpc('delete_personal_record', { p_pr_id: prId })
+    .single();
+
+  if (error) return { error: error.message };
+
+  const row = data as { video_path: string | null; thumbnail_path: string | null } | null;
+  const paths = [row?.video_path, row?.thumbnail_path].filter(
+    (p): p is string => !!p
+  );
+  if (paths.length > 0) {
+    await supabase.storage.from(PR_VIDEOS_BUCKET).remove(paths);
+  }
+
+  return { error: null };
+}
+
+/**
  * Delete a PR's video — removes the pr_videos row and both Storage files.
  * Called when a user removes their video or when the PR itself is deleted
  * (the DB cascade handles the row; this cleans up Storage).
