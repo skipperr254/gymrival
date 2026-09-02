@@ -8,7 +8,8 @@
   "tabs": {
     "schedule": "PLANO",
     "checkin": "CHECK-IN",
-    "progress": "PROGRESSO"
+    "progress": "PROGRESSO",
+    "nutrition": "NUTRIÇÃO"
   },
   "days": {
     "full": { "0": "Segunda-feira", "1": "Terça-feira", "2": "Quarta-feira", "3": "Quinta-feira", "4": "Sexta-feira", "5": "Sábado", "6": "Domingo" },
@@ -42,6 +43,10 @@
   "exercisesAdded_one": "{{count}} EXERCÍCIO ADICIONADO",
   "exercisesAdded_other": "{{count}} EXERCÍCIOS ADICIONADOS",
   "saveSchedule": "GUARDAR PLANO",
+  "saveErrorTitle": "Não foi possível guardar",
+  "saveScheduleError": "Não foi possível guardar este treino. Verifica a tua ligação e tenta novamente.",
+  "finishWorkoutError": "Não foi possível guardar o teu treino concluído. Verifica a tua ligação e tenta novamente.",
+  "deleteSessionError": "Não foi possível eliminar este treino. Verifica a tua ligação e tenta novamente.",
   "checkin": {
     "weeklyStreak": "SEQUÊNCIA SEMANAL",
     "ofSevenDays": "/ 7 dias",
@@ -57,6 +62,9 @@
     "xpEarned": "+25 XP GANHOS",
     "undoCheckIn": "DESFAZER CHECK-IN",
     "friendsCheckedIn": "AMIGOS COM CHECK-IN",
-    "unknown": "Desconhecido"
+    "unknown": "Desconhecido",
+    "errorTitle": "Algo correu mal",
+    "checkinError": "Não foi possível fazer o check-in. Verifica a tua ligação e tenta novamente.",
+    "undoError": "Não foi possível anular o check-in. Verifica a tua ligação e tenta novamente."
   }
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import Svg, {
   Path,
@@ -41,8 +41,8 @@ export function LineChart({ points, height = 120, color = Colors.accent }: LineC
 
   if (points.length === 0) {
     return (
-      <View style={[styles.empty, { height }]}>
-        <Text style={styles.emptyText}>{t('chart.noData')}</Text>
+      <View className="items-center justify-center" style={{ height }}>
+        <Text className="font-sans text-[13px] text-muted">{t('chart.noData')}</Text>
       </View>
     );
   }
@@ -183,15 +183,3 @@ export function LineChart({ points, height = 120, color = Colors.accent }: LineC
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  empty: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyText: {
-    fontFamily: Fonts.body,
-    fontSize: 13,
-    color: Colors.muted,
-  },
-});

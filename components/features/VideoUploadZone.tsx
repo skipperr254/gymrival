@@ -4,21 +4,14 @@ import {
   Text,
   Pressable,
   Image,
-  StyleSheet,
   Alert,
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import * as VideoThumbnails from 'expo-video-thumbnails';
 import { Video, Camera, X, Clock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Fonts } from '@/constants/theme';
+import { pickVideoFromLibrary, recordVideoFromCamera, type PickedVideoAsset } from '@/lib/media/pickVideoAsset';
+import { Colors } from '@/constants/theme';
 
-interface VideoAsset {
-  uri: string;
-  thumbnailUri: string;
-  durationSec: number;
-  fileSizeBytes: number;
-}
+type VideoAsset = PickedVideoAsset;
 
 interface Props {
   asset: VideoAsset | null;
@@ -27,66 +20,26 @@ interface Props {
   disabled?: boolean;
 }
 
-const MAX_DURATION_SEC = 60;
-
 export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabled }: Props) {
   const { t } = useTranslation('logpr');
-  const processAsset = useCallback(async (pickerAsset: ImagePicker.ImagePickerAsset) => {
-    const videoUri = pickerAsset.uri;
-    const rawDuration = pickerAsset.duration ?? 0;
-    // expo-image-picker returns duration in milliseconds on some platforms
-    const durationSec = rawDuration > 1000 ? Math.round(rawDuration / 1000) : Math.round(rawDuration);
-    const fileSizeBytes = pickerAsset.fileSize ?? 0;
-
-    // Generate thumbnail from first frame
-    let thumbnailUri = '';
-    try {
-      const thumb = await VideoThumbnails.getThumbnailAsync(videoUri, {
-        time: 0,
-        quality: 0.7,
-      });
-      thumbnailUri = thumb.uri;
-    } catch {
-      // Thumbnail failure is non-fatal — upload will proceed without one
-    }
-
-    onVideoSelected({ uri: videoUri, thumbnailUri, durationSec, fileSizeBytes });
-  }, [onVideoSelected]);
 
   const pickFromLibrary = useCallback(async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
+    const result = await pickVideoFromLibrary();
+    if (result.status === 'permission_denied') {
       Alert.alert(t('video.permissionNeededTitle'), t('video.permissionLibraryMsg'));
       return;
     }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['videos'],
-      videoMaxDuration: MAX_DURATION_SEC,
-      quality: 1,
-      allowsEditing: false,
-    });
-
-    if (result.canceled || !result.assets?.[0]) return;
-    await processAsset(result.assets[0]);
-  }, [processAsset]);
+    if (result.status === 'picked') onVideoSelected(result.asset);
+  }, [onVideoSelected, t]);
 
   const recordFromCamera = useCallback(async () => {
-    const { status: camStatus } = await ImagePicker.requestCameraPermissionsAsync();
-    if (camStatus !== 'granted') {
+    const result = await recordVideoFromCamera();
+    if (result.status === 'permission_denied') {
       Alert.alert(t('video.permissionNeededTitle'), t('video.permissionCameraMsg'));
       return;
     }
-
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ['videos'],
-      videoMaxDuration: MAX_DURATION_SEC,
-      quality: 1,
-    });
-
-    if (result.canceled || !result.assets?.[0]) return;
-    await processAsset(result.assets[0]);
-  }, [processAsset]);
+    if (result.status === 'picked') onVideoSelected(result.asset);
+  }, [onVideoSelected, t]);
 
   const showPickerOptions = useCallback(() => {
     if (disabled) return;
@@ -103,33 +56,35 @@ export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabl
 
   if (asset) {
     return (
-      <View style={styles.preview}>
+      <View className="h-40 rounded-2xl overflow-hidden bg-[#0d0d0d]">
         {asset.thumbnailUri ? (
-          <Image source={{ uri: asset.thumbnailUri }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+          <Image source={{ uri: asset.thumbnailUri }} className="absolute inset-0" resizeMode="cover" />
         ) : (
-          <View style={[StyleSheet.absoluteFill, styles.thumbFallback]}>
+          <View className="absolute inset-0 items-center justify-center bg-[#111]">
             <Video size={28} strokeWidth={1.4} color="#444" />
           </View>
         )}
         {/* Overlay */}
-        <View style={styles.previewOverlay}>
+        <View className="absolute inset-0 flex-row justify-between items-start p-2.5 bg-black/25">
           {/* Duration badge */}
-          <View style={styles.durationBadge}>
+          <View className="flex-row items-center gap-1 bg-black/70 rounded-full py-1 px-2">
             <Clock size={10} strokeWidth={2} color="#ccc" />
-            <Text style={styles.durationText}>{formatDuration(asset.durationSec)}</Text>
+            <Text className="font-heading text-[11px] text-[#ccc]">{formatDuration(asset.durationSec)}</Text>
           </View>
           {/* Remove button */}
           <Pressable
             onPress={onVideoRemoved}
-            style={styles.removeBtn}
+            className="w-7 h-7 rounded-full bg-black/70 items-center justify-center"
             hitSlop={8}
           >
-            <X size={14} strokeWidth={2.5} color="#fff" />
+            <X size={14} strokeWidth={2.5} color={Colors.primary} />
           </Pressable>
         </View>
         {/* Ready label */}
-        <View style={styles.readyBadge}>
-          <Text style={styles.readyBadgeText}>{t('video.readyLabel')}</Text>
+        <View className="absolute bottom-2.5 left-2.5 bg-[rgba(0,204,68,0.85)] rounded-full py-1 px-2.5">
+          <Text className="font-heading text-[9px] tracking-[1.5px] text-white">
+            {t('video.readyLabel')}
+          </Text>
         </View>
       </View>
     );
@@ -139,22 +94,25 @@ export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabl
     <Pressable
       onPress={showPickerOptions}
       disabled={disabled}
-      style={({ pressed }) => [
-        styles.empty,
-        pressed && !disabled && styles.emptyPressed,
-        disabled && styles.emptyDisabled,
-      ]}
+      className={`h-[130px] rounded-2xl border-[1.5px] border-dashed bg-[#161616] items-center justify-center gap-1.5 ${
+        disabled ? 'opacity-40' : ''
+      }`}
+      style={({ pressed }) =>
+        pressed && !disabled ? { backgroundColor: Colors.surface, borderColor: '#3a3a3a' } : undefined
+      }
     >
-      <View style={styles.emptyIconRow}>
-        <View style={styles.emptyIconWrap}>
-          <Camera size={20} strokeWidth={1.6} color="#555" />
+      <View className="flex-row gap-3 mb-1">
+        <View className="w-10 h-10 rounded-xl bg-surface items-center justify-center">
+          <Camera size={20} strokeWidth={1.6} color={Colors.muted} />
         </View>
-        <View style={styles.emptyIconWrap}>
-          <Video size={20} strokeWidth={1.4} color="#555" />
+        <View className="w-10 h-10 rounded-xl bg-surface items-center justify-center">
+          <Video size={20} strokeWidth={1.4} color={Colors.muted} />
         </View>
       </View>
-      <Text style={styles.emptyTitle}>{t('video.addProofTitle')}</Text>
-      <Text style={styles.emptySub}>{t('video.addProofSub')}</Text>
+      <Text className="font-heading text-[11px] tracking-[2px] text-[#444]">
+        {t('video.addProofTitle')}
+      </Text>
+      <Text className="font-sans text-[10px] text-[#333]">{t('video.addProofSub')}</Text>
     </Pressable>
   );
 }
@@ -164,104 +122,3 @@ function formatDuration(sec: number): string {
   const s = sec % 60;
   return `${m}:${String(s).padStart(2, '0')}`;
 }
-
-const styles = StyleSheet.create({
-  empty: {
-    height: 130,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: '#2a2a2a',
-    borderStyle: 'dashed',
-    backgroundColor: '#161616',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  emptyPressed: {
-    backgroundColor: '#1e1e1e',
-    borderColor: '#3a3a3a',
-  },
-  emptyDisabled: {
-    opacity: 0.4,
-  },
-  emptyIconRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 4,
-  },
-  emptyIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: '#1e1e1e',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyTitle: {
-    fontFamily: Fonts.display,
-    fontSize: 11,
-    letterSpacing: 2,
-    color: '#444',
-  },
-  emptySub: {
-    fontFamily: Fonts.body,
-    fontSize: 10,
-    color: '#333',
-  },
-  preview: {
-    height: 160,
-    borderRadius: 16,
-    overflow: 'hidden',
-    backgroundColor: '#0d0d0d',
-  },
-  thumbFallback: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#111',
-  },
-  previewOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    padding: 10,
-    backgroundColor: 'rgba(0,0,0,0.25)',
-  },
-  durationBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    borderRadius: 20,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-  },
-  durationText: {
-    fontFamily: Fonts.display,
-    fontSize: 11,
-    color: '#ccc',
-  },
-  removeBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  readyBadge: {
-    position: 'absolute',
-    bottom: 10,
-    left: 10,
-    backgroundColor: 'rgba(0,204,68,0.85)',
-    borderRadius: 20,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-  },
-  readyBadgeText: {
-    fontFamily: Fonts.display,
-    fontSize: 9,
-    letterSpacing: 1.5,
-    color: '#fff',
-  },
-});

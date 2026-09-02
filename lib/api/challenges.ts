@@ -109,53 +109,32 @@ export async function leaveChallenge(
 /**
  * Create a friend challenge and immediately invite the target friend.
  * Returns the new challenge id on success.
+ *
+ * Runs as a single SECURITY DEFINER transaction (see migration 034) so a
+ * network drop mid-flow can no longer leave a challenge whose creator was
+ * never added as a participant, or an invitation that never got sent — the
+ * three inserts (challenges, challenge_participants, challenge_invitations)
+ * either all happen or none do.
  */
 export async function createFriendChallenge(
   creatorId: string,
   input: CreateFriendChallengeInput,
 ): Promise<{ challengeId: string | null; error: string | null }> {
-  const now = new Date().toISOString();
+  const { data, error } = await supabase.rpc('create_friend_challenge', {
+    p_metric:       input.metric,
+    p_exercise_key: input.exercise_key,
+    p_title:        input.title,
+    p_description:  input.description ?? null,
+    p_prize_label:  input.prize_label ?? null,
+    p_ends_at:      input.ends_at,
+    p_invitee_id:   input.invitee_id,
+  });
 
-  const { data, error: insertErr } = await supabase
-    .from('challenges')
-    .insert({
-      type:        'friend',
-      scope:       'direct',
-      metric:      input.metric,
-      exercise_key: input.exercise_key,
-      title:       input.title,
-      description: input.description ?? null,
-      prize_label: input.prize_label ?? null,
-      starts_at:   now,
-      ends_at:     input.ends_at,
-      created_by:  creatorId,
-      status:      'active',
-    })
-    .select('id')
-    .single();
-
-  if (insertErr || !data) {
-    return { challengeId: null, error: insertErr?.message ?? 'Failed to create challenge' };
+  if (error || !data) {
+    return { challengeId: null, error: error?.message ?? 'Failed to create challenge' };
   }
 
-  const challengeId = data.id as string;
-
-  // Add creator as participant
-  await supabase
-    .from('challenge_participants')
-    .insert({ challenge_id: challengeId, user_id: creatorId });
-
-  // Send invitation to friend
-  const { error: invErr } = await supabase
-    .from('challenge_invitations')
-    .insert({
-      challenge_id: challengeId,
-      inviter_id:   creatorId,
-      invitee_id:   input.invitee_id,
-    });
-
-  if (invErr) return { challengeId, error: invErr.message };
-  return { challengeId, error: null };
+  return { challengeId: data as string, error: null };
 }
 
 /**

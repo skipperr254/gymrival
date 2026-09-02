@@ -1,76 +1,93 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { Fonts } from '@/constants/theme';
+import { View, Text } from 'react-native';
+import { Image } from 'expo-image';
+import { Colors, Fonts, AvatarPalette } from '@/constants/theme';
 
-const AVATAR_COLORS = [
-  '#e63030',
-  '#3b82f6',
-  '#10b981',
-  '#f59e0b',
-  '#8b5cf6',
-  '#ec4899',
-  '#0ea5e9',
-  '#f97316',
-];
+const SIZE_PRESETS = { sm: 32, md: 44, lg: 56, xl: 72 } as const;
 
-const SIZE_MAP = {
-  sm: { diameter: 32, fontSize: 12 },
-  md: { diameter: 44, fontSize: 16 },
-  lg: { diameter: 56, fontSize: 20 },
-  xl: { diameter: 72, fontSize: 24 },
-} as const;
-
-export type AvatarSize = keyof typeof SIZE_MAP;
+export type AvatarSize = keyof typeof SIZE_PRESETS | number;
 
 export interface AvatarProps {
+  /** Display name — used both for initials and as the color-hash fallback key. */
   name: string;
+  /** Stable identifier (user id) preferred for the color hash so it never changes if the name does. */
   userId?: string;
+  /** Uploaded profile photo URL. When present, renders the photo instead of initials. */
+  avatarUrl?: string | null;
   size?: AvatarSize;
+  /** Shows a small green presence dot, bottom-right. */
+  online?: boolean;
 }
 
-function hashString(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return Math.abs(hash);
+function hashToIndex(key: string, modulo: number): number {
+  let h = 0;
+  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) | 0;
+  return Math.abs(h) % modulo;
 }
 
-function getColor(userId: string): string {
-  return AVATAR_COLORS[hashString(userId) % AVATAR_COLORS.length];
+/** Deterministic on-brand color for a user's generated avatar. */
+export function getAvatarColor(key: string): string {
+  return AvatarPalette[hashToIndex(key, AvatarPalette.length)];
 }
 
-function getInitials(name: string): string {
-  const words = name.trim().split(/\s+/).filter(Boolean);
-  if (words.length === 0) return '?';
-  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-  return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+/** Google-style monogram: the first letter of the name, uppercased. */
+function getInitial(name: string): string {
+  const first = name.trim()[0];
+  return first ? first.toUpperCase() : '?';
 }
 
-export function Avatar({ name, userId, size = 'md' }: AvatarProps) {
-  const { diameter, fontSize } = SIZE_MAP[size];
-  const bgColor = getColor(userId ?? name);
-  const initials = getInitials(name);
+/**
+ * The single avatar renderer used everywhere in the app. Shows the user's
+ * uploaded photo when they have one; otherwise falls back to a deterministic
+ * Google-style monogram avatar: a single first-letter over a flat, solid color
+ * derived from userId (or name if no id is available), so every user gets a
+ * distinct, stable avatar out of the box.
+ */
+export function Avatar({ name, userId, avatarUrl, size = 'md', online = false }: AvatarProps) {
+  const diameter = typeof size === 'number' ? size : SIZE_PRESETS[size];
+  // ~0.45 of the diameter fills the circle the way Google's monograms do —
+  // noticeably larger than the old 0.32 so the letter reads as the focal point.
+  const fontSize = Math.round(diameter * 0.45);
 
   return (
-    <View
-      style={[
-        styles.container,
-        { width: diameter, height: diameter, borderRadius: diameter / 2, backgroundColor: bgColor },
-      ]}
-    >
-      <Text style={[styles.initials, { fontSize }]}>{initials}</Text>
+    <View style={{ width: diameter, height: diameter, flexShrink: 0 }}>
+      {avatarUrl ? (
+        <Image
+          source={{ uri: avatarUrl }}
+          style={{ width: diameter, height: diameter, borderRadius: diameter / 2 }}
+          contentFit="cover"
+          transition={150}
+        />
+      ) : (
+        <View
+          style={{
+            width: diameter,
+            height: diameter,
+            borderRadius: diameter / 2,
+            backgroundColor: getAvatarColor(userId ?? name),
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text style={{ fontFamily: Fonts.display, fontSize, color: Colors.primary }}>
+            {getInitial(name)}
+          </Text>
+        </View>
+      )}
+      {online && (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 1,
+            right: 1,
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            backgroundColor: Colors.success,
+            borderWidth: 2,
+            borderColor: Colors.base,
+          }}
+        />
+      )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  initials: {
-    fontFamily: Fonts.display,
-    color: '#ffffff',
-    letterSpacing: 1,
-  },
-});

@@ -1,7 +1,12 @@
 {
   "settings": {
     "language": "Idioma",
-    "languageAuto": "Seguindo o idioma do dispositivo"
+    "languageAuto": "Seguindo o idioma do dispositivo",
+    "languageErrorTitle": "Não foi possível guardar o idioma",
+    "languageErrorSub": "A tua escolha de idioma não sincronizou — verifica a tua ligação e tenta novamente.",
+    "languageConfirmTitle": "Alterar idioma?",
+    "languageConfirmSub": "A aplicação será reiniciada para mudar para {{language}}.",
+    "languageConfirmCta": "Alterar"
   },
   "actions": {
     "back": "Voltar",
@@ -19,6 +24,7 @@
     "profile": "Perfil"
   },
   "accessibility": {
-    "logActivity": "Registar atividade"
+    "logActivity": "Registar atividade",
+    "back": "Voltar"
   }
 }

@@ -8,7 +8,8 @@
   "tabs": {
     "schedule": "SCHEMA",
     "checkin": "CHECK-IN",
-    "progress": "VOORTGANG"
+    "progress": "VOORTGANG",
+    "nutrition": "VOEDING"
   },
   "days": {
     "full": { "0": "Maandag", "1": "Dinsdag", "2": "Woensdag", "3": "Donderdag", "4": "Vrijdag", "5": "Zaterdag", "6": "Zondag" },
@@ -42,6 +43,10 @@
   "exercisesAdded_one": "{{count}} OEFENING TOEGEVOEGD",
   "exercisesAdded_other": "{{count}} OEFENINGEN TOEGEVOEGD",
   "saveSchedule": "SCHEMA OPSLAAN",
+  "saveErrorTitle": "Opslaan mislukt",
+  "saveScheduleError": "Kon deze training niet opslaan. Controleer je verbinding en probeer het opnieuw.",
+  "finishWorkoutError": "Kon je voltooide training niet opslaan. Controleer je verbinding en probeer het opnieuw.",
+  "deleteSessionError": "Kon deze training niet verwijderen. Controleer je verbinding en probeer het opnieuw.",
   "checkin": {
     "weeklyStreak": "WEKELIJKSE REEKS",
     "ofSevenDays": "/ 7 dagen",
@@ -57,6 +62,9 @@
     "xpEarned": "+25 XP VERDIEND",
     "undoCheckIn": "CHECK-IN ONGEDAAN MAKEN",
     "friendsCheckedIn": "VRIENDEN INGECHECKT",
-    "unknown": "Onbekend"
+    "unknown": "Onbekend",
+    "errorTitle": "Er is iets misgegaan",
+    "checkinError": "Kon je niet inchecken. Controleer je verbinding en probeer het opnieuw.",
+    "undoError": "Kon je check-in niet ongedaan maken. Controleer je verbinding en probeer het opnieuw."
   }
 }

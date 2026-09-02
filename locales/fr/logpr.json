@@ -1,0 +1,46 @@
+{
+  "logSheet": {
+    "title": "ENREGISTRER UNE ACTIVITÉ",
+    "logPr": { "label": "Enregistrer un PR", "sub": "Enregistrer un nouveau record personnel" },
+    "checkin": { "label": "Check-in salle", "sub": "Enregistre ta présence à la salle" },
+    "logMeal": { "label": "Enregistrer un repas", "sub": "Suis tes calories et macros" }
+  },
+  "step": {
+    "stepOf": "ÉTAPE {{step}} SUR 2",
+    "logYourPr": "Enregistre ton PR",
+    "addProof": "Ajouter une preuve"
+  },
+  "selectExercise": "SÉLECTIONNER UN EXERCICE",
+  "prWithValue": "PR  {{value}} {{unit}}",
+  "noPrYet": "Pas encore de PR",
+  "yourNewPr": "TON NOUVEAU PR",
+  "notHigherThanCurrent": "Pas supérieur à ton PR actuel ({{value}} {{unit}})",
+  "valueTooLarge": "Cette valeur semble trop élevée — vérifie-la",
+  "nextAddProof": "SUIVANT — AJOUTER UNE PREUVE",
+  "previousWithValue": "Précédent : {{value}} {{unit}}",
+  "firstPr": "Premier PR",
+  "xpReward": "+100 XP",
+  "savePr": "ENREGISTRER LE PR",
+  "saveError": "Impossible d'enregistrer ton PR. Vérifie ta connexion et réessaie.",
+  "prSaved": "PR ENREGISTRÉ !",
+  "newBest": "NOUVEAU RECORD",
+  "uploadingVideoProof": "Envoi de la preuve vidéo…",
+  "videoProofSaved": "Preuve vidéo enregistrée",
+  "videoUploadFailed": "Échec de l'envoi de la vidéo — tu peux réessayer depuis ta publication",
+  "addedToLeaderboard": "Ajouté au classement",
+  "xpEarned": "+100 XP GAGNÉS",
+  "video": {
+    "readyLabel": "VIDÉO PRÊTE",
+    "requiredHint": "Une preuve vidéo est requise pour enregistrer un PR",
+    "addProofTitle": "AJOUTER UNE PREUVE VIDÉO",
+    "addProofSub": "Caméra ou galerie · 60 sec max",
+    "permissionNeededTitle": "Autorisation requise",
+    "permissionLibraryMsg": "Autorise l'accès à ta galerie photo pour joindre une vidéo.",
+    "permissionCameraMsg": "Autorise l'accès à la caméra pour filmer ta performance.",
+    "pickerTitle": "Ajouter une preuve vidéo",
+    "pickerMsg": "Filme ta performance ou choisis une vidéo existante (60 secondes max)",
+    "recordVideo": "Filmer une vidéo",
+    "chooseFromLibrary": "Choisir dans la galerie",
+    "cancel": "Annuler"
+  }
+}

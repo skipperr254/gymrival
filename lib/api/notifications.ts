@@ -3,8 +3,9 @@ import type { AppNotification } from "@/types/notification";
 
 export async function fetchNotifications(
   userId: string,
-  limit = 50
-): Promise<{ data: AppNotification[]; error: string | null }> {
+  limit = 50,
+  offset = 0
+): Promise<{ data: AppNotification[]; hasMore: boolean; error: string | null }> {
   const { data, error } = await supabase
     .from('notifications')
     .select(`
@@ -19,9 +20,9 @@ export async function fetchNotifications(
     `)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
-    .limit(limit);
+    .range(offset, offset + limit - 1);
 
-  if (error) return { data: [], error: error.message };
+  if (error) return { data: [], hasMore: false, error: error.message };
 
   const mapped: AppNotification[] = (data ?? []).map((row: any) => ({
     id: row.id,
@@ -36,7 +37,26 @@ export async function fetchNotifications(
     created_at: row.created_at,
   }));
 
-  return { data: mapped, error: null };
+  return { data: mapped, hasMore: mapped.length === limit, error: null };
+}
+
+/**
+ * True unread count, independent of fetchNotifications' page size. Deriving
+ * unread count from a capped list (e.g. the 50 most recent) undercounts for
+ * any user with more unread notifications than the page size — this counts
+ * every unread row server-side instead.
+ */
+export async function fetchUnreadNotificationCount(
+  userId: string
+): Promise<{ count: number; error: string | null }> {
+  const { count, error } = await supabase
+    .from('notifications')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .is('read_at', null);
+
+  if (error) return { count: 0, error: error.message };
+  return { count: count ?? 0, error: null };
 }
 
 export async function markNotificationRead(

@@ -1,15 +1,10 @@
 {
-  "friendsStub": {
-    "back": "SOCIAL",
-    "title": "AMIGOS",
-    "subtitle": "Añade y gestiona a tus rivales de gimnasio",
-    "comingSoon": "PRÓXIMAMENTE"
-  },
-  "tabs": {
-    "feed": { "label": "Feed", "subtitle": "FEED" },
-    "friends": { "label": "Amigos", "subtitle": "AMIGOS" },
-    "messages": { "label": "Mensajes", "subtitle": "MENSAJES" }
-  },
+  "friendsTitle": "AMIGOS",
+  "messagesTitle": "MENSAJES",
+  "headerFriends": "Amigos",
+  "headerMessages": "Mensajes",
+  "soundOn": "Activar sonido",
+  "soundOff": "Desactivar sonido",
   "you": "TÚ",
   "athlete": "Atleta",
   "gym": "Gimnasio",
@@ -17,12 +12,28 @@
   "levelShort": "NV{{level}}",
   "newPr": "NUEVO PR",
   "videoUploading": "SUBIENDO VÍDEO…",
+  "videoFailed": "VÍDEO FALLIDO",
   "likes": "ME GUSTA",
   "like": "ME GUSTA",
   "liked": "TE GUSTA",
   "yourPr": "TU PR",
+  "deletePr": {
+    "action": "Eliminar PR",
+    "confirmTitle": "¿Eliminar este PR?",
+    "confirmMsg": "Se eliminará del feed, de tu historial de PRs y de las clasificaciones. No se puede deshacer.",
+    "confirmCta": "Eliminar",
+    "errorTitle": "No se pudo eliminar el PR",
+    "errorMsg": "Algo salió mal. Inténtalo de nuevo."
+  },
   "feedEmptyTitle": "AÚN SIN ACTIVIDAD",
   "feedEmptySubtitle": "Añade amigos y empieza a registrar PRs para animar el feed.",
+  "retry": "REINTENTAR",
+  "videoLoadError": "No se pudo cargar el vídeo",
+  "loadErrorFriends": "No se pudieron cargar tus amigos",
+  "loadErrorRequests": "No se pudieron cargar las solicitudes",
+  "loadErrorSearch": "Error en la búsqueda",
+  "loadErrorMessages": "No se pudieron cargar tus mensajes",
+  "loadErrorFeed": "No se pudo cargar el feed",
   "allCaughtUp": "ESTÁS AL DÍA",
   "friendsSubTabs": {
     "friends": "AMIGOS",
@@ -58,6 +69,8 @@
   "chat": {
     "cantOpen": "NO SE PUEDE ABRIR EL CHAT",
     "errorSub": "Algo salió mal. Inténtalo de nuevo más tarde.",
+    "loadError": "No se pudieron cargar los mensajes",
+    "retry": "REINTENTAR",
     "online": "En línea",
     "offline": "Desconectado",
     "startOfConversation": "INICIO DE LA CONVERSACIÓN",

@@ -6,17 +6,16 @@ import {
   Pressable,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
   ActivityIndicator,
   useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { Colors } from "@/constants/theme";
 import { Routes } from "@/constants/routes";
 import { useAuthStore } from "@/store/useAuthStore";
+import { BackButton } from "@/components/ui/BackButton";
 
 const CODE_LENGTH = 8;
 
@@ -31,6 +30,7 @@ export default function VerifyScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendLoading, setResendLoading] = useState(false);
 
   const inputRef = useRef<TextInput>(null);
 
@@ -96,9 +96,14 @@ export default function VerifyScreen() {
   }, [code]);
 
   const handleResend = async () => {
-    if (resendCooldown > 0 || !email) return;
+    // The cooldown alone isn't enough — it's only set *after* the request
+    // resolves, so rapid taps before the first response lands could fire
+    // multiple concurrent resend calls. Disable immediately on tap instead.
+    if (resendCooldown > 0 || resendLoading || !email) return;
     setError(null);
+    setResendLoading(true);
     const { error } = await resendOtp(email, type!);
+    setResendLoading(false);
     if (error) {
       setError(error);
     } else {
@@ -113,18 +118,14 @@ export default function VerifyScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={0}
       >
-        <View style={styles.container}>
+        <View className="flex-1 px-5 pt-4 pb-10">
           {/* Back */}
-          <Pressable
-            onPress={() => router.back()}
-            hitSlop={12}
-            style={styles.back}
-          >
-            <Ionicons name="arrow-back" size={24} color={Colors.primary} />
-          </Pressable>
+          <View className="mb-9 self-start">
+            <BackButton />
+          </View>
 
           {/* Header */}
-          <View style={styles.header}>
+          <View className="mb-11">
             <Text className="font-heading text-[46px] text-primary tracking-[2px] leading-[50px]">
               {t("verify.title")}
             </Text>
@@ -137,7 +138,7 @@ export default function VerifyScreen() {
 
           {/* Code boxes */}
           <Pressable
-            style={styles.boxRow}
+            className="flex-row justify-center gap-2"
             onPress={() => inputRef.current?.focus()}
           >
             {Array.from({ length: CODE_LENGTH }).map((_, i) => {
@@ -146,16 +147,21 @@ export default function VerifyScreen() {
               return (
                 <View
                   key={i}
-                  style={[
-                    styles.box,
-                    { width: boxWidth },
-                    isActive && styles.boxActive,
-                    char !== "" && styles.boxFilled,
-                    loading && styles.boxLoading,
-                  ]}
+                  className={`h-[58px] rounded-[14px] bg-elevated border-[1.5px] items-center justify-center ${
+                    isActive
+                      ? "border-accent"
+                      : char !== ""
+                        ? "border-white/20 bg-surface"
+                        : "border-elevated"
+                  } ${loading ? "opacity-50" : ""}`}
+                  style={{ width: boxWidth }}
                 >
-                  <Text style={styles.boxChar}>{char}</Text>
-                  {isActive && !loading && <View style={styles.cursor} />}
+                  <Text className="font-heading text-primary text-[28px] leading-[34px]">
+                    {char}
+                  </Text>
+                  {isActive && !loading && (
+                    <View className="absolute bottom-[10px] w-0.5 h-[18px] rounded-[1px] bg-accent" />
+                  )}
                 </View>
               );
             })}
@@ -183,7 +189,7 @@ export default function VerifyScreen() {
             keyboardType="number-pad"
             maxLength={CODE_LENGTH}
             caretHidden
-            style={styles.hiddenInput}
+            className="absolute opacity-0 w-px h-px top-0 left-0"
             editable={!loading}
           />
 
@@ -195,11 +201,12 @@ export default function VerifyScreen() {
             <Pressable
               hitSlop={8}
               onPress={handleResend}
-              disabled={resendCooldown > 0}
+              disabled={resendCooldown > 0 || resendLoading}
             >
               <Text
-                className="font-sans-semibold text-[14px]"
-                style={{ color: resendCooldown > 0 ? Colors.muted : Colors.accent }}
+                className={`font-sans-semibold text-[14px] ${
+                  resendCooldown > 0 || resendLoading ? "text-muted" : "text-accent"
+                }`}
               >
                 {" "}
                 {resendCooldown > 0
@@ -213,64 +220,3 @@ export default function VerifyScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 40,
-  },
-  back: {
-    marginBottom: 36,
-  },
-  header: {
-    marginBottom: 44,
-  },
-  boxRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 8,
-  },
-  box: {
-    height: 58,
-    borderRadius: 14,
-    backgroundColor: Colors.elevated,
-    borderWidth: 1.5,
-    borderColor: Colors.elevated,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  boxActive: {
-    borderColor: Colors.accent,
-  },
-  boxFilled: {
-    borderColor: Colors.primary + "33",
-    backgroundColor: Colors.surface,
-  },
-  boxLoading: {
-    opacity: 0.5,
-  },
-  boxChar: {
-    fontFamily: "BebasNeue_400Regular",
-    fontSize: 28,
-    color: Colors.primary,
-    lineHeight: 34,
-  },
-  cursor: {
-    position: "absolute",
-    bottom: 10,
-    width: 2,
-    height: 18,
-    borderRadius: 1,
-    backgroundColor: Colors.accent,
-  },
-  hiddenInput: {
-    position: "absolute",
-    opacity: 0,
-    width: 1,
-    height: 1,
-    top: 0,
-    left: 0,
-  },
-});

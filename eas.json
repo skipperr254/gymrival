@@ -6,16 +6,29 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "channel": "development"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "channel": "preview"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "channel": "production"
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "ascAppId": "6801829217",
+        "ascApiKeyPath": "./AuthKey_D8X5LC5B4K.p8",
+        "ascApiKeyId": "D8X5LC5B4K",
+        "ascApiKeyIssuerId": "36567d31-f738-4369-b20d-6263a51f03a0"
+      }
+    }
   }
 }

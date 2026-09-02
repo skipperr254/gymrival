@@ -31,10 +31,13 @@ module.exports = defineConfig([
               'id', 'x1', 'y1', 'x2', 'y2', 'offset', 'stopOpacity', 'fill',
               'strokeLinejoin', 'strokeLinecap', 'textAnchor', 'animationType',
               'placeholderTextColor', 'keyboardShouldPersistTaps', 'size',
-              'pointerEvents', 'contentFit', 'resizeMode',
+              'pointerEvents', 'contentFit', 'resizeMode', 'cachePolicy',
+              // expo-linear-gradient color stops — not user copy
+              'colors',
             ],
           },
-          words: { exclude: ['PR', 'PRs', 'XP', 'GYM', 'RIVAL', 'GYMRIVAL'] },
+          // '·' is a punctuation separator, '99+' a badge cap — not user copy
+          words: { exclude: ['PR', 'PRs', 'XP', 'GYM', 'RIVAL', 'GYMRIVAL', 'GYM RIVAL', '99+', '·'] },
         },
       ],
     },

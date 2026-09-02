@@ -1,0 +1,75 @@
+{
+  "editGoals": "Ernährungsziele bearbeiten",
+  "setGoalsTitle": "LEGE DEINE ZIELE FEST",
+  "setGoalsSub": "Erzähl uns etwas über dich, um personalisierte Kalorien- und Makroziele zu erhalten",
+  "summary": {
+    "calories": "KALORIEN",
+    "remaining": "{{value}} übrig",
+    "protein": "PROTEIN",
+    "carbs": "KOHLENHYDRATE",
+    "fat": "FETT"
+  },
+  "mealTypes": {
+    "breakfast": "Frühstück",
+    "lunch": "Mittagessen",
+    "dinner": "Abendessen",
+    "snack": "Snack"
+  },
+  "mealSection": {
+    "calorieCount": "{{value}} kcal",
+    "empty": "Noch nichts protokolliert",
+    "deleteTitle": "Eintrag entfernen?",
+    "deleteMessage": "{{name}} aus dem heutigen Protokoll entfernen?",
+    "cancel": "Abbrechen",
+    "delete": "Löschen"
+  },
+  "logSheet": {
+    "titleSelect": "Mahlzeit Protokollieren",
+    "titleDetails": "Mahlzeitdetails",
+    "addNewFood": "Neues Lebensmittel Hinzufügen",
+    "myFoods": "MEINE LEBENSMITTEL",
+    "searchFoods": "Lebensmittel durchsuchen",
+    "noFoodsYet": "Du hast noch keine Lebensmittel gespeichert",
+    "noSearchResults": "Keine Lebensmittel gefunden",
+    "macroSummary": "{{calories}} kcal · P {{protein}}g · K {{carbs}}g · F {{fat}}g",
+    "servings": "PORTIONEN",
+    "foodName": "NAME",
+    "foodNamePlaceholder": "z. B. Gegrillte Hähnchenbrust",
+    "calories": "KALORIEN",
+    "protein": "PROTEIN (G)",
+    "carbs": "KOHLENHYDRATE (G)",
+    "fat": "FETT (G)",
+    "servingLabelPlaceholder": "Portionsgröße (z. B. 1 Tasse, 100g)",
+    "saveToMyFoods": "In Meine Lebensmittel speichern für schnelleres Protokollieren später",
+    "mealType": "MAHLZEITENART",
+    "saving": "SPEICHERN…",
+    "logIt": "PROTOKOLLIEREN",
+    "mealLogged": "MAHLZEIT PROTOKOLLIERT!",
+    "addedToMeal": "Zu {{meal}} hinzugefügt"
+  },
+  "goalsForm": {
+    "headerTitle": "ERNÄHRUNGSZIELE",
+    "bodyStats": "KÖRPERDATEN",
+    "weightKg": "GEWICHT (KG)",
+    "heightCm": "GRÖSSE (CM)",
+    "age": "ALTER",
+    "sex": "GESCHLECHT",
+    "sexOptions": { "male": "Männlich", "female": "Weiblich" },
+    "activityLevel": "AKTIVITÄTSLEVEL",
+    "activityOptions": {
+      "sedentary": "Sitzend",
+      "light": "Leicht aktiv",
+      "moderate": "Mäßig aktiv",
+      "active": "Aktiv",
+      "very_active": "Sehr aktiv"
+    },
+    "dietGoal": "ZIEL",
+    "dietGoalOptions": { "lose": "Abnehmen", "maintain": "Halten", "gain": "Zunehmen" },
+    "calculatedPreview": "BERECHNETES TAGESZIEL",
+    "customizeTargets": "Ziele manuell anpassen",
+    "saving": "SPEICHERN…",
+    "saveGoals": "ZIELE SPEICHERN",
+    "saveErrorTitle": "Etwas ist schiefgelaufen",
+    "saveError": "Deine Ziele konnten nicht gespeichert werden. Überprüfe deine Verbindung und versuche es erneut."
+  }
+}

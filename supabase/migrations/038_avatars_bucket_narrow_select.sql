@@ -1,0 +1,12 @@
+-- Public buckets serve objects via the public URL without going through RLS
+-- at all — the broad SELECT policy from 037 only enabled listing every file
+-- in the bucket via the storage API, which nothing in the app does or needs
+-- (avatars are always fetched by known path via getPublicUrl()). Drop it.
+--
+-- ⚠️ REGRESSION: dropping SELECT entirely also broke avatar *uploads*. The
+-- client re-uploads to a fixed path with `upsert: true`, and the storage
+-- upsert path must read the existing object row (a SELECT) to decide
+-- insert-vs-overwrite. With no SELECT policy that read is denied and Postgres
+-- reports the write as "new row violates row-level security policy". Fixed in
+-- migration 039 by restoring a *narrow*, owner-scoped SELECT policy.
+DROP POLICY IF EXISTS "avatars_storage_select_auth" ON storage.objects;

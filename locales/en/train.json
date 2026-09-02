@@ -8,7 +8,8 @@
   "tabs": {
     "schedule": "SCHEDULE",
     "checkin": "CHECK IN",
-    "progress": "PROGRESS"
+    "progress": "PROGRESS",
+    "nutrition": "NUTRITION"
   },
   "days": {
     "full": { "0": "Monday", "1": "Tuesday", "2": "Wednesday", "3": "Thursday", "4": "Friday", "5": "Saturday", "6": "Sunday" },
@@ -42,6 +43,10 @@
   "exercisesAdded_one": "{{count}} EXERCISE ADDED",
   "exercisesAdded_other": "{{count}} EXERCISES ADDED",
   "saveSchedule": "SAVE SCHEDULE",
+  "saveErrorTitle": "Could not save",
+  "saveScheduleError": "Could not save this workout. Check your connection and try again.",
+  "finishWorkoutError": "Could not save your completed workout. Check your connection and try again.",
+  "deleteSessionError": "Could not delete this workout. Check your connection and try again.",
   "checkin": {
     "weeklyStreak": "WEEKLY STREAK",
     "ofSevenDays": "/ 7 days",
@@ -57,6 +62,9 @@
     "xpEarned": "+25 XP EARNED",
     "undoCheckIn": "UNDO CHECK-IN",
     "friendsCheckedIn": "FRIENDS CHECKED IN",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "errorTitle": "Something went wrong",
+    "checkinError": "Could not check you in. Check your connection and try again.",
+    "undoError": "Could not undo your check-in. Check your connection and try again."
   }
 }

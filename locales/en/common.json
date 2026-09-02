@@ -1,7 +1,12 @@
 {
   "settings": {
     "language": "Language",
-    "languageAuto": "Following device language"
+    "languageAuto": "Following device language",
+    "languageErrorTitle": "Could not save language",
+    "languageErrorSub": "Your language choice didn't sync — check your connection and try again.",
+    "languageConfirmTitle": "Change language?",
+    "languageConfirmSub": "The app will restart to switch to {{language}}.",
+    "languageConfirmCta": "Change"
   },
   "actions": {
     "back": "Back",
@@ -19,6 +24,7 @@
     "profile": "Profile"
   },
   "accessibility": {
-    "logActivity": "Log activity"
+    "logActivity": "Log activity",
+    "back": "Back"
   }
 }

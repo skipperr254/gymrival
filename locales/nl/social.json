@@ -1,15 +1,10 @@
 {
-  "friendsStub": {
-    "back": "SOCIAAL",
-    "title": "VRIENDEN",
-    "subtitle": "Voeg je gymrivalen toe en beheer ze",
-    "comingSoon": "BINNENKORT"
-  },
-  "tabs": {
-    "feed": { "label": "Feed", "subtitle": "FEED" },
-    "friends": { "label": "Vrienden", "subtitle": "VRIENDEN" },
-    "messages": { "label": "Berichten", "subtitle": "BERICHTEN" }
-  },
+  "friendsTitle": "VRIENDEN",
+  "messagesTitle": "BERICHTEN",
+  "headerFriends": "Vrienden",
+  "headerMessages": "Berichten",
+  "soundOn": "Geluid aanzetten",
+  "soundOff": "Geluid uitzetten",
   "you": "JIJ",
   "athlete": "Sporter",
   "gym": "Sportschool",
@@ -17,12 +12,28 @@
   "levelShort": "LVL{{level}}",
   "newPr": "NIEUWE PR",
   "videoUploading": "VIDEO UPLOADEN…",
+  "videoFailed": "VIDEO MISLUKT",
   "likes": "LIKES",
   "like": "LIKE",
   "liked": "GELIKED",
   "yourPr": "JOUW PR",
+  "deletePr": {
+    "action": "PR verwijderen",
+    "confirmTitle": "Deze PR verwijderen?",
+    "confirmMsg": "Dit verwijdert hem uit de feed, je PR-geschiedenis en de ranglijsten. Dit kan niet ongedaan worden gemaakt.",
+    "confirmCta": "Verwijderen",
+    "errorTitle": "PR kon niet worden verwijderd",
+    "errorMsg": "Er is iets misgegaan. Probeer het opnieuw."
+  },
   "feedEmptyTitle": "NOG GEEN ACTIVITEIT",
   "feedEmptySubtitle": "Voeg vrienden toe en log PR's om de feed tot leven te brengen.",
+  "retry": "OPNIEUW",
+  "videoLoadError": "Kon video niet laden",
+  "loadErrorFriends": "Kon je vrienden niet laden",
+  "loadErrorRequests": "Kon verzoeken niet laden",
+  "loadErrorSearch": "Zoeken mislukt",
+  "loadErrorMessages": "Kon je berichten niet laden",
+  "loadErrorFeed": "Kon de feed niet laden",
   "allCaughtUp": "JE BENT HELEMAAL BIJ",
   "friendsSubTabs": {
     "friends": "VRIENDEN",
@@ -58,6 +69,8 @@
   "chat": {
     "cantOpen": "KAN CHAT NIET OPENEN",
     "errorSub": "Er is iets misgegaan. Probeer het later opnieuw.",
+    "loadError": "Kon berichten niet laden",
+    "retry": "OPNIEUW",
     "online": "Online",
     "offline": "Offline",
     "startOfConversation": "BEGIN VAN GESPREK",

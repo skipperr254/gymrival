@@ -1,0 +1,75 @@
+{
+  "editGoals": "Modifier les objectifs nutritionnels",
+  "setGoalsTitle": "DÉFINIS TES OBJECTIFS",
+  "setGoalsSub": "Parle-nous un peu de toi pour obtenir des objectifs personnalisés de calories et macros",
+  "summary": {
+    "calories": "CALORIES",
+    "remaining": "{{value}} restantes",
+    "protein": "PROTÉINES",
+    "carbs": "GLUCIDES",
+    "fat": "LIPIDES"
+  },
+  "mealTypes": {
+    "breakfast": "Petit-déjeuner",
+    "lunch": "Déjeuner",
+    "dinner": "Dîner",
+    "snack": "Collation"
+  },
+  "mealSection": {
+    "calorieCount": "{{value}} kcal",
+    "empty": "Rien d'enregistré pour le moment",
+    "deleteTitle": "Supprimer l'entrée ?",
+    "deleteMessage": "Supprimer {{name}} du journal d'aujourd'hui ?",
+    "cancel": "Annuler",
+    "delete": "Supprimer"
+  },
+  "logSheet": {
+    "titleSelect": "Enregistrer un Repas",
+    "titleDetails": "Détails du Repas",
+    "addNewFood": "Ajouter un Nouvel Aliment",
+    "myFoods": "MES ALIMENTS",
+    "searchFoods": "Rechercher dans tes aliments",
+    "noFoodsYet": "Tu n'as encore enregistré aucun aliment",
+    "noSearchResults": "Aucun aliment ne correspond à ta recherche",
+    "macroSummary": "{{calories}} kcal · P {{protein}}g · G {{carbs}}g · L {{fat}}g",
+    "servings": "PORTIONS",
+    "foodName": "NOM DE L'ALIMENT",
+    "foodNamePlaceholder": "ex. Blanc de Poulet Grillé",
+    "calories": "CALORIES",
+    "protein": "PROTÉINES (G)",
+    "carbs": "GLUCIDES (G)",
+    "fat": "LIPIDES (G)",
+    "servingLabelPlaceholder": "Taille de la portion (ex. 1 tasse, 100g)",
+    "saveToMyFoods": "Enregistrer dans Mes Aliments pour un ajout plus rapide plus tard",
+    "mealType": "TYPE DE REPAS",
+    "saving": "ENREGISTREMENT…",
+    "logIt": "ENREGISTRER",
+    "mealLogged": "REPAS ENREGISTRÉ !",
+    "addedToMeal": "Ajouté à {{meal}}"
+  },
+  "goalsForm": {
+    "headerTitle": "OBJECTIFS NUTRITIONNELS",
+    "bodyStats": "DONNÉES CORPORELLES",
+    "weightKg": "POIDS (KG)",
+    "heightCm": "TAILLE (CM)",
+    "age": "ÂGE",
+    "sex": "SEXE",
+    "sexOptions": { "male": "Homme", "female": "Femme" },
+    "activityLevel": "NIVEAU D'ACTIVITÉ",
+    "activityOptions": {
+      "sedentary": "Sédentaire",
+      "light": "Léger",
+      "moderate": "Modéré",
+      "active": "Actif",
+      "very_active": "Très actif"
+    },
+    "dietGoal": "OBJECTIF",
+    "dietGoalOptions": { "lose": "Perdre du poids", "maintain": "Maintenir", "gain": "Prendre du poids" },
+    "calculatedPreview": "OBJECTIF QUOTIDIEN CALCULÉ",
+    "customizeTargets": "Personnaliser les objectifs manuellement",
+    "saving": "ENREGISTREMENT…",
+    "saveGoals": "ENREGISTRER LES OBJECTIFS",
+    "saveErrorTitle": "Un problème est survenu",
+    "saveError": "Impossible d'enregistrer tes objectifs. Vérifie ta connexion et réessaie."
+  }
+}

@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Eye, EyeOff } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import { Colors } from "@/constants/theme";
 import { Routes } from "@/constants/routes";
@@ -87,17 +87,14 @@ export default function ResetPasswordScreen() {
               <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
                 {t("resetPassword.newPasswordLabel")}
               </Text>
-              <View
-                className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
-                style={styles.inputBorder}
-              >
+              <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
                 <TextInput
                   value={password}
                   onChangeText={setPassword}
                   placeholder={t("resetPassword.newPasswordPlaceholder")}
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
-                  style={[styles.input, { flex: 1 }]}
+                  className="flex-1 font-sans text-[15px] text-primary"
                   secureTextEntry={!showPassword}
                   returnKeyType="next"
                   onSubmitEditing={() => confirmRef.current?.focus()}
@@ -107,11 +104,11 @@ export default function ResetPasswordScreen() {
                   onPress={() => setShowPassword((v) => !v)}
                   hitSlop={10}
                 >
-                  <Ionicons
-                    name={showPassword ? "eye-off-outline" : "eye-outline"}
-                    size={20}
-                    color={Colors.secondary}
-                  />
+                  {showPassword ? (
+                    <EyeOff size={20} color={Colors.secondary} />
+                  ) : (
+                    <Eye size={20} color={Colors.secondary} />
+                  )}
                 </Pressable>
               </View>
               <Text className="font-sans text-[12px] text-muted mt-1.5 ml-1">
@@ -124,10 +121,7 @@ export default function ResetPasswordScreen() {
               <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
                 {t("resetPassword.confirmPasswordLabel")}
               </Text>
-              <View
-                className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center"
-                style={styles.inputBorder}
-              >
+              <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
                 <TextInput
                   ref={confirmRef}
                   value={confirmPassword}
@@ -135,7 +129,7 @@ export default function ResetPasswordScreen() {
                   placeholder={t("resetPassword.confirmPasswordPlaceholder")}
                   placeholderTextColor={Colors.hint}
                   selectionColor={Colors.accent}
-                  style={[styles.input, { flex: 1 }]}
+                  className="flex-1 font-sans text-[15px] text-primary"
                   secureTextEntry={!showConfirm}
                   returnKeyType="done"
                   onSubmitEditing={handleSubmit}
@@ -144,21 +138,35 @@ export default function ResetPasswordScreen() {
                   onPress={() => setShowConfirm((v) => !v)}
                   hitSlop={10}
                 >
-                  <Ionicons
-                    name={showConfirm ? "eye-off-outline" : "eye-outline"}
-                    size={20}
-                    color={Colors.secondary}
-                  />
+                  {showConfirm ? (
+                    <EyeOff size={20} color={Colors.secondary} />
+                  ) : (
+                    <Eye size={20} color={Colors.secondary} />
+                  )}
                 </Pressable>
               </View>
             </View>
           </View>
 
-          {/* Error */}
+          {/* Error — recovery tokens are short-lived, and this screen has no
+              back button; without an escape hatch, a user landing here with
+              an expired/invalid link was stuck reading an error with no way
+              forward short of an OS back gesture or force-closing the app. */}
           {error && (
-            <Text className="font-sans text-[13px] text-accent mt-4 text-center">
-              {error}
-            </Text>
+            <>
+              <Text className="font-sans text-[13px] text-accent mt-4 text-center">
+                {error}
+              </Text>
+              <Pressable
+                className="mt-2"
+                onPress={() => router.replace(Routes.forgotPassword)}
+                hitSlop={8}
+              >
+                <Text className="font-sans-medium text-[13px] text-secondary text-center underline">
+                  {t("resetPassword.requestNewLink")}
+                </Text>
+              </Pressable>
+            </>
           )}
 
           {/* CTA */}
@@ -190,15 +198,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 40,
-  },
-  inputBorder: {
-    borderWidth: 1.5,
-    borderColor: Colors.elevated,
-  },
-  input: {
-    flex: 1,
-    fontFamily: "DMSans_400Regular",
-    fontSize: 15,
-    color: Colors.primary,
   },
 });

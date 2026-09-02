@@ -6,11 +6,18 @@ export interface PRVideo {
   id: string;
   pr_id: string;
   user_id: string;
+  /** Raw Storage path (bucket-relative) — needed to delete the object on retry */
+  video_path: string;
+  /** Raw Storage path (bucket-relative), null if no thumbnail was generated */
+  thumbnail_path: string | null;
   /** Full public URL — computed in the API layer from storage path */
   video_url: string;
   /** Full public URL or null if thumbnail generation failed */
   thumbnail_url: string | null;
   duration_sec: number | null;
+  /** Source video dimensions, captured at upload time — null on legacy rows */
+  video_width: number | null;
+  video_height: number | null;
   status: PRVideoStatus;
   created_at: string;
 }
@@ -18,7 +25,6 @@ export interface PRVideo {
 export interface ExerciseType {
   key: string;
   label: string;
-  icon: string;
   unit: ExerciseUnit;
 }
 

@@ -9,40 +9,43 @@ import { useCompeteStore } from '@/store/useCompeteStore';
 import { useSocialStore } from '@/store/useSocialStore';
 import type { ChallengeMetric } from '@/types/challenge';
 import { metricLabel } from '@/types/challenge';
-import { LeaderboardAvatar } from './LeaderboardAvatar';
+import { Avatar } from '@/components/ui/Avatar';
 import { ChallengeCard } from './ChallengeCard';
 import { InvitationCard } from './InvitationCard';
 import { CreateChallengeModal } from './CreateChallengeModal';
-import { cStyles, gStyles } from './styles';
 
 export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) {
   const { t } = useTranslation('compete');
-  const { user }    = useAuthStore();
-  const {
-    challenges,
-    loadingChallenges,
-    challengesError,
-    leaderboards,
-    pendingInvitations,
-    loadingInvitations,
-    exercises,
-    loadChallenges,
-    loadLeaderboard,
-    joinChallenge,
-    leaveChallenge,
-    loadPendingInvitations,
-    respondToInvitation,
-    createFriendChallenge,
-    loadExercises,
-  } = useCompeteStore();
+  const user = useAuthStore((s) => s.user);
+  // Per-field selectors — avoids re-rendering this tab on unrelated compete
+  // store changes (rivals loads, global leaderboard pages, etc.)
+  const challenges = useCompeteStore((s) => s.challenges);
+  const loadingChallenges = useCompeteStore((s) => s.loadingChallenges);
+  const challengesError = useCompeteStore((s) => s.challengesError);
+  const leaderboards = useCompeteStore((s) => s.leaderboards);
+  const pendingInvitations = useCompeteStore((s) => s.pendingInvitations);
+  const loadingInvitations = useCompeteStore((s) => s.loadingInvitations);
+  const invitationsError = useCompeteStore((s) => s.invitationsError);
+  const exercises = useCompeteStore((s) => s.exercises);
+  const loadChallenges = useCompeteStore((s) => s.loadChallenges);
+  const loadLeaderboard = useCompeteStore((s) => s.loadLeaderboard);
+  const joinChallenge = useCompeteStore((s) => s.joinChallenge);
+  const leaveChallenge = useCompeteStore((s) => s.leaveChallenge);
+  const loadPendingInvitations = useCompeteStore((s) => s.loadPendingInvitations);
+  const respondToInvitation = useCompeteStore((s) => s.respondToInvitation);
+  const createFriendChallenge = useCompeteStore((s) => s.createFriendChallenge);
+  const loadExercises = useCompeteStore((s) => s.loadExercises);
+  const subscribeToInvitationEvents = useCompeteStore((s) => s.subscribeToInvitationEvents);
 
-  const { friends, loadFriends } = useSocialStore();
+  const friends = useSocialStore((s) => s.friends);
+  const loadFriends = useSocialStore((s) => s.loadFriends);
 
   const [joiningId,    setJoiningId]    = useState<string | null>(null);
   const [invLoading,   setInvLoading]   = useState<string | null>(null);
   const [showModal,    setShowModal]    = useState(false);
   const [creating,     setCreating]     = useState(false);
   const [createError,  setCreateError]  = useState<string | null>(null);
+  const [actionError,  setActionError]  = useState<string | null>(null);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -59,17 +62,35 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
     });
   }, [challenges, leaderboards, loadLeaderboard, user?.id]);
 
+  // Live-update pending invitations while this tab is mounted — previously
+  // a new invite only appeared after a manual refresh or remount.
+  useEffect(() => {
+    if (!user?.id) return;
+    return subscribeToInvitationEvents(user.id);
+    // subscribeToInvitationEvents is a stable Zustand action
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
   const handleJoin = async (challengeId: string) => {
     if (!user?.id) return;
     setJoiningId(challengeId);
-    await joinChallenge(challengeId, user.id);
+    setActionError(null);
+    const { error } = await joinChallenge(challengeId, user.id);
     setJoiningId(null);
+    if (error) setActionError(error);
     onDetailChange?.();
   };
 
   const handleLeave = async (challengeId: string) => {
     if (!user?.id) return;
-    await leaveChallenge(challengeId, user.id);
+    // Same in-flight guard as handleJoin — without it, "Leave" stayed fully
+    // interactive during the request (no spinner, no disabling) and a rapid
+    // double-tap could fire two DELETE requests.
+    setJoiningId(challengeId);
+    setActionError(null);
+    const { error } = await leaveChallenge(challengeId, user.id);
+    setJoiningId(null);
+    if (error) setActionError(error);
     onDetailChange?.();
   };
 
@@ -78,8 +99,10 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
   ) => {
     if (!user?.id) return;
     setInvLoading(invId);
-    await respondToInvitation(invId, chalId, user.id, response);
+    setActionError(null);
+    const { error } = await respondToInvitation(invId, chalId, user.id, response);
     setInvLoading(null);
+    if (error) setActionError(error);
     onDetailChange?.();
   };
 
@@ -110,7 +133,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
 
   if (loadingChallenges && challenges.length === 0) {
     return (
-      <View style={{ alignItems: 'center', paddingVertical: 60 }}>
+      <View className="items-center py-16">
         <ActivityIndicator color={Colors.accent} />
       </View>
     );
@@ -118,15 +141,17 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
 
   if (challengesError && challenges.length === 0) {
     return (
-      <View style={[gStyles.errorCard, { marginTop: 24 }]}>
+      <View className="items-center bg-[rgba(230,48,48,0.06)] rounded-2xl border border-[rgba(230,48,48,0.2)] py-7 px-5 gap-2 mt-6">
         <AlertCircle size={22} strokeWidth={1.6} color={Colors.accent} />
-        <Text style={gStyles.errorText}>{t('challenges.loadError')}</Text>
+        <Text className="font-sans text-[13px] text-secondary">{t('challenges.loadError')}</Text>
         <Pressable
           onPress={() => user?.id && loadChallenges(user.id)}
-          style={gStyles.retryBtn}
+          className="flex-row items-center gap-1.5 mt-1 bg-accent py-2 px-4 rounded-[10px]"
         >
-          <RefreshCw size={13} strokeWidth={2} color="#fff" />
-          <Text style={gStyles.retryText}>{t('challenges.retry')}</Text>
+          <RefreshCw size={13} strokeWidth={2} color={Colors.primary} />
+          <Text className="font-heading text-xs tracking-[2px] text-white">
+            {t('challenges.retry')}
+          </Text>
         </Pressable>
       </View>
     );
@@ -136,12 +161,34 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
     <>
       <View style={{ height: 16 }} />
 
+      {!!actionError && (
+        <View className="flex-row items-center gap-2 bg-[rgba(230,48,48,0.1)] rounded-[10px] p-3 mb-3">
+          <AlertCircle size={14} strokeWidth={2} color={Colors.accent} />
+          <Text className="font-sans text-[13px] text-accent flex-1">{actionError}</Text>
+        </View>
+      )}
+
       {/* ── Pending Invitations ─────────────────────────────────────── */}
-      {(pendingInvitations.length > 0 || loadingInvitations) && (
+      {(pendingInvitations.length > 0 || loadingInvitations || invitationsError) && (
         <>
-          <Text style={cStyles.sectionLabel}>{t('challenges.pendingInvitations')}</Text>
+          <Text className="font-heading text-[11px] tracking-[3px] text-muted mb-2.5">
+            {t('challenges.pendingInvitations')}
+          </Text>
           {loadingInvitations ? (
             <ActivityIndicator color={Colors.accent} style={{ marginBottom: 16 }} />
+          ) : invitationsError && pendingInvitations.length === 0 ? (
+            // A failed fetch previously just made this whole section vanish
+            // with no trace — indistinguishable from "no invitations".
+            <Pressable
+              onPress={() => user?.id && loadPendingInvitations(user.id)}
+              className="flex-row items-center gap-2 bg-[rgba(230,48,48,0.06)] border border-[rgba(230,48,48,0.2)] rounded-2xl py-3 px-4 mb-3.5"
+            >
+              <AlertCircle size={14} strokeWidth={2} color={Colors.accent} />
+              <Text className="font-sans text-[13px] text-secondary flex-1">
+                {t('challenges.invitationsLoadError')}
+              </Text>
+              <RefreshCw size={13} strokeWidth={2} color={Colors.accent} />
+            </Pressable>
           ) : (
             pendingInvitations.map(inv => (
               <InvitationCard
@@ -159,7 +206,9 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
       {/* ── Admin / Global Challenges ───────────────────────────────── */}
       {adminChallenges.length > 0 && (
         <>
-          <Text style={cStyles.sectionLabel}>{t('challenges.activeChallenges')}</Text>
+          <Text className="font-heading text-[11px] tracking-[3px] text-muted mb-2.5">
+            {t('challenges.activeChallenges')}
+          </Text>
           {adminChallenges.map(ch => (
             <ChallengeCard
               key={ch.id}
@@ -177,7 +226,9 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
       {/* ── Friend Challenges ───────────────────────────────────────── */}
       {friendChallenges.length > 0 && (
         <>
-          <Text style={cStyles.sectionLabel}>{t('challenges.friendChallenges')}</Text>
+          <Text className="font-heading text-[11px] tracking-[3px] text-muted mb-2.5">
+            {t('challenges.friendChallenges')}
+          </Text>
           {friendChallenges.map(ch => (
             <ChallengeCard
               key={ch.id}
@@ -194,34 +245,43 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
 
       {/* ── Empty state ─────────────────────────────────────────────── */}
       {!loadingChallenges && challenges.length === 0 && (
-        <View style={[gStyles.emptyCard, { marginTop: 0 }]}>
+        <View className="items-center bg-surface rounded-2xl py-12 px-5 gap-2">
           <Zap size={32} strokeWidth={1.4} color="#333" />
-          <Text style={gStyles.emptyTitle}>{t('challenges.emptyTitle')}</Text>
-          <Text style={gStyles.emptySub}>{t('challenges.emptySub')}</Text>
+          <Text className="font-heading text-lg tracking-[2px] text-white">
+            {t('challenges.emptyTitle')}
+          </Text>
+          <Text className="font-sans text-[13px] text-muted">{t('challenges.emptySub')}</Text>
         </View>
       )}
 
       {/* ── Challenge a Friend ──────────────────────────────────────── */}
-      <View style={[cStyles.card, { borderColor: '#2a2a2a', marginTop: 4 }]}>
-        <View style={cStyles.friendHeader}>
+      <View className="bg-surface rounded-2xl py-4 px-[18px] mb-3 mt-1 border border-default">
+        <View className="flex-row items-center gap-2.5 mb-1">
           <Swords size={17} strokeWidth={1.6} color={Colors.accent} />
-          <Text style={cStyles.friendTitle}>{t('challenges.challengeFriendTitle')}</Text>
+          <Text className="font-heading text-sm tracking-[2px] text-white">
+            {t('challenges.challengeFriendTitle')}
+          </Text>
         </View>
-        <Text style={cStyles.friendSubtitle}>{t('challenges.challengeFriendSub')}</Text>
+        <Text className="font-sans text-xs text-muted mb-3.5">
+          {t('challenges.challengeFriendSub')}
+        </Text>
 
         {friends.length > 0 && (
-          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+          <View className="flex-row gap-2 mb-3.5 flex-wrap">
             {friends.slice(0, 6).map(f => (
-              <LeaderboardAvatar
+              <Avatar
                 key={f.id}
-                id={f.id}
+                userId={f.id}
                 name={f.full_name ?? f.username ?? '?'}
+                avatarUrl={f.avatar_url}
                 size={36}
               />
             ))}
             {friends.length > 6 && (
-              <View style={cStyles.moreCount}>
-                <Text style={cStyles.moreCountText}>{t('challenges.moreCount', { count: friends.length - 6 })}</Text>
+              <View className="w-9 h-9 rounded-full bg-[#252525] border border-default items-center justify-center">
+                <Text className="font-heading text-[11px] text-muted">
+                  {t('challenges.moreCount', { count: friends.length - 6 })}
+                </Text>
               </View>
             )}
           </View>
@@ -230,19 +290,25 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
         <Pressable
           onPress={() => setShowModal(true)}
           disabled={friends.length === 0}
-          style={[
-            { borderRadius: 14, overflow: 'hidden' },
-            friends.length === 0 && { opacity: 0.35 },
-          ]}
+          className={`rounded-2xl overflow-hidden ${friends.length === 0 ? 'opacity-35' : ''}`}
         >
           <LinearGradient
             colors={['rgba(230,48,48,0.14)', 'rgba(230,48,48,0.06)']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={cStyles.challengeFriendBtn}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              paddingVertical: 13,
+              borderRadius: 14,
+              borderWidth: 1,
+              borderColor: 'rgba(230,48,48,0.25)',
+            }}
           >
             <Swords size={14} strokeWidth={1.8} color={Colors.accent} />
-            <Text style={cStyles.challengeFriendBtnText}>
+            <Text className="font-heading text-xs tracking-[2px] text-accent">
               {friends.length === 0 ? t('challenges.addFriendsFirst') : t('challenges.challengeFriendBtn')}
             </Text>
           </LinearGradient>

@@ -3,6 +3,8 @@
     "brand": "GYM RIVAL",
     "pageLabel": "PROFIEL"
   },
+  "loadErrorSub": "Kon je profiel niet laden. Controleer je verbinding en probeer het opnieuw.",
+  "retry": "OPNIEUW",
   "proUpsell": "UPGRADE NAAR PRO — €4,99/MND",
   "proActive": "PRO-LID — TIK OM UIT TE SCHAKELEN",
   "details": {
@@ -26,13 +28,24 @@
   "settings": {
     "title": "INSTELLINGEN",
     "notifications": "Meldingen",
-    "notificationsSub": "Pushmeldingen aan",
-    "privacy": "Privacy",
-    "privacySub": "Profiel zichtbaar voor vrienden",
-    "darkMode": "Donkere modus",
-    "darkModeOn": "Aan",
+    "notificationsSub": "Likes, berichten en vriendschapsverzoeken",
+    "changePassword": "Wachtwoord wijzigen",
+    "changePasswordSub": "Werk je accountwachtwoord bij",
     "shareProfile": "Profiel delen",
-    "shareProfileSub": "Kopieer je link"
+    "shareProfileSub": "Binnenkort beschikbaar"
+  },
+  "changePassword": {
+    "title": "WACHTWOORD WIJZIGEN",
+    "newPasswordLabel": "NIEUW WACHTWOORD",
+    "newPasswordPlaceholder": "Min. 8 tekens",
+    "passwordHint": "Gebruik 8 of meer tekens.",
+    "confirmPasswordLabel": "BEVESTIG WACHTWOORD",
+    "confirmPasswordPlaceholder": "Herhaal je wachtwoord",
+    "passwordMismatch": "Wachtwoorden komen niet overeen.",
+    "submit": "WACHTWOORD BIJWERKEN",
+    "successTitle": "Wachtwoord bijgewerkt",
+    "successMsg": "Je wachtwoord is gewijzigd.",
+    "errorTitle": "Wachtwoord kon niet worden bijgewerkt"
   },
   "logOut": "UITLOGGEN",
   "edit": {
@@ -56,7 +69,17 @@
     "invalidWeightMsg": "Voer een geldig gewicht in kg in.",
     "invalidHeightTitle": "Ongeldige lengte",
     "invalidHeightMsg": "Voer een geldige lengte in cm in.",
-    "saveErrorTitle": "Opslaan mislukt"
+    "saveErrorTitle": "Opslaan mislukt",
+    "usernameTakenError": "Die gebruikersnaam is al bezet. Kies een andere.",
+    "saveErrorGeneric": "Er is iets misgegaan. Controleer je verbinding en probeer het opnieuw.",
+    "changePhotoTitle": "Foto wijzigen",
+    "takePhoto": "Foto maken",
+    "chooseFromLibrary": "Kiezen uit bibliotheek",
+    "removePhoto": "Foto verwijderen",
+    "photoPermissionTitle": "Toestemming nodig",
+    "photoPermissionMsg": "Geef toegang tot je camera of fotobibliotheek om een profielfoto in te stellen.",
+    "uploadErrorTitle": "Foto uploaden mislukt",
+    "uploadErrorMsg": "Er is iets misgegaan. Controleer je verbinding en probeer het opnieuw."
   },
   "badges": {
     "title": "BADGES",
@@ -86,7 +109,13 @@
     "title": "PR-GESCHIEDENIS",
     "best": "Beste: {{value}} {{unit}}",
     "emptyTitle": "NOG GEEN PR'S",
-    "emptySub": "Log je eerste PR om je voortgang bij te houden"
+    "emptySub": "Log je eerste PR om je voortgang bij te houden",
+    "deleteA11y": "PR verwijderen",
+    "deleteConfirmTitle": "Deze PR verwijderen?",
+    "deleteConfirmMsg": "Dit verwijdert hem uit je geschiedenis, de feed en de ranglijsten. Dit kan niet ongedaan worden gemaakt.",
+    "deleteConfirmCta": "Verwijderen",
+    "deleteErrorTitle": "PR kon niet worden verwijderd",
+    "deleteErrorMsg": "Er is iets misgegaan. Probeer het opnieuw."
   },
   "notifications": {
     "title": "MELDINGEN",

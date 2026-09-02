@@ -3,6 +3,8 @@
     "brand": "GYM RIVAL",
     "pageLabel": "PERFIL"
   },
+  "loadErrorSub": "No se pudo cargar tu perfil. Comprueba tu conexión e inténtalo de nuevo.",
+  "retry": "REINTENTAR",
   "proUpsell": "HAZTE PRO — 4,99 €/MES",
   "proActive": "MIEMBRO PRO — TOCA PARA DESACTIVAR",
   "details": {
@@ -26,13 +28,24 @@
   "settings": {
     "title": "AJUSTES",
     "notifications": "Notificaciones",
-    "notificationsSub": "Notificaciones push activadas",
-    "privacy": "Privacidad",
-    "privacySub": "Perfil visible para amigos",
-    "darkMode": "Modo oscuro",
-    "darkModeOn": "Activado",
+    "notificationsSub": "Me gusta, mensajes y solicitudes de amistad",
+    "changePassword": "Cambiar contraseña",
+    "changePasswordSub": "Actualiza la contraseña de tu cuenta",
     "shareProfile": "Compartir perfil",
-    "shareProfileSub": "Copiar tu enlace"
+    "shareProfileSub": "Próximamente"
+  },
+  "changePassword": {
+    "title": "CAMBIAR CONTRASEÑA",
+    "newPasswordLabel": "NUEVA CONTRASEÑA",
+    "newPasswordPlaceholder": "Mín. 8 caracteres",
+    "passwordHint": "Usa 8 caracteres o más.",
+    "confirmPasswordLabel": "CONFIRMAR CONTRASEÑA",
+    "confirmPasswordPlaceholder": "Repite tu contraseña",
+    "passwordMismatch": "Las contraseñas no coinciden.",
+    "submit": "ACTUALIZAR CONTRASEÑA",
+    "successTitle": "Contraseña actualizada",
+    "successMsg": "Tu contraseña ha sido cambiada.",
+    "errorTitle": "No se pudo actualizar la contraseña"
   },
   "logOut": "CERRAR SESIÓN",
   "edit": {
@@ -56,7 +69,17 @@
     "invalidWeightMsg": "Introduce un peso válido en kg.",
     "invalidHeightTitle": "Altura no válida",
     "invalidHeightMsg": "Introduce una altura válida en cm.",
-    "saveErrorTitle": "No se pudo guardar"
+    "saveErrorTitle": "No se pudo guardar",
+    "usernameTakenError": "Ese nombre de usuario ya está en uso. Elige otro.",
+    "saveErrorGeneric": "Algo salió mal. Comprueba tu conexión e inténtalo de nuevo.",
+    "changePhotoTitle": "Cambiar foto",
+    "takePhoto": "Tomar foto",
+    "chooseFromLibrary": "Elegir de la galería",
+    "removePhoto": "Eliminar foto",
+    "photoPermissionTitle": "Permiso necesario",
+    "photoPermissionMsg": "Permite el acceso a tu cámara o galería de fotos para establecer una foto de perfil.",
+    "uploadErrorTitle": "No se pudo subir la foto",
+    "uploadErrorMsg": "Algo salió mal. Comprueba tu conexión e inténtalo de nuevo."
   },
   "badges": {
     "title": "INSIGNIAS",
@@ -86,7 +109,13 @@
     "title": "HISTORIAL DE PRs",
     "best": "Mejor: {{value}} {{unit}}",
     "emptyTitle": "AÚN NO HAY PRs",
-    "emptySub": "Registra tu primer PR para empezar a seguir tu progreso"
+    "emptySub": "Registra tu primer PR para empezar a seguir tu progreso",
+    "deleteA11y": "Eliminar PR",
+    "deleteConfirmTitle": "¿Eliminar este PR?",
+    "deleteConfirmMsg": "Se eliminará de tu historial, del feed y de las clasificaciones. No se puede deshacer.",
+    "deleteConfirmCta": "Eliminar",
+    "deleteErrorTitle": "No se pudo eliminar el PR",
+    "deleteErrorMsg": "Algo salió mal. Inténtalo de nuevo."
   },
   "notifications": {
     "title": "NOTIFICACIONES",

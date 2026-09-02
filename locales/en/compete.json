@@ -22,7 +22,9 @@
   "rivals": {
     "emptyTitle": "NO RIVALS YET",
     "emptySub": "Add friends to compete on the leaderboard",
-    "footerNote": "BASED ON PERSONAL RECORDS"
+    "footerNote": "BASED ON PERSONAL RECORDS",
+    "loadError": "Could not load leaderboard",
+    "retry": "RETRY"
   },
   "card": {
     "joined": "{{count}} joined",
@@ -60,6 +62,7 @@
   "challenges": {
     "loadError": "Could not load challenges",
     "retry": "RETRY",
+    "invitationsLoadError": "Could not load your invitations",
     "pendingInvitations": "PENDING INVITATIONS",
     "activeChallenges": "ACTIVE CHALLENGES",
     "friendChallenges": "FRIEND CHALLENGES",
@@ -78,6 +81,7 @@
     "totalKg": "TOTAL KG",
     "searchPlaceholder": "Search by name or @username...",
     "loadError": "Could not load leaderboard",
+    "myRankLoadError": "Could not load your rank",
     "retry": "RETRY",
     "yourGlobalRank": "YOUR GLOBAL RANK",
     "unrankedTitle": "YOU'RE UNRANKED",
@@ -93,6 +97,9 @@
   "detail": {
     "heading": "CHALLENGE",
     "notFound": "Challenge not found",
+    "loadError": "Could not load this challenge",
+    "leaderboardError": "Could not load leaderboard",
+    "retry": "RETRY",
     "endsIn": "ENDS IN",
     "participants": "PARTICIPANTS",
     "xpReward": "XP REWARD",

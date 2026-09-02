@@ -1,0 +1,115 @@
+{
+  "tabs": {
+    "rivals": { "label": "Rivaux", "subtitle": "RIVAUX" },
+    "challenges": { "label": "Défis", "subtitle": "DÉFIS" },
+    "global": { "label": "Global", "subtitle": "CLASSEMENT MONDIAL" }
+  },
+  "you": "TOI",
+  "unknown": "Inconnu",
+  "youSuffix": " (Toi)",
+  "lvl": "NIV {{level}}",
+  "metric": {
+    "highestPr": "Record le plus élevé",
+    "mostImproved": "Meilleure progression",
+    "totalVolume": "Volume total"
+  },
+  "endsIn": {
+    "ended": "Terminé",
+    "days": "{{count}}j restants",
+    "hours": "{{count}}h restantes",
+    "minutes": "{{count}}min restantes"
+  },
+  "rivals": {
+    "emptyTitle": "AUCUN RIVAL POUR L'INSTANT",
+    "emptySub": "Ajoute des amis pour rivaliser au classement",
+    "footerNote": "BASÉ SUR LES RECORDS PERSONNELS",
+    "loadError": "Impossible de charger le classement",
+    "retry": "RÉESSAYER"
+  },
+  "card": {
+    "joined": "{{count}} inscrits",
+    "yourRank": "Ton rang : #{{rank}}",
+    "joinedBtn": "REJOINT",
+    "joinBtn": "REJOINDRE",
+    "viewAll": "TOUT VOIR"
+  },
+  "invitation": {
+    "defaultTitle": "Invitation au défi",
+    "someone": "Quelqu'un",
+    "challengedYou": "{{name}} t'a défié",
+    "accept": "ACCEPTER",
+    "decline": "REFUSER"
+  },
+  "modal": {
+    "title": "DÉFI",
+    "challengeLabel": "DÉFI",
+    "change": "CHANGER",
+    "searchFriendsPlaceholder": "Rechercher des amis...",
+    "noFriends": "Ajoute des amis avant de les défier",
+    "noMatchingFriends": "Aucun ami correspondant",
+    "friend": "Ami",
+    "exercise": "EXERCICE",
+    "metric": "MÉTRIQUE",
+    "duration": "DURÉE",
+    "sendChallenge": "ENVOYER LE DÉFI",
+    "durationOptions": {
+      "3d": "3 jours",
+      "1w": "1 semaine",
+      "2w": "2 semaines",
+      "1m": "1 mois"
+    }
+  },
+  "challenges": {
+    "loadError": "Impossible de charger les défis",
+    "retry": "RÉESSAYER",
+    "invitationsLoadError": "Impossible de charger tes invitations",
+    "pendingInvitations": "INVITATIONS EN ATTENTE",
+    "activeChallenges": "DÉFIS ACTIFS",
+    "friendChallenges": "DÉFIS ENTRE AMIS",
+    "emptyTitle": "AUCUN DÉFI ACTIF",
+    "emptySub": "Reviens bientôt — ou défie un ami ci-dessous !",
+    "challengeFriendTitle": "DÉFIER UN AMI",
+    "challengeFriendSub": "Choisis un ami et fixe les règles",
+    "moreCount": "+{{count}}",
+    "addFriendsFirst": "AJOUTE DES AMIS D'ABORD",
+    "challengeFriendBtn": "DÉFIER UN AMI"
+  },
+  "global": {
+    "statBench": "DÉVELOPPÉ",
+    "statSquat": "SQUAT",
+    "statDead": "SOULEVÉ",
+    "totalKg": "TOTAL KG",
+    "searchPlaceholder": "Rechercher par nom ou @pseudo...",
+    "loadError": "Impossible de charger le classement",
+    "retry": "RÉESSAYER",
+    "myRankLoadError": "Impossible de charger ton rang",
+    "yourGlobalRank": "TON RANG MONDIAL",
+    "unrankedTitle": "TU N'ES PAS CLASSÉ",
+    "unrankedSub": "Enregistre un record au développé couché, squat et soulevé de terre pour rejoindre le classement mondial",
+    "noResultsTitle": "AUCUN RÉSULTAT",
+    "noResultsSub": "Essaie un autre nom ou pseudo",
+    "noAthletesTitle": "AUCUN ATHLÈTE POUR L'INSTANT",
+    "noAthletesSub": "Sois le premier à enregistrer un record au développé couché, squat et soulevé de terre !",
+    "loadMore": "CHARGER PLUS",
+    "refresh": "ACTUALISER",
+    "footerNote": "BASÉ SUR LE TOTAL DÉVELOPPÉ · SQUAT · SOULEVÉ DE TERRE"
+  },
+  "detail": {
+    "heading": "DÉFI",
+    "notFound": "Défi introuvable",
+    "loadError": "Impossible de charger ce défi",
+    "leaderboardError": "Impossible de charger le classement",
+    "retry": "RÉESSAYER",
+    "endsIn": "SE TERMINE DANS",
+    "participants": "PARTICIPANTS",
+    "xpReward": "RÉCOMPENSE XP",
+    "prize": "PRIX",
+    "leaderboard": "CLASSEMENT",
+    "noParticipants": "Aucun participant pour l'instant",
+    "beFirst": "Sois le premier à rejoindre !",
+    "refresh": "ACTUALISER",
+    "joinedTapToLeave": "REJOINT — APPUIE POUR QUITTER",
+    "joinChallenge": "REJOINDRE LE DÉFI",
+    "challengeEnded": "DÉFI TERMINÉ"
+  }
+}

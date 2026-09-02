@@ -8,8 +8,10 @@ const FEED_SELECT = `
   profiles!personal_records_user_id_fkey(full_name, username, avatar_url, level, gym),
   exercise_types!personal_records_exercise_key_fkey(label, unit),
   pr_likes(id, user_id),
-  pr_videos(id, user_id, video_path, thumbnail_path, duration_sec, status, created_at)
+  pr_videos(id, user_id, video_path, thumbnail_path, duration_sec, video_width, video_height, status, created_at)
 ` as const;
+
+export const FEED_PAGE_SIZE = 20;
 
 function mapFeedRow(row: any, currentUserId: string): FeedPost {
   // PostgREST returns an array for most reverse-FK joins, but returns a single object
@@ -20,11 +22,15 @@ function mapFeedRow(row: any, currentUserId: string): FeedPost {
         id: videoRow.id,
         pr_id: row.id,
         user_id: videoRow.user_id,
+        video_path: videoRow.video_path,
+        thumbnail_path: videoRow.thumbnail_path ?? null,
         video_url: getPRVideoPublicUrl(videoRow.video_path),
         thumbnail_url: videoRow.thumbnail_path
           ? getPRVideoPublicUrl(videoRow.thumbnail_path)
           : null,
         duration_sec: videoRow.duration_sec ?? null,
+        video_width: videoRow.video_width ?? null,
+        video_height: videoRow.video_height ?? null,
         status: videoRow.status as PRVideoStatus,
         created_at: videoRow.created_at,
       }
@@ -56,25 +62,39 @@ function mapFeedRow(row: any, currentUserId: string): FeedPost {
 /**
  * Fetch the social feed: the most recent PRs from the current user and their
  * accepted friends, enriched with author profiles and like counts.
+ *
+ * Pagination is keyset-based on created_at (`before` = the created_at of the
+ * oldest post already loaded). Keyset cursors stay stable when realtime events
+ * prepend new posts, unlike offset ranges. Two posts sharing an exact
+ * created_at across a page boundary could be dropped or duplicated; duplicates
+ * are deduped by id in the store, and the drop risk is negligible for this
+ * data shape.
  */
 export async function fetchFeed(
   currentUserId: string,
   participantIds: string[],
-  limit = 50
-): Promise<{ data: FeedPost[]; error: string | null }> {
-  if (participantIds.length === 0) return { data: [], error: null };
+  opts: { limit?: number; before?: string } = {}
+): Promise<{ data: FeedPost[]; hasMore: boolean; error: string | null }> {
+  const limit = opts.limit ?? FEED_PAGE_SIZE;
+  if (participantIds.length === 0) return { data: [], hasMore: false, error: null };
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("personal_records")
     .select(FEED_SELECT)
     .in("user_id", participantIds)
     .order("created_at", { ascending: false })
     .limit(limit);
 
-  if (error) return { data: [], error: error.message };
+  if (opts.before) query = query.lt("created_at", opts.before);
 
+  const { data, error } = await query;
+
+  if (error) return { data: [], hasMore: false, error: error.message };
+
+  const rows = data ?? [];
   return {
-    data: (data ?? []).map((row: any) => mapFeedRow(row, currentUserId)),
+    data: rows.map((row: any) => mapFeedRow(row, currentUserId)),
+    hasMore: rows.length === limit,
     error: null,
   };
 }

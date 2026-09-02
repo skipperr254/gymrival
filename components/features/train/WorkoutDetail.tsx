@@ -1,13 +1,13 @@
-import { View, Text, Pressable } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, Pressable, ActivityIndicator } from 'react-native';
+import { Dumbbell, Activity, Check, Zap, Trophy, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import type { TrainingSessionWithExercises } from '@/types/train';
-import { styles } from './styles';
 
 interface WorkoutDetailProps {
   session: TrainingSessionWithExercises;
   workoutStarted: boolean;
+  starting: boolean;
   completedSets: Record<string, boolean>;
   totalSets: number;
   doneSets: number;
@@ -21,6 +21,7 @@ interface WorkoutDetailProps {
 export function WorkoutDetail({
   session,
   workoutStarted,
+  starting,
   completedSets,
   totalSets,
   doneSets,
@@ -40,14 +41,16 @@ export function WorkoutDetail({
   return (
     <>
       {/* Detail header card */}
-      <View style={styles.detailCard}>
-        <View style={styles.detailCardTop}>
-          <View style={styles.detailIconWrap}>
-            <Ionicons name="barbell" size={26} color={Colors.accent} />
+      <View className="bg-black rounded-[20px] p-5 mb-3.5">
+        <View className="flex-row items-center gap-3.5 mb-3">
+          <View className="w-[50px] h-[50px] rounded-2xl bg-[rgba(230,48,48,0.12)] border border-[rgba(230,48,48,0.25)] items-center justify-center">
+            <Dumbbell size={26} color={Colors.accent} />
           </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.detailName}>{session.name.toUpperCase()}</Text>
-            <Text style={styles.detailMeta}>
+          <View className="flex-1">
+            <Text className="font-heading text-2xl tracking-[3px] text-primary" numberOfLines={1}>
+              {session.name.toUpperCase()}
+            </Text>
+            <Text className="font-sans text-xs text-secondary tracking-[2px]">
               {t('detailMeta', { day: sessionDay(session).toUpperCase(), count: session.exercises.length })}
             </Text>
           </View>
@@ -55,12 +58,16 @@ export function WorkoutDetail({
 
         {workoutStarted && (
           <>
-            <View style={styles.progressRow}>
-              <Text style={styles.progressLabel}>{t('progressLabel')}</Text>
-              <Text style={styles.progressLabel}>{t('setsProgress', { done: doneSets, total: totalSets })}</Text>
+            <View className="flex-row justify-between mb-1.5">
+              <Text className="font-heading text-[11px] tracking-[1px] text-muted">
+                {t('progressLabel')}
+              </Text>
+              <Text className="font-heading text-[11px] tracking-[1px] text-muted">
+                {t('setsProgress', { done: doneSets, total: totalSets })}
+              </Text>
             </View>
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { flex: doneSets }]} />
+            <View className="h-1 bg-white/[0.08] rounded overflow-hidden flex-row">
+              <View className="bg-accent rounded" style={{ flex: doneSets }} />
               <View style={{ flex: Math.max(totalSets - doneSets, 0) }} />
             </View>
           </>
@@ -69,48 +76,58 @@ export function WorkoutDetail({
 
       {/* Exercise list */}
       {session.exercises.map((ex, i) => (
-        <View key={ex.id} style={styles.exCard}>
-          <View style={[styles.exCardTop, workoutStarted && { marginBottom: 12 }]}>
-            <View style={[styles.exIcon, workoutStarted && styles.exIconActive]}>
-              <Ionicons
-                name="pulse"
+        <View key={ex.id} className="bg-surface rounded-2xl py-3.5 px-4 mb-2.5">
+          <View className={`flex-row items-center gap-3 ${workoutStarted ? 'mb-3' : ''}`}>
+            <View
+              className={`w-[42px] h-[42px] rounded-xl items-center justify-center border ${
+                workoutStarted
+                  ? 'bg-[rgba(230,48,48,0.1)] border-[rgba(230,48,48,0.3)]'
+                  : 'bg-base border-default'
+              }`}
+            >
+              <Activity
                 size={18}
                 color={workoutStarted ? Colors.accent : Colors.muted}
               />
             </View>
-            <View style={styles.exInfo}>
-              <Text style={styles.exName}>{ex.exercise_name}</Text>
-              <Text style={styles.exMeta}>
+            <View className="flex-1">
+              <Text className="font-sans-semibold text-[15px] text-primary mb-0.5" numberOfLines={1}>
+                {ex.exercise_name}
+              </Text>
+              <Text className="font-sans text-xs text-muted">
                 {(ex.target_weight ?? 0) > 0
                   ? t('exerciseMetaWithWeight', { sets: ex.sets, reps: ex.reps, weight: ex.target_weight })
                   : t('exerciseMeta', { sets: ex.sets, reps: ex.reps })}
               </Text>
             </View>
             {!workoutStarted && (
-              <View style={styles.exBadge}>
-                <Text style={styles.exBadgeText}>{`${ex.sets}×${ex.reps}`}</Text>
+              <View className="bg-base border border-default rounded-[10px] py-1.5 px-3">
+                <Text className="font-heading text-[17px] text-primary">{`${ex.sets}×${ex.reps}`}</Text>
               </View>
             )}
           </View>
 
           {workoutStarted && (
-            <View style={styles.setsRow}>
+            <View className="flex-row gap-2">
               {Array.from({ length: ex.sets }).map((_, j) => {
                 const done = !!completedSets[`${i}-${j}`];
                 return (
                   <Pressable
                     key={j}
-                    style={({ pressed }) => [
-                      styles.setBtn,
-                      done && styles.setBtnDone,
-                      pressed && { opacity: 0.7 },
-                    ]}
+                    className={`flex-1 py-2.5 px-1.5 rounded-[10px] items-center justify-center border-[1.5px] ${
+                      done
+                        ? 'border-accent bg-[rgba(230,48,48,0.12)]'
+                        : 'border-default bg-base'
+                    }`}
+                    style={({ pressed }) => pressed && { opacity: 0.7 }}
                     onPress={() => onToggleSet(i, j)}
                   >
                     {done ? (
-                      <Ionicons name="checkmark" size={14} color={Colors.accent} />
+                      <Check size={14} color={Colors.accent} />
                     ) : (
-                      <Text style={styles.setBtnLabel}>{t('setNumber', { n: j + 1 })}</Text>
+                      <Text className="font-heading text-[11px] tracking-[1px] text-muted">
+                        {t('setNumber', { n: j + 1 })}
+                      </Text>
                     )}
                   </Pressable>
                 );
@@ -123,31 +140,51 @@ export function WorkoutDetail({
       {/* CTAs */}
       {!workoutStarted ? (
         <Pressable
-          style={({ pressed }) => [styles.startBtn, pressed && { opacity: 0.85 }]}
+          className={`flex-row items-center justify-center gap-2.5 bg-accent rounded-2xl h-[52px] mt-1.5 ${
+            starting ? 'opacity-70' : ''
+          }`}
+          style={({ pressed }) => pressed && !starting && { opacity: 0.85 }}
           onPress={onStart}
+          disabled={starting}
         >
-          <Ionicons name="flash" size={18} color={Colors.primary} />
-          <Text style={styles.startBtnText}>{t('startWorkout')}</Text>
+          {starting ? (
+            <ActivityIndicator size="small" color={Colors.primary} />
+          ) : (
+            <>
+              <Zap size={18} color={Colors.primary} />
+              <Text className="font-heading text-[15px] tracking-[3px] text-primary">
+                {t('startWorkout')}
+              </Text>
+            </>
+          )}
         </Pressable>
       ) : allDone ? (
-        <View style={styles.doneCard}>
-          <Ionicons name="trophy" size={42} color={Colors.success} style={{ marginBottom: 12 }} />
-          <Text style={styles.doneTitle}>{t('workoutDone')}</Text>
-          <Text style={styles.doneSub}>{t('workoutDoneSub')}</Text>
+        <View className="bg-[#0a1f0a] border border-[#1a3a1a] rounded-2xl p-6 items-center mt-1.5">
+          <Trophy size={42} color={Colors.success} style={{ marginBottom: 12 }} />
+          <Text className="font-heading text-[22px] tracking-[3px] text-primary mb-1">
+            {t('workoutDone')}
+          </Text>
+          <Text className="font-sans text-[13px] text-muted mb-[18px]">{t('workoutDoneSub')}</Text>
           <Pressable
-            style={({ pressed }) => [styles.doneBtn, pressed && { opacity: 0.8 }]}
+            className="bg-accent rounded-xl py-3 px-7"
+            style={({ pressed }) => pressed && { opacity: 0.8 }}
             onPress={onFinish}
           >
-            <Text style={styles.doneBtnText}>{t('backToSchedule')}</Text>
+            <Text className="font-heading text-sm tracking-[2px] text-primary">
+              {t('backToSchedule')}
+            </Text>
           </Pressable>
         </View>
       ) : (
         <Pressable
-          style={({ pressed }) => [styles.cancelBtn, pressed && { opacity: 0.75 }]}
+          className="flex-row items-center justify-center gap-2 border-[1.5px] border-default rounded-2xl h-[52px] mt-1.5"
+          style={({ pressed }) => pressed && { opacity: 0.75 }}
           onPress={onCancel}
         >
-          <Ionicons name="close" size={15} color={Colors.muted} />
-          <Text style={styles.cancelBtnText}>{t('cancelWorkout')}</Text>
+          <X size={15} color={Colors.muted} />
+          <Text className="font-heading text-[13px] tracking-[2px] text-muted">
+            {t('cancelWorkout')}
+          </Text>
         </Pressable>
       )}
     </>

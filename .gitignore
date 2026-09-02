@@ -50,5 +50,8 @@ app-example
 /Tempgymrival-export*
 
 .mcp.json
+.agents/mcp_config.json
 
 todo.md
+
+audits

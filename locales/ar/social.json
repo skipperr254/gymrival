@@ -1,15 +1,10 @@
 {
-  "friendsStub": {
-    "back": "اجتماعي",
-    "title": "الأصدقاء",
-    "subtitle": "أضف منافسيك في النادي وأدرهم",
-    "comingSoon": "قريباً"
-  },
-  "tabs": {
-    "feed": { "label": "الخلاصة", "subtitle": "الخلاصة" },
-    "friends": { "label": "الأصدقاء", "subtitle": "الأصدقاء" },
-    "messages": { "label": "الرسائل", "subtitle": "الرسائل" }
-  },
+  "friendsTitle": "الأصدقاء",
+  "messagesTitle": "الرسائل",
+  "headerFriends": "الأصدقاء",
+  "headerMessages": "الرسائل",
+  "soundOn": "تشغيل الصوت",
+  "soundOff": "كتم الصوت",
   "you": "أنت",
   "athlete": "رياضي",
   "gym": "النادي",
@@ -17,12 +12,28 @@
   "levelShort": "المستوى {{level}}",
   "newPr": "رقم قياسي جديد",
   "videoUploading": "جارٍ رفع الفيديو…",
+  "videoFailed": "فشل رفع الفيديو",
   "likes": "إعجابات",
   "like": "إعجاب",
   "liked": "أعجبني",
   "yourPr": "رقمك القياسي",
+  "deletePr": {
+    "action": "حذف الرقم القياسي",
+    "confirmTitle": "حذف هذا الرقم القياسي؟",
+    "confirmMsg": "سيتم حذفه من الموجز وسجل أرقامك القياسية ولوحات المتصدرين. لا يمكن التراجع عن هذا الإجراء.",
+    "confirmCta": "حذف",
+    "errorTitle": "تعذّر حذف الرقم القياسي",
+    "errorMsg": "حدث خطأ ما. حاول مرة أخرى."
+  },
   "feedEmptyTitle": "لا يوجد نشاط بعد",
   "feedEmptySubtitle": "أضف أصدقاء وابدأ بتسجيل أرقامك القياسية لتنشيط الخلاصة.",
+  "retry": "إعادة المحاولة",
+  "videoLoadError": "تعذّر تحميل الفيديو",
+  "loadErrorFriends": "تعذّر تحميل أصدقائك",
+  "loadErrorRequests": "تعذّر تحميل الطلبات",
+  "loadErrorSearch": "فشل البحث",
+  "loadErrorMessages": "تعذّر تحميل رسائلك",
+  "loadErrorFeed": "تعذّر تحميل الخلاصة",
   "allCaughtUp": "لقد اطّلعت على كل شيء",
   "friendsSubTabs": {
     "friends": "الأصدقاء",
@@ -58,6 +69,8 @@
   "chat": {
     "cantOpen": "تعذّر فتح الدردشة",
     "errorSub": "حدث خطأ ما. حاول مرة أخرى لاحقاً.",
+    "loadError": "تعذّر تحميل الرسائل",
+    "retry": "إعادة المحاولة",
     "online": "متصل",
     "offline": "غير متصل",
     "startOfConversation": "بداية المحادثة",

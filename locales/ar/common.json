@@ -1,7 +1,12 @@
 {
   "settings": {
     "language": "اللغة",
-    "languageAuto": "اتباع لغة الجهاز"
+    "languageAuto": "اتباع لغة الجهاز",
+    "languageErrorTitle": "تعذّر حفظ اللغة",
+    "languageErrorSub": "لم تتم مزامنة اختيارك للغة — تحقق من اتصالك وحاول مرة أخرى.",
+    "languageConfirmTitle": "تغيير اللغة؟",
+    "languageConfirmSub": "سيُعاد تشغيل التطبيق للتبديل إلى {{language}}.",
+    "languageConfirmCta": "تغيير"
   },
   "actions": {
     "back": "رجوع",
@@ -19,6 +24,7 @@
     "profile": "الملف الشخصي"
   },
   "accessibility": {
-    "logActivity": "تسجيل نشاط"
+    "logActivity": "تسجيل نشاط",
+    "back": "رجوع"
   }
 }

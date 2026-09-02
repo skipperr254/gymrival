@@ -1,15 +1,10 @@
 {
-  "friendsStub": {
-    "back": "SOCIAL",
-    "title": "AMIGOS",
-    "subtitle": "Adiciona e gere os teus rivais de ginásio",
-    "comingSoon": "brevemente"
-  },
-  "tabs": {
-    "feed": { "label": "Feed", "subtitle": "FEED" },
-    "friends": { "label": "Amigos", "subtitle": "AMIGOS" },
-    "messages": { "label": "Mensagens", "subtitle": "MENSAGENS" }
-  },
+  "friendsTitle": "AMIGOS",
+  "messagesTitle": "MENSAGENS",
+  "headerFriends": "Amigos",
+  "headerMessages": "Mensagens",
+  "soundOn": "Ativar som",
+  "soundOff": "Desativar som",
   "you": "TU",
   "athlete": "Atleta",
   "gym": "Ginásio",
@@ -17,12 +12,28 @@
   "levelShort": "NV{{level}}",
   "newPr": "NOVO PR",
   "videoUploading": "A CARREGAR VÍDEO…",
+  "videoFailed": "VÍDEO FALHOU",
   "likes": "GOSTOS",
   "like": "GOSTO",
   "liked": "GOSTASTE",
   "yourPr": "O TEU PR",
+  "deletePr": {
+    "action": "Eliminar PR",
+    "confirmTitle": "Eliminar este PR?",
+    "confirmMsg": "Isto remove-o do feed, do teu histórico de PRs e das classificações. Esta ação não pode ser desfeita.",
+    "confirmCta": "Eliminar",
+    "errorTitle": "Não foi possível eliminar o PR",
+    "errorMsg": "Algo correu mal. Tenta novamente."
+  },
   "feedEmptyTitle": "AINDA SEM ATIVIDADE",
   "feedEmptySubtitle": "Adiciona amigos e regista PRs para dar vida ao feed.",
+  "retry": "TENTAR NOVAMENTE",
+  "videoLoadError": "Não foi possível carregar o vídeo",
+  "loadErrorFriends": "Não foi possível carregar os teus amigos",
+  "loadErrorRequests": "Não foi possível carregar os pedidos",
+  "loadErrorSearch": "Falha na pesquisa",
+  "loadErrorMessages": "Não foi possível carregar as tuas mensagens",
+  "loadErrorFeed": "Não foi possível carregar o feed",
   "allCaughtUp": "ESTÁS EM DIA",
   "friendsSubTabs": {
     "friends": "AMIGOS",
@@ -58,6 +69,8 @@
   "chat": {
     "cantOpen": "NÃO É POSSÍVEL ABRIR O CHAT",
     "errorSub": "Algo correu mal. Tenta novamente mais tarde.",
+    "loadError": "Não foi possível carregar as mensagens",
+    "retry": "TENTAR NOVAMENTE",
     "online": "Online",
     "offline": "Offline",
     "startOfConversation": "INÍCIO DA CONVERSA",

@@ -8,7 +8,8 @@
   "tabs": {
     "schedule": "PLAN",
     "checkin": "CHECK-IN",
-    "progress": "FORTSCHRITT"
+    "progress": "FORTSCHRITT",
+    "nutrition": "ERNÄHRUNG"
   },
   "days": {
     "full": { "0": "Montag", "1": "Dienstag", "2": "Mittwoch", "3": "Donnerstag", "4": "Freitag", "5": "Samstag", "6": "Sonntag" },
@@ -42,6 +43,10 @@
   "exercisesAdded_one": "{{count}} ÜBUNG HINZUGEFÜGT",
   "exercisesAdded_other": "{{count}} ÜBUNGEN HINZUGEFÜGT",
   "saveSchedule": "PLAN SPEICHERN",
+  "saveErrorTitle": "Speichern fehlgeschlagen",
+  "saveScheduleError": "Dieses Workout konnte nicht gespeichert werden. Überprüfe deine Verbindung und versuche es erneut.",
+  "finishWorkoutError": "Dein abgeschlossenes Workout konnte nicht gespeichert werden. Überprüfe deine Verbindung und versuche es erneut.",
+  "deleteSessionError": "Dieses Workout konnte nicht gelöscht werden. Überprüfe deine Verbindung und versuche es erneut.",
   "checkin": {
     "weeklyStreak": "WÖCHENTLICHE SERIE",
     "ofSevenDays": "/ 7 Tage",
@@ -57,6 +62,9 @@
     "xpEarned": "+25 XP ERHALTEN",
     "undoCheckIn": "CHECK-IN RÜCKGÄNGIG MACHEN",
     "friendsCheckedIn": "FREUNDE EINGECHECKT",
-    "unknown": "Unbekannt"
+    "unknown": "Unbekannt",
+    "errorTitle": "Etwas ist schiefgelaufen",
+    "checkinError": "Check-in fehlgeschlagen. Überprüfe deine Verbindung und versuche es erneut.",
+    "undoError": "Check-in konnte nicht rückgängig gemacht werden. Überprüfe deine Verbindung und versuche es erneut."
   }
 }

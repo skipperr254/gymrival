@@ -17,6 +17,11 @@ let _inboxChannel: any = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let _chatChannel: any = null;
 let _presenceHeartbeat: ReturnType<typeof setInterval> | null = null;
+// Monotonic counter so two sendMessage() calls within the same millisecond
+// (e.g. keyboard-submit + button-tap firing back to back) never produce the
+// same optimistic temp id — a collision meant the second bubble got wiped
+// out when the first real server row replaced "the" message matching that id.
+let _sendMessageSeq = 0;
 
 const ONLINE_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes
 
@@ -30,10 +35,12 @@ interface ChatState {
   // ── Inbox ────────────────────────────────────────────────────────────────────
   conversations: ConversationPreview[];
   conversationsLoading: boolean;
+  conversationsError: string | null;
 
   // ── Active chat ──────────────────────────────────────────────────────────────
   messages: Message[];
   messagesLoading: boolean;
+  messagesError: string | null;
   activeConversationId: string | null;
   loadingOlderMessages: boolean;
   hasMoreMessages: boolean;
@@ -83,14 +90,19 @@ interface ChatState {
 
   /** Total number of conversations with unread messages from the other user. */
   unreadCount: (currentUserId: string) => number;
+
+  /** Clears all state, stops the presence heartbeat, and tears down any active realtime channels. Call on sign-out. */
+  reset: () => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
   conversations: [],
   conversationsLoading: false,
+  conversationsError: null,
 
   messages: [],
   messagesLoading: false,
+  messagesError: null,
   activeConversationId: null,
   loadingOlderMessages: false,
   hasMoreMessages: true,
@@ -100,7 +112,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   // ─── Inbox ─────────────────────────────────────────────────────────────────
 
   loadConversations: async (userId) => {
-    set({ conversationsLoading: true });
+    set({ conversationsLoading: true, conversationsError: null });
     const { data, error } = await fetchConversations(userId);
     if (!error) {
       set({ conversations: data });
@@ -108,7 +120,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const otherIds = data.map((c) => c.other_user.id);
       if (otherIds.length > 0) get().fetchFriendsPresence(otherIds);
     }
-    set({ conversationsLoading: false });
+    set({ conversationsLoading: false, conversationsError: error });
   },
 
   getOrOpenChat: async (currentUserId, otherUserId) => {
@@ -122,6 +134,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   loadMessages: async (conversationId, userId) => {
     set({
       messagesLoading: true,
+      messagesError: null,
       activeConversationId: conversationId,
       messages: [],
       hasMoreMessages: true,
@@ -130,7 +143,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
     if (!error) {
       set({ messages: data, hasMoreMessages: data.length === 50 });
     }
-    set({ messagesLoading: false });
+    set({ messagesLoading: false, messagesError: error });
+    if (error) return;
     // Mark all incoming messages as read upon opening
     get().markRead(conversationId, userId);
   },
@@ -156,7 +170,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
     if (!trimmed) return;
 
     // Optimistic: append to messages immediately
-    const tempId = `temp-${Date.now()}`;
+    _sendMessageSeq += 1;
+    const tempId = `temp-${Date.now()}-${_sendMessageSeq}`;
     const optimistic: Message = {
       id: tempId,
       conversation_id: conversationId,
@@ -198,9 +213,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
       return;
     }
 
-    // Replace temp with the real persisted row
+    // Replace temp with the real persisted row. Filters out (rather than
+    // maps) both the temp id and the real id before re-adding `sent`: the
+    // realtime subscription (see subscribeToChat) can deliver this same row
+    // before this await resolves, in which case a plain map-replace would
+    // leave two copies — the realtime-appended one and this one.
     set((s) => ({
-      messages: s.messages.map((m) => (m.id === tempId ? sent : m)),
+      messages: [...s.messages.filter((m) => m.id !== tempId && m.id !== sent.id), sent].sort(
+        (a, b) => (a.created_at > b.created_at ? 1 : -1)
+      ),
     }));
   },
 
@@ -231,7 +252,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       _inboxChannel = null;
     }
 
-    _inboxChannel = supabase
+    const channel = supabase
       .channel(`inbox-${userId}`)
       .on(
         "postgres_changes",
@@ -275,11 +296,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
       )
       .subscribe();
 
+    _inboxChannel = channel;
+
     return () => {
-      if (_inboxChannel) {
-        supabase.removeChannel(_inboxChannel);
-        _inboxChannel = null;
-      }
+      // Owner-aware cleanup: only clear the module ref if it still points at
+      // the channel THIS subscriber created. A stale cleanup (e.g. a popped
+      // screen unmounting after the feed screen re-subscribed on focus) must
+      // not kill the newer subscriber's channel.
+      supabase.removeChannel(channel);
+      if (_inboxChannel === channel) _inboxChannel = null;
     };
   },
 
@@ -289,7 +314,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       _chatChannel = null;
     }
 
-    _chatChannel = supabase
+    const channel = supabase
       .channel(`chat-${conversationId}`)
       .on(
         "postgres_changes",
@@ -302,10 +327,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
         (payload) => {
           const msg = payload.new as Message;
 
-          // Skip own messages — the optimistic update already added them
-          if (msg.sender_id === userId) return;
-
-          // Append and keep in chronological order
+          // Dedup by real id instead of blanket-skipping every event whose
+          // sender is "me": the same account signed in on a second device
+          // has sender_id === userId too, and that message is never our own
+          // already-applied optimistic echo — skipping it just silently
+          // dropped it. A message genuinely already present locally (our
+          // own optimistic send, already replaced by sendMessage's response,
+          // or a duplicate delivery) is caught by the id check instead.
           set((s) => {
             const exists = s.messages.some((m) => m.id === msg.id);
             if (exists) return s;
@@ -316,17 +344,26 @@ export const useChatStore = create<ChatState>((set, get) => ({
             };
           });
 
-          // Auto-mark as read since the user is currently in this conversation
-          get().markRead(conversationId, userId);
+          // Only auto-mark-read for messages actually sent by the other
+          // participant — marking our own send as "read" is meaningless.
+          if (msg.sender_id !== userId) {
+            get().markRead(conversationId, userId);
+          }
         }
       )
       .subscribe();
 
+    _chatChannel = channel;
+
     return () => {
-      if (_chatChannel) {
-        supabase.removeChannel(_chatChannel);
-        _chatChannel = null;
-      }
+      // Owner-aware cleanup, matching subscribeToInbox/subscribeToFeedEvents/
+      // subscribeToFriendEvents: only clear the module ref if it still points
+      // at the channel THIS subscriber created. Without this, an older chat
+      // screen's cleanup (e.g. React Navigation keeps pushed screens mounted
+      // underneath newer ones) could remove a newer chat screen's active
+      // channel and silently kill its live message delivery.
+      supabase.removeChannel(channel);
+      if (_chatChannel === channel) _chatChannel = null;
     };
   },
 
@@ -374,4 +411,31 @@ export const useChatStore = create<ChatState>((set, get) => ({
         c.last_message_sender_id !== currentUserId &&
         c.last_message_read_at === null
     ).length,
+
+  reset: () => {
+    if (_inboxChannel) {
+      supabase.removeChannel(_inboxChannel);
+      _inboxChannel = null;
+    }
+    if (_chatChannel) {
+      supabase.removeChannel(_chatChannel);
+      _chatChannel = null;
+    }
+    if (_presenceHeartbeat) {
+      clearInterval(_presenceHeartbeat);
+      _presenceHeartbeat = null;
+    }
+    set({
+      conversations: [],
+      conversationsLoading: false,
+      conversationsError: null,
+      messages: [],
+      messagesLoading: false,
+      messagesError: null,
+      activeConversationId: null,
+      loadingOlderMessages: false,
+      hasMoreMessages: true,
+      presenceMap: {},
+    });
+  },
 }));

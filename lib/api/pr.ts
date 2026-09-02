@@ -27,7 +27,7 @@ export async function fetchBestPRs(
       .order("value", { ascending: false }),
     supabase
       .from("exercise_types")
-      .select("key, label, icon, unit"),
+      .select("key, label, unit"),
   ]);
 
   if (prsResult.error) {
@@ -87,7 +87,7 @@ export async function fetchPRHistory(
       .order("created_at", { ascending: false }),
     supabase
       .from("exercise_types")
-      .select("key, label, icon, unit"),
+      .select("key, label, unit"),
   ]);
 
   if (prsResult.error) return { data: [], error: prsResult.error.message };
@@ -134,7 +134,9 @@ export async function uploadPRVideo(
   videoUri: string,
   thumbnailUri: string | null,
   durationSec: number | null,
-  fileSizeBytes: number | null
+  fileSizeBytes: number | null,
+  videoWidth: number | null = null,
+  videoHeight: number | null = null
 ): Promise<{ prVideoId: string | null; error: string | null }> {
   // Derive extension and MIME type from the local URI
   const rawExt = videoUri.split('?')[0].split('.').pop()?.toLowerCase() ?? 'mp4';
@@ -153,6 +155,8 @@ export async function uploadPRVideo(
       thumbnail_path: thumbnailPath,
       duration_sec: durationSec,
       file_size_bytes: fileSizeBytes,
+      video_width: videoWidth,
+      video_height: videoHeight,
       status: 'uploading',
     })
     .select('id')
@@ -205,6 +209,58 @@ export async function uploadPRVideo(
     return { prVideoId, error: updateErr.message };
   }
   return { prVideoId, error: null };
+}
+
+const STALE_UPLOAD_THRESHOLD_MINUTES = 15;
+
+/**
+ * Flips the current user's own `pr_videos` rows that have been stuck in
+ * `status = 'uploading'` for longer than a reasonable upload window to
+ * `'failed'`. uploadPRVideo() inserts the row before the actual Storage
+ * upload runs (so the owner's feed can show an "uploading" state); if the
+ * app is killed or the network drops mid-upload, nothing ever moves that
+ * row past 'uploading' — this reconciles it the next time the owner's own
+ * client is active, rather than leaving it stuck forever with no
+ * indication anything went wrong. Call once per session (see app/_layout.tsx).
+ */
+export async function reconcileStaleVideoUploads(userId: string): Promise<void> {
+  const staleBefore = new Date(Date.now() - STALE_UPLOAD_THRESHOLD_MINUTES * 60_000).toISOString();
+  await supabase
+    .from('pr_videos')
+    .update({ status: 'failed' })
+    .eq('user_id', userId)
+    .eq('status', 'uploading')
+    .lt('created_at', staleBefore);
+}
+
+/**
+ * Delete a PR the current user owns — retracts it from the social feed, PR
+ * History, and both leaderboards (all query personal_records live, so the
+ * row going away is the whole fix). The delete_personal_record RPC (migration
+ * 046) does the DB side atomically: XP clawback, dangling-notification
+ * cleanup, active-challenge score recompute, then the row delete itself
+ * (which cascades pr_videos/pr_likes). It hands back the video's Storage
+ * paths so this function can remove the actual files — SQL can't touch the
+ * Storage backend directly, only the metadata row.
+ */
+export async function deletePersonalRecord(
+  prId: string
+): Promise<{ error: string | null }> {
+  const { data, error } = await supabase
+    .rpc('delete_personal_record', { p_pr_id: prId })
+    .single();
+
+  if (error) return { error: error.message };
+
+  const row = data as { video_path: string | null; thumbnail_path: string | null } | null;
+  const paths = [row?.video_path, row?.thumbnail_path].filter(
+    (p): p is string => !!p
+  );
+  if (paths.length > 0) {
+    await supabase.storage.from(PR_VIDEOS_BUCKET).remove(paths);
+  }
+
+  return { error: null };
 }
 
 /**

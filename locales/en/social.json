@@ -1,15 +1,10 @@
 {
-  "friendsStub": {
-    "back": "SOCIAL",
-    "title": "FRIENDS",
-    "subtitle": "Add and manage your gym rivals",
-    "comingSoon": "COMING SOON"
-  },
-  "tabs": {
-    "feed": { "label": "Feed", "subtitle": "FEED" },
-    "friends": { "label": "Friends", "subtitle": "FRIENDS" },
-    "messages": { "label": "Messages", "subtitle": "MESSAGES" }
-  },
+  "friendsTitle": "FRIENDS",
+  "messagesTitle": "MESSAGES",
+  "headerFriends": "Friends",
+  "headerMessages": "Messages",
+  "soundOn": "Turn sound on",
+  "soundOff": "Turn sound off",
   "you": "YOU",
   "athlete": "Athlete",
   "gym": "Gym",
@@ -17,12 +12,28 @@
   "levelShort": "LV{{level}}",
   "newPr": "NEW PR",
   "videoUploading": "VIDEO UPLOADING…",
+  "videoFailed": "VIDEO FAILED",
   "likes": "LIKES",
   "like": "LIKE",
   "liked": "LIKED",
   "yourPr": "YOUR PR",
+  "deletePr": {
+    "action": "Delete PR",
+    "confirmTitle": "Delete this PR?",
+    "confirmMsg": "This removes it from the feed, your PR history, and leaderboards. This can't be undone.",
+    "confirmCta": "Delete",
+    "errorTitle": "Couldn't delete PR",
+    "errorMsg": "Something went wrong. Try again."
+  },
   "feedEmptyTitle": "NO ACTIVITY YET",
   "feedEmptySubtitle": "Add friends and start logging PRs to see the feed come alive.",
+  "retry": "RETRY",
+  "videoLoadError": "Couldn't load video",
+  "loadErrorFriends": "Could not load your friends",
+  "loadErrorRequests": "Could not load requests",
+  "loadErrorSearch": "Search failed",
+  "loadErrorMessages": "Could not load your messages",
+  "loadErrorFeed": "Could not load the feed",
   "allCaughtUp": "YOU'RE ALL CAUGHT UP",
   "friendsSubTabs": {
     "friends": "FRIENDS",
@@ -58,6 +69,8 @@
   "chat": {
     "cantOpen": "CAN'T OPEN CHAT",
     "errorSub": "Something went wrong. Try again later.",
+    "loadError": "Couldn't load messages",
+    "retry": "RETRY",
     "online": "Online",
     "offline": "Offline",
     "startOfConversation": "START OF CONVERSATION",

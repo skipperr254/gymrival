@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
-import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import { MessageCircle } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors, Fonts } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
 import { formatDate, formatRelativeTime as formatRelativeTimeIntl } from '@/lib/i18n/format';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useChatStore } from '@/store/useChatStore';
-import { FriendAvatar } from './FriendAvatar';
+import { computeIsOnline, useChatStore } from '@/store/useChatStore';
+import { ErrorState, Avatar } from '@/components/ui';
+import { Colors } from '@/constants/theme';
 
 function formatConvTime(iso: string | null): string {
   if (!iso) return '';
@@ -23,15 +23,18 @@ function formatConvTime(iso: string | null): string {
 export function MessagesContent() {
   const { t } = useTranslation('social');
   const userId = useAuthStore((s) => s.user?.id ?? '');
-  const {
-    conversations,
-    conversationsLoading,
-    loadConversations,
-    subscribeToInbox,
-    startPresenceHeartbeat,
-    isOnline,
-    unreadCount,
-  } = useChatStore();
+  // Per-field selectors — a whole-store subscription re-rendered the inbox on
+  // every chat-store change (open-thread message traffic, etc.)
+  const conversations = useChatStore((s) => s.conversations);
+  const conversationsLoading = useChatStore((s) => s.conversationsLoading);
+  const conversationsError = useChatStore((s) => s.conversationsError);
+  const loadConversations = useChatStore((s) => s.loadConversations);
+  const subscribeToInbox = useChatStore((s) => s.subscribeToInbox);
+  const startPresenceHeartbeat = useChatStore((s) => s.startPresenceHeartbeat);
+  const unreadCount = useChatStore((s) => s.unreadCount);
+  // Subscribed (not read via getState) so online dots update when presence
+  // refreshes.
+  const presenceMap = useChatStore((s) => s.presenceMap);
 
   useEffect(() => {
     if (!userId) return;
@@ -48,20 +51,34 @@ export function MessagesContent() {
 
   if (conversationsLoading && conversations.length === 0) {
     return (
-      <View style={msgStyles.emptyCard}>
-        <ActivityIndicator color="#404040" />
+      <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
+        <ActivityIndicator color={Colors.hint} />
       </View>
+    );
+  }
+
+  if (conversationsError && conversations.length === 0) {
+    return (
+      <ErrorState
+        message={t('loadErrorMessages')}
+        retryLabel={t('retry')}
+        onRetry={() => loadConversations(userId)}
+      />
     );
   }
 
   if (!conversationsLoading && conversations.length === 0) {
     return (
-      <View style={msgStyles.emptyCard}>
-        <View style={msgStyles.emptyIconWrap}>
-          <MessageCircle size={24} strokeWidth={1.5} color="#404040" />
+      <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
+        <View className="w-14 h-14 rounded-full bg-[#242424] items-center justify-center mb-3.5">
+          <MessageCircle size={24} strokeWidth={1.5} color={Colors.hint} />
         </View>
-        <Text style={msgStyles.emptyTitle}>{t('noMessagesTitle')}</Text>
-        <Text style={msgStyles.emptySubtitle}>{t('noMessagesSub')}</Text>
+        <Text className="font-heading text-[17px] tracking-[2px] text-white mb-1.5">
+          {t('noMessagesTitle')}
+        </Text>
+        <Text className="font-sans text-[13px] text-muted text-center">
+          {t('noMessagesSub')}
+        </Text>
       </View>
     );
   }
@@ -71,16 +88,20 @@ export function MessagesContent() {
   return (
     <>
       {total > 0 && (
-        <View style={msgStyles.unreadBanner}>
-          <Text style={msgStyles.unreadBannerText}>{t('unreadBanner', { count: total })}</Text>
+        <View className="bg-[rgba(230,48,48,0.12)] border border-[rgba(230,48,48,0.25)] rounded-[10px] py-[7px] px-3.5 self-start mb-3.5">
+          <Text className="font-heading text-[10px] text-accent tracking-[2px]">
+            {t('unreadBanner', { count: total })}
+          </Text>
         </View>
       )}
 
-      <Text style={msgStyles.sectionLabel}>{t('allMessages')}</Text>
-      <View style={msgStyles.convList}>
+      <Text className="font-heading text-[10px] text-[#484848] tracking-[2px] mb-3">
+        {t('allMessages')}
+      </Text>
+      <View className="mb-6">
         {conversations.map((conv) => {
           const name = conv.other_user.full_name ?? conv.other_user.username ?? t('athlete');
-          const online = isOnline(conv.other_user.id);
+          const online = computeIsOnline(presenceMap[conv.other_user.id] ?? null);
           const isFromMe = conv.last_message_sender_id === userId;
           const hasUnread =
             !isFromMe &&
@@ -91,27 +112,43 @@ export function MessagesContent() {
             <Pressable
               key={conv.id}
               onPress={() => router.push(Routes.chat(conv.other_user.id) as never)}
-              style={({ pressed }) => [msgStyles.convRow, pressed && msgStyles.convRowPressed]}
+              className="flex-row items-center gap-[13px] py-[13px] px-3 rounded-2xl"
+              style={({ pressed }) => pressed && { backgroundColor: '#1c1c1c' }}
             >
-              <FriendAvatar id={conv.other_user.id} name={name} size={50} online={online} />
-              <View style={msgStyles.convInfo}>
-                <View style={msgStyles.convHeader}>
-                  <Text style={[msgStyles.convName, hasUnread && msgStyles.convNameUnread]}>
+              <Avatar userId={conv.other_user.id} name={name} avatarUrl={conv.other_user.avatar_url} size={50} online={online} />
+              <View className="flex-1 min-w-0">
+                <View className="flex-row justify-between items-baseline mb-[3px]">
+                  <Text
+                    className={`text-[15px] ${
+                      hasUnread ? 'font-sans-semibold text-white' : 'font-sans-medium text-[#ccc]'
+                    }`}
+                  >
                     {name}
                   </Text>
-                  <Text style={[msgStyles.convTime, hasUnread && msgStyles.convTimeUnread]}>
+                  <Text
+                    className={`font-sans text-[11px] ${
+                      hasUnread ? 'text-accent' : 'text-[#454545]'
+                    }`}
+                  >
                     {formatConvTime(conv.last_message_at)}
                   </Text>
                 </View>
-                <View style={msgStyles.convPreviewRow}>
-                  <Text style={[msgStyles.convPreview, hasUnread && msgStyles.convPreviewUnread]} numberOfLines={1}>
+                <View className="flex-row items-center gap-1.5 flex-1">
+                  <Text
+                    className={`font-sans text-[13px] flex-1 ${
+                      hasUnread ? 'text-[#888]' : 'text-[#505050]'
+                    }`}
+                    numberOfLines={1}
+                  >
                     {conv.last_message_content
                       ? isFromMe
                         ? t('youPrefix', { message: conv.last_message_content })
                         : conv.last_message_content
                       : t('startConversation')}
                   </Text>
-                  {hasUnread && <View style={msgStyles.unreadDot} />}
+                  {hasUnread && (
+                    <View className="w-2 h-2 rounded-full bg-accent shrink-0" />
+                  )}
                 </View>
               </View>
             </Pressable>
@@ -121,123 +158,3 @@ export function MessagesContent() {
     </>
   );
 }
-
-const msgStyles = StyleSheet.create({
-  emptyCard: {
-    alignItems: 'center',
-    paddingVertical: 48,
-    paddingHorizontal: 24,
-    backgroundColor: '#1c1c1c',
-    borderWidth: 1,
-    borderColor: '#242424',
-    borderRadius: 20,
-  },
-  emptyIconWrap: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#242424',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 14,
-  },
-  emptyTitle: {
-    fontFamily: Fonts.display,
-    fontSize: 17,
-    letterSpacing: 2,
-    color: '#fff',
-    marginBottom: 6,
-  },
-  emptySubtitle: {
-    fontFamily: Fonts.body,
-    fontSize: 13,
-    color: '#555',
-    textAlign: 'center',
-  },
-  unreadBanner: {
-    backgroundColor: 'rgba(230,48,48,0.12)',
-    borderWidth: 1,
-    borderColor: 'rgba(230,48,48,0.25)',
-    borderRadius: 10,
-    paddingVertical: 7,
-    paddingHorizontal: 14,
-    alignSelf: 'flex-start',
-    marginBottom: 14,
-  },
-  unreadBannerText: {
-    fontFamily: Fonts.display,
-    fontSize: 10,
-    color: Colors.accent,
-    letterSpacing: 2,
-  },
-  sectionLabel: {
-    fontFamily: Fonts.display,
-    fontSize: 10,
-    color: '#484848',
-    letterSpacing: 2,
-    marginBottom: 12,
-  },
-  convList: {
-    marginBottom: 24,
-  },
-  convRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 13,
-    paddingVertical: 13,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-  },
-  convRowPressed: {
-    backgroundColor: '#1c1c1c',
-  },
-  convInfo: {
-    flex: 1,
-    minWidth: 0,
-  },
-  convHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-    marginBottom: 3,
-  },
-  convName: {
-    fontFamily: Fonts.bodyMedium,
-    fontSize: 15,
-    color: '#ccc',
-  },
-  convNameUnread: {
-    fontFamily: Fonts.bodySemiBold,
-    color: '#fff',
-  },
-  convTime: {
-    fontFamily: Fonts.body,
-    fontSize: 11,
-    color: '#454545',
-  },
-  convTimeUnread: {
-    color: Colors.accent,
-  },
-  convPreviewRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    flex: 1,
-  },
-  convPreview: {
-    fontFamily: Fonts.body,
-    fontSize: 13,
-    color: '#505050',
-    flex: 1,
-  },
-  convPreviewUnread: {
-    color: '#888',
-  },
-  unreadDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: Colors.accent,
-    flexShrink: 0,
-  },
-});

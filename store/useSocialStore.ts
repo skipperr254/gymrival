@@ -13,8 +13,11 @@ import {
   fetchSingleFeedPost,
   likePR,
   unlikePR,
+  deletePersonalRecord,
   getPRVideoPublicUrl,
+  FEED_PAGE_SIZE,
 } from "@/lib/api";
+import { useProfileStore } from "@/store/useProfileStore";
 import type { FriendProfile, FriendRequest, UserSearchResult, FeedPost } from "@/types/social";
 import type { PRVideo, PRVideoStatus } from "@/types/pr";
 
@@ -23,6 +26,22 @@ import type { PRVideo, PRVideoStatus } from "@/types/pr";
 let _friendChannel: any = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let _feedChannel: any = null;
+
+// Per-post monotonic sequence number for toggleLike — lets a slow/failed
+// response know whether a newer toggle for the same post has since been
+// issued, so it doesn't revert the optimistic UI out from under a more
+// recent tap (a rapid like→unlike→like burst produces overlapping requests
+// that can resolve out of order).
+const _likeRequestSeq = new Map<string, number>();
+
+// Number of this-device optimistic like/unlike ops awaiting their own
+// realtime echo, per post id. The realtime handlers consume one slot per
+// echo instead of blanket-skipping every event whose actor is "me" — a
+// blanket skip also silently dropped genuine likes/unlikes made from a
+// second device signed into the same account, since pr_likes rows carry no
+// per-device identifier to otherwise distinguish "my own echo" from "a
+// second device's real action" beyond this bookkeeping.
+const _pendingOwnLikeOps = new Map<string, number>();
 
 interface SocialState {
   // ── Friends ──────────────────────────────────────────────────────────────────
@@ -34,6 +53,12 @@ interface SocialState {
   friendsLoading: boolean;
   requestsLoading: boolean;
   searchLoading: boolean;
+
+  // Set (non-null) when the last fetch failed, so screens can render a
+  // retry state instead of treating a network error as "genuinely empty".
+  friendsError: string | null;
+  requestsError: string | null;
+  searchError: string | null;
 
   loadFriends: (userId: string) => Promise<void>;
   loadRequests: (userId: string) => Promise<void>;
@@ -51,15 +76,28 @@ interface SocialState {
   // ── Feed ─────────────────────────────────────────────────────────────────────
   feed: FeedPost[];
   feedLoading: boolean;
+  feedLoadingMore: boolean;
+  feedHasMore: boolean;
   /** IDs of users whose PRs appear in the feed (current user + accepted friends) */
   feedParticipantIds: string[];
+  /**
+   * Global feed mute (Instagram-style): videos autoplay muted; unmuting one
+   * keeps subsequent videos unmuted. Session-scoped — not persisted.
+   */
+  feedMuted: boolean;
+  setFeedMuted: (muted: boolean) => void;
+  /** Set (non-null) when the last feed fetch failed. */
+  feedError: string | null;
 
   /**
-   * Loads the feed: fetches accepted friend IDs, then fetches the combined
-   * personal_records feed with like counts. Stores participantIds for the
-   * realtime subscription to use.
+   * Loads the first feed page: fetches accepted friend IDs, then fetches the
+   * combined personal_records feed with like counts. Stores participantIds for
+   * the realtime subscription to use. Also serves as the pull-to-refresh reset.
    */
   loadFeed: (userId: string) => Promise<void>;
+
+  /** Loads the next page (keyset cursor on the oldest loaded post's created_at). */
+  loadMoreFeed: (userId: string) => Promise<void>;
 
   /**
    * Optimistically toggles a like on a feed post and syncs to the database.
@@ -68,14 +106,27 @@ interface SocialState {
   toggleLike: (userId: string, prId: string) => Promise<void>;
 
   /**
+   * Optimistically removes a post the user owns from the feed, then deletes
+   * it server-side. On failure the post is restored. Also refreshes the
+   * profile store (XP/level clawback happens server-side) and the owner's
+   * PR History / best-PRs, since a post can be deleted from the feed without
+   * ever visiting those screens.
+   */
+  deleteFeedPost: (userId: string, prId: string) => Promise<{ error: string | null }>;
+
+  /**
    * Opens Supabase Realtime channels for:
    *   - pr_likes INSERT/DELETE  → live like count + has_liked updates
    *   - personal_records INSERT → prepend new posts from friends (and self)
+   *   - personal_records DELETE → drop a retracted PR from the feed live
    *
    * Returns an unsubscribe function for useEffect cleanup.
    * Tears down any previous subscription automatically (StrictMode safe).
    */
   subscribeToFeedEvents: (userId: string, participantIds: string[]) => () => void;
+
+  /** Clears all state and tears down any active realtime channels. Call on sign-out. */
+  reset: () => void;
 }
 
 export const useSocialStore = create<SocialState>((set, get) => ({
@@ -89,22 +140,32 @@ export const useSocialStore = create<SocialState>((set, get) => ({
   requestsLoading: false,
   searchLoading: false,
 
+  friendsError: null,
+  requestsError: null,
+  searchError: null,
+
   // ── Feed initial state ───────────────────────────────────────────────────────
   feed: [],
   feedLoading: false,
+  feedLoadingMore: false,
+  feedHasMore: true,
   feedParticipantIds: [],
+  feedMuted: true,
+  feedError: null,
+
+  setFeedMuted: (muted) => set({ feedMuted: muted }),
 
   // ─── Loaders ───────────────────────────────────────────────────────────────
 
   loadFriends: async (userId) => {
-    set({ friendsLoading: true });
+    set({ friendsLoading: true, friendsError: null });
     const { data, error } = await fetchFriends(userId);
     if (!error) set({ friends: data });
-    set({ friendsLoading: false });
+    set({ friendsLoading: false, friendsError: error });
   },
 
   loadRequests: async (userId) => {
-    set({ requestsLoading: true });
+    set({ requestsLoading: true, requestsError: null });
     const [inc, out] = await Promise.all([
       fetchIncomingRequests(userId),
       fetchOutgoingRequests(userId),
@@ -112,15 +173,16 @@ export const useSocialStore = create<SocialState>((set, get) => ({
     set({
       incomingRequests: inc.error ? get().incomingRequests : inc.data,
       outgoingRequests: out.error ? get().outgoingRequests : out.data,
+      requestsError: inc.error ?? out.error,
       requestsLoading: false,
     });
   },
 
   search: async (userId, query) => {
-    set({ searchLoading: true });
+    set({ searchLoading: true, searchError: null });
     const { data, error } = await apiSearchUsers(userId, query);
     if (!error) set({ searchResults: data });
-    set({ searchLoading: false });
+    set({ searchLoading: false, searchError: error });
   },
 
   clearSearch: () => set({ searchResults: [] }),
@@ -296,12 +358,12 @@ export const useSocialStore = create<SocialState>((set, get) => ({
   // ─── Feed actions ───────────────────────────────────────────────────────────
 
   loadFeed: async (userId) => {
-    set({ feedLoading: true });
+    set({ feedLoading: true, feedError: null });
 
     // 1. Get accepted friend IDs so we can include them in the feed query
     const { data: friends, error: friendErr } = await fetchFriends(userId);
     if (friendErr) {
-      set({ feedLoading: false });
+      set({ feedLoading: false, feedError: friendErr });
       return;
     }
 
@@ -309,10 +371,37 @@ export const useSocialStore = create<SocialState>((set, get) => ({
     const participantIds = [userId, ...friendIds];
     set({ feedParticipantIds: participantIds });
 
-    // 2. Fetch the feed posts
-    const { data, error } = await fetchFeed(userId, participantIds);
-    if (!error) set({ feed: data });
-    set({ feedLoading: false });
+    // 2. Fetch the first page of feed posts
+    const { data, hasMore, error } = await fetchFeed(userId, participantIds, {
+      limit: FEED_PAGE_SIZE,
+    });
+    if (!error) set({ feed: data, feedHasMore: hasMore });
+    set({ feedLoading: false, feedError: error });
+  },
+
+  loadMoreFeed: async (userId) => {
+    const s = get();
+    if (s.feedLoadingMore || s.feedLoading || !s.feedHasMore || s.feed.length === 0) return;
+
+    set({ feedLoadingMore: true });
+
+    const cursor = s.feed[s.feed.length - 1].created_at;
+    const { data, hasMore, error } = await fetchFeed(userId, s.feedParticipantIds, {
+      limit: FEED_PAGE_SIZE,
+      before: cursor,
+    });
+
+    if (!error) {
+      set((state) => ({
+        // De-dupe by id: realtime prepends or created_at ties could overlap pages
+        feed: [
+          ...state.feed,
+          ...data.filter((p) => !state.feed.some((q) => q.id === p.id)),
+        ],
+        feedHasMore: hasMore,
+      }));
+    }
+    set({ feedLoadingMore: false });
   },
 
   toggleLike: async (userId, prId) => {
@@ -320,6 +409,9 @@ export const useSocialStore = create<SocialState>((set, get) => ({
     if (!post) return;
 
     const wasLiked = post.has_liked;
+    const mySeq = (_likeRequestSeq.get(prId) ?? 0) + 1;
+    _likeRequestSeq.set(prId, mySeq);
+    _pendingOwnLikeOps.set(prId, (_pendingOwnLikeOps.get(prId) ?? 0) + 1);
 
     // Optimistic update
     set((s) => ({
@@ -339,7 +431,14 @@ export const useSocialStore = create<SocialState>((set, get) => ({
       : await likePR(userId, prId);
 
     if (error) {
-      // Revert on failure
+      // The write never happened, so it will never get a matching realtime
+      // echo — release the pending slot so a later genuine event isn't
+      // incorrectly swallowed.
+      _pendingOwnLikeOps.set(prId, Math.max(0, (_pendingOwnLikeOps.get(prId) ?? 1) - 1));
+      // Only revert if no newer toggle for this post was issued while this
+      // one was in flight — otherwise this stale failure would stomp on
+      // whatever more recent optimistic state the user has already moved to.
+      if (_likeRequestSeq.get(prId) !== mySeq) return;
       set((s) => ({
         feed: s.feed.map((p) =>
           p.id !== prId
@@ -354,13 +453,46 @@ export const useSocialStore = create<SocialState>((set, get) => ({
     }
   },
 
+  deleteFeedPost: async (userId, prId) => {
+    const post = get().feed.find((p) => p.id === prId);
+    if (!post) return { error: null };
+
+    set((s) => ({ feed: s.feed.filter((p) => p.id !== prId) }));
+
+    const { error } = await deletePersonalRecord(prId);
+
+    if (error) {
+      // Restore in its original position rather than re-prepending, in case
+      // other posts arrived (via realtime) while the delete was in flight.
+      set((s) => {
+        if (s.feed.some((p) => p.id === prId)) return s;
+        const idx = s.feed.findIndex((p) => p.created_at < post.created_at);
+        const feed = [...s.feed];
+        feed.splice(idx === -1 ? feed.length : idx, 0, post);
+        return { feed };
+      });
+      return { error };
+    }
+
+    // XP clawback happens server-side — refresh the profile, and PR History
+    // / best-PRs since the user may not revisit those screens this session.
+    const profileStore = useProfileStore.getState();
+    await Promise.all([
+      profileStore.loadProfile(userId),
+      profileStore.loadBestPRs(userId),
+      profileStore.loadPRHistory(userId),
+    ]);
+
+    return { error: null };
+  },
+
   subscribeToFeedEvents: (userId, participantIds) => {
     if (_feedChannel) {
       supabase.removeChannel(_feedChannel);
       _feedChannel = null;
     }
 
-    _feedChannel = supabase
+    const channel = supabase
       .channel(`feed-events-${userId}`)
 
       // ── Like added ──────────────────────────────────────────────────────────
@@ -369,9 +501,17 @@ export const useSocialStore = create<SocialState>((set, get) => ({
         { event: "INSERT", schema: "public", table: "pr_likes" },
         (payload) => {
           const { pr_id, user_id } = payload.new as { pr_id: string; user_id: string };
-          // Skip own likes — the optimistic update in toggleLike() already
-          // incremented the count. Applying it again here would double-count.
-          if (user_id === userId) return;
+          if (user_id === userId) {
+            // Only skip if this is the echo of a like toggleLike() on THIS
+            // device already applied optimistically — a blanket skip on
+            // sender === userId would also swallow a genuine like made from
+            // a second device signed into the same account.
+            const pending = _pendingOwnLikeOps.get(pr_id) ?? 0;
+            if (pending > 0) {
+              _pendingOwnLikeOps.set(pr_id, pending - 1);
+              return;
+            }
+          }
           set((s) => ({
             feed: s.feed.map((p) =>
               p.id !== pr_id
@@ -390,8 +530,16 @@ export const useSocialStore = create<SocialState>((set, get) => ({
           // REPLICA IDENTITY FULL guarantees old row has pr_id + user_id
           const old = payload.old as { pr_id?: string; user_id?: string };
           if (!old.pr_id) return;
-          // Skip own unlikes — optimistic update already decremented the count.
-          if (old.user_id === userId) return;
+          if (old.user_id === userId) {
+            // Same pending-slot bookkeeping as the INSERT handler above —
+            // shared per prId since each toggleLike() call produces exactly
+            // one realtime echo (either this DELETE or the INSERT above).
+            const pending = _pendingOwnLikeOps.get(old.pr_id) ?? 0;
+            if (pending > 0) {
+              _pendingOwnLikeOps.set(old.pr_id, pending - 1);
+              return;
+            }
+          }
           set((s) => ({
             feed: s.feed.map((p) =>
               p.id !== old.pr_id
@@ -421,6 +569,21 @@ export const useSocialStore = create<SocialState>((set, get) => ({
         }
       )
 
+      // ── PR retracted (by its owner, from any surface/session) ───────────────
+      // REPLICA IDENTITY FULL on personal_records (migration 012) guarantees
+      // payload.old carries the full row. This is a no-op when the delete
+      // originated on this device (deleteFeedPost already removed it
+      // optimistically), and is what removes a friend's retracted PR live.
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "personal_records" },
+        (payload) => {
+          const old = payload.old as { id?: string };
+          if (!old.id) return;
+          set((s) => ({ feed: s.feed.filter((p) => p.id !== old.id) }));
+        }
+      )
+
       // ── Video proof added to a feed post ────────────────────────────────────
       .on(
         "postgres_changes",
@@ -433,6 +596,8 @@ export const useSocialStore = create<SocialState>((set, get) => ({
             video_path: string;
             thumbnail_path: string | null;
             duration_sec: number | null;
+            video_width: number | null;
+            video_height: number | null;
             status: string;
             created_at: string;
           };
@@ -440,11 +605,15 @@ export const useSocialStore = create<SocialState>((set, get) => ({
             id: row.id,
             pr_id: row.pr_id,
             user_id: row.user_id,
+            video_path: row.video_path,
+            thumbnail_path: row.thumbnail_path,
             video_url: getPRVideoPublicUrl(row.video_path),
             thumbnail_url: row.thumbnail_path
               ? getPRVideoPublicUrl(row.thumbnail_path)
               : null,
             duration_sec: row.duration_sec,
+            video_width: row.video_width ?? null,
+            video_height: row.video_height ?? null,
             status: row.status as PRVideoStatus,
             created_at: row.created_at,
           };
@@ -479,6 +648,8 @@ export const useSocialStore = create<SocialState>((set, get) => ({
                 video: {
                   ...p.video,
                   status: row.status as PRVideoStatus,
+                  video_path: row.video_path,
+                  thumbnail_path: row.thumbnail_path,
                   // Re-compute URLs in case paths changed (shouldn't happen but be safe)
                   video_url: getPRVideoPublicUrl(row.video_path),
                   thumbnail_url: row.thumbnail_path
@@ -493,11 +664,13 @@ export const useSocialStore = create<SocialState>((set, get) => ({
 
       .subscribe();
 
+    _feedChannel = channel;
+
     return () => {
-      if (_feedChannel) {
-        supabase.removeChannel(_feedChannel);
-        _feedChannel = null;
-      }
+      // Owner-aware cleanup — a stale cleanup must not remove a newer
+      // subscriber's channel (see subscribeToFriendEvents for details).
+      supabase.removeChannel(channel);
+      if (_feedChannel === channel) _feedChannel = null;
     };
   },
 
@@ -510,7 +683,7 @@ export const useSocialStore = create<SocialState>((set, get) => ({
       _friendChannel = null;
     }
 
-    _friendChannel = supabase
+    const channel = supabase
       .channel(`friend-events-${userId}`)
 
       // ── Someone sent ME a request ──────────────────────────────────────────
@@ -673,11 +846,46 @@ export const useSocialStore = create<SocialState>((set, get) => ({
 
       .subscribe();
 
+    _friendChannel = channel;
+
     return () => {
-      if (_friendChannel) {
-        supabase.removeChannel(_friendChannel);
-        _friendChannel = null;
-      }
+      // Owner-aware cleanup: only clear the module ref if it still points at
+      // the channel THIS subscriber created. Both the feed screen (badges) and
+      // the Friends screen subscribe; on back-navigation the popped screen's
+      // cleanup can run AFTER the feed re-subscribed on focus — it must not
+      // kill the fresh channel.
+      supabase.removeChannel(channel);
+      if (_friendChannel === channel) _friendChannel = null;
     };
+  },
+
+  reset: () => {
+    if (_friendChannel) {
+      supabase.removeChannel(_friendChannel);
+      _friendChannel = null;
+    }
+    if (_feedChannel) {
+      supabase.removeChannel(_feedChannel);
+      _feedChannel = null;
+    }
+    set({
+      friends: [],
+      incomingRequests: [],
+      outgoingRequests: [],
+      searchResults: [],
+      friendsLoading: false,
+      requestsLoading: false,
+      searchLoading: false,
+      friendsError: null,
+      requestsError: null,
+      searchError: null,
+      feed: [],
+      feedLoading: false,
+      feedLoadingMore: false,
+      feedHasMore: true,
+      feedParticipantIds: [],
+      feedMuted: true,
+      feedError: null,
+    });
   },
 }));

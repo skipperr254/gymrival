@@ -1,15 +1,10 @@
 {
-  "friendsStub": {
-    "back": "SOZIAL",
-    "title": "FREUNDE",
-    "subtitle": "Füge deine Trainingsrivalen hinzu und verwalte sie",
-    "comingSoon": "DEMNÄCHST"
-  },
-  "tabs": {
-    "feed": { "label": "Feed", "subtitle": "FEED" },
-    "friends": { "label": "Freunde", "subtitle": "FREUNDE" },
-    "messages": { "label": "Nachrichten", "subtitle": "NACHRICHTEN" }
-  },
+  "friendsTitle": "FREUNDE",
+  "messagesTitle": "NACHRICHTEN",
+  "headerFriends": "Freunde",
+  "headerMessages": "Nachrichten",
+  "soundOn": "Ton einschalten",
+  "soundOff": "Ton ausschalten",
   "you": "DU",
   "athlete": "Athlet",
   "gym": "Studio",
@@ -17,12 +12,28 @@
   "levelShort": "LVL{{level}}",
   "newPr": "NEUER PR",
   "videoUploading": "VIDEO WIRD HOCHGELADEN…",
+  "videoFailed": "VIDEO FEHLGESCHLAGEN",
   "likes": "LIKES",
   "like": "GEFÄLLT MIR",
   "liked": "GEFÄLLT DIR",
   "yourPr": "DEIN PR",
+  "deletePr": {
+    "action": "PR löschen",
+    "confirmTitle": "Diesen PR löschen?",
+    "confirmMsg": "Er wird aus dem Feed, deinem PR-Verlauf und den Ranglisten entfernt. Das kann nicht rückgängig gemacht werden.",
+    "confirmCta": "Löschen",
+    "errorTitle": "PR konnte nicht gelöscht werden",
+    "errorMsg": "Etwas ist schiefgelaufen. Versuch es erneut."
+  },
   "feedEmptyTitle": "NOCH KEINE AKTIVITÄT",
   "feedEmptySubtitle": "Füge Freunde hinzu und protokolliere PRs, damit der Feed lebendig wird.",
+  "retry": "ERNEUT VERSUCHEN",
+  "videoLoadError": "Video konnte nicht geladen werden",
+  "loadErrorFriends": "Deine Freunde konnten nicht geladen werden",
+  "loadErrorRequests": "Anfragen konnten nicht geladen werden",
+  "loadErrorSearch": "Suche fehlgeschlagen",
+  "loadErrorMessages": "Deine Nachrichten konnten nicht geladen werden",
+  "loadErrorFeed": "Feed konnte nicht geladen werden",
   "allCaughtUp": "DU BIST AUF DEM LAUFENDEN",
   "friendsSubTabs": {
     "friends": "FREUNDE",
@@ -58,6 +69,8 @@
   "chat": {
     "cantOpen": "CHAT KANN NICHT GEÖFFNET WERDEN",
     "errorSub": "Etwas ist schiefgelaufen. Versuch es später noch einmal.",
+    "loadError": "Nachrichten konnten nicht geladen werden",
+    "retry": "ERNEUT VERSUCHEN",
     "online": "Online",
     "offline": "Offline",
     "startOfConversation": "BEGINN DER UNTERHALTUNG",
