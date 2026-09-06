@@ -31,7 +31,8 @@
     "yourRank": "A tua posição: #{{rank}}",
     "joinedBtn": "INSCRITO",
     "joinBtn": "PARTICIPAR",
-    "viewAll": "VER TUDO"
+    "viewAll": "VER TUDO",
+    "winner": "VENCEDOR"
   },
   "invitation": {
     "defaultTitle": "Convite para Desafio",
@@ -110,6 +111,49 @@
     "refresh": "ATUALIZAR",
     "joinedTapToLeave": "INSCRITO — TOCA PARA SAIR",
     "joinChallenge": "PARTICIPAR NO DESAFIO",
-    "challengeEnded": "DESAFIO TERMINADO"
+    "challengeEnded": "DESAFIO TERMINADO",
+    "winner": "VENCEDOR"
+  },
+  "admin": {
+    "entry": "ADMIN",
+    "createTitle": "CRIAR DESAFIO",
+    "manageTitle": "OS TEUS DESAFIOS",
+    "submit": "CRIAR DESAFIO",
+    "createSuccess": "Desafio criado",
+    "fields": {
+      "title": "TÍTULO",
+      "titlePlaceholder": "ex. Duelo de Supino",
+      "description": "DESCRIÇÃO",
+      "descriptionPlaceholder": "Detalhes opcionais para os participantes",
+      "scope": "QUEM PODE PARTICIPAR",
+      "scopeGlobal": "TODOS",
+      "scopeFriendsOnly": "APENAS OS MEUS AMIGOS",
+      "exercise": "EXERCÍCIO",
+      "metric": "MÉTRICA",
+      "duration": "DURAÇÃO",
+      "durationWeekly": "SEMANAL",
+      "durationMonthly": "MENSAL",
+      "prizeLabel": "PRÉMIO",
+      "prizeLabelPlaceholder": "ex. 1 Mês de Pro",
+      "rewardXp": "RECOMPENSA XP",
+      "rewardXpPlaceholder": "0",
+      "maxParticipants": "MÁX. PARTICIPANTES",
+      "maxParticipantsPlaceholder": "Sem limite"
+    },
+    "manage": {
+      "emptyTitle": "AINDA SEM DESAFIOS",
+      "emptySub": "Os desafios que criares aparecem aqui",
+      "statusActive": "ATIVO",
+      "statusCompleted": "TERMINADO",
+      "statusCancelled": "CANCELADO",
+      "statusDraft": "RASCUNHO",
+      "cancel": "CANCELAR",
+      "cancelConfirmTitle": "Cancelar este desafio?",
+      "cancelConfirmMessage": "Os participantes deixarão de poder participar ou pontuar. Esta ação não pode ser desfeita.",
+      "cancelConfirmYes": "CANCELAR DESAFIO",
+      "cancelConfirmNo": "MANTER",
+      "loadError": "Não foi possível carregar os teus desafios",
+      "retry": "TENTAR NOVAMENTE"
+    }
   }
 }

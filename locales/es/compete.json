@@ -31,7 +31,8 @@
     "yourRank": "Tu puesto: #{{rank}}",
     "joinedBtn": "UNIDO",
     "joinBtn": "UNIRSE",
-    "viewAll": "VER TODO"
+    "viewAll": "VER TODO",
+    "winner": "GANADOR"
   },
   "invitation": {
     "defaultTitle": "Invitación a Reto",
@@ -110,6 +111,49 @@
     "refresh": "ACTUALIZAR",
     "joinedTapToLeave": "UNIDO — TOCA PARA SALIR",
     "joinChallenge": "UNIRSE AL RETO",
-    "challengeEnded": "RETO FINALIZADO"
+    "challengeEnded": "RETO FINALIZADO",
+    "winner": "GANADOR"
+  },
+  "admin": {
+    "entry": "ADMIN",
+    "createTitle": "CREAR RETO",
+    "manageTitle": "TUS RETOS",
+    "submit": "CREAR RETO",
+    "createSuccess": "Reto creado",
+    "fields": {
+      "title": "TÍTULO",
+      "titlePlaceholder": "ej. Duelo de Press de Banca",
+      "description": "DESCRIPCIÓN",
+      "descriptionPlaceholder": "Detalles opcionales para los participantes",
+      "scope": "QUIÉN PUEDE UNIRSE",
+      "scopeGlobal": "TODOS",
+      "scopeFriendsOnly": "SOLO MIS AMIGOS",
+      "exercise": "EJERCICIO",
+      "metric": "MÉTRICA",
+      "duration": "DURACIÓN",
+      "durationWeekly": "SEMANAL",
+      "durationMonthly": "MENSUAL",
+      "prizeLabel": "PREMIO",
+      "prizeLabelPlaceholder": "ej. 1 Mes de Pro",
+      "rewardXp": "RECOMPENSA XP",
+      "rewardXpPlaceholder": "0",
+      "maxParticipants": "MÁX. PARTICIPANTES",
+      "maxParticipantsPlaceholder": "Sin límite"
+    },
+    "manage": {
+      "emptyTitle": "AÚN SIN RETOS",
+      "emptySub": "Los retos que crees aparecerán aquí",
+      "statusActive": "ACTIVO",
+      "statusCompleted": "FINALIZADO",
+      "statusCancelled": "CANCELADO",
+      "statusDraft": "BORRADOR",
+      "cancel": "CANCELAR",
+      "cancelConfirmTitle": "¿Cancelar este reto?",
+      "cancelConfirmMessage": "Los participantes ya no podrán unirse ni puntuar. Esto no se puede deshacer.",
+      "cancelConfirmYes": "CANCELAR RETO",
+      "cancelConfirmNo": "MANTENERLO",
+      "loadError": "No se pudieron cargar tus retos",
+      "retry": "REINTENTAR"
+    }
   }
 }

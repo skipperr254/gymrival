@@ -31,7 +31,8 @@
     "yourRank": "Jouw positie: #{{rank}}",
     "joinedBtn": "DEELGENOMEN",
     "joinBtn": "DEELNEMEN",
-    "viewAll": "ALLES BEKIJKEN"
+    "viewAll": "ALLES BEKIJKEN",
+    "winner": "WINNAAR"
   },
   "invitation": {
     "defaultTitle": "Challenge Uitnodiging",
@@ -110,6 +111,49 @@
     "refresh": "VERVERSEN",
     "joinedTapToLeave": "DEELGENOMEN — TIK OM TE VERLATEN",
     "joinChallenge": "DEELNEMEN AAN CHALLENGE",
-    "challengeEnded": "CHALLENGE BEËINDIGD"
+    "challengeEnded": "CHALLENGE BEËINDIGD",
+    "winner": "WINNAAR"
+  },
+  "admin": {
+    "entry": "ADMIN",
+    "createTitle": "CHALLENGE AANMAKEN",
+    "manageTitle": "JOUW CHALLENGES",
+    "submit": "CHALLENGE AANMAKEN",
+    "createSuccess": "Challenge aangemaakt",
+    "fields": {
+      "title": "TITEL",
+      "titlePlaceholder": "bijv. Bankdrukken Showdown",
+      "description": "BESCHRIJVING",
+      "descriptionPlaceholder": "Optionele details voor deelnemers",
+      "scope": "WIE KAN DEELNEMEN",
+      "scopeGlobal": "IEDEREEN",
+      "scopeFriendsOnly": "ALLEEN MIJN VRIENDEN",
+      "exercise": "OEFENING",
+      "metric": "METRIEK",
+      "duration": "DUUR",
+      "durationWeekly": "WEKELIJKS",
+      "durationMonthly": "MAANDELIJKS",
+      "prizeLabel": "PRIJS",
+      "prizeLabelPlaceholder": "bijv. 1 Maand Pro",
+      "rewardXp": "XP BELONING",
+      "rewardXpPlaceholder": "0",
+      "maxParticipants": "MAX. DEELNEMERS",
+      "maxParticipantsPlaceholder": "Geen limiet"
+    },
+    "manage": {
+      "emptyTitle": "NOG GEEN CHALLENGES",
+      "emptySub": "Challenges die je aanmaakt verschijnen hier",
+      "statusActive": "ACTIEF",
+      "statusCompleted": "VOLTOOID",
+      "statusCancelled": "GEANNULEERD",
+      "statusDraft": "CONCEPT",
+      "cancel": "ANNULEREN",
+      "cancelConfirmTitle": "Deze challenge annuleren?",
+      "cancelConfirmMessage": "Deelnemers kunnen niet meer deelnemen of scoren. Dit kan niet ongedaan worden gemaakt.",
+      "cancelConfirmYes": "CHALLENGE ANNULEREN",
+      "cancelConfirmNo": "BEHOUDEN",
+      "loadError": "Kon je challenges niet laden",
+      "retry": "OPNIEUW"
+    }
   }
 }

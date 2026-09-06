@@ -69,6 +69,10 @@ function routeForNotificationTap(data: Record<string, unknown> | undefined): str
     case "pr_liked":
     case "friend_pr":
       return Routes.social;
+    case "challenge_won":
+      return typeof data?.challenge_id === "string"
+        ? Routes.challengeDetail(data.challenge_id)
+        : Routes.compete;
     default:
       return null;
   }

@@ -35,6 +35,7 @@ import {
 } from '@/types/challenge';
 import { ChallengeLeaderboardRow } from '@/components/features/compete/ChallengeLeaderboardRow';
 import { DetailHeader } from '@/components/ui/DetailHeader';
+import { Avatar } from '@/components/ui/Avatar';
 
 export default function ChallengeDetailScreen() {
   const { t } = useTranslation('compete');
@@ -367,12 +368,36 @@ export default function ChallengeDetailScreen() {
         )}
 
         {challenge?.status === 'completed' && (
-          <View className="flex-row items-center justify-center gap-2 py-3 rounded-xl bg-[rgba(212,160,23,0.1)] border border-[rgba(212,160,23,0.3)] mb-4">
-            <Trophy size={15} strokeWidth={1.8} color="#d4a017" />
-            <Text className="font-heading text-[13px] tracking-[2px] text-[#d4a017]">
-              {t('detail.challengeEnded')}
-            </Text>
-          </View>
+          entries.length > 0 ? (
+            <View className="flex-row items-center gap-3 py-3.5 px-4 rounded-2xl bg-[rgba(212,160,23,0.1)] border border-[rgba(212,160,23,0.3)] mb-4">
+              <Trophy size={22} strokeWidth={1.8} color="#d4a017" />
+              <Avatar
+                userId={entries[0].user_id}
+                name={entries[0].full_name ?? entries[0].username ?? t('unknown')}
+                avatarUrl={entries[0].avatar_url}
+                size={36}
+              />
+              <View className="flex-1">
+                <Text className="font-heading text-[9px] tracking-[2px]" style={{ color: '#d4a017' }}>
+                  {t('detail.winner')}
+                </Text>
+                <Text className="font-sans-medium text-sm text-white" numberOfLines={1}>
+                  {entries[0].full_name ?? entries[0].username ?? t('unknown')}
+                  {entries[0].is_me ? t('youSuffix') : ''}
+                </Text>
+              </View>
+              <Text className="font-heading text-lg" style={{ color: '#d4a017' }}>
+                {formatChallengeScore(entries[0].score, challenge.metric, '')}
+              </Text>
+            </View>
+          ) : (
+            <View className="flex-row items-center justify-center gap-2 py-3 rounded-xl bg-[rgba(212,160,23,0.1)] border border-[rgba(212,160,23,0.3)] mb-4">
+              <Trophy size={15} strokeWidth={1.8} color="#d4a017" />
+              <Text className="font-heading text-[13px] tracking-[2px] text-[#d4a017]">
+                {t('detail.challengeEnded')}
+              </Text>
+            </View>
+          )
         )}
       </ScrollView>
     </SafeAreaView>

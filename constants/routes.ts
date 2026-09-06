@@ -12,6 +12,7 @@ export const Routes = {
   // Compete tab
   compete: '/(tabs)/compete',
   challengeDetail: (id: string) => `/(stack)/challenge/${id}`,
+  adminChallenges: '/(stack)/admin-challenges',
 
   // Social tab
   social: '/(tabs)/social',

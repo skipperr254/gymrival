@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { setAudioModeAsync } from 'expo-audio';
 import { Image as ExpoImage } from 'expo-image';
 import { VideoView, useVideoPlayer } from 'expo-video';
-import { AlertCircle, Clock, Maximize2, RefreshCw, Volume2, VolumeX } from 'lucide-react-native';
+import { AlertCircle, Clock, Maximize2, RefreshCw, Volume2, VolumeX, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { useSocialStore } from '@/store/useSocialStore';
 import { Colors } from '@/constants/theme';
@@ -44,7 +45,8 @@ function formatDuration(sec: number): string {
 
 export function FeedVideo({ postId, videoUrl, thumbnailUrl, durationSec, isActive }: Props) {
   const { t } = useTranslation('social');
-  const viewRef = useRef<VideoView>(null);
+  const insets = useSafeAreaInsets();
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Global feed mute (Instagram-style): read from the store here rather than
   // via props so toggling never re-renders the surrounding list rows.
@@ -94,6 +96,7 @@ export function FeedVideo({ postId, videoUrl, thumbnailUrl, durationSec, isActiv
     } else {
       setFirstFrameRendered(false);
       setHasError(false);
+      setIsFullscreen(false);
     }
   }, [isActive, player]);
 
@@ -114,7 +117,11 @@ export function FeedVideo({ postId, videoUrl, thumbnailUrl, durationSec, isActiv
   };
 
   const handleFullscreen = () => {
-    viewRef.current?.enterFullscreen();
+    setIsFullscreen(true);
+  };
+
+  const handleExitFullscreen = () => {
+    setIsFullscreen(false);
   };
 
   return (
@@ -124,14 +131,13 @@ export function FeedVideo({ postId, videoUrl, thumbnailUrl, durationSec, isActiv
       accessibilityLabel={feedMuted ? t('soundOn') : t('soundOff')}
       className="flex-1 bg-black overflow-hidden"
     >
-      {isActive && (
+      {isActive && !isFullscreen && (
         <VideoView
-          ref={viewRef}
           player={player}
           style={StyleSheet.absoluteFill}
           contentFit="cover"
           nativeControls={false}
-          fullscreenOptions={{ enable: true }}
+          fullscreenOptions={{ enable: false }}
           onFirstFrameRender={() => setFirstFrameRendered(true)}
         />
       )}
@@ -185,6 +191,7 @@ export function FeedVideo({ postId, videoUrl, thumbnailUrl, durationSec, isActiv
         <Pressable
           onPress={handleFullscreen}
           accessibilityRole="button"
+          accessibilityLabel={t('enterFullscreen')}
           className="absolute top-2.5 right-2.5 w-[30px] h-[30px] rounded-lg bg-black/50 border border-white/10 items-center justify-center"
           hitSlop={14}
         >
@@ -204,6 +211,32 @@ export function FeedVideo({ postId, videoUrl, thumbnailUrl, durationSec, isActiv
             <Volume2 size={14} strokeWidth={2} color={Colors.primary} />
           )}
         </View>
+      )}
+
+      {/* Fullscreen viewer — a custom Modal rather than expo-video's native
+          fullscreen presentation, which covers the whole screen with no
+          hook for us to render our own dismiss control over it. */}
+      {isActive && (
+        <Modal
+          visible={isFullscreen}
+          animationType="fade"
+          statusBarTranslucent
+          onRequestClose={handleExitFullscreen}
+        >
+          <View className="flex-1 bg-black">
+            <VideoView player={player} style={StyleSheet.absoluteFill} contentFit="contain" nativeControls={false} />
+            <Pressable
+              onPress={handleExitFullscreen}
+              accessibilityRole="button"
+              accessibilityLabel={t('exitFullscreen')}
+              hitSlop={16}
+              className="absolute left-3 w-9 h-9 rounded-full bg-black/60 border border-white/10 items-center justify-center"
+              style={{ top: insets.top + 10 }}
+            >
+              <X size={18} strokeWidth={2.5} color="#fff" />
+            </Pressable>
+          </View>
+        </Modal>
       )}
     </Pressable>
   );

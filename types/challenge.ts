@@ -92,6 +92,20 @@ export interface CreateFriendChallengeInput {
   invitee_id: string;
 }
 
+/** Input for an admin creating a new global/friends_only challenge */
+export interface CreateAdminChallengeInput {
+  scope: Extract<ChallengeScope, 'global' | 'friends_only'>;
+  metric: ChallengeMetric;
+  exercise_key: string | null;
+  title: string;
+  description?: string;
+  prize_label?: string;
+  reward_xp?: number;
+  starts_at: string;
+  ends_at: string;
+  max_participants?: number;
+}
+
 import i18n from '@/lib/i18n';
 import { formatNumber } from '@/lib/i18n/format';
 

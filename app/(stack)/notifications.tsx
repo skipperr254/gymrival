@@ -56,6 +56,8 @@ function buildNotificationText(n: AppNotification, t: TFunction): string {
       const value = n.data.value != null ? ` ${n.data.value}${n.data.unit ?? ''}` : '';
       return t('notifications:friendPr', { name, exercise, value });
     }
+    case 'challenge_won':
+      return t('notifications:challengeWon', { title: n.data.title ?? t('notifications:aChallenge') });
     default:
       return t('notifications:generic');
   }
@@ -73,6 +75,8 @@ function notificationIcon(type: NotificationType): { icon: LucideIcon; color: st
       return { icon: Heart, color: Colors.accent };
     case 'friend_pr':
       return { icon: Trophy, color: Colors.warning };
+    case 'challenge_won':
+      return { icon: Trophy, color: '#d4a017' };
     default:
       // A notification type the client doesn't recognize yet (e.g. a new
       // type shipped server-side before this app version updated, or bad
@@ -94,6 +98,9 @@ function handleNotificationPress(n: AppNotification) {
     case 'pr_liked':
     case 'friend_pr':
       router.push(Routes.social as never);
+      break;
+    case 'challenge_won':
+      if (n.data.challenge_id) router.push(Routes.challengeDetail(n.data.challenge_id) as never);
       break;
   }
 }

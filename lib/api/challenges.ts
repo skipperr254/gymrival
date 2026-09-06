@@ -4,6 +4,7 @@ import type {
   ChallengeLeaderboardEntry,
   ChallengeInvitation,
   CreateFriendChallengeInput,
+  CreateAdminChallengeInput,
   InvitationStatus,
 } from "@/types/challenge";
 
@@ -210,31 +211,17 @@ export async function respondToInvitation(
  */
 export async function createAdminChallenge(
   adminId: string,
-  input: {
-    type: 'admin';
-    scope: 'global' | 'friends_only';
-    metric: string;
-    exercise_key: string | null;
-    title: string;
-    description?: string;
-    icon?: string;
-    prize_label?: string;
-    reward_xp?: number;
-    starts_at: string;
-    ends_at: string;
-    max_participants?: number;
-  },
+  input: CreateAdminChallengeInput,
 ): Promise<{ challengeId: string | null; error: string | null }> {
   const { data, error } = await supabase
     .from('challenges')
     .insert({
-      type:             input.type,
+      type:             'admin',
       scope:            input.scope,
       metric:           input.metric,
       exercise_key:     input.exercise_key,
       title:            input.title,
       description:      input.description ?? null,
-      icon:             input.icon ?? null,
       prize_label:      input.prize_label ?? null,
       reward_xp:        input.reward_xp ?? 0,
       starts_at:        input.starts_at,
@@ -253,6 +240,9 @@ export async function createAdminChallenge(
 /**
  * Admin-only: mark a challenge as completed.
  * This triggers the award_challenge_xp() DB trigger which awards XP to the winner.
+ * Left available for a manual override, though in practice the scheduled
+ * complete_expired_challenges() sweep (migration 047) now does this
+ * automatically for every challenge once ends_at passes.
  */
 export async function completeChallenge(
   challengeId: string,
@@ -260,6 +250,47 @@ export async function completeChallenge(
   const { error } = await supabase
     .from('challenges')
     .update({ status: 'completed' })
+    .eq('id', challengeId);
+  return { error: error?.message ?? null };
+}
+
+/**
+ * Admin-only: fetch every challenge the given admin created, in any status
+ * (including 'cancelled'/'draft') — unlike active_challenges_for_user(),
+ * which only surfaces 'active'/'completed'. Backs the admin management list.
+ */
+export async function fetchAdminCreatedChallenges(
+  adminId: string,
+): Promise<{ data: ChallengeWithStats[]; error: string | null }> {
+  const { data, error } = await supabase
+    .from('challenges')
+    .select('*')
+    .eq('created_by', adminId)
+    .order('created_at', { ascending: false });
+
+  if (error) return { data: [], error: error.message };
+
+  return {
+    data: (data ?? []).map((row: any) => ({
+      ...mapChallengeRow(row),
+      // This is a plain table select, not the enriched RPC — these fields
+      // aren't available here and aren't used by the admin list UI.
+      participant_count: 0,
+      is_joined: false,
+      user_score: null,
+      user_rank: null,
+    })),
+    error: null,
+  };
+}
+
+/** Admin-only: cancel a challenge the admin created (or any challenge, if admin). */
+export async function cancelChallenge(
+  challengeId: string,
+): Promise<{ error: string | null }> {
+  const { error } = await supabase
+    .from('challenges')
+    .update({ status: 'cancelled' })
     .eq('id', challengeId);
   return { error: error?.message ?? null };
 }

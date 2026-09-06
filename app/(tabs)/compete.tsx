@@ -1,8 +1,12 @@
 import { useState, useRef } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
+import { ShieldCheck } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
+import { Routes } from '@/constants/routes';
+import { useProfileStore } from '@/store/useProfileStore';
 import { RivalsContent, ChallengesContent, GlobalContent } from '@/components/features/compete';
 import { AppHeader, SegmentedControl } from '@/components/ui';
 
@@ -19,6 +23,7 @@ type TabKey = (typeof TABS)[number]['key'];
 
 export default function CompeteScreen() {
   const { t } = useTranslation('compete');
+  const isAdmin = useProfileStore((s) => s.profile?.role === 'admin');
   const [activeTab, setActiveTab] = useState<TabKey>('rivals');
   const scrollRef = useRef<ScrollView>(null);
   const activeIndex = TABS.findIndex(tab => tab.key === activeTab);
@@ -27,7 +32,15 @@ export default function CompeteScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
-      <AppHeader />
+      <AppHeader
+        right={
+          isAdmin ? (
+            <Pressable onPress={() => router.push(Routes.adminChallenges as never)}>
+              <ShieldCheck size={20} strokeWidth={1.8} color={Colors.accent} />
+            </Pressable>
+          ) : undefined
+        }
+      />
       <View className="px-4 pb-2.5">
         <SegmentedControl
           options={TABS.map(tab => t(tab.labelKey))}

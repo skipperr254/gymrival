@@ -4,24 +4,20 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Search, ChevronRight, Zap, AlertCircle, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
-import { getExerciseIcon } from '@/constants/exerciseIcons';
 import type { ChallengeMetric } from '@/types/challenge';
 import type { FriendProfile } from '@/types/social';
 import type { ExerciseType } from '@/types/pr';
 import { Avatar } from '@/components/ui/Avatar';
+import { ExercisePicker } from './ExercisePicker';
+import { MetricPicker } from './MetricPicker';
+import { DurationPicker, type DurationOption } from './DurationPicker';
 
 // Display text resolved via t() at render time — see labelKey usage below.
-const DURATION_OPTIONS = [
+const DURATION_OPTIONS: DurationOption[] = [
   { labelKey: 'modal.durationOptions.3d', days: 3  },
   { labelKey: 'modal.durationOptions.1w', days: 7  },
   { labelKey: 'modal.durationOptions.2w', days: 14 },
   { labelKey: 'modal.durationOptions.1m', days: 30 },
-];
-
-const METRIC_OPTIONS: { labelKey: string; value: ChallengeMetric }[] = [
-  { labelKey: 'metric.highestPr',    value: 'highest_pr'    },
-  { labelKey: 'metric.mostImproved', value: 'most_improved' },
-  { labelKey: 'metric.totalVolume',  value: 'total_volume'  },
 ];
 
 export function CreateChallengeModal({
@@ -190,88 +186,31 @@ export function CreateChallengeModal({
             <Text className="font-heading text-[10px] tracking-[3px] text-muted mb-2.5">
               {t('modal.exercise')}
             </Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
-              <View className="flex-row gap-1.5 pb-1">
-                {exercises.map(ex => {
-                  const active = exercise === ex.key;
-                  const ExIcon = getExerciseIcon(ex.key);
-                  return (
-                    <Pressable
-                      key={ex.key}
-                      onPress={() => {
-                        exerciseAutoPicked.current = false;
-                        setExercise(ex.key);
-                      }}
-                      className={`flex-row items-center gap-1.5 py-2 px-3 rounded-[10px] border-[1.5px] justify-center ${
-                        active
-                          ? 'border-accent bg-[rgba(230,48,48,0.1)]'
-                          : 'border-default bg-transparent'
-                      }`}
-                    >
-                      <ExIcon size={12} strokeWidth={2} color={active ? Colors.accent : Colors.muted} />
-                      <Text
-                        className={`font-heading text-[10px] tracking-[1px] ${
-                          active ? 'text-accent' : 'text-muted'
-                        }`}
-                      >
-                        {ex.label.toUpperCase()}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </ScrollView>
+            <View className="mb-4">
+              <ExercisePicker
+                exercises={exercises}
+                value={exercise}
+                onChange={(key) => {
+                  exerciseAutoPicked.current = false;
+                  setExercise(key);
+                }}
+              />
+            </View>
 
             {/* ── Metric ───────────────────────────────────── */}
             <Text className="font-heading text-[10px] tracking-[3px] text-muted mb-2.5">
               {t('modal.metric')}
             </Text>
-            <View className="flex-row gap-2 mb-4">
-              {METRIC_OPTIONS.map(opt => (
-                <Pressable
-                  key={opt.value}
-                  onPress={() => setMetric(opt.value)}
-                  className={`flex-1 py-2 px-3 rounded-[10px] border-[1.5px] items-center justify-center ${
-                    metric === opt.value
-                      ? 'border-accent bg-[rgba(230,48,48,0.1)]'
-                      : 'border-default bg-transparent'
-                  }`}
-                >
-                  <Text
-                    className={`font-heading text-[10px] tracking-[1px] ${
-                      metric === opt.value ? 'text-accent' : 'text-muted'
-                    }`}
-                  >
-                    {t(opt.labelKey).toUpperCase()}
-                  </Text>
-                </Pressable>
-              ))}
+            <View className="mb-4">
+              <MetricPicker value={metric} onChange={setMetric} />
             </View>
 
             {/* ── Duration ─────────────────────────────────── */}
             <Text className="font-heading text-[10px] tracking-[3px] text-muted mb-2.5">
               {t('modal.duration')}
             </Text>
-            <View className="flex-row gap-2 mb-7">
-              {DURATION_OPTIONS.map(opt => (
-                <Pressable
-                  key={opt.days}
-                  onPress={() => setDuration(opt.days)}
-                  className={`flex-1 py-2 px-3 rounded-[10px] border-[1.5px] items-center justify-center ${
-                    duration === opt.days
-                      ? 'border-accent bg-[rgba(230,48,48,0.1)]'
-                      : 'border-default bg-transparent'
-                  }`}
-                >
-                  <Text
-                    className={`font-heading text-[10px] tracking-[1px] ${
-                      duration === opt.days ? 'text-accent' : 'text-muted'
-                    }`}
-                  >
-                    {t(opt.labelKey).toUpperCase()}
-                  </Text>
-                </Pressable>
-              ))}
+            <View className="mb-7">
+              <DurationPicker options={DURATION_OPTIONS} value={duration} onChange={setDuration} />
             </View>
 
             {/* ── Error ────────────────────────────────────── */}

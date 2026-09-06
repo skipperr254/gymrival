@@ -5,6 +5,8 @@
   "headerMessages": "Nachrichten",
   "soundOn": "Ton einschalten",
   "soundOff": "Ton ausschalten",
+  "enterFullscreen": "Vollbild anzeigen",
+  "exitFullscreen": "Vollbild verlassen",
   "you": "DU",
   "athlete": "Athlet",
   "gym": "Studio",
