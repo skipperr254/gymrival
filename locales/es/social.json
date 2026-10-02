@@ -81,6 +81,14 @@
     "sent": "Enviado",
     "messagePlaceholder": "Mensaje para {{name}}...",
     "messagePlaceholderGeneric": "Mensaje...",
-    "quickReplies": ["¡Buen levantamiento!", "¡A entrenar!", "¿Cuál es tu PR?", "Respeto"]
+    "quickReplies": [
+      "¡Buen levantamiento!",
+      "¡A entrenar!",
+      "¿Cuál es tu PR?",
+      "Respeto"
+    ],
+    "lockedTitle": "Responder es una función Pro",
+    "lockedSub": "Mejora tu plan para hablar con tus rivales",
+    "lockedCta": "DESBLOQUEAR"
   }
 }

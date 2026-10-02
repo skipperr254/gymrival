@@ -81,6 +81,14 @@
     "sent": "Verzonden",
     "messagePlaceholder": "Bericht aan {{name}}...",
     "messagePlaceholderGeneric": "Bericht...",
-    "quickReplies": ["Mooie lift!", "Laten we trainen!", "Wat is je PR?", "Respect"]
+    "quickReplies": [
+      "Mooie lift!",
+      "Laten we trainen!",
+      "Wat is je PR?",
+      "Respect"
+    ],
+    "lockedTitle": "Reageren is een Pro-functie",
+    "lockedSub": "Upgrade om je rivalen te berichten",
+    "lockedCta": "ONTGRENDEL"
   }
 }

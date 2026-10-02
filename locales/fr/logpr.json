@@ -1,9 +1,18 @@
 {
   "logSheet": {
     "title": "ENREGISTRER UNE ACTIVITÉ",
-    "logPr": { "label": "Enregistrer un PR", "sub": "Enregistrer un nouveau record personnel" },
-    "checkin": { "label": "Check-in salle", "sub": "Enregistre ta présence à la salle" },
-    "logMeal": { "label": "Enregistrer un repas", "sub": "Suis tes calories et macros" }
+    "logPr": {
+      "label": "Enregistrer un PR",
+      "sub": "Enregistrer un nouveau record personnel"
+    },
+    "checkin": {
+      "label": "Check-in salle",
+      "sub": "Enregistre ta présence à la salle"
+    },
+    "logMeal": {
+      "label": "Enregistrer un repas",
+      "sub": "Suis tes calories et macros"
+    }
   },
   "step": {
     "stepOf": "ÉTAPE {{step}} SUR 2",
@@ -31,7 +40,6 @@
   "xpEarned": "+100 XP GAGNÉS",
   "video": {
     "readyLabel": "VIDÉO PRÊTE",
-    "requiredHint": "Une preuve vidéo est requise pour enregistrer un PR",
     "addProofTitle": "AJOUTER UNE PREUVE VIDÉO",
     "addProofSub": "Caméra ou galerie · 60 sec max",
     "permissionNeededTitle": "Autorisation requise",
@@ -42,5 +50,17 @@
     "recordVideo": "Filmer une vidéo",
     "chooseFromLibrary": "Choisir dans la galerie",
     "cancel": "Annuler"
+  },
+  "gate": {
+    "proBadge": "PRO",
+    "videoLockedTitle": "Preuve en vidéo",
+    "videoLockedSub": "Filme cette performance",
+    "publishTitle": "Partager sur le fil",
+    "publishSub": "Tes rivaux verront ce PR",
+    "publishOffSub": "Gardé dans tes archives",
+    "publishLockedSub": "Publier sur le fil est une fonction Pro",
+    "privateNote": "Ton PR est enregistré dans tous les cas — il rapporte de l'XP et compte dans les deux classements.",
+    "sharedToFeed": "Partagé sur le fil",
+    "savedPrivately": "Enregistré dans tes archives"
   }
 }

@@ -1,0 +1,109 @@
+{
+  "title": "GYMRIVAL PRO",
+  "subtitle": "Blijf gratis trainen. Strijd als een pro.",
+  "contextual": "Ontgrendel {{feature}}",
+  "features": {
+    "publishPR": {
+      "title": "Deel je PR's",
+      "sub": "Zet je lifts op de feed"
+    },
+    "prVideo": {
+      "title": "Videobewijs",
+      "sub": "Leg elke lift vast op camera"
+    },
+    "sendMessage": {
+      "title": "Bericht je rivalen",
+      "sub": "Reageer op iedereen, altijd"
+    },
+    "leaderboardDepth": {
+      "title": "Het hele klassement",
+      "sub": "Elke atleet, niet alleen de top 10"
+    },
+    "leaderboardSearch": {
+      "title": "Zoek atleten",
+      "sub": "Vind iedereen op het klassement"
+    },
+    "createChallenge": {
+      "title": "Maak uitdagingen",
+      "sub": "Daag je vrienden rechtstreeks uit"
+    }
+  },
+  "freeNote": "Voeding, schema, check-ins en voortgang blijven gratis. Altijd.",
+  "plans": {
+    "yearly": "Jaarlijks",
+    "monthly": "Maandelijks",
+    "weekly": "Wekelijks",
+    "quarterly": "Per kwartaal",
+    "lifetime": "Levenslang",
+    "bestValue": "BESTE DEAL",
+    "save": "Bespaar {{percent}}%",
+    "perMonth": "{{price}} / maand",
+    "trialBadge": "{{count}} dagen gratis"
+  },
+  "cta": {
+    "startTrial": "Start {{count}} dagen gratis",
+    "subscribe": "Doorgaan",
+    "processing": "Bezig"
+  },
+  "terms": {
+    "withTrial": "{{count}} dagen gratis, daarna {{price}} per {{period}}. Wordt automatisch verlengd tot je opzegt. Opzeggen kan altijd in je App Store-instellingen.",
+    "noTrial": "{{price}} per {{period}}. Wordt automatisch verlengd tot je opzegt. Opzeggen kan altijd in je App Store-instellingen."
+  },
+  "period": {
+    "weekly": "week",
+    "monthly": "maand",
+    "quarterly": "3 maanden",
+    "yearly": "jaar",
+    "lifetime": "eenmalig",
+    "unknown": "periode"
+  },
+  "links": {
+    "restore": "Herstellen",
+    "terms": "Voorwaarden",
+    "privacy": "Privacy"
+  },
+  "loading": "Abonnementen laden",
+  "empty": {
+    "title": "Niet beschikbaar",
+    "body": "We konden de abonnementen nu niet laden. Probeer het zo meteen opnieuw.",
+    "retry": "Opnieuw proberen"
+  },
+  "restore": {
+    "successTitle": "Pro hersteld",
+    "successBody": "Welkom terug. Je Pro-functies zijn weer actief.",
+    "noneTitle": "Niets te herstellen",
+    "noneBody": "We vonden geen actief abonnement voor dit Apple-account.",
+    "failedTitle": "Herstellen mislukt"
+  },
+  "purchase": {
+    "pendingTitle": "Aankoop in behandeling",
+    "pendingBody": "Je aankoop moet nog goedgekeurd worden. Pro wordt actief zodra dat gebeurt.",
+    "failedTitle": "Aankoop mislukt",
+    "unavailable": "In-app-aankopen zijn niet beschikbaar op dit apparaat."
+  },
+  "close": "Sluiten",
+  "subscription": {
+    "sectionTitle": "ABONNEMENT",
+    "proTitle": "GymRival Pro",
+    "freeTitle": "Gratis abonnement",
+    "freeSub": "Upgrade om de sociale en competitiefuncties te ontgrendelen",
+    "upgrade": "Upgrade naar Pro",
+    "manage": "Abonnement beheren",
+    "manageSub": "Je abonnement wijzigen of opzeggen",
+    "restore": "Aankopen herstellen",
+    "restoreSub": "Al geabonneerd met deze Apple ID?",
+    "renewsOn": "Verlengt {{date}}",
+    "expiresOn": "Toegang tot {{date}}",
+    "noExpiry": "Actief",
+    "status": {
+      "trialing": "Proefperiode",
+      "active": "Actief",
+      "grace": "Actief",
+      "billing_issue": "Betaalprobleem",
+      "cancelled": "Opgezegd",
+      "expired": "Verlopen"
+    },
+    "billingIssueBody": "We konden je laatste betaling niet verwerken. Werk je betaalmethode bij om Pro te behouden.",
+    "cancelledBody": "Automatisch verlengen staat uit. Je houdt Pro tot de datum hierboven."
+  }
+}

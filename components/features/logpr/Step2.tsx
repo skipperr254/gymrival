@@ -1,9 +1,11 @@
-import { View, Text, Pressable, ActivityIndicator } from 'react-native';
+import { useCallback } from 'react';
+import { View, Text, Pressable, Switch, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { CheckCircle, AlertCircle } from 'lucide-react-native';
+import { CheckCircle, AlertCircle, Lock, Video, Globe } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import type { ExerciseType } from '@/types/pr';
+import type { ProFeature } from '@/constants/entitlements';
 import { VideoUploadZone } from '@/components/features/VideoUploadZone';
 import { getExerciseIcon } from '@/constants/exerciseIcons';
 
@@ -27,16 +29,65 @@ interface Step2Props {
   onVideoRemoved: () => void;
   onSave: () => void;
   onBack: () => void;
+  /** Resolved once in LogPRSheet so both gates and the save path agree. */
+  isPro: boolean;
+  publish: boolean;
+  onTogglePublish: (value: boolean) => void;
+  /** Closes this sheet first, then opens the paywall — see LogPRSheet. */
+  onRequestUpgrade: (feature: ProFeature) => void;
+}
+
+/** A locked row standing in for a Pro-only control. Taps through to the paywall. */
+function LockedRow({
+  icon: Icon,
+  title,
+  sub,
+  onPress,
+}: {
+  icon: typeof Video;
+  title: string;
+  sub: string;
+  onPress: () => void;
+}) {
+  const { t } = useTranslation('logpr');
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      className="flex-row items-center gap-3 bg-[#1a1a1a] border border-[#2e2a2a] rounded-2xl px-4 py-3.5 mb-2.5"
+      style={({ pressed }) => pressed && { opacity: 0.7 }}
+    >
+      <View className="w-10 h-10 rounded-xl bg-[rgba(230,48,48,0.1)] items-center justify-center">
+        <Icon size={18} strokeWidth={1.8} color={Colors.accent} />
+      </View>
+      <View className="flex-1">
+        <View className="flex-row items-center gap-1.5">
+          <Text className="font-sans-semibold text-[13px] text-primary">{title}</Text>
+          <View className="bg-accent rounded-full px-1.5 py-px">
+            <Text className="font-heading text-[8px] text-primary tracking-[1px]">
+              {t('gate.proBadge')}
+            </Text>
+          </View>
+        </View>
+        <Text className="font-sans text-[11px] text-[#707070] mt-px">{sub}</Text>
+      </View>
+      <Lock size={15} strokeWidth={2} color={Colors.hint} />
+    </Pressable>
+  );
 }
 
 export function Step2({
   selectedEx, prValue, currentPR, saving, saveError,
   videoAsset, onVideoSelected, onVideoRemoved,
-  onSave,
+  onSave, isPro, publish, onTogglePublish, onRequestUpgrade,
 }: Step2Props) {
   const { t } = useTranslation('logpr');
   const ExIcon = getExerciseIcon(selectedEx.key);
-  const hasVideo = !!videoAsset;
+
+  // Hoisted out of JSX: these are feature identifiers, not copy, but inline
+  // they trip the i18next no-literal-string rule.
+  const upgradeForVideo = useCallback(() => onRequestUpgrade('prVideo'), [onRequestUpgrade]);
+  const upgradeForPublish = useCallback(() => onRequestUpgrade('publishPR'), [onRequestUpgrade]);
 
   return (
     <>
@@ -66,19 +117,61 @@ export function Step2({
         </Text>
       </View>
 
-      {/* Video upload zone — required, PR can't be saved without it */}
-      <View className="mb-2">
-        <VideoUploadZone
-          asset={videoAsset}
-          onVideoSelected={onVideoSelected}
-          onVideoRemoved={onVideoRemoved}
-          disabled={saving}
+      {/* ── Video proof — Pro ───────────────────────────────────────────── */}
+      {isPro ? (
+        <View className="mb-2.5">
+          <VideoUploadZone
+            asset={videoAsset}
+            onVideoSelected={onVideoSelected}
+            onVideoRemoved={onVideoRemoved}
+            disabled={saving}
+          />
+        </View>
+      ) : (
+        <LockedRow
+          icon={Video}
+          title={t('gate.videoLockedTitle')}
+          sub={t('gate.videoLockedSub')}
+          onPress={upgradeForVideo}
         />
-      </View>
+      )}
 
-      {!hasVideo && (
-        <Text className="font-sans text-[11px] text-muted text-center mb-3">
-          {t('video.requiredHint')}
+      {/* ── Share to the feed — Pro ─────────────────────────────────────── */}
+      {isPro ? (
+        <View className="flex-row items-center gap-3 bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl px-4 py-3 mb-2.5">
+          <View className="w-10 h-10 rounded-xl bg-[rgba(230,48,48,0.1)] items-center justify-center">
+            <Globe size={18} strokeWidth={1.8} color={Colors.accent} />
+          </View>
+          <View className="flex-1">
+            <Text className="font-sans-semibold text-[13px] text-primary">
+              {t('gate.publishTitle')}
+            </Text>
+            <Text className="font-sans text-[11px] text-[#707070] mt-px">
+              {publish ? t('gate.publishSub') : t('gate.publishOffSub')}
+            </Text>
+          </View>
+          <Switch
+            value={publish}
+            onValueChange={onTogglePublish}
+            disabled={saving}
+            trackColor={{ false: Colors.elevated, true: Colors.accent }}
+            thumbColor={Colors.primary}
+            ios_backgroundColor={Colors.elevated}
+          />
+        </View>
+      ) : (
+        <LockedRow
+          icon={Globe}
+          title={t('gate.publishTitle')}
+          sub={t('gate.publishLockedSub')}
+          onPress={upgradeForPublish}
+        />
+      )}
+
+      {/* Reassurance: a private PR is not a lesser PR. It still ranks. */}
+      {!isPro && (
+        <Text className="font-sans text-[11px] text-muted text-center mb-3 px-2 leading-4">
+          {t('gate.privateNote')}
         </Text>
       )}
 
@@ -89,11 +182,13 @@ export function Step2({
         </View>
       )}
 
-      {/* Primary save button — disabled until a video is attached */}
+      {/* Video is no longer required to save. It could not stay required once
+          video proof became Pro-only — a free user would have been unable to
+          log a PR at all, and logging is explicitly free. */}
       <Pressable
         onPress={onSave}
-        disabled={saving || !hasVideo}
-        style={({ pressed }) => [(pressed && hasVideo) && { opacity: 0.85 }, !hasVideo && { opacity: 0.4 }]}
+        disabled={saving}
+        style={({ pressed }) => [pressed && { opacity: 0.85 }]}
       >
         <LinearGradient
           colors={[Colors.accent, Colors.accentDark]}

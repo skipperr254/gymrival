@@ -9,7 +9,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Trophy, Search, RefreshCw, AlertCircle } from 'lucide-react-native';
+import { Trophy, Search, RefreshCw, AlertCircle, Lock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors, MedalColors } from '@/constants/theme';
 import { getExerciseIcon } from '@/constants/exerciseIcons';
@@ -18,6 +18,9 @@ import { useCompeteStore } from '@/store/useCompeteStore';
 import { formatNumber } from '@/lib/i18n/format';
 import type { GlobalLeaderboardEntry } from '@/types/compete';
 import { Avatar } from '@/components/ui/Avatar';
+import { useProGate } from '@/hooks/useProGate';
+import { FREE_LIMITS } from '@/constants/entitlements';
+import { LockedBoardTeaser } from './LockedBoardTeaser';
 
 /** Converts an ISO 3166-1 alpha-2 code (e.g. 'NL') to its Unicode flag emoji. */
 function toFlagEmoji(code: string | null | undefined): string {
@@ -198,6 +201,11 @@ export function GlobalContent() {
   const loadMoreGlobal = useCompeteStore((s) => s.loadMoreGlobal);
   const loadMyGlobalRank = useCompeteStore((s) => s.loadMyGlobalRank);
 
+  // Depth and search are Pro; the viewer's own rank stays free (that is the
+  // point — they can see they are #847 but not who is above them).
+  const depthGate = useProGate('leaderboardDepth');
+  const searchGate = useProGate('leaderboardSearch');
+
   const [search, setSearch] = useState('');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const listRef = useRef<FlatList<GlobalLeaderboardEntry>>(null);
@@ -271,16 +279,32 @@ export function GlobalContent() {
           color={Colors.muted}
           style={{ position: 'absolute', left: 14, zIndex: 1 }}
         />
-        <TextInput
-          value={search}
-          onChangeText={handleSearch}
-          placeholder={t('global.searchPlaceholder')}
-          placeholderTextColor={Colors.muted}
-          className="bg-surface rounded-[14px] border-[1.5px] border-default py-3 pl-[42px] pr-3.5 font-sans text-sm text-white"
-          returnKeyType="search"
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
+        {searchGate.locked ? (
+          // Not just disabled — a dead input invites tapping with no
+          // explanation. This one says why and routes to the paywall.
+          <Pressable
+            onPress={searchGate.requestUpgrade}
+            accessibilityRole="button"
+            className="flex-row items-center bg-surface rounded-[14px] border-[1.5px] border-default py-3 pl-[42px] pr-3.5"
+            style={({ pressed }) => pressed && { opacity: 0.7 }}
+          >
+            <Text className="flex-1 font-sans text-sm text-muted" numberOfLines={1}>
+              {t('global.searchLocked')}
+            </Text>
+            <Lock size={14} strokeWidth={2} color={Colors.hint} />
+          </Pressable>
+        ) : (
+          <TextInput
+            value={search}
+            onChangeText={handleSearch}
+            placeholder={t('global.searchPlaceholder')}
+            placeholderTextColor={Colors.muted}
+            className="bg-surface rounded-[14px] border-[1.5px] border-default py-3 pl-[42px] pr-3.5 font-sans text-sm text-white"
+            returnKeyType="search"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+        )}
         {loadingGlobal && !isFirstLoad && (
           <ActivityIndicator
             size="small"
@@ -381,8 +405,18 @@ export function GlobalContent() {
     </>
   );
 
+  // The server returns at most FREE_LIMITS.globalLeaderboardRows to a free
+  // viewer, so a full page is the signal that the board continues past it.
+  const showLockedTeaser =
+    depthGate.locked &&
+    !isFirstLoad &&
+    !globalError &&
+    globalEntries.length >= FREE_LIMITS.globalLeaderboardRows;
+
   const listFooter = (
     <>
+      {showLockedTeaser && <LockedBoardTeaser onUpgradePress={depthGate.requestUpgrade} />}
+
       {/* Load more */}
       {!isFirstLoad && globalHasMore && globalEntries.length > 0 && (
         <Pressable
@@ -401,7 +435,7 @@ export function GlobalContent() {
       )}
 
       {/* Refresh button (shown at bottom when fully loaded) */}
-      {!isFirstLoad && !globalHasMore && globalEntries.length > 0 && (
+      {!isFirstLoad && !globalHasMore && globalEntries.length > 0 && !showLockedTeaser && (
         <Pressable
           onPress={handleRefresh}
           className="flex-row items-center justify-center gap-1.5 py-2.5 mt-1"

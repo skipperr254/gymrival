@@ -81,6 +81,14 @@
     "sent": "Gesendet",
     "messagePlaceholder": "Nachricht an {{name}}...",
     "messagePlaceholderGeneric": "Nachricht...",
-    "quickReplies": ["Starker Lift!", "Auf geht's zum Training!", "Was ist dein PR?", "Respekt"]
+    "quickReplies": [
+      "Starker Lift!",
+      "Auf geht's zum Training!",
+      "Was ist dein PR?",
+      "Respekt"
+    ],
+    "lockedTitle": "Antworten ist eine Pro-Funktion",
+    "lockedSub": "Upgrade, um deinen Rivalen zu schreiben",
+    "lockedCta": "FREISCHALTEN"
   }
 }

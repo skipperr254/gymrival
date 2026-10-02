@@ -1,0 +1,109 @@
+{
+  "title": "GYMRIVAL PRO",
+  "subtitle": "تدرّب مجاناً. نافس باحتراف.",
+  "contextual": "افتح {{feature}}",
+  "features": {
+    "publishPR": {
+      "title": "انشر أرقامك القياسية",
+      "sub": "اعرض رفعاتك في التغذية الإخبارية"
+    },
+    "prVideo": {
+      "title": "إثبات بالفيديو",
+      "sub": "وثّق كل رفعة بالكاميرا"
+    },
+    "sendMessage": {
+      "title": "راسل منافسيك",
+      "sub": "رد على أي شخص في أي وقت"
+    },
+    "leaderboardDepth": {
+      "title": "لوحة الصدارة كاملة",
+      "sub": "كل الرياضيين، وليس العشرة الأوائل فقط"
+    },
+    "leaderboardSearch": {
+      "title": "ابحث عن الرياضيين",
+      "sub": "اعثر على أي شخص في لوحة الصدارة"
+    },
+    "createChallenge": {
+      "title": "أنشئ تحديات",
+      "sub": "تحدَّ أصدقاءك وجهاً لوجه"
+    }
+  },
+  "freeNote": "التغذية والجدول وتسجيل الحضور والتقدم تبقى مجانية. دائماً.",
+  "plans": {
+    "yearly": "سنوي",
+    "monthly": "شهري",
+    "weekly": "أسبوعي",
+    "quarterly": "ربع سنوي",
+    "lifetime": "مدى الحياة",
+    "bestValue": "أفضل قيمة",
+    "save": "وفّر {{percent}}%",
+    "perMonth": "{{price}} / شهر",
+    "trialBadge": "{{count}} أيام مجاناً"
+  },
+  "cta": {
+    "startTrial": "ابدأ {{count}} أيام مجاناً",
+    "subscribe": "متابعة",
+    "processing": "جارٍ المعالجة"
+  },
+  "terms": {
+    "withTrial": "{{count}} أيام مجاناً، ثم {{price}} لكل {{period}}. يتجدد تلقائياً حتى الإلغاء. يمكنك الإلغاء في أي وقت من إعدادات App Store.",
+    "noTrial": "{{price}} لكل {{period}}. يتجدد تلقائياً حتى الإلغاء. يمكنك الإلغاء في أي وقت من إعدادات App Store."
+  },
+  "period": {
+    "weekly": "أسبوع",
+    "monthly": "شهر",
+    "quarterly": "3 أشهر",
+    "yearly": "سنة",
+    "lifetime": "مرة واحدة",
+    "unknown": "فترة"
+  },
+  "links": {
+    "restore": "استعادة",
+    "terms": "الشروط",
+    "privacy": "الخصوصية"
+  },
+  "loading": "جارٍ تحميل الخطط",
+  "empty": {
+    "title": "الخطط غير متاحة",
+    "body": "تعذّر تحميل خيارات الاشتراك الآن. حاول مرة أخرى بعد قليل.",
+    "retry": "إعادة المحاولة"
+  },
+  "restore": {
+    "successTitle": "تمت استعادة Pro",
+    "successBody": "أهلاً بعودتك. ميزات Pro نشطة مرة أخرى.",
+    "noneTitle": "لا شيء لاستعادته",
+    "noneBody": "لم نعثر على اشتراك نشط لحساب Apple هذا.",
+    "failedTitle": "فشلت الاستعادة"
+  },
+  "purchase": {
+    "pendingTitle": "الشراء قيد الانتظار",
+    "pendingBody": "عملية الشراء بحاجة إلى موافقة. سيتم تفعيل Pro فور اكتمالها.",
+    "failedTitle": "فشل الشراء",
+    "unavailable": "عمليات الشراء داخل التطبيق غير متاحة على هذا الجهاز."
+  },
+  "close": "إغلاق",
+  "subscription": {
+    "sectionTitle": "الاشتراك",
+    "proTitle": "GymRival Pro",
+    "freeTitle": "الخطة المجانية",
+    "freeSub": "قم بالترقية لفتح الميزات الاجتماعية والتنافسية",
+    "upgrade": "الترقية إلى Pro",
+    "manage": "إدارة الاشتراك",
+    "manageSub": "غيّر خطتك أو ألغها",
+    "restore": "استعادة المشتريات",
+    "restoreSub": "هل لديك اشتراك بهذا الـ Apple ID؟",
+    "renewsOn": "يتجدد في {{date}}",
+    "expiresOn": "الوصول حتى {{date}}",
+    "noExpiry": "نشط",
+    "status": {
+      "trialing": "فترة تجريبية",
+      "active": "نشط",
+      "grace": "نشط",
+      "billing_issue": "مشكلة في الدفع",
+      "cancelled": "ملغى",
+      "expired": "منتهٍ"
+    },
+    "billingIssueBody": "تعذّر تحصيل آخر دفعة. حدّث طريقة الدفع للاحتفاظ بـ Pro.",
+    "cancelledBody": "التجديد التلقائي متوقف. ستحتفظ بـ Pro حتى التاريخ أعلاه."
+  }
+}

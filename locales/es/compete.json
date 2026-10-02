@@ -1,8 +1,17 @@
 {
   "tabs": {
-    "rivals": { "label": "Rivales", "subtitle": "RIVALES" },
-    "challenges": { "label": "Retos", "subtitle": "RETOS" },
-    "global": { "label": "Global", "subtitle": "CLASIFICACIÓN GLOBAL" }
+    "rivals": {
+      "label": "Rivales",
+      "subtitle": "RIVALES"
+    },
+    "challenges": {
+      "label": "Retos",
+      "subtitle": "RETOS"
+    },
+    "global": {
+      "label": "Global",
+      "subtitle": "CLASIFICACIÓN GLOBAL"
+    }
   },
   "you": "TÚ",
   "unknown": "Desconocido",
@@ -73,7 +82,8 @@
     "challengeFriendSub": "Elige un amigo y define las condiciones",
     "moreCount": "+{{count}}",
     "addFriendsFirst": "AÑADE AMIGOS PRIMERO",
-    "challengeFriendBtn": "RETAR A UN AMIGO"
+    "challengeFriendBtn": "RETAR A UN AMIGO",
+    "proRequired": "Crear retos es una función Pro."
   },
   "global": {
     "statBench": "BANCA",
@@ -93,7 +103,11 @@
     "noAthletesSub": "¡Sé el primero en registrar un PR de press de banca, sentadilla y peso muerto!",
     "loadMore": "CARGAR MÁS",
     "refresh": "ACTUALIZAR",
-    "footerNote": "BASADO EN PRESS DE BANCA · SENTADILLA · PESO MUERTO COMBINADOS"
+    "footerNote": "BASADO EN PRESS DE BANCA · SENTADILLA · PESO MUERTO COMBINADOS",
+    "lockedTitle": "Ve la clasificación completa",
+    "lockedSub": "Gratis muestra el top {{count}}. Pro muestra a todos los atletas y te deja buscar a cualquiera.",
+    "lockedCta": "DESBLOQUEAR",
+    "searchLocked": "Buscar atletas — Pro"
   },
   "detail": {
     "heading": "RETO",

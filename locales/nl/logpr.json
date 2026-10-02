@@ -1,9 +1,18 @@
 {
   "logSheet": {
     "title": "ACTIVITEIT LOGGEN",
-    "logPr": { "label": "Log een PR", "sub": "Leg een nieuw persoonlijk record vast" },
-    "checkin": { "label": "Gym Check-in", "sub": "Check in bij je sportschool" },
-    "logMeal": { "label": "Log een maaltijd", "sub": "Volg calorieën en macro's" }
+    "logPr": {
+      "label": "Log een PR",
+      "sub": "Leg een nieuw persoonlijk record vast"
+    },
+    "checkin": {
+      "label": "Gym Check-in",
+      "sub": "Check in bij je sportschool"
+    },
+    "logMeal": {
+      "label": "Log een maaltijd",
+      "sub": "Volg calorieën en macro's"
+    }
   },
   "step": {
     "stepOf": "STAP {{step}} VAN 2",
@@ -31,7 +40,6 @@
   "xpEarned": "+100 XP VERDIEND",
   "video": {
     "readyLabel": "VIDEO KLAAR",
-    "requiredHint": "Videobewijs is verplicht om een PR te loggen",
     "addProofTitle": "VIDEOBEWIJS TOEVOEGEN",
     "addProofSub": "Camera of bibliotheek · max 60 sec",
     "permissionNeededTitle": "Toestemming vereist",
@@ -42,5 +50,17 @@
     "recordVideo": "Video Opnemen",
     "chooseFromLibrary": "Kies uit Bibliotheek",
     "cancel": "Annuleren"
+  },
+  "gate": {
+    "proBadge": "PRO",
+    "videoLockedTitle": "Videobewijs",
+    "videoLockedSub": "Leg deze lift vast op camera",
+    "publishTitle": "Deel op de feed",
+    "publishSub": "Je rivalen zien deze PR",
+    "publishOffSub": "Alleen in je eigen records",
+    "publishLockedSub": "Delen op de feed is een Pro-functie",
+    "privateNote": "Je PR wordt hoe dan ook opgeslagen — je verdient XP en telt mee op beide klassementen.",
+    "sharedToFeed": "Gedeeld op de feed",
+    "savedPrivately": "Opgeslagen in je records"
   }
 }

@@ -28,12 +28,23 @@ export interface ExerciseType {
   unit: ExerciseUnit;
 }
 
+/**
+ * Who can see a PR.
+ *
+ * `private` is NOT "hidden" — the record still counts for PR history,
+ * Progress, XP and BOTH leaderboards. It simply never reaches the social
+ * feed and cannot carry video proof. Free users log privately; publishing is
+ * Pro. Enforced server-side by tr_personal_records_visibility (migration 054).
+ */
+export type PRVisibility = 'public' | 'private';
+
 export interface PersonalRecord {
   id: string;
   user_id: string;
   exercise_key: string;
   value: number;
   unit: ExerciseUnit;
+  visibility: PRVisibility;
   created_at: string;
 }
 

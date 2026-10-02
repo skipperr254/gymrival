@@ -1,8 +1,17 @@
 {
   "tabs": {
-    "rivals": { "label": "المنافسون", "subtitle": "المنافسون" },
-    "challenges": { "label": "التحديات", "subtitle": "التحديات" },
-    "global": { "label": "العالمي", "subtitle": "التصنيف العالمي" }
+    "rivals": {
+      "label": "المنافسون",
+      "subtitle": "المنافسون"
+    },
+    "challenges": {
+      "label": "التحديات",
+      "subtitle": "التحديات"
+    },
+    "global": {
+      "label": "العالمي",
+      "subtitle": "التصنيف العالمي"
+    }
   },
   "you": "أنت",
   "unknown": "غير معروف",
@@ -73,7 +82,8 @@
     "challengeFriendSub": "اختر صديقاً وحدد الشروط",
     "moreCount": "+{{count}}",
     "addFriendsFirst": "أضف أصدقاء أولاً",
-    "challengeFriendBtn": "تحدَّ صديقاً"
+    "challengeFriendBtn": "تحدَّ صديقاً",
+    "proRequired": "إنشاء التحديات ميزة Pro."
   },
   "global": {
     "statBench": "بنش",
@@ -93,7 +103,11 @@
     "noAthletesSub": "كن أول من يسجّل رقماً قياسياً في البنش والسكوات والرفعة الميتة!",
     "loadMore": "تحميل المزيد",
     "refresh": "تحديث",
-    "footerNote": "استناداً إلى مجموع البنش والسكوات والرفعة الميتة"
+    "footerNote": "استناداً إلى مجموع البنش والسكوات والرفعة الميتة",
+    "lockedTitle": "شاهد لوحة الصدارة كاملة",
+    "lockedSub": "المجاني يعرض أفضل {{count}}. Pro يعرض كل الرياضيين ويتيح لك البحث عن أي شخص.",
+    "lockedCta": "افتح اللوحة",
+    "searchLocked": "ابحث عن الرياضيين — Pro"
   },
   "detail": {
     "heading": "تحدٍّ",

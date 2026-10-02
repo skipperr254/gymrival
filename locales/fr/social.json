@@ -81,6 +81,14 @@
     "sent": "Envoyé",
     "messagePlaceholder": "Message à {{name}}...",
     "messagePlaceholderGeneric": "Message...",
-    "quickReplies": ["Belle performance !", "Allons nous entraîner !", "C'est quoi ton PR ?", "Respect"]
+    "quickReplies": [
+      "Belle performance !",
+      "Allons nous entraîner !",
+      "C'est quoi ton PR ?",
+      "Respect"
+    ],
+    "lockedTitle": "Répondre est une fonction Pro",
+    "lockedSub": "Passe à Pro pour parler à tes rivaux",
+    "lockedCta": "DÉBLOQUER"
   }
 }

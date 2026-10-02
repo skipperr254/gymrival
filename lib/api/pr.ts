@@ -6,6 +6,7 @@ import type {
   PRHistoryGroup,
   PRHistoryEntry,
   PRVideoStatus,
+  PRVisibility,
 } from "@/types/pr";
 
 const PR_VIDEOS_BUCKET = 'pr-videos';
@@ -22,7 +23,7 @@ export async function fetchBestPRs(
   const [prsResult, exercisesResult] = await Promise.all([
     supabase
       .from("personal_records")
-      .select("id, user_id, exercise_key, value, unit, created_at")
+      .select("id, user_id, exercise_key, value, unit, visibility, created_at")
       .eq("user_id", userId)
       .order("value", { ascending: false }),
     supabase
@@ -54,6 +55,7 @@ export async function fetchBestPRs(
       exercise_key: row.exercise_key,
       value: Number(row.value),
       unit: row.unit as ExerciseUnit,
+      visibility: row.visibility as PRVisibility,
       created_at: row.created_at,
       exercise,
     });
@@ -62,18 +64,31 @@ export async function fetchBestPRs(
   return { data: deduped.slice(0, limit), count: deduped.length, error: null };
 }
 
+/**
+ * Logs a PR. Free for everyone — only `visibility: 'public'` is gated.
+ *
+ * Passing 'public' as a non-Pro user is not an error: the database trigger
+ * silently stores it as 'private' instead (migration 054), so the PR is still
+ * recorded, still earns XP and still ranks on both leaderboards. The returned
+ * `visibility` is what was actually stored, so the caller can tell the user
+ * the truth rather than what they asked for.
+ */
 export async function logPersonalRecord(
   userId: string,
   exerciseKey: string,
   value: number,
-  unit: ExerciseUnit
-): Promise<{ data: { id: string } | null; error: string | null }> {
+  unit: ExerciseUnit,
+  visibility: PRVisibility = "private"
+): Promise<{ data: { id: string; visibility: PRVisibility } | null; error: string | null }> {
   const { data, error } = await supabase
     .from("personal_records")
-    .insert({ user_id: userId, exercise_key: exerciseKey, value, unit })
-    .select("id")
+    .insert({ user_id: userId, exercise_key: exerciseKey, value, unit, visibility })
+    .select("id, visibility")
     .single();
-  return { data: data ? { id: data.id } : null, error: error?.message ?? null };
+  return {
+    data: data ? { id: data.id, visibility: data.visibility as PRVisibility } : null,
+    error: error?.message ?? null,
+  };
 }
 
 export async function fetchPRHistory(

@@ -10,6 +10,7 @@ import {
   Easing,
   PanResponder,
   Dimensions,
+  Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { X, ChevronLeft } from 'lucide-react-native';
@@ -19,6 +20,10 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useCompeteStore } from '@/store/useCompeteStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { logPersonalRecord, fetchBestPRs, uploadPRVideo } from '@/lib/api';
+import { showPaywall } from '@/lib/billing';
+import { useEntitlement } from '@/hooks/useEntitlement';
+import { FEATURE_TRIGGER, type ProFeature } from '@/constants/entitlements';
+import type { PRVisibility } from '@/types/pr';
 import { Step1 } from './Step1';
 import { Step2 } from './Step2';
 import { Step3 } from './Step3';
@@ -40,6 +45,11 @@ const SHEET_HEIGHT = SCREEN_HEIGHT * 0.9;
 // the request). Comfortably below the column's real ~999999.99 ceiling; no
 // legitimate kg/reps/sec entry needs six digits.
 const MAX_PR_VALUE = 99999;
+
+// Mirrors LogSheet: iOS keeps a Modal's host view mounted until the OS reports
+// the dismissal. If that report never arrives we still have to proceed, or a
+// queued paywall never opens and the lock row looks dead.
+const DISMISS_CONFIRM_TIMEOUT_MS = 400;
 
 interface Props {
   visible: boolean;
@@ -68,6 +78,14 @@ export function LogPRSheet({ visible, onClose }: Props) {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [savedValue, setSavedValue] = useState(0);
+  // What the server actually stored, not what we asked for — a free user's
+  // 'public' request comes back as 'private' (migration 054).
+  const [savedVisibility, setSavedVisibility] = useState<PRVisibility>('private');
+
+  const { isPro } = useEntitlement();
+  // Pro's per-PR switch, defaulted to public. Free users have no switch and
+  // the server forces private regardless of what the client sends.
+  const [publish, setPublish] = useState(true);
 
   // Video upload state
   const [videoAsset, setVideoAsset] = useState<VideoAsset | null>(null);
@@ -88,6 +106,28 @@ export function LogPRSheet({ visible, onClose }: Props) {
   // that upload settles, its completion callback must not overwrite the new
   // session's saving/video-upload UI state with the previous PR's result.
   const sessionRef = useRef(0);
+
+  // A gate tapped inside this sheet must not open the paywall on top of it:
+  // two live RN <Modal>s make UIKit silently drop the second presentation and
+  // leave an invisible, touch-eating view (see app/(tabs)/_layout.tsx). So the
+  // request is parked, the sheet closes, and the paywall opens only once the
+  // dismissal is confirmed.
+  const pendingPaywall = useRef<ProFeature | null>(null);
+  const dismissTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  const firePendingPaywall = useCallback(() => {
+    clearTimeout(dismissTimeout.current);
+    const feature = pendingPaywall.current;
+    pendingPaywall.current = null;
+    if (feature) showPaywall({ trigger: FEATURE_TRIGGER[feature] });
+  }, []);
+
+  const requestUpgrade = useCallback((feature: ProFeature) => {
+    pendingPaywall.current = feature;
+    onClose();
+  }, [onClose]);
+
+  useEffect(() => () => clearTimeout(dismissTimeout.current), []);
 
   const selectedEx = exercises.find(e => e.key === selectedExKey);
   // parseFloat (not parseInt) — half-plate PR increments (e.g. 82.5kg) are
@@ -133,9 +173,16 @@ export function LogPRSheet({ visible, onClose }: Props) {
         // reopen still wins the race.
         if (visibleRef.current) return;
         setMounted(false);
+        if (Platform.OS === 'ios') {
+          // Wait for the real dismissal (Modal onDismiss below); the timeout
+          // is the fallback so a missed callback can't strand the paywall.
+          dismissTimeout.current = setTimeout(firePendingPaywall, DISMISS_CONFIRM_TIMEOUT_MS);
+        } else {
+          firePendingPaywall();
+        }
       });
     }
-  }, [visible, translateY]);
+  }, [visible, translateY, firePendingPaywall]);
 
   // Track mount state to avoid setState after unmount during async upload
   useEffect(() => {
@@ -159,6 +206,8 @@ export function LogPRSheet({ visible, onClose }: Props) {
     setVideoUploading(false);
     setVideoUploadDone(false);
     setVideoUploadFailed(false);
+    setPublish(true);
+    setSavedVisibility('private');
     loadExercises();
     if (user?.id) {
       fetchBestPRs(user.id, 100).then(({ data }) => {
@@ -169,7 +218,8 @@ export function LogPRSheet({ visible, onClose }: Props) {
     }
   }, [visible, user?.id, loadExercises]);
 
-  // Auto-close logic — every PR now has a video attached:
+  // Auto-close logic:
+  // • No video (the free-tier path) — nothing to wait for, close promptly
   // • Video uploading — wait; close 1.5 s after upload completes
   // • Video failed — close after 3.5 s so user sees the error
   // • Safety net — always close after 15 s maximum
@@ -178,7 +228,9 @@ export function LogPRSheet({ visible, onClose }: Props) {
       clearTimeout(closeTimer.current);
       return;
     }
-    if (videoUploadDone) {
+    if (!videoAsset) {
+      closeTimer.current = setTimeout(onClose, 1800);
+    } else if (videoUploadDone) {
       closeTimer.current = setTimeout(onClose, 1500);
     } else if (videoUploadFailed) {
       closeTimer.current = setTimeout(onClose, 3500);
@@ -187,14 +239,23 @@ export function LogPRSheet({ visible, onClose }: Props) {
       closeTimer.current = setTimeout(onClose, 15000);
     }
     return () => clearTimeout(closeTimer.current);
-  }, [step, onClose, videoUploadDone, videoUploadFailed]);
+  }, [step, onClose, videoAsset, videoUploadDone, videoUploadFailed]);
 
   const handleSave = useCallback(async () => {
-    if (!user?.id || !selectedExKey || !selectedEx || !isValidValue || !videoAsset) return;
+    if (!user?.id || !selectedExKey || !selectedEx || !isValidValue) return;
     const mySession = sessionRef.current;
     setSaving(true);
     setSaveError(null);
-    const { data: prData, error } = await logPersonalRecord(user.id, selectedExKey, numValue, selectedEx.unit);
+    // Non-Pro callers always send 'private'; even if they didn't, the database
+    // trigger would store it that way. The response tells us what was really
+    // saved, which is what Step 3 reports back to the user.
+    const { data: prData, error } = await logPersonalRecord(
+      user.id,
+      selectedExKey,
+      numValue,
+      selectedEx.unit,
+      isPro && publish ? 'public' : 'private'
+    );
 
     // The sheet was closed and reopened for a different PR while this was in
     // flight — don't let a stale response touch the new session's state.
@@ -207,6 +268,7 @@ export function LogPRSheet({ visible, onClose }: Props) {
     }
 
     setSavedValue(numValue);
+    setSavedVisibility(prData.visibility);
     setStep(3);
 
     // Refresh stores in background so all screens reflect the new PR
@@ -215,7 +277,10 @@ export function LogPRSheet({ visible, onClose }: Props) {
     loadPRHistory(user.id);
     loadProfile(user.id);
 
-    // Upload the (required) video now — continues even if the sheet closes
+    // Upload the video if one was attached — continues even if the sheet
+    // closes. Video proof is Pro-only, so this is skipped entirely on the
+    // free path.
+    if (!videoAsset) return;
     const uid = user.id;
     const pid = prData.id;
     const asset = videoAsset;
@@ -244,7 +309,7 @@ export function LogPRSheet({ visible, onClose }: Props) {
         setVideoUploadDone(true);
       }
     }
-  }, [user?.id, selectedExKey, selectedEx, isValidValue, numValue, videoAsset, loadRivals, loadBestPRs, loadPRHistory, loadProfile, t]);
+  }, [user?.id, selectedExKey, selectedEx, isValidValue, numValue, videoAsset, isPro, publish, loadRivals, loadBestPRs, loadPRHistory, loadProfile, t]);
 
   // Drag-to-dismiss on the handle
   const panResponder = useRef(
@@ -270,7 +335,14 @@ export function LogPRSheet({ visible, onClose }: Props) {
   ).current;
 
   return (
-    <Modal visible={mounted} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
+    <Modal
+      visible={mounted}
+      transparent
+      animationType="none"
+      onRequestClose={onClose}
+      onDismiss={firePendingPaywall}
+      statusBarTranslucent
+    >
       <View className="flex-1 bg-black/[0.78] justify-end">
         {/* Backdrop tap-to-close */}
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
@@ -369,12 +441,18 @@ export function LogPRSheet({ visible, onClose }: Props) {
                   onVideoRemoved={() => setVideoAsset(null)}
                   onSave={handleSave}
                   onBack={() => setStep(1)}
+                  isPro={isPro}
+                  publish={publish}
+                  onTogglePublish={setPublish}
+                  onRequestUpgrade={requestUpgrade}
                 />
               )}
               {step === 3 && selectedEx && (
                 <Step3
                   exercise={selectedEx}
                   savedValue={savedValue}
+                  visibility={savedVisibility}
+                  hasVideo={!!videoAsset}
                   videoUploading={videoUploading}
                   videoUploadDone={videoUploadDone}
                   videoUploadFailed={videoUploadFailed}

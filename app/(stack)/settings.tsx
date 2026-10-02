@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { LANGUAGES } from '@/lib/i18n/languages';
 import { SettingsRow, SettingsToggleRow } from '@/components/features/profile';
+import { SubscriptionSection } from '@/components/features/paywall';
 import { DetailHeader } from '@/components/ui/DetailHeader';
 
 export default function SettingsScreen() {
@@ -73,6 +74,8 @@ export default function SettingsScreen() {
             badge={t('profile:settings.shareProfileSub')}
           />
         </View>
+
+        <SubscriptionSection />
 
         <Pressable
           className="flex-row items-center justify-center gap-2.5 py-3.5 rounded-2xl border border-[#3a1a1a] mt-6"

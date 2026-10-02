@@ -68,12 +68,21 @@ export default function ProfileScreen() {
   // (Phase 3) still see the real tier. To test those, insert a
   // `provider: 'manual'` row in `subscriptions` with the service role.
   const handleProPress = () => {
-    if (__DEV__) {
-      setDevOverride(!devOverride);
+    // Pro users land in Settings, where the Subscription section shows their
+    // renewal date and the manage/restore actions App Review requires.
+    if (isPro) {
+      router.push(Routes.profileSettings as never);
       return;
     }
-    if (isPro) return; // Phase 2 routes this to Settings → Subscription.
     showPaywall({ trigger: 'upgrade_card' });
+  };
+
+  // Dev-only escape hatch, moved to long-press so a plain tap still opens the
+  // real paywall in a dev build — otherwise the thing we most need to test by
+  // hand would be the one thing unreachable on a dev device. Client-side only:
+  // server-enforced gates (Phase 3) still see the real tier.
+  const handleProLongPress = () => {
+    if (__DEV__) setDevOverride(!devOverride);
   };
 
   const barRatios = computeBarRatios(bestPRs);
@@ -231,6 +240,7 @@ export default function ProfileScreen() {
           <Pressable
             style={({ pressed }) => [pressed && { opacity: 0.82 }]}
             onPress={handleProPress}
+            onLongPress={handleProLongPress}
           >
             <LinearGradient
               colors={[Colors.accent, Colors.accentDark]}
@@ -249,6 +259,7 @@ export default function ProfileScreen() {
             className="flex-row items-center justify-center gap-2 bg-surface rounded-2xl h-[52px] border border-success"
             style={({ pressed }) => pressed && { opacity: 0.82 }}
             onPress={handleProPress}
+            onLongPress={handleProLongPress}
           >
             <CheckCircle size={18} color={Colors.success} />
             <Text className="font-heading text-base text-success tracking-[1.5px]">

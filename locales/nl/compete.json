@@ -1,8 +1,17 @@
 {
   "tabs": {
-    "rivals": { "label": "Rivalen", "subtitle": "RIVALEN" },
-    "challenges": { "label": "Challenges", "subtitle": "CHALLENGES" },
-    "global": { "label": "Wereldwijd", "subtitle": "WERELDRANGLIJST" }
+    "rivals": {
+      "label": "Rivalen",
+      "subtitle": "RIVALEN"
+    },
+    "challenges": {
+      "label": "Challenges",
+      "subtitle": "CHALLENGES"
+    },
+    "global": {
+      "label": "Wereldwijd",
+      "subtitle": "WERELDRANGLIJST"
+    }
   },
   "you": "JIJ",
   "unknown": "Onbekend",
@@ -73,7 +82,8 @@
     "challengeFriendSub": "Kies een vriend en stel de voorwaarden in",
     "moreCount": "+{{count}}",
     "addFriendsFirst": "VOEG EERST VRIENDEN TOE",
-    "challengeFriendBtn": "DAAG EEN VRIEND UIT"
+    "challengeFriendBtn": "DAAG EEN VRIEND UIT",
+    "proRequired": "Uitdagingen maken is een Pro-functie."
   },
   "global": {
     "statBench": "BANK",
@@ -93,7 +103,11 @@
     "noAthletesSub": "Wees de eerste die een Bankdrukken-, Squat- en Deadlift-PR logt!",
     "loadMore": "MEER LADEN",
     "refresh": "VERVERSEN",
-    "footerNote": "GEBASEERD OP GECOMBINEERDE BANKDRUKKEN · SQUAT · DEADLIFT"
+    "footerNote": "GEBASEERD OP GECOMBINEERDE BANKDRUKKEN · SQUAT · DEADLIFT",
+    "lockedTitle": "Bekijk het hele klassement",
+    "lockedSub": "Gratis toont de top {{count}}. Pro toont elke atleet — en laat je iedereen zoeken.",
+    "lockedCta": "ONTGRENDEL",
+    "searchLocked": "Atleten zoeken — Pro"
   },
   "detail": {
     "heading": "CHALLENGE",

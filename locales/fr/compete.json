@@ -1,8 +1,17 @@
 {
   "tabs": {
-    "rivals": { "label": "Rivaux", "subtitle": "RIVAUX" },
-    "challenges": { "label": "Défis", "subtitle": "DÉFIS" },
-    "global": { "label": "Global", "subtitle": "CLASSEMENT MONDIAL" }
+    "rivals": {
+      "label": "Rivaux",
+      "subtitle": "RIVAUX"
+    },
+    "challenges": {
+      "label": "Défis",
+      "subtitle": "DÉFIS"
+    },
+    "global": {
+      "label": "Global",
+      "subtitle": "CLASSEMENT MONDIAL"
+    }
   },
   "you": "TOI",
   "unknown": "Inconnu",
@@ -73,7 +82,8 @@
     "challengeFriendSub": "Choisis un ami et fixe les règles",
     "moreCount": "+{{count}}",
     "addFriendsFirst": "AJOUTE DES AMIS D'ABORD",
-    "challengeFriendBtn": "DÉFIER UN AMI"
+    "challengeFriendBtn": "DÉFIER UN AMI",
+    "proRequired": "Créer des défis est une fonction Pro."
   },
   "global": {
     "statBench": "DÉVELOPPÉ",
@@ -93,7 +103,11 @@
     "noAthletesSub": "Sois le premier à enregistrer un record au développé couché, squat et soulevé de terre !",
     "loadMore": "CHARGER PLUS",
     "refresh": "ACTUALISER",
-    "footerNote": "BASÉ SUR LE TOTAL DÉVELOPPÉ · SQUAT · SOULEVÉ DE TERRE"
+    "footerNote": "BASÉ SUR LE TOTAL DÉVELOPPÉ · SQUAT · SOULEVÉ DE TERRE",
+    "lockedTitle": "Voir tout le classement",
+    "lockedSub": "La version gratuite montre le top {{count}}. Pro montre tous les athlètes — et te laisse chercher n'importe qui.",
+    "lockedCta": "DÉBLOQUER",
+    "searchLocked": "Rechercher des athlètes — Pro"
   },
   "detail": {
     "heading": "DÉFI",
