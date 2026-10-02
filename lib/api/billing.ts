@@ -50,3 +50,18 @@ export async function fetchSubscription(
     error: null,
   };
 }
+
+/**
+ * Asks the server to re-derive the caller's row from the billing provider's
+ * REST API (`billing-reconcile` edge function). Call it right after a purchase
+ * so the server catches up without waiting for the webhook, or when the device
+ * receipt and the server row disagree.
+ *
+ * The function identifies the user from the JWT; there is no way to reconcile
+ * anyone else. A 503 means the provider's secret key isn't configured yet —
+ * not an error worth surfacing, the webhook path still works.
+ */
+export async function reconcileSubscription(): Promise<{ error: string | null }> {
+  const { error } = await supabase.functions.invoke('billing-reconcile', { method: 'POST' });
+  return { error: error?.message ?? null };
+}

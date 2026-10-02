@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
-import { fetchSubscription } from '@/lib/api/billing';
+import { fetchSubscription, reconcileSubscription } from '@/lib/api/billing';
 import {
   isEntitled,
   type EntitlementSnapshot,
@@ -72,6 +72,12 @@ interface EntitlementState {
 
   load: (userId: string) => Promise<void>;
   refresh: (userId: string) => Promise<void>;
+  /**
+   * Post-purchase path: have the server pull truth from the provider, then
+   * re-read. Closes the gap between the store confirming a purchase and the
+   * webhook landing, and heals a webhook that never arrives.
+   */
+  reconcile: (userId: string) => Promise<void>;
   setDeviceSnapshot: (snapshot: EntitlementSnapshot | null) => void;
   setDevOverride: (value: boolean) => void;
   reset: () => void;
@@ -112,7 +118,14 @@ export const useEntitlementStore = create<EntitlementState>((set, get) => ({
     writeCache(userId, data);
   },
 
-  /** Fed by the billing adapter's own listener (Phase 1). */
+  reconcile: async (userId) => {
+    // Errors are deliberately swallowed: the device snapshot already grants
+    // access optimistically, and the webhook is still on its way.
+    await reconcileSubscription().catch(() => ({ error: null }));
+    await get().refresh(userId);
+  },
+
+  /** Fed by the billing adapter's own listener. */
   setDeviceSnapshot: (snapshot) => set({ device: snapshot }),
 
   setDevOverride: (value) => {

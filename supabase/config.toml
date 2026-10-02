@@ -1,0 +1,25 @@
+project_id = "gymrival"
+
+# Per-function JWT verification.
+#
+# `supabase functions deploy` defaults verify_jwt to TRUE. Both webhook-style
+# functions here are called by machines that cannot mint a Supabase JWT, so a
+# deploy without these entries silently breaks them — the caller starts getting
+# 401s from the platform gateway before our code ever runs, and the function
+# looks fine in the dashboard. Pinned here so it survives every future deploy,
+# from any machine, without anyone having to remember a flag.
+
+[functions.send-notification]
+# Called by Postgres via pg_net (migration 028). Authenticates with a shared
+# secret on the x-webhook-secret header.
+verify_jwt = false
+
+[functions.revenuecat-webhook]
+# Called by RevenueCat. Authenticates with REVENUECAT_WEBHOOK_SECRET on the
+# Authorization header, compared in constant time before the body is parsed.
+verify_jwt = false
+
+[functions.billing-reconcile]
+# Called by the app. The caller's JWT is the authorization — the user id comes
+# from the token, never the request body, so nobody can reconcile anyone else.
+verify_jwt = true
