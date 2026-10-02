@@ -55,3 +55,7 @@ app-example
 todo.md
 
 audits
+# Supabase CLI scratch (version cache, linked project ref)
+supabase/.temp/
+
+/docs

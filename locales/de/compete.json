@@ -31,7 +31,8 @@
     "yourRank": "Dein Rang: #{{rank}}",
     "joinedBtn": "BEIGETRETEN",
     "joinBtn": "BEITRETEN",
-    "viewAll": "ALLE ANZEIGEN"
+    "viewAll": "ALLE ANZEIGEN",
+    "winner": "GEWINNER"
   },
   "invitation": {
     "defaultTitle": "Challenge-Einladung",
@@ -110,6 +111,49 @@
     "refresh": "AKTUALISIEREN",
     "joinedTapToLeave": "BEIGETRETEN — TIPPEN ZUM VERLASSEN",
     "joinChallenge": "CHALLENGE BEITRETEN",
-    "challengeEnded": "CHALLENGE BEENDET"
+    "challengeEnded": "CHALLENGE BEENDET",
+    "winner": "GEWINNER"
+  },
+  "admin": {
+    "entry": "ADMIN",
+    "createTitle": "CHALLENGE ERSTELLEN",
+    "manageTitle": "DEINE CHALLENGES",
+    "submit": "CHALLENGE ERSTELLEN",
+    "createSuccess": "Challenge erstellt",
+    "fields": {
+      "title": "TITEL",
+      "titlePlaceholder": "z. B. Bankdrücken-Showdown",
+      "description": "BESCHREIBUNG",
+      "descriptionPlaceholder": "Optionale Details für Teilnehmer",
+      "scope": "WER KANN BEITRETEN",
+      "scopeGlobal": "ALLE",
+      "scopeFriendsOnly": "NUR MEINE FREUNDE",
+      "exercise": "ÜBUNG",
+      "metric": "METRIK",
+      "duration": "DAUER",
+      "durationWeekly": "WÖCHENTLICH",
+      "durationMonthly": "MONATLICH",
+      "prizeLabel": "PREIS",
+      "prizeLabelPlaceholder": "z. B. 1 Monat Pro",
+      "rewardXp": "XP-BELOHNUNG",
+      "rewardXpPlaceholder": "0",
+      "maxParticipants": "MAX. TEILNEHMER",
+      "maxParticipantsPlaceholder": "Kein Limit"
+    },
+    "manage": {
+      "emptyTitle": "NOCH KEINE CHALLENGES",
+      "emptySub": "Von dir erstellte Challenges erscheinen hier",
+      "statusActive": "AKTIV",
+      "statusCompleted": "BEENDET",
+      "statusCancelled": "ABGEBROCHEN",
+      "statusDraft": "ENTWURF",
+      "cancel": "ABBRECHEN",
+      "cancelConfirmTitle": "Diese Challenge abbrechen?",
+      "cancelConfirmMessage": "Teilnehmer können nicht mehr beitreten oder punkten. Dies kann nicht rückgängig gemacht werden.",
+      "cancelConfirmYes": "CHALLENGE ABBRECHEN",
+      "cancelConfirmNo": "BEHALTEN",
+      "loadError": "Deine Challenges konnten nicht geladen werden",
+      "retry": "ERNEUT VERSUCHEN"
+    }
   }
 }

@@ -3,7 +3,8 @@ export type NotificationType =
   | 'friend_request'
   | 'friend_request_accepted'
   | 'pr_liked'
-  | 'friend_pr';
+  | 'friend_pr'
+  | 'challenge_won';
 
 export interface AppNotification {
   id: string;
@@ -21,6 +22,9 @@ export interface AppNotification {
     exercise_key?: string;
     value?: number;
     unit?: string;
+    challenge_id?: string;
+    title?: string;
+    prize_label?: string | null;
   };
   read_at: string | null;
   created_at: string;

@@ -2,10 +2,12 @@
   "someone": "شخص ما",
   "yourPr": "رقمك القياسي",
   "aPr": "رقماً قياسياً",
+  "aChallenge": "تحدياً",
   "newMessage": "أرسل لك {{name}} رسالة",
   "friendRequest": "أرسل لك {{name}} طلب صداقة",
   "friendRequestAccepted": "قبل {{name}} طلب صداقتك",
   "prLiked": "أعجب {{name}} بـ {{exercise}}{{value}} الخاص بك",
   "friendPr": "حقق {{name}} للتو رقماً قياسياً جديداً في {{exercise}}{{value}}",
+  "challengeWon": "لقد فزت بـ \"{{title}}\"! 🏆",
   "generic": "لديك إشعار جديد"
 }

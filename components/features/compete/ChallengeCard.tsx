@@ -31,8 +31,10 @@ export function ChallengeCard({
   joining: boolean;
 }) {
   const { t } = useTranslation('compete');
-  const isFriend = ch.type === 'friend';
+  const isFriend    = ch.type === 'friend';
+  const isCompleted = ch.status === 'completed';
   const color    = isFriend ? Colors.friend : CHALLENGE_COLOR;
+  const winner = isCompleted ? topEntries[0] : undefined;
   const MetricIcon = ch.exercise_key ? getExerciseIcon(ch.exercise_key)
     : ch.metric === 'most_improved' ? TrendingUp
     : ch.metric === 'total_volume' ? Activity
@@ -74,7 +76,33 @@ export function ChallengeCard({
         )}
       </View>
 
-      {topEntries.slice(0, 3).map((p, i) => {
+      {isCompleted && winner && (
+        <View
+          className="flex-row items-center gap-2.5 rounded-xl border py-2.5 px-3 mb-2.5"
+          style={{ backgroundColor: 'rgba(212,160,23,0.1)', borderColor: 'rgba(212,160,23,0.3)' }}
+        >
+          <Trophy size={18} strokeWidth={1.8} color="#d4a017" />
+          <Avatar
+            userId={winner.user_id}
+            name={winner.full_name ?? winner.username ?? t('unknown')}
+            avatarUrl={winner.avatar_url}
+            size={28}
+          />
+          <View className="flex-1">
+            <Text className="font-heading text-[9px] tracking-[2px]" style={{ color: '#d4a017' }}>
+              {t('card.winner')}
+            </Text>
+            <Text className="font-sans-medium text-[13px] text-white" numberOfLines={1}>
+              {winner.full_name ?? winner.username ?? t('unknown')}{winner.is_me ? t('youSuffix') : ''}
+            </Text>
+          </View>
+          <Text className="font-heading text-[15px]" style={{ color: '#d4a017' }}>
+            {formatChallengeScore(winner.score, ch.metric, unit)}
+          </Text>
+        </View>
+      )}
+
+      {!isCompleted && topEntries.slice(0, 3).map((p, i) => {
         const displayName = p.full_name ?? p.username ?? t('unknown');
         return (
           <View key={p.user_id} className="flex-row items-center gap-2.5 mb-[7px]">
@@ -110,39 +138,48 @@ export function ChallengeCard({
       )}
 
       <View className="flex-row gap-2 mt-3.5">
-        <Pressable onPress={ch.is_joined ? onLeave : onJoin} className="flex-1" disabled={joining}>
-          {ch.is_joined ? (
-            <View className="flex-row items-center justify-center gap-1.5 py-2.5 rounded-xl bg-elevated">
-              <CheckCircle size={13} strokeWidth={2} color={Colors.muted} />
-              <Text className="font-heading text-xs tracking-[2px] text-muted">
-                {t('card.joinedBtn')}
-              </Text>
-            </View>
-          ) : joining ? (
-            <View className="flex-row items-center justify-center gap-1.5 py-2.5 rounded-xl bg-elevated">
-              <ActivityIndicator size="small" color={Colors.muted} />
-            </View>
-          ) : (
-            <LinearGradient
-              colors={[color, color + '99']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 6,
-                paddingVertical: 10,
-                borderRadius: 12,
-              }}
-            >
-              <Zap size={13} strokeWidth={2} color={Colors.primary} />
-              <Text className="font-heading text-xs tracking-[2px] text-white">
-                {t('card.joinBtn')}
-              </Text>
-            </LinearGradient>
-          )}
-        </Pressable>
+        {isCompleted ? (
+          <View className="flex-1 flex-row items-center justify-center gap-1.5 py-2.5 rounded-xl bg-elevated">
+            <CheckCircle size={13} strokeWidth={2} color={Colors.muted} />
+            <Text className="font-heading text-xs tracking-[2px] text-muted">
+              {t('detail.challengeEnded')}
+            </Text>
+          </View>
+        ) : (
+          <Pressable onPress={ch.is_joined ? onLeave : onJoin} className="flex-1" disabled={joining}>
+            {ch.is_joined ? (
+              <View className="flex-row items-center justify-center gap-1.5 py-2.5 rounded-xl bg-elevated">
+                <CheckCircle size={13} strokeWidth={2} color={Colors.muted} />
+                <Text className="font-heading text-xs tracking-[2px] text-muted">
+                  {t('card.joinedBtn')}
+                </Text>
+              </View>
+            ) : joining ? (
+              <View className="flex-row items-center justify-center gap-1.5 py-2.5 rounded-xl bg-elevated">
+                <ActivityIndicator size="small" color={Colors.muted} />
+              </View>
+            ) : (
+              <LinearGradient
+                colors={[color, color + '99']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6,
+                  paddingVertical: 10,
+                  borderRadius: 12,
+                }}
+              >
+                <Zap size={13} strokeWidth={2} color={Colors.primary} />
+                <Text className="font-heading text-xs tracking-[2px] text-white">
+                  {t('card.joinBtn')}
+                </Text>
+              </LinearGradient>
+            )}
+          </Pressable>
+        )}
         <Pressable
           onPress={() => router.push(Routes.challengeDetail(ch.id) as never)}
           className="flex-1 flex-row items-center justify-center gap-1.5 py-2.5 rounded-xl border-[1.5px] bg-transparent"

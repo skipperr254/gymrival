@@ -2,10 +2,12 @@
   "someone": "Jemand",
   "yourPr": "deinen PR",
   "aPr": "einen PR",
+  "aChallenge": "eine Challenge",
   "newMessage": "{{name}} hat dir eine Nachricht geschickt",
   "friendRequest": "{{name}} hat dir eine Freundschaftsanfrage geschickt",
   "friendRequestAccepted": "{{name}} hat deine Freundschaftsanfrage angenommen",
   "prLiked": "{{name}} gefällt dein {{exercise}}{{value}} PR",
   "friendPr": "{{name}} hat gerade einen neuen {{exercise}}{{value}} PR aufgestellt",
+  "challengeWon": "Du hast \"{{title}}\" gewonnen! 🏆",
   "generic": "Du hast eine neue Benachrichtigung"
 }

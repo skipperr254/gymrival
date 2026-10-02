@@ -8,6 +8,39 @@ module.exports = defineConfig([
   {
     ignores: ['dist/*'],
   },
+  // The billing SDK may only be imported by its adapter. Every other module
+  // talks to `lib/billing` through the provider-agnostic `BillingProvider`
+  // interface, so swapping vendors stays a one-file change — see the
+  // "Monetization & Entitlements" section in AGENTS.md.
+  {
+    files: ['**/*.{ts,tsx,js,jsx}'],
+    ignores: ['lib/billing/revenuecat.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'react-native-purchases',
+              message:
+                'Only lib/billing/revenuecat.ts may import the RevenueCat SDK. Use getBillingProvider() from @/lib/billing.',
+            },
+            {
+              name: 'react-native-purchases-ui',
+              message:
+                'RevenueCat paywall templates are not used — the paywall is our own component (see AGENTS.md).',
+            },
+          ],
+          patterns: [
+            {
+              group: ['react-native-purchases/*', '@revenuecat/*'],
+              message: 'Only lib/billing/revenuecat.ts may import the RevenueCat SDK.',
+            },
+          ],
+        },
+      ],
+    },
+  },
   // Flags new hardcoded JSX copy so it doesn't sneak back in as the app
   // grows — see the "Internationalization Rules" section in AGENTS.md.
   // Warning-level only: the app has ~450+ pre-existing un-converted <Text>

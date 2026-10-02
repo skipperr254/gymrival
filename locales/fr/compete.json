@@ -31,7 +31,8 @@
     "yourRank": "Ton rang : #{{rank}}",
     "joinedBtn": "REJOINT",
     "joinBtn": "REJOINDRE",
-    "viewAll": "TOUT VOIR"
+    "viewAll": "TOUT VOIR",
+    "winner": "GAGNANT"
   },
   "invitation": {
     "defaultTitle": "Invitation au défi",
@@ -110,6 +111,49 @@
     "refresh": "ACTUALISER",
     "joinedTapToLeave": "REJOINT — APPUIE POUR QUITTER",
     "joinChallenge": "REJOINDRE LE DÉFI",
-    "challengeEnded": "DÉFI TERMINÉ"
+    "challengeEnded": "DÉFI TERMINÉ",
+    "winner": "GAGNANT"
+  },
+  "admin": {
+    "entry": "ADMIN",
+    "createTitle": "CRÉER UN DÉFI",
+    "manageTitle": "TES DÉFIS",
+    "submit": "CRÉER LE DÉFI",
+    "createSuccess": "Défi créé",
+    "fields": {
+      "title": "TITRE",
+      "titlePlaceholder": "ex. Duel de développé couché",
+      "description": "DESCRIPTION",
+      "descriptionPlaceholder": "Détails facultatifs pour les participants",
+      "scope": "QUI PEUT REJOINDRE",
+      "scopeGlobal": "TOUT LE MONDE",
+      "scopeFriendsOnly": "MES AMIS UNIQUEMENT",
+      "exercise": "EXERCICE",
+      "metric": "MÉTRIQUE",
+      "duration": "DURÉE",
+      "durationWeekly": "HEBDOMADAIRE",
+      "durationMonthly": "MENSUEL",
+      "prizeLabel": "PRIX",
+      "prizeLabelPlaceholder": "ex. 1 mois de Pro",
+      "rewardXp": "RÉCOMPENSE XP",
+      "rewardXpPlaceholder": "0",
+      "maxParticipants": "PARTICIPANTS MAX.",
+      "maxParticipantsPlaceholder": "Aucune limite"
+    },
+    "manage": {
+      "emptyTitle": "AUCUN DÉFI POUR L'INSTANT",
+      "emptySub": "Les défis que tu crées apparaîtront ici",
+      "statusActive": "ACTIF",
+      "statusCompleted": "TERMINÉ",
+      "statusCancelled": "ANNULÉ",
+      "statusDraft": "BROUILLON",
+      "cancel": "ANNULER",
+      "cancelConfirmTitle": "Annuler ce défi ?",
+      "cancelConfirmMessage": "Les participants ne pourront plus rejoindre ni marquer de points. Cette action est irréversible.",
+      "cancelConfirmYes": "ANNULER LE DÉFI",
+      "cancelConfirmNo": "GARDER",
+      "loadError": "Impossible de charger tes défis",
+      "retry": "RÉESSAYER"
+    }
   }
 }

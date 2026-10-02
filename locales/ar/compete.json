@@ -31,7 +31,8 @@
     "yourRank": "ترتيبك: #{{rank}}",
     "joinedBtn": "منضم",
     "joinBtn": "انضمام",
-    "viewAll": "عرض الكل"
+    "viewAll": "عرض الكل",
+    "winner": "الفائز"
   },
   "invitation": {
     "defaultTitle": "دعوة تحدٍّ",
@@ -110,6 +111,49 @@
     "refresh": "تحديث",
     "joinedTapToLeave": "منضم — اضغط للمغادرة",
     "joinChallenge": "الانضمام إلى التحدي",
-    "challengeEnded": "انتهى التحدي"
+    "challengeEnded": "انتهى التحدي",
+    "winner": "الفائز"
+  },
+  "admin": {
+    "entry": "المسؤول",
+    "createTitle": "إنشاء تحدٍّ",
+    "manageTitle": "تحدياتك",
+    "submit": "إنشاء التحدي",
+    "createSuccess": "تم إنشاء التحدي",
+    "fields": {
+      "title": "العنوان",
+      "titlePlaceholder": "مثال: مواجهة البنش برس",
+      "description": "الوصف",
+      "descriptionPlaceholder": "تفاصيل اختيارية للمشاركين",
+      "scope": "من يمكنه الانضمام",
+      "scopeGlobal": "الجميع",
+      "scopeFriendsOnly": "أصدقائي فقط",
+      "exercise": "التمرين",
+      "metric": "المقياس",
+      "duration": "المدة",
+      "durationWeekly": "أسبوعي",
+      "durationMonthly": "شهري",
+      "prizeLabel": "الجائزة",
+      "prizeLabelPlaceholder": "مثال: شهر واحد من الاشتراك المميز",
+      "rewardXp": "مكافأة نقاط الخبرة",
+      "rewardXpPlaceholder": "0",
+      "maxParticipants": "الحد الأقصى للمشاركين",
+      "maxParticipantsPlaceholder": "بلا حد"
+    },
+    "manage": {
+      "emptyTitle": "لا توجد تحديات بعد",
+      "emptySub": "ستظهر التحديات التي تنشئها هنا",
+      "statusActive": "نشط",
+      "statusCompleted": "منتهٍ",
+      "statusCancelled": "ملغى",
+      "statusDraft": "مسودة",
+      "cancel": "إلغاء",
+      "cancelConfirmTitle": "إلغاء هذا التحدي؟",
+      "cancelConfirmMessage": "لن يتمكن المشاركون بعد الآن من الانضمام أو تسجيل النقاط. لا يمكن التراجع عن هذا الإجراء.",
+      "cancelConfirmYes": "إلغاء التحدي",
+      "cancelConfirmNo": "الاحتفاظ به",
+      "loadError": "تعذّر تحميل تحدياتك",
+      "retry": "إعادة المحاولة"
+    }
   }
 }

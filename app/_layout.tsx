@@ -69,6 +69,10 @@ function routeForNotificationTap(data: Record<string, unknown> | undefined): str
     case "pr_liked":
     case "friend_pr":
       return Routes.social;
+    case "challenge_won":
+      return typeof data?.challenge_id === "string"
+        ? Routes.challengeDetail(data.challenge_id)
+        : Routes.compete;
     default:
       return null;
   }
@@ -234,22 +238,28 @@ export default function RootLayout() {
   // persisted tier first so a paying subscriber never sees a flash of free-tier
   // UI at cold start, then confirms against `public.subscriptions`.
   //
-  // Until Phase 1 the provider is the no-op adapter, so `configure`/`identify`
-  // do nothing and the server row is the only source of Pro — which is exactly
-  // how the grandfathered `manual` grants resolve.
+  // Where billing can't run (Expo Go, web, no SDK key for this platform) the
+  // provider is the no-op adapter: `configure`/`identify` do nothing and the
+  // server row is the only source of Pro — which is exactly how the
+  // grandfathered `manual` grants resolve.
   useEffect(() => {
     const userId = session?.user?.id;
     const billing = getBillingProvider();
+    const { setDeviceSnapshot } = useEntitlementStore.getState();
 
     billing.configure(userId ?? null).catch(() => {});
     if (!userId) return;
 
-    billing.identify(userId).catch(() => {});
     loadEntitlement(userId);
+    // identify() aliases the SDK to our uuid; the device receipt is only
+    // meaningful once that's done, so read it after.
+    billing
+      .identify(userId)
+      .then(() => billing.getEntitlements())
+      .then(setDeviceSnapshot)
+      .catch(() => {});
 
-    const unsubscribe = billing.onEntitlementChange((snapshot) => {
-      useEntitlementStore.getState().setDeviceSnapshot(snapshot);
-    });
+    const unsubscribe = billing.onEntitlementChange(setDeviceSnapshot);
     return unsubscribe;
   }, [session?.user?.id, loadEntitlement]);
 

@@ -474,6 +474,8 @@ Current functions:
 | Function            | Purpose                                                                               |
 | ------------------- | ------------------------------------------------------------------------------------- |
 | `send-notification` | Triggers Expo push notifications for events (new PR, challenge, like, friend request) |
+| `revenuecat-webhook` | RevenueCat → `public.subscriptions`. verify_jwt off; checks `REVENUECAT_WEBHOOK_SECRET` on the `Authorization` header. Ledgers every event in `billing_events` (PK dedupes retries), maps event type → status, skips out-of-order events via `last_event_at`. The only writer of entitlement for paying users |
+| `billing-reconcile` | Caller re-derives their own row from RevenueCat's REST API (needs `REVENUECAT_SECRET_API_KEY`). verify_jwt on; user id comes from the JWT. Called after a purchase and whenever device/server disagree. Shares `_shared/billing.ts` with the webhook |
 
 ### Calling Edge Functions from the app
 
@@ -500,7 +502,11 @@ GymRival is freemium: a real, permanently useful free tier plus a **Pro** subscr
 
 ### Status
 
-Phase 0 (the entitlement spine) has landed. Phases 1–5 have not. Concretely: nothing charges money, no feature is gated yet, and `getBillingProvider()` still returns the no-op adapter in every environment. Do not assume a purchase flow exists.
+Phases 0 and 1 have landed: the entitlement spine, the RevenueCat adapter (`lib/billing/revenuecat.ts`), the webhook + reconcile edge functions, and the hourly expiry sweep (`pg_cron` job `refresh-expired-entitlements`). Phases 2–5 (paywall UI, feature gates, onboarding, measurement) have not. Concretely: no feature is gated yet and there is no purchase UI.
+
+**iOS first.** Only `EXPO_PUBLIC_REVENUECAT_IOS_KEY` is provisioned. `getBillingProvider()` resolves to the no-op adapter on any platform without a key, so Android lights up later by setting `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY` + connecting Play in the RevenueCat dashboard — no code change. Both keys must also be registered as **EAS environment variables** (same trap as the Supabase vars: `.env.local` is not read by EAS builds).
+
+**Decisions locked with the client (2026-09-14):** free users can *read* chat but not send; Pro users get a per-PR public/private switch (default public); Android deferred.
 
 ### The rules that must not be broken
 
@@ -524,7 +530,7 @@ Every `showPaywall` call passes the trigger that opened it, so conversion can be
 
 ### Testing Pro locally
 
-The Profile screen's Pro card toggles a `__DEV__`-only local override (`useEntitlementStore.setDevOverride`). It writes nothing to the server, so it exercises client affordances only. To test a **server-enforced** gate, insert a `provider: 'manual'` row into `subscriptions` with the service role — the trigger flips `is_pro` for you, and deleting the row revokes it.
+The Profile screen's Pro card toggles a `__DEV__`-only local override (`useEntitlementStore.setDevOverride`). It writes nothing to the server, so it exercises client affordances only. To test a **server-enforced** gate, insert a `provider: 'manual'` row into `subscriptions` with the service role — the trigger flips `is_pro` for you, and deleting the row revokes it. Note the inverse too: the webhook and reconcile **never overwrite a `manual` row**, so an account with a manual grant will not reflect sandbox purchases until that row is deleted.
 
 ---
 

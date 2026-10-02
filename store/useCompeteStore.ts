@@ -8,6 +8,7 @@ import type {
   ChallengeLeaderboardEntry,
   ChallengeInvitation,
   CreateFriendChallengeInput,
+  CreateAdminChallengeInput,
 } from "@/types/challenge";
 import {
   fetchExerciseTypes,
@@ -21,6 +22,9 @@ import {
   createFriendChallenge as apiCreateFriendChallenge,
   fetchPendingInvitations,
   respondToInvitation as apiRespondToInvitation,
+  createAdminChallenge as apiCreateAdminChallenge,
+  fetchAdminCreatedChallenges,
+  cancelChallenge as apiCancelChallenge,
 } from "@/lib/api";
 
 const PAGE_SIZE = 50;
@@ -80,6 +84,11 @@ interface CompeteState {
   loadingInvitations: boolean;
   invitationsError: string | null;
 
+  /** Admin-only: challenges created by the current (admin) user, any status */
+  myAdminChallenges: ChallengeWithStats[];
+  loadingMyAdminChallenges: boolean;
+  myAdminChallengesError: string | null;
+
   // ─── Shared ─────────────────────────────────────────────────────────────────
   error: string | null;
 
@@ -108,6 +117,14 @@ interface CompeteState {
     userId: string,
     response: 'accepted' | 'declined',
   ) => Promise<{ error: string | null }>;
+
+  // Admin
+  loadMyAdminChallenges: (adminId: string) => Promise<void>;
+  adminCreateChallenge: (
+    adminId: string,
+    input: CreateAdminChallengeInput,
+  ) => Promise<{ challengeId: string | null; error: string | null }>;
+  cancelChallenge: (challengeId: string, adminId: string) => Promise<{ error: string | null }>;
 
   /** Live-updates a single challenge's leaderboard when any participant's
    * score/membership changes. Call when a challenge detail screen mounts.
@@ -149,6 +166,10 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
   pendingInvitations: [],
   loadingInvitations: false,
   invitationsError: null,
+
+  myAdminChallenges: [],
+  loadingMyAdminChallenges: false,
+  myAdminChallengesError: null,
 
   error: null,
 
@@ -319,6 +340,30 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
     return result;
   },
 
+  // ─── Admin ──────────────────────────────────────────────────────────────────
+
+  loadMyAdminChallenges: async (adminId) => {
+    set({ loadingMyAdminChallenges: true, myAdminChallengesError: null });
+    const { data, error } = await fetchAdminCreatedChallenges(adminId);
+    set({ myAdminChallenges: data, loadingMyAdminChallenges: false, myAdminChallengesError: error });
+  },
+
+  adminCreateChallenge: async (adminId, input) => {
+    const result = await apiCreateAdminChallenge(adminId, input);
+    if (!result.error) {
+      await get().loadMyAdminChallenges(adminId);
+    }
+    return result;
+  },
+
+  cancelChallenge: async (challengeId, adminId) => {
+    const result = await apiCancelChallenge(challengeId);
+    if (!result.error) {
+      await get().loadMyAdminChallenges(adminId);
+    }
+    return result;
+  },
+
   // ─── Realtime ───────────────────────────────────────────────────────────────
 
   subscribeToChallengeEvents: (challengeId, userId) => {
@@ -418,6 +463,9 @@ export const useCompeteStore = create<CompeteState>((set, get) => ({
       pendingInvitations: [],
       loadingInvitations: false,
       invitationsError: null,
+      myAdminChallenges: [],
+      loadingMyAdminChallenges: false,
+      myAdminChallengesError: null,
     });
   },
 }));

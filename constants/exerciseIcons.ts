@@ -18,7 +18,6 @@ import {
   Footprints,
   Target,
   Flame,
-  Timer,
   Star,
   type LucideIcon,
 } from 'lucide-react-native';
@@ -41,7 +40,6 @@ const EXERCISE_ICON_MAP: Record<string, LucideIcon> = {
   lunge: Footprints,
   facepull: Target,
   hipthrust: Flame,
-  plank: Timer,
   muscle_up: Star,
 };
 

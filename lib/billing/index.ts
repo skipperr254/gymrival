@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { noopBillingProvider } from './noop';
+import { getRevenueCatApiKey, revenueCatBillingProvider } from './revenuecat';
 import type { BillingProvider } from './types';
 
 export * from './types';
@@ -12,16 +13,28 @@ function selectProvider(): BillingProvider {
   // No StoreKit / Play Billing to talk to.
   if (Platform.OS === 'web') return noopBillingProvider;
 
-  // Expo Go: `react-native-purchases` runs in a mock mode that can't complete a
-  // real purchase, and the native module isn't in the Expo Go binary at all.
+  // Expo Go: the native module isn't in the Expo Go binary, so the SDK runs
+  // in a "preview mode" that can't complete a real purchase.
   if (Constants.executionEnvironment === ExecutionEnvironment.StoreClient) {
     return noopBillingProvider;
   }
 
-  // Phase 1 returns the RevenueCat adapter here. Until then every environment
-  // resolves free from the device side and the server row is the only source
-  // of Pro — which is exactly how the grandfathered `manual` grants work.
-  return noopBillingProvider;
+  // No public SDK key for this platform means billing isn't set up here yet —
+  // today that's Android, which lights up by setting one env var. Resolving to
+  // no-op (rather than configuring with an empty key and crashing) keeps the
+  // server row as the only source of Pro, exactly like the grandfathered
+  // `manual` grants.
+  if (!getRevenueCatApiKey()) {
+    if (__DEV__) {
+      console.warn(
+        `[billing] No RevenueCat SDK key for ${Platform.OS} — using the no-op provider. ` +
+          `Set EXPO_PUBLIC_REVENUECAT_${Platform.OS.toUpperCase()}_KEY to enable purchases.`
+      );
+    }
+    return noopBillingProvider;
+  }
+
+  return revenueCatBillingProvider;
 }
 
 /**

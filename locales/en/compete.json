@@ -31,7 +31,8 @@
     "yourRank": "Your rank: #{{rank}}",
     "joinedBtn": "JOINED",
     "joinBtn": "JOIN",
-    "viewAll": "VIEW ALL"
+    "viewAll": "VIEW ALL",
+    "winner": "WINNER"
   },
   "invitation": {
     "defaultTitle": "Challenge Invite",
@@ -110,6 +111,49 @@
     "refresh": "REFRESH",
     "joinedTapToLeave": "JOINED — TAP TO LEAVE",
     "joinChallenge": "JOIN CHALLENGE",
-    "challengeEnded": "CHALLENGE ENDED"
+    "challengeEnded": "CHALLENGE ENDED",
+    "winner": "WINNER"
+  },
+  "admin": {
+    "entry": "ADMIN",
+    "createTitle": "CREATE CHALLENGE",
+    "manageTitle": "YOUR CHALLENGES",
+    "submit": "CREATE CHALLENGE",
+    "createSuccess": "Challenge created",
+    "fields": {
+      "title": "TITLE",
+      "titlePlaceholder": "e.g. Bench Press Showdown",
+      "description": "DESCRIPTION",
+      "descriptionPlaceholder": "Optional details for participants",
+      "scope": "WHO CAN JOIN",
+      "scopeGlobal": "EVERYONE",
+      "scopeFriendsOnly": "MY FRIENDS ONLY",
+      "exercise": "EXERCISE",
+      "metric": "METRIC",
+      "duration": "DURATION",
+      "durationWeekly": "WEEKLY",
+      "durationMonthly": "MONTHLY",
+      "prizeLabel": "PRIZE",
+      "prizeLabelPlaceholder": "e.g. 1 Month of Pro",
+      "rewardXp": "XP REWARD",
+      "rewardXpPlaceholder": "0",
+      "maxParticipants": "MAX PARTICIPANTS",
+      "maxParticipantsPlaceholder": "No limit"
+    },
+    "manage": {
+      "emptyTitle": "NO CHALLENGES YET",
+      "emptySub": "Challenges you create will appear here",
+      "statusActive": "ACTIVE",
+      "statusCompleted": "COMPLETED",
+      "statusCancelled": "CANCELLED",
+      "statusDraft": "DRAFT",
+      "cancel": "CANCEL",
+      "cancelConfirmTitle": "Cancel this challenge?",
+      "cancelConfirmMessage": "Participants will no longer be able to join or score. This can't be undone.",
+      "cancelConfirmYes": "CANCEL CHALLENGE",
+      "cancelConfirmNo": "KEEP IT",
+      "loadError": "Could not load your challenges",
+      "retry": "RETRY"
+    }
   }
 }

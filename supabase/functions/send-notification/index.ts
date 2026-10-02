@@ -19,7 +19,8 @@ type NotificationType =
   | "friend_request"
   | "friend_request_accepted"
   | "pr_liked"
-  | "friend_pr";
+  | "friend_pr"
+  | "challenge_won";
 
 type SupportedLocale = "en" | "nl" | "es" | "de" | "pt" | "fr" | "ar";
 
@@ -31,6 +32,7 @@ interface WebhookPayload {
     exercise_key?: string;
     value?: number;
     unit?: string;
+    title?: string;
     [key: string]: unknown;
   };
 }
@@ -45,6 +47,7 @@ const TEMPLATES: Record<SupportedLocale, Record<NotificationType, string>> = {
     friend_request_accepted: "{{name}} accepted your friend request",
     pr_liked: "{{name}} liked your {{exercise}}{{value}} PR",
     friend_pr: "{{name}} just hit a new {{exercise}}{{value}} PR",
+    challenge_won: "You won \"{{title}}\"! 🏆",
   },
   nl: {
     new_message: "{{name}} heeft je een bericht gestuurd",
@@ -52,6 +55,7 @@ const TEMPLATES: Record<SupportedLocale, Record<NotificationType, string>> = {
     friend_request_accepted: "{{name}} heeft je vriendschapsverzoek geaccepteerd",
     pr_liked: "{{name}} vond je {{exercise}}{{value}} PR leuk",
     friend_pr: "{{name}} heeft zojuist een nieuwe {{exercise}}{{value}} PR neergezet",
+    challenge_won: "Je hebt \"{{title}}\" gewonnen! 🏆",
   },
   es: {
     new_message: "{{name}} te envió un mensaje",
@@ -59,6 +63,7 @@ const TEMPLATES: Record<SupportedLocale, Record<NotificationType, string>> = {
     friend_request_accepted: "{{name}} aceptó tu solicitud de amistad",
     pr_liked: "A {{name}} le gustó tu PR de {{exercise}}{{value}}",
     friend_pr: "{{name}} acaba de lograr un nuevo PR de {{exercise}}{{value}}",
+    challenge_won: "¡Ganaste \"{{title}}\"! 🏆",
   },
   de: {
     new_message: "{{name}} hat dir eine Nachricht geschickt",
@@ -66,6 +71,7 @@ const TEMPLATES: Record<SupportedLocale, Record<NotificationType, string>> = {
     friend_request_accepted: "{{name}} hat deine Freundschaftsanfrage angenommen",
     pr_liked: "{{name}} gefällt dein {{exercise}}{{value}} PR",
     friend_pr: "{{name}} hat gerade einen neuen {{exercise}}{{value}} PR aufgestellt",
+    challenge_won: "Du hast \"{{title}}\" gewonnen! 🏆",
   },
   pt: {
     new_message: "{{name}} enviou-te uma mensagem",
@@ -73,6 +79,7 @@ const TEMPLATES: Record<SupportedLocale, Record<NotificationType, string>> = {
     friend_request_accepted: "{{name}} aceitou o teu pedido de amizade",
     pr_liked: "{{name}} gostou do teu PR de {{exercise}}{{value}}",
     friend_pr: "{{name}} acabou de alcançar um novo PR de {{exercise}}{{value}}",
+    challenge_won: "Ganhaste \"{{title}}\"! 🏆",
   },
   fr: {
     new_message: "{{name}} t'a envoyé un message",
@@ -80,6 +87,7 @@ const TEMPLATES: Record<SupportedLocale, Record<NotificationType, string>> = {
     friend_request_accepted: "{{name}} a accepté ta demande d'ami",
     pr_liked: "{{name}} a aimé ton PR {{exercise}}{{value}}",
     friend_pr: "{{name}} vient de réaliser un nouveau PR {{exercise}}{{value}}",
+    challenge_won: "Tu as gagné \"{{title}}\" ! 🏆",
   },
   ar: {
     new_message: "أرسل لك {{name}} رسالة",
@@ -87,6 +95,7 @@ const TEMPLATES: Record<SupportedLocale, Record<NotificationType, string>> = {
     friend_request_accepted: "قبل {{name}} طلب صداقتك",
     pr_liked: "أعجب {{name}} بـ {{exercise}}{{value}} الخاص بك",
     friend_pr: "حقق {{name}} للتو رقماً قياسياً جديداً في {{exercise}}{{value}}",
+    challenge_won: "لقد فزت بـ \"{{title}}\"! 🏆",
   },
 };
 
@@ -102,13 +111,13 @@ const SOMEONE: Record<SupportedLocale, string> = {
 
 // Mirrors locales/*/exercises.json — keep in sync by hand.
 const EXERCISE_NAMES: Record<SupportedLocale, Record<string, string>> = {
-  en: { bench: "Bench Press", squat: "Squat", deadlift: "Deadlift", pullups: "Pull-ups", overhead: "Overhead Press", bulgarian: "Bulgarian Split Squat", rdl: "Romanian Deadlift", incline: "Incline Bench", dips: "Dips", row: "Barbell Row", curl: "Bicep Curl", legpress: "Leg Press", lunge: "Lunges", facepull: "Face Pull", hipthrust: "Hip Thrust", plank: "Plank", muscle_up: "Muscle Up" },
-  nl: { bench: "Bankdrukken", squat: "Squat", deadlift: "Deadlift", pullups: "Optrekken", overhead: "Overhead Press", bulgarian: "Bulgaarse Split Squat", rdl: "Roemeense Deadlift", incline: "Schuine Bankdrukken", dips: "Dips", row: "Barbell Roeien", curl: "Biceps Curl", legpress: "Beenpers", lunge: "Uitvalspassen", facepull: "Face Pull", hipthrust: "Heupheffen", plank: "Plank", muscle_up: "Muscle Up" },
-  es: { bench: "Press de Banca", squat: "Sentadilla", deadlift: "Peso Muerto", pullups: "Dominadas", overhead: "Press Militar", bulgarian: "Sentadilla Búlgara", rdl: "Peso Muerto Rumano", incline: "Press Inclinado", dips: "Fondos", row: "Remo con Barra", curl: "Curl de Bíceps", legpress: "Prensa de Piernas", lunge: "Zancadas", facepull: "Jalón de Cara", hipthrust: "Empuje de Cadera", plank: "Plancha", muscle_up: "Muscle Up" },
-  de: { bench: "Bankdrücken", squat: "Kniebeuge", deadlift: "Kreuzheben", pullups: "Klimmzüge", overhead: "Schulterdrücken", bulgarian: "Bulgarische Split-Kniebeuge", rdl: "Rumänisches Kreuzheben", incline: "Schrägbankdrücken", dips: "Dips", row: "Langhantelrudern", curl: "Bizepscurl", legpress: "Beinpresse", lunge: "Ausfallschritte", facepull: "Face Pull", hipthrust: "Hüftstoßen", plank: "Unterarmstütz", muscle_up: "Muscle Up" },
-  pt: { bench: "Supino", squat: "Agachamento", deadlift: "Levantamento Terra", pullups: "Barra Fixa", overhead: "Desenvolvimento Militar", bulgarian: "Agachamento Búlgaro", rdl: "Levantamento Terra Romeno", incline: "Supino Inclinado", dips: "Mergulho (Dips)", row: "Remada com Barra", curl: "Rosca Bíceps", legpress: "Leg Press", lunge: "Afundo", facepull: "Face Pull", hipthrust: "Elevação Pélvica", plank: "Prancha", muscle_up: "Muscle Up" },
-  fr: { bench: "Développé couché", squat: "Squat", deadlift: "Soulevé de terre", pullups: "Tractions", overhead: "Développé militaire", bulgarian: "Fente bulgare", rdl: "Soulevé de terre roumain", incline: "Développé incliné", dips: "Dips", row: "Rowing barre", curl: "Curl biceps", legpress: "Presse à cuisses", lunge: "Fentes", facepull: "Face pull", hipthrust: "Hip thrust", plank: "Planche", muscle_up: "Muscle up" },
-  ar: { bench: "بنش برس", squat: "سكوات", deadlift: "الرفعة الميتة", pullups: "العقلة", overhead: "الضغط العلوي", bulgarian: "سكوات بلغاري", rdl: "الرفعة الميتة الرومانية", incline: "بنش مائل", dips: "متوازي", row: "التجديف بالبار", curl: "تمرين البايسبس", legpress: "ضغط الأرجل", lunge: "الاندفاع", facepull: "فيس بول", hipthrust: "دفع الورك", plank: "بلانك", muscle_up: "ماسل أب" },
+  en: { bench: "Bench Press", squat: "Squat", deadlift: "Deadlift", pullups: "Pull-ups", overhead: "Overhead Press", bulgarian: "Bulgarian Split Squat", rdl: "Romanian Deadlift", incline: "Incline Bench", dips: "Dips", row: "Barbell Row", curl: "Bicep Curl", legpress: "Leg Press", lunge: "Lunges", facepull: "Face Pull", hipthrust: "Hip Thrust", muscle_up: "Muscle Up" },
+  nl: { bench: "Bankdrukken", squat: "Squat", deadlift: "Deadlift", pullups: "Optrekken", overhead: "Overhead Press", bulgarian: "Bulgaarse Split Squat", rdl: "Roemeense Deadlift", incline: "Schuine Bankdrukken", dips: "Dips", row: "Barbell Roeien", curl: "Biceps Curl", legpress: "Beenpers", lunge: "Uitvalspassen", facepull: "Face Pull", hipthrust: "Heupheffen", muscle_up: "Muscle Up" },
+  es: { bench: "Press de Banca", squat: "Sentadilla", deadlift: "Peso Muerto", pullups: "Dominadas", overhead: "Press Militar", bulgarian: "Sentadilla Búlgara", rdl: "Peso Muerto Rumano", incline: "Press Inclinado", dips: "Fondos", row: "Remo con Barra", curl: "Curl de Bíceps", legpress: "Prensa de Piernas", lunge: "Zancadas", facepull: "Jalón de Cara", hipthrust: "Empuje de Cadera", muscle_up: "Muscle Up" },
+  de: { bench: "Bankdrücken", squat: "Kniebeuge", deadlift: "Kreuzheben", pullups: "Klimmzüge", overhead: "Schulterdrücken", bulgarian: "Bulgarische Split-Kniebeuge", rdl: "Rumänisches Kreuzheben", incline: "Schrägbankdrücken", dips: "Dips", row: "Langhantelrudern", curl: "Bizepscurl", legpress: "Beinpresse", lunge: "Ausfallschritte", facepull: "Face Pull", hipthrust: "Hüftstoßen", muscle_up: "Muscle Up" },
+  pt: { bench: "Supino", squat: "Agachamento", deadlift: "Levantamento Terra", pullups: "Barra Fixa", overhead: "Desenvolvimento Militar", bulgarian: "Agachamento Búlgaro", rdl: "Levantamento Terra Romeno", incline: "Supino Inclinado", dips: "Mergulho (Dips)", row: "Remada com Barra", curl: "Rosca Bíceps", legpress: "Leg Press", lunge: "Afundo", facepull: "Face Pull", hipthrust: "Elevação Pélvica", muscle_up: "Muscle Up" },
+  fr: { bench: "Développé couché", squat: "Squat", deadlift: "Soulevé de terre", pullups: "Tractions", overhead: "Développé militaire", bulgarian: "Fente bulgare", rdl: "Soulevé de terre roumain", incline: "Développé incliné", dips: "Dips", row: "Rowing barre", curl: "Curl biceps", legpress: "Presse à cuisses", lunge: "Fentes", facepull: "Face pull", hipthrust: "Hip thrust", muscle_up: "Muscle up" },
+  ar: { bench: "بنش برس", squat: "سكوات", deadlift: "الرفعة الميتة", pullups: "العقلة", overhead: "الضغط العلوي", bulgarian: "سكوات بلغاري", rdl: "الرفعة الميتة الرومانية", incline: "بنش مائل", dips: "متوازي", row: "التجديف بالبار", curl: "تمرين البايسبس", legpress: "ضغط الأرجل", lunge: "الاندفاع", facepull: "فيس بول", hipthrust: "دفع الورك", muscle_up: "ماسل أب" },
 };
 
 function isSupportedLocale(l: string | null | undefined): l is SupportedLocale {
@@ -136,7 +145,8 @@ function composeBody(
       value = type === "pr_liked" ? ` (${suffix})` : ` ${suffix}`;
     }
   }
-  return interpolate(TEMPLATES[locale][type], { name: actorName, exercise, value });
+  const title = type === "challenge_won" ? (data.title ?? "") : "";
+  return interpolate(TEMPLATES[locale][type], { name: actorName, exercise, value, title });
 }
 
 // Timing-safe string comparison — a plain `!==` short-circuits on the first

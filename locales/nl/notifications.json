@@ -2,10 +2,12 @@
   "someone": "Iemand",
   "yourPr": "je PR",
   "aPr": "een PR",
+  "aChallenge": "een challenge",
   "newMessage": "{{name}} heeft je een bericht gestuurd",
   "friendRequest": "{{name}} heeft je een vriendschapsverzoek gestuurd",
   "friendRequestAccepted": "{{name}} heeft je vriendschapsverzoek geaccepteerd",
   "prLiked": "{{name}} vond je {{exercise}}{{value}} PR leuk",
   "friendPr": "{{name}} heeft zojuist een nieuwe {{exercise}}{{value}} PR neergezet",
+  "challengeWon": "Je hebt \"{{title}}\" gewonnen! 🏆",
   "generic": "Je hebt een nieuwe melding"
 }
