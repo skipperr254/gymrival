@@ -1,9 +1,18 @@
 {
   "logSheet": {
     "title": "AKTIVITÄT PROTOKOLLIEREN",
-    "logPr": { "label": "PR protokollieren", "sub": "Erfasse einen neuen persönlichen Rekord" },
-    "checkin": { "label": "Gym Check-in", "sub": "Im Studio einchecken" },
-    "logMeal": { "label": "Mahlzeit protokollieren", "sub": "Kalorien und Makros verfolgen" }
+    "logPr": {
+      "label": "PR protokollieren",
+      "sub": "Erfasse einen neuen persönlichen Rekord"
+    },
+    "checkin": {
+      "label": "Gym Check-in",
+      "sub": "Im Studio einchecken"
+    },
+    "logMeal": {
+      "label": "Mahlzeit protokollieren",
+      "sub": "Kalorien und Makros verfolgen"
+    }
   },
   "step": {
     "stepOf": "SCHRITT {{step}} VON 2",
@@ -31,7 +40,6 @@
   "xpEarned": "+100 XP ERHALTEN",
   "video": {
     "readyLabel": "VIDEO BEREIT",
-    "requiredHint": "Ein Videobeweis ist erforderlich, um einen PR zu protokollieren",
     "addProofTitle": "VIDEOBEWEIS HINZUFÜGEN",
     "addProofSub": "Kamera oder Bibliothek · max. 60 Sek.",
     "permissionNeededTitle": "Berechtigung erforderlich",
@@ -42,5 +50,17 @@
     "recordVideo": "Video aufnehmen",
     "chooseFromLibrary": "Aus Bibliothek wählen",
     "cancel": "Abbrechen"
+  },
+  "gate": {
+    "proBadge": "PRO",
+    "videoLockedTitle": "Videobeweis",
+    "videoLockedSub": "Halte diesen Lift auf Video fest",
+    "publishTitle": "Im Feed teilen",
+    "publishSub": "Deine Rivalen sehen diesen PR",
+    "publishOffSub": "Nur in deinen Aufzeichnungen",
+    "publishLockedSub": "Im Feed posten ist eine Pro-Funktion",
+    "privateNote": "Dein PR wird so oder so gespeichert — er bringt XP und zählt in beiden Ranglisten.",
+    "sharedToFeed": "Im Feed geteilt",
+    "savedPrivately": "In deinen Aufzeichnungen gespeichert"
   }
 }

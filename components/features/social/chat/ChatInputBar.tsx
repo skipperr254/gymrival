@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, ScrollView, Pressable, TextInput, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ArrowUp } from 'lucide-react-native';
+import { ArrowUp, Lock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 
@@ -13,6 +13,14 @@ interface ChatInputBarProps {
   placeholder: string;
   /** False until the conversation id is resolved — send stays disabled. */
   canSend: boolean;
+  /**
+   * Sending is Pro (B3b). Reading the thread stays free, so the whole screen
+   * is left alone and only the composer is replaced — the point of the gate
+   * is that the user can see a named friend waiting on a reply.
+   */
+  locked: boolean;
+  /** Opens the paywall. The chat screen is a route, not a modal, so this is safe to call directly. */
+  onUpgradePress: () => void;
   /** Bottom padding (safe-area aware, computed by the screen). */
   bottomPad: number;
   onSend: (text: string) => void;
@@ -27,8 +35,10 @@ function ChatInputBarInner({
   otherUserId,
   placeholder,
   canSend,
+  locked,
   bottomPad,
   onSend,
+  onUpgradePress,
 }: ChatInputBarProps) {
   const { t } = useTranslation('social');
   const QUICK_REPLIES = t('chat.quickReplies', { returnObjects: true }) as string[];
@@ -67,6 +77,34 @@ function ChatInputBarInner({
     if (otherUserId) AsyncStorage.removeItem(draftKey(otherUserId)).catch(() => {});
     inputRef.current?.focus();
   };
+
+  if (locked) {
+    return (
+      <View className="px-4 pt-2.5" style={{ paddingBottom: bottomPad }}>
+        <Pressable
+          onPress={onUpgradePress}
+          accessibilityRole="button"
+          className="flex-row items-center gap-3 bg-[#1c1c1c] border-[1.5px] border-default rounded-[22px] px-4 py-3"
+          style={({ pressed }) => pressed && { opacity: 0.75 }}
+        >
+          <Lock size={16} strokeWidth={2} color={Colors.accent} />
+          <View className="flex-1">
+            <Text className="font-sans-semibold text-[13px] text-primary">
+              {t('chat.lockedTitle')}
+            </Text>
+            <Text className="font-sans text-[11px] text-[#707070] mt-px">
+              {t('chat.lockedSub')}
+            </Text>
+          </View>
+          <View className="bg-accent rounded-full px-3 py-1.5">
+            <Text className="font-heading text-[10px] text-primary tracking-[1.5px]">
+              {t('chat.lockedCta')}
+            </Text>
+          </View>
+        </Pressable>
+      </View>
+    );
+  }
 
   return (
     <>

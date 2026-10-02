@@ -14,6 +14,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { computeIsOnline, useChatStore } from '@/store/useChatStore';
 import { fetchProfile } from '@/lib/api';
 import { ChatInputBar, MessageList } from '@/components/features/social/chat';
+import { useProGate } from '@/hooks/useProGate';
 import { Avatar } from '@/components/ui/Avatar';
 import { DetailHeader } from '@/components/ui/DetailHeader';
 
@@ -22,6 +23,9 @@ export default function ChatScreen() {
   const { userId: otherUserId } = useLocalSearchParams<{ userId: string }>();
   const currentUserId = useAuthStore((s) => s.user?.id ?? '');
   const { bottom: bottomInset } = useSafeAreaInsets();
+  // Reading the thread is free; sending is Pro. This screen is a route, not a
+  // modal, so requestUpgrade() can open the paywall directly.
+  const sendGate = useProGate('sendMessage');
 
   // Per-field selectors: this screen re-renders for its own thread's state,
   // not for unrelated chat-store changes (inbox updates, other presence rows).
@@ -122,9 +126,17 @@ export default function ChatScreen() {
   const handleSend = useCallback(
     (text: string) => {
       if (!conversationId) return;
+      // Belt and braces: the composer is already replaced by a locked bar, but
+      // entitlement can lapse mid-session and a quick-reply chip could still
+      // fire. The database rejects it either way (migration 056) — this just
+      // makes that a paywall instead of a message that silently disappears.
+      if (!sendGate.allowed) {
+        sendGate.requestUpgrade();
+        return;
+      }
       sendMessage(conversationId, currentUserId, text);
     },
-    [conversationId, currentUserId, sendMessage]
+    [conversationId, currentUserId, sendMessage, sendGate]
   );
 
   const handleLoadOlder = useCallback(() => {
@@ -219,8 +231,10 @@ export default function ChatScreen() {
               : t('chat.messagePlaceholderGeneric')
           }
           canSend={!!conversationId}
+          locked={sendGate.locked}
           bottomPad={inputBottomPad}
           onSend={handleSend}
+          onUpgradePress={sendGate.requestUpgrade}
         />
       </KeyboardAvoidingView>
     </SafeAreaView>

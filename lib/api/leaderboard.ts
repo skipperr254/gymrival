@@ -63,76 +63,34 @@ export async function fetchRivalsLeaderboard(
   userId: string,
   exerciseKey: string
 ): Promise<{ data: RivalEntry[]; error: string | null }> {
-  // 1. Get accepted friend IDs
-  const { data: friendships, error: friendErr } = await supabase
-    .from("friendships")
-    .select("requester_id, addressee_id")
-    .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`)
-    .eq("status", "accepted");
+  // Was: three client-side queries (friendships -> personal_records -> profiles)
+  // that read the whole friend group's PRs directly. Migration 054 restricts
+  // SELECT on personal_records to "own rows, or public rows", so that version
+  // silently started omitting friends' private PRs — a wrong leaderboard that
+  // looks like a data bug rather than a permissions one.
+  //
+  // rivals_leaderboard() is SECURITY DEFINER and derives the friend circle
+  // from auth.uid() internally. It deliberately takes no user id: a definer
+  // function that accepted one would let any caller read any other user's
+  // friends' private PRs.
+  const { data, error } = await supabase.rpc("rivals_leaderboard", {
+    p_exercise_key: exerciseKey,
+  });
 
-  if (friendErr) return { data: [], error: friendErr.message };
+  if (error) return { data: [], error: error.message };
 
-  const friendIds = (friendships ?? []).map((f: any) =>
-    f.requester_id === userId ? f.addressee_id : f.requester_id
-  );
+  const entries: RivalEntry[] = ((data as any[]) ?? []).map((row, i) => ({
+    userId: row.user_id,
+    fullName: row.full_name ?? row.username ?? "Unknown",
+    username: row.username ?? null,
+    avatarUrl: row.avatar_url ?? null,
+    level: row.level ?? 1,
+    bestPR: Number(row.best_pr),
+    unit: row.unit as ExerciseUnit,
+    isMe: row.user_id === userId,
+    rank: i + 1,
+  }));
 
-  const participantIds = [userId, ...friendIds];
-
-  // 2. Fetch all PR entries for these users and the selected exercise
-  const { data: prRows, error: prErr } = await supabase
-    .from("personal_records")
-    .select("user_id, value, unit")
-    .in("user_id", participantIds)
-    .eq("exercise_key", exerciseKey);
-
-  if (prErr) return { data: [], error: prErr.message };
-
-  // 3. Build best PR per user (max value)
-  const bestMap = new Map<string, { value: number; unit: ExerciseUnit }>();
-  for (const row of prRows ?? []) {
-    const existing = bestMap.get(row.user_id);
-    const val = Number(row.value);
-    if (!existing || val > existing.value) {
-      bestMap.set(row.user_id, { value: val, unit: row.unit as ExerciseUnit });
-    }
-  }
-
-  // Only include users who have a PR for this exercise
-  const usersWithPR = participantIds.filter((id) => bestMap.has(id));
-  if (usersWithPR.length === 0) return { data: [], error: null };
-
-  // 4. Fetch profiles for those users
-  const { data: profiles, error: profileErr } = await supabase
-    .from("profiles")
-    .select("id, full_name, username, avatar_url, level")
-    .in("id", usersWithPR);
-
-  if (profileErr) return { data: [], error: profileErr.message };
-
-  const profileMap = new Map(
-    (profiles ?? []).map((p: any) => [p.id, p])
-  );
-
-  // 5. Build ranked entries
-  const entries: Omit<RivalEntry, "rank">[] = usersWithPR
-    .map((id) => {
-      const pr = bestMap.get(id)!;
-      const profile = profileMap.get(id);
-      return {
-        userId: id,
-        fullName: profile?.full_name ?? profile?.username ?? "Unknown",
-        username: profile?.username ?? null,
-        avatarUrl: profile?.avatar_url ?? null,
-        level: profile?.level ?? 1,
-        bestPR: pr.value,
-        unit: pr.unit,
-        isMe: id === userId,
-      };
-    })
-    .sort((a, b) => b.bestPR - a.bestPR);
-
-  return {
-    data: entries.map((e, i) => ({ ...e, rank: i + 1 })),
-    error: null,
-  };
+  return { data: entries, error: null };
 }
+

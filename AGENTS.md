@@ -502,7 +502,9 @@ GymRival is freemium: a real, permanently useful free tier plus a **Pro** subscr
 
 ### Status
 
-Phases 0 and 1 have landed: the entitlement spine, the RevenueCat adapter (`lib/billing/revenuecat.ts`), the webhook + reconcile edge functions, and the hourly expiry sweep (`pg_cron` job `refresh-expired-entitlements`). Phases 2–5 (paywall UI, feature gates, onboarding, measurement) have not. Concretely: no feature is gated yet and there is no purchase UI.
+**Tracker: `docs/pro-rollout-tracker.md`** — single source of truth for what is done and what is left. Read it before planning any Pro work.
+
+B0–B2 have landed: the entitlement spine, the RevenueCat adapter, the webhook + reconcile edge functions, the hourly expiry sweep, and the paywall + subscription management UI (`components/features/paywall/`). B3–B5 (feature gates, onboarding rebuild, measurement) have not. Concretely: a purchase flow exists but **no feature is gated yet**, and only 2 of the 8 paywall triggers are wired (`upgrade_card`, `settings`).
 
 **iOS first.** Only `EXPO_PUBLIC_REVENUECAT_IOS_KEY` is provisioned. `getBillingProvider()` resolves to the no-op adapter on any platform without a key, so Android lights up later by setting `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY` + connecting Play in the RevenueCat dashboard — no code change. Both keys must also be registered as **EAS environment variables** (same trap as the Supabase vars: `.env.local` is not read by EAS builds).
 

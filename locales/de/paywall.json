@@ -1,0 +1,109 @@
+{
+  "title": "GYMRIVAL PRO",
+  "subtitle": "Trainiere kostenlos. Tritt an wie ein Profi.",
+  "contextual": "{{feature}} freischalten",
+  "features": {
+    "publishPR": {
+      "title": "Teile deine PRs",
+      "sub": "Bring deine Lifts in den Feed"
+    },
+    "prVideo": {
+      "title": "Videobeweis",
+      "sub": "Halte jeden Lift auf Video fest"
+    },
+    "sendMessage": {
+      "title": "Schreib deinen Rivalen",
+      "sub": "Antworte jedem, jederzeit"
+    },
+    "leaderboardDepth": {
+      "title": "Die ganze Rangliste",
+      "sub": "Alle Athleten, nicht nur die Top 10"
+    },
+    "leaderboardSearch": {
+      "title": "Athleten suchen",
+      "sub": "Finde jeden in der Rangliste"
+    },
+    "createChallenge": {
+      "title": "Challenges erstellen",
+      "sub": "Fordere deine Freunde direkt heraus"
+    }
+  },
+  "freeNote": "Ernährung, Trainingsplan, Check-ins und Fortschritt bleiben kostenlos. Immer.",
+  "plans": {
+    "yearly": "Jährlich",
+    "monthly": "Monatlich",
+    "weekly": "Wöchentlich",
+    "quarterly": "Vierteljährlich",
+    "lifetime": "Einmalig",
+    "bestValue": "BESTER PREIS",
+    "save": "Spare {{percent}}%",
+    "perMonth": "{{price}} / Monat",
+    "trialBadge": "{{count}} Tage gratis"
+  },
+  "cta": {
+    "startTrial": "{{count}} Tage gratis starten",
+    "subscribe": "Weiter",
+    "processing": "Wird verarbeitet"
+  },
+  "terms": {
+    "withTrial": "{{count}} Tage gratis, danach {{price}} pro {{period}}. Verlängert sich automatisch bis zur Kündigung. Jederzeit in den App-Store-Einstellungen kündbar.",
+    "noTrial": "{{price}} pro {{period}}. Verlängert sich automatisch bis zur Kündigung. Jederzeit in den App-Store-Einstellungen kündbar."
+  },
+  "period": {
+    "weekly": "Woche",
+    "monthly": "Monat",
+    "quarterly": "3 Monate",
+    "yearly": "Jahr",
+    "lifetime": "einmalig",
+    "unknown": "Zeitraum"
+  },
+  "links": {
+    "restore": "Wiederherstellen",
+    "terms": "AGB",
+    "privacy": "Datenschutz"
+  },
+  "loading": "Tarife werden geladen",
+  "empty": {
+    "title": "Nicht verfügbar",
+    "body": "Die Abo-Optionen konnten gerade nicht geladen werden. Bitte versuch es gleich noch einmal.",
+    "retry": "Erneut versuchen"
+  },
+  "restore": {
+    "successTitle": "Pro wiederhergestellt",
+    "successBody": "Willkommen zurück. Deine Pro-Funktionen sind wieder aktiv.",
+    "noneTitle": "Nichts wiederherzustellen",
+    "noneBody": "Für dieses Apple-Konto wurde kein aktives Abo gefunden.",
+    "failedTitle": "Wiederherstellung fehlgeschlagen"
+  },
+  "purchase": {
+    "pendingTitle": "Kauf ausstehend",
+    "pendingBody": "Dein Kauf muss noch bestätigt werden. Pro wird freigeschaltet, sobald das passiert.",
+    "failedTitle": "Kauf fehlgeschlagen",
+    "unavailable": "In-App-Käufe sind auf diesem Gerät nicht verfügbar."
+  },
+  "close": "Schließen",
+  "subscription": {
+    "sectionTitle": "ABO",
+    "proTitle": "GymRival Pro",
+    "freeTitle": "Kostenloser Tarif",
+    "freeSub": "Upgrade, um die Social- und Wettkampf-Funktionen freizuschalten",
+    "upgrade": "Auf Pro upgraden",
+    "manage": "Abo verwalten",
+    "manageSub": "Tarif ändern oder kündigen",
+    "restore": "Käufe wiederherstellen",
+    "restoreSub": "Schon mit dieser Apple-ID abonniert?",
+    "renewsOn": "Verlängert sich am {{date}}",
+    "expiresOn": "Zugriff bis {{date}}",
+    "noExpiry": "Aktiv",
+    "status": {
+      "trialing": "Testphase",
+      "active": "Aktiv",
+      "grace": "Aktiv",
+      "billing_issue": "Zahlungsproblem",
+      "cancelled": "Gekündigt",
+      "expired": "Abgelaufen"
+    },
+    "billingIssueBody": "Deine letzte Zahlung konnte nicht eingezogen werden. Aktualisiere deine Zahlungsmethode, um Pro zu behalten.",
+    "cancelledBody": "Die automatische Verlängerung ist aus. Pro bleibt bis zum oben genannten Datum aktiv."
+  }
+}

@@ -1,8 +1,17 @@
 {
   "tabs": {
-    "rivals": { "label": "Rivals", "subtitle": "RIVALS" },
-    "challenges": { "label": "Challenges", "subtitle": "CHALLENGES" },
-    "global": { "label": "Global", "subtitle": "GLOBAL LEADERBOARD" }
+    "rivals": {
+      "label": "Rivals",
+      "subtitle": "RIVALS"
+    },
+    "challenges": {
+      "label": "Challenges",
+      "subtitle": "CHALLENGES"
+    },
+    "global": {
+      "label": "Global",
+      "subtitle": "GLOBAL LEADERBOARD"
+    }
   },
   "you": "YOU",
   "unknown": "Unknown",
@@ -73,7 +82,8 @@
     "challengeFriendSub": "Pick a friend and set the terms",
     "moreCount": "+{{count}}",
     "addFriendsFirst": "ADD FRIENDS FIRST",
-    "challengeFriendBtn": "CHALLENGE A FRIEND"
+    "challengeFriendBtn": "CHALLENGE A FRIEND",
+    "proRequired": "Creating challenges is a Pro feature."
   },
   "global": {
     "statBench": "BENCH",
@@ -93,7 +103,11 @@
     "noAthletesSub": "Be the first to log a Bench, Squat, and Deadlift PR!",
     "loadMore": "LOAD MORE",
     "refresh": "REFRESH",
-    "footerNote": "BASED ON COMBINED BENCH · SQUAT · DEADLIFT"
+    "footerNote": "BASED ON COMBINED BENCH · SQUAT · DEADLIFT",
+    "lockedTitle": "See the whole board",
+    "lockedSub": "Free shows the top {{count}}. Pro shows every athlete — and lets you search for anyone.",
+    "lockedCta": "UNLOCK THE BOARD",
+    "searchLocked": "Search athletes — Pro"
   },
   "detail": {
     "heading": "CHALLENGE",

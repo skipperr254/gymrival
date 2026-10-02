@@ -1,20 +1,26 @@
 import { View, Text, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Trophy, Zap, VideoOff } from 'lucide-react-native';
+import { Trophy, Zap, VideoOff, Globe, Lock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
-import type { ExerciseType } from '@/types/pr';
+import type { ExerciseType, PRVisibility } from '@/types/pr';
 import { getExerciseIcon } from '@/constants/exerciseIcons';
 
 interface Step3Props {
   exercise: ExerciseType;
   savedValue: number;
+  /** What the server actually stored — not what the client requested. */
+  visibility: PRVisibility;
+  hasVideo: boolean;
   videoUploading: boolean;
   videoUploadDone: boolean;
   videoUploadFailed: boolean;
 }
 
-export function Step3({ exercise, savedValue, videoUploading, videoUploadDone, videoUploadFailed }: Step3Props) {
+export function Step3({
+  exercise, savedValue, visibility, hasVideo,
+  videoUploading, videoUploadDone, videoUploadFailed,
+}: Step3Props) {
   const { t } = useTranslation('logpr');
   const ExIcon = getExerciseIcon(exercise.key);
 
@@ -56,8 +62,24 @@ export function Step3({ exercise, savedValue, videoUploading, videoUploadDone, v
         </View>
       </View>
 
+      {/* Where it ended up. A private PR is still a real PR — say so plainly
+          rather than leaving a free user wondering why it isn't on the feed. */}
+      <View className="flex-row items-center gap-[7px] mb-2.5">
+        {visibility === 'public' ? (
+          <>
+            <Globe size={13} strokeWidth={2} color={Colors.success} />
+            <Text className="font-sans text-[11px] text-success">{t('gate.sharedToFeed')}</Text>
+          </>
+        ) : (
+          <>
+            <Lock size={13} strokeWidth={2} color={Colors.muted} />
+            <Text className="font-sans text-[11px] text-muted">{t('gate.savedPrivately')}</Text>
+          </>
+        )}
+      </View>
+
       {/* Video upload status row */}
-      <View className="flex-row items-center gap-[7px] mb-3.5">
+      <View className={`flex-row items-center gap-[7px] ${hasVideo ? 'mb-3.5' : ''}`}>
         {videoUploading && (
           <>
             <ActivityIndicator size="small" color={Colors.muted} />

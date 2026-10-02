@@ -81,6 +81,14 @@
     "sent": "Sent",
     "messagePlaceholder": "Message {{name}}...",
     "messagePlaceholderGeneric": "Message...",
-    "quickReplies": ["Great lift!", "Let's train!", "What's your PR?", "Respect"]
+    "quickReplies": [
+      "Great lift!",
+      "Let's train!",
+      "What's your PR?",
+      "Respect"
+    ],
+    "lockedTitle": "Replying is a Pro feature",
+    "lockedSub": "Upgrade to message your rivals",
+    "lockedCta": "UNLOCK"
   }
 }

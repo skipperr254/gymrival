@@ -1,8 +1,17 @@
 {
   "tabs": {
-    "rivals": { "label": "Rivalen", "subtitle": "RIVALEN" },
-    "challenges": { "label": "Challenges", "subtitle": "CHALLENGES" },
-    "global": { "label": "Global", "subtitle": "GLOBALE RANGLISTE" }
+    "rivals": {
+      "label": "Rivalen",
+      "subtitle": "RIVALEN"
+    },
+    "challenges": {
+      "label": "Challenges",
+      "subtitle": "CHALLENGES"
+    },
+    "global": {
+      "label": "Global",
+      "subtitle": "GLOBALE RANGLISTE"
+    }
   },
   "you": "DU",
   "unknown": "Unbekannt",
@@ -73,7 +82,8 @@
     "challengeFriendSub": "Wähle einen Freund und lege die Bedingungen fest",
     "moreCount": "+{{count}}",
     "addFriendsFirst": "ERST FREUNDE HINZUFÜGEN",
-    "challengeFriendBtn": "FREUND HERAUSFORDERN"
+    "challengeFriendBtn": "FREUND HERAUSFORDERN",
+    "proRequired": "Challenges erstellen ist eine Pro-Funktion."
   },
   "global": {
     "statBench": "BANK",
@@ -93,7 +103,11 @@
     "noAthletesSub": "Sei der Erste, der einen Bankdrücken-, Kniebeuge- und Kreuzheben-PR einträgt!",
     "loadMore": "MEHR LADEN",
     "refresh": "AKTUALISIEREN",
-    "footerNote": "BASIEREND AUF KOMBINIERTEM BANKDRÜCKEN · KNIEBEUGE · KREUZHEBEN"
+    "footerNote": "BASIEREND AUF KOMBINIERTEM BANKDRÜCKEN · KNIEBEUGE · KREUZHEBEN",
+    "lockedTitle": "Die ganze Rangliste sehen",
+    "lockedSub": "Kostenlos zeigt die Top {{count}}. Pro zeigt alle Athleten — und lässt dich jeden suchen.",
+    "lockedCta": "FREISCHALTEN",
+    "searchLocked": "Athleten suchen — Pro"
   },
   "detail": {
     "heading": "CHALLENGE",

@@ -81,6 +81,14 @@
     "sent": "مُرسلة",
     "messagePlaceholder": "رسالة إلى {{name}}...",
     "messagePlaceholderGeneric": "رسالة...",
-    "quickReplies": ["رفعة رائعة!", "لنتدرّب!", "ما هو رقمك القياسي؟", "احترام"]
+    "quickReplies": [
+      "رفعة رائعة!",
+      "لنتدرّب!",
+      "ما هو رقمك القياسي؟",
+      "احترام"
+    ],
+    "lockedTitle": "الرد ميزة Pro",
+    "lockedSub": "قم بالترقية لمراسلة منافسيك",
+    "lockedCta": "افتح"
   }
 }

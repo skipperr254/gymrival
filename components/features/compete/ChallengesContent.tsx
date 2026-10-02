@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { AlertCircle, RefreshCw, Zap, Swords } from 'lucide-react-native';
+import { AlertCircle, RefreshCw, Zap, Swords, Lock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -13,6 +13,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { ChallengeCard } from './ChallengeCard';
 import { InvitationCard } from './InvitationCard';
 import { CreateChallengeModal } from './CreateChallengeModal';
+import { useProGate } from '@/hooks/useProGate';
 
 export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => void }) {
   const { t } = useTranslation('compete');
@@ -34,6 +35,8 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
   const loadPendingInvitations = useCompeteStore((s) => s.loadPendingInvitations);
   const respondToInvitation = useCompeteStore((s) => s.respondToInvitation);
   const createFriendChallenge = useCompeteStore((s) => s.createFriendChallenge);
+  // Creating a challenge is Pro; joining one you were invited to stays free.
+  const createGate = useProGate('createChallenge');
   const loadExercises = useCompeteStore((s) => s.loadExercises);
   const subscribeToInvitationEvents = useCompeteStore((s) => s.subscribeToInvitationEvents);
 
@@ -124,7 +127,12 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
       setShowModal(false);
     } else {
       console.error('[createFriendChallenge]', error);
-      setCreateError(error);
+      // The server raises a bare 'pro_required' (migration 057). Reaching it
+      // means entitlement lapsed between opening this modal and submitting —
+      // the entry button is already gated. Surfaced inline rather than as a
+      // paywall because this modal is still on screen, and stacking a second
+      // <Modal> on iOS is the documented freeze (see app/(tabs)/_layout.tsx).
+      setCreateError(error === 'pro_required' ? t('challenges.proRequired') : error);
     }
   };
 
@@ -288,7 +296,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
         )}
 
         <Pressable
-          onPress={() => setShowModal(true)}
+          onPress={createGate.locked ? createGate.requestUpgrade : () => setShowModal(true)}
           disabled={friends.length === 0}
           className={`rounded-2xl overflow-hidden ${friends.length === 0 ? 'opacity-35' : ''}`}
         >
@@ -307,7 +315,11 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
               borderColor: 'rgba(230,48,48,0.25)',
             }}
           >
-            <Swords size={14} strokeWidth={1.8} color={Colors.accent} />
+            {createGate.locked ? (
+              <Lock size={13} strokeWidth={2} color={Colors.accent} />
+            ) : (
+              <Swords size={14} strokeWidth={1.8} color={Colors.accent} />
+            )}
             <Text className="font-heading text-xs tracking-[2px] text-accent">
               {friends.length === 0 ? t('challenges.addFriendsFirst') : t('challenges.challengeFriendBtn')}
             </Text>

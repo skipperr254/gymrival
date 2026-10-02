@@ -1,8 +1,17 @@
 {
   "tabs": {
-    "rivals": { "label": "Rivais", "subtitle": "RIVAIS" },
-    "challenges": { "label": "Desafios", "subtitle": "DESAFIOS" },
-    "global": { "label": "Global", "subtitle": "CLASSIFICAÇÃO GLOBAL" }
+    "rivals": {
+      "label": "Rivais",
+      "subtitle": "RIVAIS"
+    },
+    "challenges": {
+      "label": "Desafios",
+      "subtitle": "DESAFIOS"
+    },
+    "global": {
+      "label": "Global",
+      "subtitle": "CLASSIFICAÇÃO GLOBAL"
+    }
   },
   "you": "TU",
   "unknown": "Desconhecido",
@@ -73,7 +82,8 @@
     "challengeFriendSub": "Escolhe um amigo e define os termos",
     "moreCount": "+{{count}}",
     "addFriendsFirst": "ADICIONA AMIGOS PRIMEIRO",
-    "challengeFriendBtn": "DESAFIAR UM AMIGO"
+    "challengeFriendBtn": "DESAFIAR UM AMIGO",
+    "proRequired": "Criar desafios é uma funcionalidade Pro."
   },
   "global": {
     "statBench": "SUPINO",
@@ -93,7 +103,11 @@
     "noAthletesSub": "Sê o primeiro a registar um PR de supino, agachamento e levantamento terra!",
     "loadMore": "CARREGAR MAIS",
     "refresh": "ATUALIZAR",
-    "footerNote": "BASEADO EM SUPINO · AGACHAMENTO · LEVANTAMENTO TERRA COMBINADOS"
+    "footerNote": "BASEADO EM SUPINO · AGACHAMENTO · LEVANTAMENTO TERRA COMBINADOS",
+    "lockedTitle": "Vê a classificação completa",
+    "lockedSub": "O plano grátis mostra o top {{count}}. O Pro mostra todos os atletas — e deixa-te procurar qualquer um.",
+    "lockedCta": "DESBLOQUEAR",
+    "searchLocked": "Procurar atletas — Pro"
   },
   "detail": {
     "heading": "DESAFIO",

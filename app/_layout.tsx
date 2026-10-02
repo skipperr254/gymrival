@@ -20,6 +20,7 @@ import { useChatStore } from "@/store/useChatStore";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { useEntitlementStore } from "@/store/useEntitlementStore";
 import { getBillingProvider } from "@/lib/billing";
+import { PaywallProvider } from "@/components/features/paywall";
 import { savePushToken, getUserLanguage, reconcileStaleVideoUploads } from "@/lib/api";
 import { Routes } from "@/constants/routes";
 import { stackScreenOptions } from "@/constants/navigation";
@@ -343,8 +344,13 @@ export default function RootLayout() {
   if ((!fontsLoaded && !fontError) || !initialized || !i18nReady) return null;
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      {/* The push from a tab into a drill-down screen is a cross-group
+    // PaywallProvider wraps the navigator so the paywall has exactly one mount
+    // point for the whole app, above every screen and every bottom sheet. Two
+    // live RN <Modal>s on iOS leave an invisible touch-eating view — see the
+    // UIKit note in app/(tabs)/_layout.tsx and the contract in PaywallProvider.
+    <PaywallProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* The push from a tab into a drill-down screen is a cross-group
           transition — (tabs) to (stack) — handled by THIS root stack, not
           (stack)/_layout.tsx's own nested Stack (that one only governs
           navigation between screens already inside the group). Without this
@@ -352,7 +358,8 @@ export default function RootLayout() {
           platform's raw native-stack default: a fine slide on iOS, but an
           Android default that reads as a fade, not the WhatsApp-style slide
           both platforms should have. */}
-      <Stack.Screen name="(stack)" options={stackScreenOptions} />
-    </Stack>
+        <Stack.Screen name="(stack)" options={stackScreenOptions} />
+      </Stack>
+    </PaywallProvider>
   );
 }

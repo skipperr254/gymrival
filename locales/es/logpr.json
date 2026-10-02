@@ -1,9 +1,18 @@
 {
   "logSheet": {
     "title": "REGISTRAR ACTIVIDAD",
-    "logPr": { "label": "Registrar un PR", "sub": "Registra un nuevo récord personal" },
-    "checkin": { "label": "Check-in de Gimnasio", "sub": "Regístrate en tu gimnasio" },
-    "logMeal": { "label": "Registrar una comida", "sub": "Controla calorías y macros" }
+    "logPr": {
+      "label": "Registrar un PR",
+      "sub": "Registra un nuevo récord personal"
+    },
+    "checkin": {
+      "label": "Check-in de Gimnasio",
+      "sub": "Regístrate en tu gimnasio"
+    },
+    "logMeal": {
+      "label": "Registrar una comida",
+      "sub": "Controla calorías y macros"
+    }
   },
   "step": {
     "stepOf": "PASO {{step}} DE 2",
@@ -31,7 +40,6 @@
   "xpEarned": "+100 XP GANADOS",
   "video": {
     "readyLabel": "VÍDEO LISTO",
-    "requiredHint": "Se requiere una prueba en vídeo para registrar un PR",
     "addProofTitle": "AÑADIR PRUEBA EN VÍDEO",
     "addProofSub": "Cámara o galería · máx. 60 seg",
     "permissionNeededTitle": "Permiso necesario",
@@ -42,5 +50,17 @@
     "recordVideo": "Grabar Vídeo",
     "chooseFromLibrary": "Elegir de la Galería",
     "cancel": "Cancelar"
+  },
+  "gate": {
+    "proBadge": "PRO",
+    "videoLockedTitle": "Prueba en vídeo",
+    "videoLockedSub": "Graba este levantamiento",
+    "publishTitle": "Compartir en el feed",
+    "publishSub": "Tus rivales verán este PR",
+    "publishOffSub": "Solo en tus registros",
+    "publishLockedSub": "Publicar en el feed es una función Pro",
+    "privateNote": "Tu PR se guarda igualmente: sigue dando XP y cuenta en ambas clasificaciones.",
+    "sharedToFeed": "Compartido en el feed",
+    "savedPrivately": "Guardado en tus registros"
   }
 }

@@ -82,6 +82,10 @@ export async function fetchFeed(
     .from("personal_records")
     .select(FEED_SELECT)
     .in("user_id", participantIds)
+    // RLS already hides other people's private PRs, but the viewer would
+    // still see their OWN private ones here. The feed is the published
+    // surface, so filter explicitly rather than relying on the policy.
+    .eq("visibility", "public")
     .order("created_at", { ascending: false })
     .limit(limit);
 
@@ -111,9 +115,12 @@ export async function fetchSingleFeedPost(
     .from("personal_records")
     .select(FEED_SELECT)
     .eq("id", prId)
-    .single();
+    .eq("visibility", "public")
+    .maybeSingle();
 
+  // A private PR is not a feed post — absent, not an error.
   if (error) return { data: null, error: error.message };
+  if (!data) return { data: null, error: null };
   return { data: mapFeedRow(data, currentUserId), error: null };
 }
 
