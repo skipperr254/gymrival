@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { PaywallTrigger } from '@/constants/entitlements';
 import { registerPaywallHandler } from '@/lib/billing';
+import { newImpressionId, trackPaywall } from '@/lib/analytics';
 import { useEntitlementStore, selectIsPro } from '@/store/useEntitlementStore';
 import { PaywallSheet } from './PaywallSheet';
 
@@ -37,6 +38,11 @@ const AUTOMATIC_TRIGGERS: ReadonlySet<PaywallTrigger> = new Set<PaywallTrigger>(
 export function PaywallProvider({ children }: { children: React.ReactNode }) {
   const [visible, setVisible] = useState(false);
   const [trigger, setTrigger] = useState<PaywallTrigger>('upgrade_card');
+  // Minted here, where the decision to present is made, and passed down so
+  // every event from this presentation shares it. That is what lets the
+  // funnel measure conversion per impression instead of dividing two
+  // independently drifting totals.
+  const [impressionId, setImpressionId] = useState<string>('');
   const isPro = useEntitlementStore(selectIsPro);
 
   // Read through a ref inside the handler: the handler is registered once, and
@@ -64,8 +70,11 @@ export function PaywallProvider({ children }: { children: React.ReactNode }) {
       automaticShown.current = true;
     }
 
+    const id = newImpressionId();
+    setImpressionId(id);
     setTrigger(requested);
     setVisible(true);
+    trackPaywall('shown', { impressionId: id, trigger: requested });
   }, []);
 
   useEffect(() => registerPaywallHandler(handleRequest), [handleRequest]);
@@ -77,12 +86,28 @@ export function PaywallProvider({ children }: { children: React.ReactNode }) {
     if (isPro && visible) setVisible(false);
   }, [isPro, visible]);
 
-  const handleClose = useCallback(() => setVisible(false), []);
+  // Only a user-initiated close counts as a dismissal. The sheet also closes
+  // on a successful purchase and on entitlement arriving from elsewhere;
+  // logging those as dismissals would understate conversion.
+  const handleClose = useCallback(
+    (reason: 'user' | 'purchased' = 'user') => {
+      if (reason === 'user') {
+        trackPaywall('dismissed', { impressionId, trigger });
+      }
+      setVisible(false);
+    },
+    [impressionId, trigger]
+  );
 
   return (
     <>
       {children}
-      <PaywallSheet visible={visible} trigger={trigger} onClose={handleClose} />
+      <PaywallSheet
+        visible={visible}
+        trigger={trigger}
+        impressionId={impressionId}
+        onClose={handleClose}
+      />
     </>
   );
 }

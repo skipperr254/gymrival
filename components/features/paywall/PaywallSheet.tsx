@@ -32,6 +32,7 @@ import { Colors } from '@/constants/theme';
 import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from '@/constants/legal';
 import type { PaywallTrigger, ProFeature } from '@/constants/entitlements';
 import { getBillingProvider, isEntitled, type Offering, type Plan } from '@/lib/billing';
+import { trackPaywall } from '@/lib/analytics';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useEntitlementStore } from '@/store/useEntitlementStore';
 import { PlanCard } from './PlanCard';
@@ -64,16 +65,25 @@ const TRIGGER_FEATURE: Partial<Record<PaywallTrigger, ProFeature>> = {
 interface Props {
   visible: boolean;
   trigger: PaywallTrigger;
-  onClose: () => void;
+  /** Minted by PaywallProvider; ties every event to this one presentation. */
+  impressionId: string;
+  /** `purchased` suppresses the dismissal event — a sale is not a dismissal. */
+  onClose: (reason?: 'user' | 'purchased') => void;
   onClosed?: () => void;
 }
 
-export function PaywallSheet({ visible, trigger, onClose, onClosed }: Props) {
+export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed }: Props) {
   const { t, i18n } = useTranslation('paywall');
   const insets = useSafeAreaInsets();
   const userId = useAuthStore((s) => s.user?.id);
   const setDeviceSnapshot = useEntitlementStore((s) => s.setDeviceSnapshot);
   const reconcile = useEntitlementStore((s) => s.reconcile);
+
+  // Every user-initiated close goes through this. Wiring `onClose` straight
+  // into onRequestClose/onPress would hand React Native's event object in as
+  // `reason`, which is truthy but never 'user' — dismissals would silently
+  // stop being recorded. The compiler caught it; the wrapper keeps it caught.
+  const dismiss = useCallback(() => onClose('user'), [onClose]);
 
   const [offering, setOffering] = useState<Offering | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
@@ -180,26 +190,40 @@ export function PaywallSheet({ visible, trigger, onClose, onClosed }: Props) {
   const handlePurchase = useCallback(async () => {
     if (!selectedPlan || busy) return;
     setBusy(true);
+    const ctx = {
+      impressionId,
+      trigger,
+      planId: selectedPlan.id,
+      productId: selectedPlan.productId,
+    };
+    trackPaywall('purchase_started', ctx);
     try {
       const outcome = await getBillingProvider().purchase(selectedPlan.id);
       if (outcome.status === 'purchased') {
+        trackPaywall('purchase_completed', ctx);
         setDeviceSnapshot(outcome.entitlement);
         // Don't wait on the webhook: ask the server to pull from the provider
         // so `profiles.is_pro` (what every RLS policy reads) catches up now.
         if (userId) reconcile(userId);
-        onClose();
+        onClose('purchased');
       } else if (outcome.status === 'pending') {
         Alert.alert(t('purchase.pendingTitle'), t('purchase.pendingBody'));
       } else if (outcome.status === 'unavailable') {
+        trackPaywall('purchase_failed', ctx);
         Alert.alert(t('purchase.failedTitle'), t('purchase.unavailable'));
       } else if (outcome.status === 'error') {
+        trackPaywall('purchase_failed', ctx);
         Alert.alert(t('purchase.failedTitle'), outcome.message);
+      } else {
+        // Backed out of the store sheet. Not an error, but worth separating
+        // from a failure: a high cancel rate is a pricing signal, a high
+        // failure rate is a bug.
+        trackPaywall('purchase_cancelled', ctx);
       }
-      // 'cancelled' is the user backing out of the store sheet — say nothing.
     } finally {
       setBusy(false);
     }
-  }, [selectedPlan, busy, setDeviceSnapshot, reconcile, userId, onClose, t]);
+  }, [selectedPlan, busy, setDeviceSnapshot, reconcile, userId, onClose, t, impressionId, trigger]);
 
   const handleRestore = useCallback(async () => {
     if (busy) return;
@@ -207,11 +231,13 @@ export function PaywallSheet({ visible, trigger, onClose, onClosed }: Props) {
     try {
       const snapshot = await getBillingProvider().restore();
       if (isEntitled(snapshot)) {
+        trackPaywall('restore_completed', { impressionId, trigger });
         setDeviceSnapshot(snapshot);
         if (userId) reconcile(userId);
         Alert.alert(t('restore.successTitle'), t('restore.successBody'));
-        onClose();
+        onClose('purchased');
       } else {
+        trackPaywall('restore_empty', { impressionId, trigger });
         Alert.alert(t('restore.noneTitle'), t('restore.noneBody'));
       }
     } catch (e) {
@@ -219,7 +245,7 @@ export function PaywallSheet({ visible, trigger, onClose, onClosed }: Props) {
     } finally {
       setBusy(false);
     }
-  }, [busy, setDeviceSnapshot, reconcile, userId, onClose, t]);
+  }, [busy, setDeviceSnapshot, reconcile, userId, onClose, t, impressionId, trigger]);
 
   // ── Copy ──────────────────────────────────────────────────────────────────
   const contextualFeature = TRIGGER_FEATURE[trigger];
@@ -250,11 +276,11 @@ export function PaywallSheet({ visible, trigger, onClose, onClosed }: Props) {
       visible={mounted}
       transparent
       animationType="none"
-      onRequestClose={onClose}
+      onRequestClose={dismiss}
       onDismiss={reportClosed}
     >
       <View className="flex-1 bg-black/80 justify-end">
-        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+        <Pressable style={StyleSheet.absoluteFill} onPress={dismiss} />
         <Animated.View
           className="bg-[#141414] rounded-t-3xl overflow-hidden"
           style={{ maxHeight: SHEET_HEIGHT * 0.92, transform: [{ translateY }] }}
@@ -267,7 +293,7 @@ export function PaywallSheet({ visible, trigger, onClose, onClosed }: Props) {
           >
             <View className="w-10 h-1 rounded-full bg-elevated self-center mb-4" />
             <Pressable
-              onPress={onClose}
+              onPress={dismiss}
               accessibilityRole="button"
               accessibilityLabel={t('close')}
               hitSlop={12}
