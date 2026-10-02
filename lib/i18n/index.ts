@@ -17,6 +17,7 @@ import enCompete from "@/locales/en/compete.json";
 import enLogpr from "@/locales/en/logpr.json";
 import enNutrition from "@/locales/en/nutrition.json";
 import enPaywall from "@/locales/en/paywall.json";
+import enOnboarding from "@/locales/en/onboarding.json";
 
 import nlCommon from "@/locales/nl/common.json";
 import nlAuth from "@/locales/nl/auth.json";
@@ -30,6 +31,7 @@ import nlCompete from "@/locales/nl/compete.json";
 import nlLogpr from "@/locales/nl/logpr.json";
 import nlNutrition from "@/locales/nl/nutrition.json";
 import nlPaywall from "@/locales/nl/paywall.json";
+import nlOnboarding from "@/locales/nl/onboarding.json";
 
 import esCommon from "@/locales/es/common.json";
 import esAuth from "@/locales/es/auth.json";
@@ -43,6 +45,7 @@ import esCompete from "@/locales/es/compete.json";
 import esLogpr from "@/locales/es/logpr.json";
 import esNutrition from "@/locales/es/nutrition.json";
 import esPaywall from "@/locales/es/paywall.json";
+import esOnboarding from "@/locales/es/onboarding.json";
 
 import deCommon from "@/locales/de/common.json";
 import deAuth from "@/locales/de/auth.json";
@@ -56,6 +59,7 @@ import deCompete from "@/locales/de/compete.json";
 import deLogpr from "@/locales/de/logpr.json";
 import deNutrition from "@/locales/de/nutrition.json";
 import dePaywall from "@/locales/de/paywall.json";
+import deOnboarding from "@/locales/de/onboarding.json";
 
 import ptCommon from "@/locales/pt/common.json";
 import ptAuth from "@/locales/pt/auth.json";
@@ -69,6 +73,7 @@ import ptCompete from "@/locales/pt/compete.json";
 import ptLogpr from "@/locales/pt/logpr.json";
 import ptNutrition from "@/locales/pt/nutrition.json";
 import ptPaywall from "@/locales/pt/paywall.json";
+import ptOnboarding from "@/locales/pt/onboarding.json";
 
 import frCommon from "@/locales/fr/common.json";
 import frAuth from "@/locales/fr/auth.json";
@@ -82,6 +87,7 @@ import frCompete from "@/locales/fr/compete.json";
 import frLogpr from "@/locales/fr/logpr.json";
 import frNutrition from "@/locales/fr/nutrition.json";
 import frPaywall from "@/locales/fr/paywall.json";
+import frOnboarding from "@/locales/fr/onboarding.json";
 
 import arCommon from "@/locales/ar/common.json";
 import arAuth from "@/locales/ar/auth.json";
@@ -95,17 +101,18 @@ import arCompete from "@/locales/ar/compete.json";
 import arLogpr from "@/locales/ar/logpr.json";
 import arNutrition from "@/locales/ar/nutrition.json";
 import arPaywall from "@/locales/ar/paywall.json";
+import arOnboarding from "@/locales/ar/onboarding.json";
 
 export const defaultNS = "common";
 
 export const resources = {
-  en: { common: enCommon, auth: enAuth, notifications: enNotifications, exercises: enExercises, profile: enProfile, train: enTrain, progress: enProgress, social: enSocial, compete: enCompete, logpr: enLogpr, nutrition: enNutrition, paywall: enPaywall },
-  nl: { common: nlCommon, auth: nlAuth, notifications: nlNotifications, exercises: nlExercises, profile: nlProfile, train: nlTrain, progress: nlProgress, social: nlSocial, compete: nlCompete, logpr: nlLogpr, nutrition: nlNutrition, paywall: nlPaywall },
-  es: { common: esCommon, auth: esAuth, notifications: esNotifications, exercises: esExercises, profile: esProfile, train: esTrain, progress: esProgress, social: esSocial, compete: esCompete, logpr: esLogpr, nutrition: esNutrition, paywall: esPaywall },
-  de: { common: deCommon, auth: deAuth, notifications: deNotifications, exercises: deExercises, profile: deProfile, train: deTrain, progress: deProgress, social: deSocial, compete: deCompete, logpr: deLogpr, nutrition: deNutrition, paywall: dePaywall },
-  pt: { common: ptCommon, auth: ptAuth, notifications: ptNotifications, exercises: ptExercises, profile: ptProfile, train: ptTrain, progress: ptProgress, social: ptSocial, compete: ptCompete, logpr: ptLogpr, nutrition: ptNutrition, paywall: ptPaywall },
-  fr: { common: frCommon, auth: frAuth, notifications: frNotifications, exercises: frExercises, profile: frProfile, train: frTrain, progress: frProgress, social: frSocial, compete: frCompete, logpr: frLogpr, nutrition: frNutrition, paywall: frPaywall },
-  ar: { common: arCommon, auth: arAuth, notifications: arNotifications, exercises: arExercises, profile: arProfile, train: arTrain, progress: arProgress, social: arSocial, compete: arCompete, logpr: arLogpr, nutrition: arNutrition, paywall: arPaywall },
+  en: { common: enCommon, auth: enAuth, notifications: enNotifications, exercises: enExercises, profile: enProfile, train: enTrain, progress: enProgress, social: enSocial, compete: enCompete, logpr: enLogpr, nutrition: enNutrition, paywall: enPaywall, onboarding: enOnboarding },
+  nl: { common: nlCommon, auth: nlAuth, notifications: nlNotifications, exercises: nlExercises, profile: nlProfile, train: nlTrain, progress: nlProgress, social: nlSocial, compete: nlCompete, logpr: nlLogpr, nutrition: nlNutrition, paywall: nlPaywall, onboarding: nlOnboarding },
+  es: { common: esCommon, auth: esAuth, notifications: esNotifications, exercises: esExercises, profile: esProfile, train: esTrain, progress: esProgress, social: esSocial, compete: esCompete, logpr: esLogpr, nutrition: esNutrition, paywall: esPaywall, onboarding: esOnboarding },
+  de: { common: deCommon, auth: deAuth, notifications: deNotifications, exercises: deExercises, profile: deProfile, train: deTrain, progress: deProgress, social: deSocial, compete: deCompete, logpr: deLogpr, nutrition: deNutrition, paywall: dePaywall, onboarding: deOnboarding },
+  pt: { common: ptCommon, auth: ptAuth, notifications: ptNotifications, exercises: ptExercises, profile: ptProfile, train: ptTrain, progress: ptProgress, social: ptSocial, compete: ptCompete, logpr: ptLogpr, nutrition: ptNutrition, paywall: ptPaywall, onboarding: ptOnboarding },
+  fr: { common: frCommon, auth: frAuth, notifications: frNotifications, exercises: frExercises, profile: frProfile, train: frTrain, progress: frProgress, social: frSocial, compete: frCompete, logpr: frLogpr, nutrition: frNutrition, paywall: frPaywall, onboarding: frOnboarding },
+  ar: { common: arCommon, auth: arAuth, notifications: arNotifications, exercises: arExercises, profile: arProfile, train: arTrain, progress: arProgress, social: arSocial, compete: arCompete, logpr: arLogpr, nutrition: arNutrition, paywall: arPaywall, onboarding: arOnboarding },
 } as const;
 
 let readyPromise: Promise<void> | null = null;

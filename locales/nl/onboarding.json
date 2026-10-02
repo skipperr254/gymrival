@@ -1,0 +1,76 @@
+{
+  "quiz": {
+    "stepOf": "STAP {{step}} VAN {{total}}",
+    "skip": "Overslaan",
+    "next": "VOLGENDE",
+    "finish": "TOON MIJN PLAN",
+    "goal": {
+      "title": "Wat is je doel?",
+      "subtitle": "Dit bepaalt je dagelijkse caloriedoel.",
+      "lose": {
+        "label": "Vet verliezen",
+        "sub": "Een gematigd tekort"
+      },
+      "maintain": {
+        "label": "Blijven waar ik ben",
+        "sub": "Je gewicht behouden"
+      },
+      "gain": {
+        "label": "Spieren opbouwen",
+        "sub": "Een gecontroleerd overschot"
+      }
+    },
+    "frequency": {
+      "title": "Hoe vaak train je?",
+      "subtitle": "Wees eerlijk — het verandert de cijfers.",
+      "light": {
+        "label": "1–2 keer per week",
+        "sub": "Net begonnen"
+      },
+      "moderate": {
+        "label": "3–4 keer per week",
+        "sub": "Een stevige routine"
+      },
+      "active": {
+        "label": "5–6 keer per week",
+        "sub": "Serieus trainen"
+      },
+      "veryActive": {
+        "label": "Elke dag",
+        "sub": "Trainen is het schema"
+      }
+    },
+    "experience": {
+      "title": "Hoe lang train je al?",
+      "subtitle": "Zodat we uitdagingen op jouw niveau kunnen aanbieden.",
+      "beginner": {
+        "label": "Minder dan een jaar",
+        "sub": "Nog de oefeningen leren"
+      },
+      "intermediate": {
+        "label": "1–3 jaar",
+        "sub": "Comfortabel onder de stang"
+      },
+      "advanced": {
+        "label": "3+ jaar",
+        "sub": "Je kent je cijfers"
+      }
+    }
+  },
+  "plan": {
+    "tag": "JOUW PLAN",
+    "title": "Je plan is klaar",
+    "subtitle": "Opgebouwd uit je lichaam, je doel en hoe vaak je traint.",
+    "subtitleNoTargets": "Je kunt dit altijd instellen via het tabblad Voeding.",
+    "dailyCalories": "DAGDOEL",
+    "kcal": "kcal",
+    "protein": "EIWIT",
+    "carbs": "KOOLHYDR.",
+    "fat": "VET",
+    "editableNote": "Pas dit later aan bij Voeding — niets ligt vast.",
+    "noTargetsTitle": "Nog geen doelen",
+    "noTargetsBody": "Vul je lengte, gewicht, leeftijd en geslacht in bij Voeding, dan rekenen we het voor je uit.",
+    "cta": "PROBEER PRO GRATIS",
+    "continueFree": "Doorgaan met het gratis plan"
+  }
+}

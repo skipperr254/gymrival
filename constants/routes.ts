@@ -2,6 +2,8 @@ export const Routes = {
   // Auth
   splash: '/(auth)/splash',
   onboarding: '/(auth)/onboarding',
+  onboardingQuiz: '/(auth)/quiz',
+  planReady: '/(auth)/plan-ready',
   signIn: '/(auth)/sign-in',
   signUp: '/(auth)/sign-up',
   verify: '/(auth)/verify',

@@ -63,7 +63,10 @@ export default function OnboardingScreen() {
         animated: true,
       });
     } else {
-      router.replace(Routes.signUp);
+      // Into the quiz, not straight to sign-up. Three questions first means
+      // the user has invested something before the ask, and gives the
+      // post-setup screen a real number to show them.
+      router.push(Routes.onboardingQuiz);
     }
   };
 

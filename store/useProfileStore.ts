@@ -27,6 +27,7 @@ type ProfileUpdate = Partial<
     | "sex"
     | "activity_level"
     | "diet_goal"
+    | "experience_level"
     | "target_calories"
     | "target_protein_g"
     | "target_carbs_g"

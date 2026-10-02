@@ -18,6 +18,10 @@ import { getBillingProvider } from "@/lib/billing";
 // on-disk inspection.
 const PENDING_PROFILE_SETUP_KEY = "gymrival:pendingProfileSetup";
 const PENDING_PASSWORD_RESET_KEY = "gymrival:pendingPasswordReset";
+// Set by the setup screen, cleared by plan-ready. Without it the root
+// layout's auth gate would bounce a freshly-signed-up user straight from
+// (auth) to the tabs and they'd never see the payoff screen at all.
+const PENDING_ONBOARDING_PAYOFF_KEY = "gymrival:pendingOnboardingPayoff";
 
 // Not currently harmful (initialize() is idempotent-guarded and its only
 // caller mounts once for the app's lifetime), but left unassigned this was
@@ -54,6 +58,7 @@ interface AuthState {
   initialized: boolean;
   pendingPasswordReset: boolean;
   pendingProfileSetup: boolean;
+  pendingOnboardingPayoff: boolean;
 
   initialize: () => void;
   signUp: (
@@ -82,6 +87,7 @@ interface AuthState {
   ) => Promise<{ error: string | null }>;
   setPendingPasswordReset: (value: boolean) => void;
   setPendingProfileSetup: (value: boolean) => void;
+  setPendingOnboardingPayoff: (value: boolean) => void;
   signOut: () => Promise<void>;
 }
 
@@ -91,6 +97,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   initialized: false,
   pendingPasswordReset: false,
   pendingProfileSetup: false,
+  pendingOnboardingPayoff: false,
 
   initialize: () => {
     if (get().initialized) return;
@@ -99,8 +106,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       supabase.auth.getSession(),
       AsyncStorage.getItem(PENDING_PROFILE_SETUP_KEY),
       AsyncStorage.getItem(PENDING_PASSWORD_RESET_KEY),
+      AsyncStorage.getItem(PENDING_ONBOARDING_PAYOFF_KEY),
     ])
-      .then(([{ data: { session } }, pendingSetup, pendingReset]) => {
+      .then(([{ data: { session } }, pendingSetup, pendingReset, pendingPayoff]) => {
         set({
           session,
           user: session?.user ?? null,
@@ -110,6 +118,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           // recovery session (see setPendingProfileSetup/setPendingPasswordReset).
           pendingProfileSetup: pendingSetup === "1",
           pendingPasswordReset: pendingReset === "1",
+          pendingOnboardingPayoff: pendingPayoff === "1",
           initialized: true,
         });
       })
@@ -225,6 +234,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       AsyncStorage.removeItem(PENDING_PROFILE_SETUP_KEY).catch(() => {});
     }
   },
+  setPendingOnboardingPayoff: (value) => {
+    set({ pendingOnboardingPayoff: value });
+    if (value) {
+      AsyncStorage.setItem(PENDING_ONBOARDING_PAYOFF_KEY, "1").catch(() => {});
+    } else {
+      AsyncStorage.removeItem(PENDING_ONBOARDING_PAYOFF_KEY).catch(() => {});
+    }
+  },
 
   signOut: async () => {
     const userId = get().user?.id;
@@ -254,6 +271,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     // session can see the previous account's cached profile/PRs/leaderboard/
     // chat data until each screen happens to remount and refetch.
     resetDomainStores();
-    set({ session: null, user: null });
+    AsyncStorage.removeItem(PENDING_ONBOARDING_PAYOFF_KEY).catch(() => {});
+    set({ session: null, user: null, pendingOnboardingPayoff: false });
   },
 }));

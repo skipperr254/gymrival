@@ -1,0 +1,76 @@
+{
+  "quiz": {
+    "stepOf": "ÉTAPE {{step}} SUR {{total}}",
+    "skip": "Passer",
+    "next": "SUIVANT",
+    "finish": "VOIR MON PLAN",
+    "goal": {
+      "title": "Quel est ton objectif ?",
+      "subtitle": "Cela définit ton objectif calorique quotidien.",
+      "lose": {
+        "label": "Perdre du gras",
+        "sub": "Un déficit modéré"
+      },
+      "maintain": {
+        "label": "Rester comme je suis",
+        "sub": "Maintenir ton poids"
+      },
+      "gain": {
+        "label": "Prendre du muscle",
+        "sub": "Un surplus maîtrisé"
+      }
+    },
+    "frequency": {
+      "title": "À quelle fréquence t'entraînes-tu ?",
+      "subtitle": "Sois honnête — ça change les chiffres.",
+      "light": {
+        "label": "1–2 fois par semaine",
+        "sub": "Tu débutes"
+      },
+      "moderate": {
+        "label": "3–4 fois par semaine",
+        "sub": "Une routine solide"
+      },
+      "active": {
+        "label": "5–6 fois par semaine",
+        "sub": "Entraînement sérieux"
+      },
+      "veryActive": {
+        "label": "Tous les jours",
+        "sub": "L'entraînement, c'est le planning"
+      }
+    },
+    "experience": {
+      "title": "Depuis combien de temps t'entraînes-tu ?",
+      "subtitle": "Pour te proposer des défis à ton niveau.",
+      "beginner": {
+        "label": "Moins d'un an",
+        "sub": "Tu apprends encore les mouvements"
+      },
+      "intermediate": {
+        "label": "1–3 ans",
+        "sub": "À l'aise sous la barre"
+      },
+      "advanced": {
+        "label": "Plus de 3 ans",
+        "sub": "Tu connais tes chiffres"
+      }
+    }
+  },
+  "plan": {
+    "tag": "TON PLAN",
+    "title": "Ton plan est prêt",
+    "subtitle": "Calculé à partir de ton corps, de ton objectif et de ta fréquence d'entraînement.",
+    "subtitleNoTargets": "Tu peux le configurer à tout moment depuis l'onglet Nutrition.",
+    "dailyCalories": "OBJECTIF DU JOUR",
+    "kcal": "kcal",
+    "protein": "PROTÉINES",
+    "carbs": "GLUCIDES",
+    "fat": "LIPIDES",
+    "editableNote": "Tu pourras tout ajuster dans Nutrition — rien n'est figé.",
+    "noTargetsTitle": "Pas encore d'objectifs",
+    "noTargetsBody": "Ajoute ta taille, ton poids, ton âge et ton sexe dans Nutrition et on calcule pour toi.",
+    "cta": "ESSAYER PRO",
+    "continueFree": "Continuer avec l'offre gratuite"
+  }
+}

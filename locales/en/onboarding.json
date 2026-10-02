@@ -1,0 +1,76 @@
+{
+  "quiz": {
+    "stepOf": "STEP {{step}} OF {{total}}",
+    "skip": "Skip",
+    "next": "NEXT",
+    "finish": "SEE MY PLAN",
+    "goal": {
+      "title": "What is your goal?",
+      "subtitle": "This sets your daily calorie target.",
+      "lose": {
+        "label": "Lose fat",
+        "sub": "A moderate deficit"
+      },
+      "maintain": {
+        "label": "Stay where I am",
+        "sub": "Maintain your weight"
+      },
+      "gain": {
+        "label": "Build muscle",
+        "sub": "A controlled surplus"
+      }
+    },
+    "frequency": {
+      "title": "How often do you train?",
+      "subtitle": "Be honest — it changes the numbers.",
+      "light": {
+        "label": "1–2 times a week",
+        "sub": "Getting started"
+      },
+      "moderate": {
+        "label": "3–4 times a week",
+        "sub": "A solid routine"
+      },
+      "active": {
+        "label": "5–6 times a week",
+        "sub": "Serious training"
+      },
+      "veryActive": {
+        "label": "Every day",
+        "sub": "Training is the schedule"
+      }
+    },
+    "experience": {
+      "title": "How long have you been lifting?",
+      "subtitle": "So we can pitch challenges at your level.",
+      "beginner": {
+        "label": "Under a year",
+        "sub": "Still learning the lifts"
+      },
+      "intermediate": {
+        "label": "1–3 years",
+        "sub": "Comfortable under the bar"
+      },
+      "advanced": {
+        "label": "3+ years",
+        "sub": "You know your numbers"
+      }
+    }
+  },
+  "plan": {
+    "tag": "YOUR PLAN",
+    "title": "Your plan is ready",
+    "subtitle": "Built from your body, your goal and how often you train.",
+    "subtitleNoTargets": "You can set this up any time from the Nutrition tab.",
+    "dailyCalories": "DAILY TARGET",
+    "kcal": "kcal",
+    "protein": "PROTEIN",
+    "carbs": "CARBS",
+    "fat": "FAT",
+    "editableNote": "Adjust any of these later in Nutrition — nothing here is locked in.",
+    "noTargetsTitle": "No targets yet",
+    "noTargetsBody": "Add your height, weight, age and sex in Nutrition and we will work these out for you.",
+    "cta": "TRY PRO FREE",
+    "continueFree": "Continue with the free plan"
+  }
+}

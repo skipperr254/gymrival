@@ -23,6 +23,8 @@ export interface Profile {
   sex: 'male' | 'female' | null;
   activity_level: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active' | null;
   diet_goal: 'lose' | 'maintain' | 'gain' | null;
+  /** Self-reported from the onboarding quiz. Not part of the TDEE maths. */
+  experience_level: 'beginner' | 'intermediate' | 'advanced' | null;
   /** NULL = use the calculated Mifflin-St Jeor value (see lib/nutrition.ts). */
   target_calories: number | null;
   target_protein_g: number | null;
