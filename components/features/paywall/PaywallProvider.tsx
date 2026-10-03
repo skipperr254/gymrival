@@ -59,6 +59,17 @@ export function PaywallProvider({ children }: { children: React.ReactNode }) {
    */
   const automaticShown = useRef(false);
 
+  /**
+   * The impression whose dismissal has already been recorded.
+   *
+   * A close can arrive more than once for a single presentation — on Android
+   * the back gesture fires `onRequestClose` while the backdrop press is still
+   * in flight, and both land before the exit animation finishes. Seen live:
+   * one impression produced two `dismissed` rows 173ms apart, which inflates
+   * dismissal rate and depresses conversion in the funnel view.
+   */
+  const dismissLoggedFor = useRef<string | null>(null);
+
   const handleRequest = useCallback(({ trigger: requested }: { trigger: PaywallTrigger }) => {
     // A gate that's gone stale (or a Pro user tapping an old affordance)
     // should never be shown a paywall for something they already own.
@@ -91,7 +102,8 @@ export function PaywallProvider({ children }: { children: React.ReactNode }) {
   // logging those as dismissals would understate conversion.
   const handleClose = useCallback(
     (reason: 'user' | 'purchased' = 'user') => {
-      if (reason === 'user') {
+      if (reason === 'user' && dismissLoggedFor.current !== impressionId) {
+        dismissLoggedFor.current = impressionId;
         trackPaywall('dismissed', { impressionId, trigger });
       }
       setVisible(false);
