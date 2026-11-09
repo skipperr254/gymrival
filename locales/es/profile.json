@@ -5,8 +5,8 @@
   },
   "loadErrorSub": "No se pudo cargar tu perfil. Comprueba tu conexión e inténtalo de nuevo.",
   "retry": "REINTENTAR",
-  "proUpsell": "HAZTE PRO — 4,99 €/MES",
-  "proActive": "MIEMBRO PRO — TOCA PARA DESACTIVAR",
+  "proUpsell": "HAZTE PRO",
+  "proActive": "MIEMBRO PRO — GESTIONAR",
   "details": {
     "title": "MIS DATOS",
     "edit": "EDITAR",

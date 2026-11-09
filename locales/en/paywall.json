@@ -79,7 +79,11 @@
     "pendingTitle": "Purchase pending",
     "pendingBody": "Your purchase needs approval. Pro unlocks as soon as it goes through.",
     "failedTitle": "Purchase failed",
-    "unavailable": "In-app purchases aren't available on this device."
+    "unavailable": "In-app purchases aren't available on this device.",
+    "successTitle": "You're Pro",
+    "successBody": "Welcome to GymRival Pro. Everything is unlocked.",
+    "notActiveTitle": "Activating Pro",
+    "notActiveBody": "Your purchase went through, but Pro is not active yet. This usually takes under a minute. If it still is not active, tap Restore Purchases."
   },
   "close": "Close",
   "subscription": {
@@ -104,6 +108,7 @@
       "expired": "Expired"
     },
     "billingIssueBody": "We couldn't take your last payment. Update your payment method to keep Pro.",
-    "cancelledBody": "Auto-renew is off. You keep Pro until the date above."
+    "cancelledBody": "Auto-renew is off. You keep Pro until the date above.",
+    "complimentary": "Complimentary access — no billing"
   }
 }

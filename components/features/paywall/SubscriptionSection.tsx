@@ -64,7 +64,14 @@ export function SubscriptionSection() {
       })
     : null;
 
-  const dateLine = subscription?.expiresAt
+  // A `manual` grant (comped / grandfathered from the old dev toggle) has no
+  // store subscription behind it: nothing renews, and the OS manage sheet would
+  // open an empty Apple subscriptions page. Say what it is and skip that row.
+  const isComplimentary = subscription?.store === 'manual';
+
+  const dateLine = isComplimentary
+    ? t('subscription.complimentary')
+    : subscription?.expiresAt
     ? subscription.willRenew
       ? t('subscription.renewsOn', { date: formatDate(subscription.expiresAt) })
       : t('subscription.expiresOn', { date: formatDate(subscription.expiresAt) })
@@ -113,13 +120,15 @@ export function SubscriptionSection() {
               </View>
             )}
 
-            <SettingsRow
-              icon={CreditCard}
-              label={t('subscription.manage')}
-              sub={t('subscription.manageSub')}
-              iconColor={Colors.friend}
-              onPress={handleManage}
-            />
+            {!isComplimentary && (
+              <SettingsRow
+                icon={CreditCard}
+                label={t('subscription.manage')}
+                sub={t('subscription.manageSub')}
+                iconColor={Colors.friend}
+                onPress={handleManage}
+              />
+            )}
           </>
         ) : (
           <SettingsRow

@@ -5,8 +5,8 @@
   },
   "loadErrorSub": "Kon je profiel niet laden. Controleer je verbinding en probeer het opnieuw.",
   "retry": "OPNIEUW",
-  "proUpsell": "UPGRADE NAAR PRO — €4,99/MND",
-  "proActive": "PRO-LID — TIK OM UIT TE SCHAKELEN",
+  "proUpsell": "UPGRADE NAAR PRO",
+  "proActive": "PRO-LID — BEHEREN",
   "details": {
     "title": "MIJN GEGEVENS",
     "edit": "BEWERKEN",

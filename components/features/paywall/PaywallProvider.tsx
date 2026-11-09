@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import type { PaywallTrigger } from '@/constants/entitlements';
 import { registerPaywallHandler } from '@/lib/billing';
 import { newImpressionId, trackPaywall } from '@/lib/analytics';
@@ -36,6 +38,7 @@ const AUTOMATIC_TRIGGERS: ReadonlySet<PaywallTrigger> = new Set<PaywallTrigger>(
 ]);
 
 export function PaywallProvider({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation('paywall');
   const [visible, setVisible] = useState(false);
   const [trigger, setTrigger] = useState<PaywallTrigger>('upgrade_card');
   // Minted here, where the decision to present is made, and passed down so
@@ -111,6 +114,22 @@ export function PaywallProvider({ children }: { children: React.ReactNode }) {
     [impressionId, trigger]
   );
 
+  // Confirm an unlock only once the sheet has fully dismissed — an Alert raised
+  // over a modal mid-dismiss is exactly the UIKit trap described above.
+  const unlockedVia = useRef<'purchase' | 'restore' | null>(null);
+  const handleUnlocked = useCallback((via: 'purchase' | 'restore') => {
+    unlockedVia.current = via;
+  }, []);
+  const handleClosed = useCallback(() => {
+    const via = unlockedVia.current;
+    unlockedVia.current = null;
+    if (via === 'purchase') {
+      Alert.alert(t('purchase.successTitle'), t('purchase.successBody'));
+    } else if (via === 'restore') {
+      Alert.alert(t('restore.successTitle'), t('restore.successBody'));
+    }
+  }, [t]);
+
   return (
     <>
       {children}
@@ -119,6 +138,8 @@ export function PaywallProvider({ children }: { children: React.ReactNode }) {
         trigger={trigger}
         impressionId={impressionId}
         onClose={handleClose}
+        onClosed={handleClosed}
+        onUnlocked={handleUnlocked}
       />
     </>
   );

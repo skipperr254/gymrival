@@ -5,8 +5,8 @@
   },
   "loadErrorSub": "Could not load your profile. Check your connection and try again.",
   "retry": "RETRY",
-  "proUpsell": "UPGRADE TO PRO — €4.99/MO",
-  "proActive": "PRO MEMBER — TAP TO DISABLE",
+  "proUpsell": "UPGRADE TO PRO",
+  "proActive": "PRO MEMBER — MANAGE",
   "details": {
     "title": "MY DETAILS",
     "edit": "EDIT",

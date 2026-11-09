@@ -5,8 +5,8 @@
   },
   "loadErrorSub": "Impossible de charger ton profil. Vérifie ta connexion et réessaie.",
   "retry": "RÉESSAYER",
-  "proUpsell": "PASSER À PRO — 4,99 €/MOIS",
-  "proActive": "MEMBRE PRO — APPUIE POUR DÉSACTIVER",
+  "proUpsell": "PASSER À PRO",
+  "proActive": "MEMBRE PRO — GÉRER",
   "details": {
     "title": "MES INFOS",
     "edit": "MODIFIER",

@@ -79,7 +79,11 @@
     "pendingTitle": "Achat en attente",
     "pendingBody": "Ton achat doit être validé. Pro s'activera dès que ce sera fait.",
     "failedTitle": "Échec de l'achat",
-    "unavailable": "Les achats intégrés ne sont pas disponibles sur cet appareil."
+    "unavailable": "Les achats intégrés ne sont pas disponibles sur cet appareil.",
+    "successTitle": "Tu es Pro",
+    "successBody": "Bienvenue dans GymRival Pro. Tout est débloqué.",
+    "notActiveTitle": "Activation de Pro",
+    "notActiveBody": "Ton achat a bien été effectué, mais Pro n'est pas encore actif. Cela prend généralement moins d'une minute. Si ce n'est toujours pas le cas, appuie sur Restaurer les achats."
   },
   "close": "Fermer",
   "subscription": {
@@ -104,6 +108,7 @@
       "expired": "Expiré"
     },
     "billingIssueBody": "Nous n'avons pas pu encaisser ton dernier paiement. Mets à jour ton moyen de paiement pour garder Pro.",
-    "cancelledBody": "Le renouvellement automatique est désactivé. Tu gardes Pro jusqu'à la date ci-dessus."
+    "cancelledBody": "Le renouvellement automatique est désactivé. Tu gardes Pro jusqu'à la date ci-dessus.",
+    "complimentary": "Accès offert — aucune facturation"
   }
 }

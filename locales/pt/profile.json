@@ -5,8 +5,8 @@
   },
   "loadErrorSub": "Não foi possível carregar o teu perfil. Verifica a tua ligação e tenta novamente.",
   "retry": "TENTAR NOVAMENTE",
-  "proUpsell": "PASSA A PRO — 4,99 €/MÊS",
-  "proActive": "MEMBRO PRO — TOCA PARA DESATIVAR",
+  "proUpsell": "PASSA A PRO",
+  "proActive": "MEMBRO PRO — GERIR",
   "details": {
     "title": "OS MEUS DADOS",
     "edit": "EDITAR",

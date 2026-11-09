@@ -5,8 +5,8 @@
   },
   "loadErrorSub": "Dein Profil konnte nicht geladen werden. Überprüfe deine Verbindung und versuche es erneut.",
   "retry": "ERNEUT VERSUCHEN",
-  "proUpsell": "AUF PRO UPGRADEN — 4,99 €/MONAT",
-  "proActive": "PRO-MITGLIED — ZUM DEAKTIVIEREN TIPPEN",
+  "proUpsell": "AUF PRO UPGRADEN",
+  "proActive": "PRO-MITGLIED — VERWALTEN",
   "details": {
     "title": "MEINE DATEN",
     "edit": "BEARBEITEN",

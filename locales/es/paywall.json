@@ -79,7 +79,11 @@
     "pendingTitle": "Compra pendiente",
     "pendingBody": "Tu compra necesita aprobación. Pro se activará en cuanto se confirme.",
     "failedTitle": "Error en la compra",
-    "unavailable": "Las compras dentro de la app no están disponibles en este dispositivo."
+    "unavailable": "Las compras dentro de la app no están disponibles en este dispositivo.",
+    "successTitle": "Ya eres Pro",
+    "successBody": "Bienvenido a GymRival Pro. Todo está desbloqueado.",
+    "notActiveTitle": "Activando Pro",
+    "notActiveBody": "Tu compra se ha completado, pero Pro aún no está activo. Suele tardar menos de un minuto. Si sigue sin activarse, toca Restaurar compras."
   },
   "close": "Cerrar",
   "subscription": {
@@ -104,6 +108,7 @@
       "expired": "Caducada"
     },
     "billingIssueBody": "No pudimos cobrar tu último pago. Actualiza tu método de pago para conservar Pro.",
-    "cancelledBody": "La renovación automática está desactivada. Conservas Pro hasta la fecha indicada."
+    "cancelledBody": "La renovación automática está desactivada. Conservas Pro hasta la fecha indicada.",
+    "complimentary": "Acceso gratuito — sin cobros"
   }
 }

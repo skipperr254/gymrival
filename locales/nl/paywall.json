@@ -79,7 +79,11 @@
     "pendingTitle": "Aankoop in behandeling",
     "pendingBody": "Je aankoop moet nog goedgekeurd worden. Pro wordt actief zodra dat gebeurt.",
     "failedTitle": "Aankoop mislukt",
-    "unavailable": "In-app-aankopen zijn niet beschikbaar op dit apparaat."
+    "unavailable": "In-app-aankopen zijn niet beschikbaar op dit apparaat.",
+    "successTitle": "Je bent Pro",
+    "successBody": "Welkom bij GymRival Pro. Alles is ontgrendeld.",
+    "notActiveTitle": "Pro wordt geactiveerd",
+    "notActiveBody": "Je aankoop is gelukt, maar Pro is nog niet actief. Dit duurt meestal minder dan een minuut. Is het daarna nog niet actief, tik dan op Aankopen herstellen."
   },
   "close": "Sluiten",
   "subscription": {
@@ -104,6 +108,7 @@
       "expired": "Verlopen"
     },
     "billingIssueBody": "We konden je laatste betaling niet verwerken. Werk je betaalmethode bij om Pro te behouden.",
-    "cancelledBody": "Automatisch verlengen staat uit. Je houdt Pro tot de datum hierboven."
+    "cancelledBody": "Automatisch verlengen staat uit. Je houdt Pro tot de datum hierboven.",
+    "complimentary": "Gratis toegang — geen facturering"
   }
 }

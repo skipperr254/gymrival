@@ -70,9 +70,15 @@ interface Props {
   /** `purchased` suppresses the dismissal event — a sale is not a dismissal. */
   onClose: (reason?: 'user' | 'purchased') => void;
   onClosed?: () => void;
+  /**
+   * A purchase or restore just granted Pro. The sheet closes itself right
+   * after; the caller shows the confirmation from `onClosed`, because an Alert
+   * raised over a modal that's mid-dismiss can be dropped by UIKit.
+   */
+  onUnlocked?: (via: 'purchase' | 'restore') => void;
 }
 
-export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed }: Props) {
+export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed, onUnlocked }: Props) {
   const { t, i18n } = useTranslation('paywall');
   const insets = useSafeAreaInsets();
   const userId = useAuthStore((s) => s.user?.id);
@@ -201,11 +207,21 @@ export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed
       const outcome = await getBillingProvider().purchase(selectedPlan.id);
       if (outcome.status === 'purchased') {
         trackPaywall('purchase_completed', ctx);
-        setDeviceSnapshot(outcome.entitlement);
         // Don't wait on the webhook: ask the server to pull from the provider
         // so `profiles.is_pro` (what every RLS policy reads) catches up now.
         if (userId) reconcile(userId);
-        onClose('purchased');
+        if (isEntitled(outcome.entitlement)) {
+          setDeviceSnapshot(outcome.entitlement);
+          onUnlocked?.('purchase');
+          onClose('purchased');
+        } else {
+          // The store charged them but the receipt doesn't carry the `pro`
+          // entitlement (product not attached to it in the dashboard, or the
+          // SDK not caught up). Closing silently would look like we took the
+          // money and gave nothing — keep the sheet open so Restore is right
+          // there; reconcile above may still flip them to Pro and auto-close.
+          Alert.alert(t('purchase.notActiveTitle'), t('purchase.notActiveBody'));
+        }
       } else if (outcome.status === 'pending') {
         Alert.alert(t('purchase.pendingTitle'), t('purchase.pendingBody'));
       } else if (outcome.status === 'unavailable') {
@@ -223,7 +239,7 @@ export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed
     } finally {
       setBusy(false);
     }
-  }, [selectedPlan, busy, setDeviceSnapshot, reconcile, userId, onClose, t, impressionId, trigger]);
+  }, [selectedPlan, busy, setDeviceSnapshot, reconcile, userId, onUnlocked, onClose, t, impressionId, trigger]);
 
   const handleRestore = useCallback(async () => {
     if (busy) return;
@@ -234,7 +250,7 @@ export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed
         trackPaywall('restore_completed', { impressionId, trigger });
         setDeviceSnapshot(snapshot);
         if (userId) reconcile(userId);
-        Alert.alert(t('restore.successTitle'), t('restore.successBody'));
+        onUnlocked?.('restore');
         onClose('purchased');
       } else {
         trackPaywall('restore_empty', { impressionId, trigger });
@@ -245,7 +261,7 @@ export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed
     } finally {
       setBusy(false);
     }
-  }, [busy, setDeviceSnapshot, reconcile, userId, onClose, t, impressionId, trigger]);
+  }, [busy, setDeviceSnapshot, reconcile, userId, onUnlocked, onClose, t, impressionId, trigger]);
 
   // ── Copy ──────────────────────────────────────────────────────────────────
   const contextualFeature = TRIGGER_FEATURE[trigger];
