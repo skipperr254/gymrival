@@ -66,7 +66,7 @@ export async function fetchConversations(
 
   if (error) return { data: [], error: error.message };
 
-  const conversations: ConversationPreview[] = (data ?? []).map((row: any) => {
+  const conversations: ConversationPreview[] = (data ?? []).map((row) => {
     const isA = row.participant_a === userId;
     const otherProfile = isA ? row.profile_b : row.profile_a;
     return {
@@ -100,8 +100,7 @@ export async function fetchMessages(
   limit = 50,
   beforeTimestamp?: string
 ): Promise<{ data: Message[]; error: string | null }> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let query: any = supabase
+  let query = supabase
     .from("messages")
     .select("id, conversation_id, sender_id, content, message_type, read_at, created_at")
     .eq("conversation_id", conversationId)

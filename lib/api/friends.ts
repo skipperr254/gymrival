@@ -16,7 +16,7 @@ export async function fetchFriends(
 
   if (error) return { data: [], error: error.message };
 
-  const friends: FriendProfile[] = (data ?? []).map((row: any) => {
+  const friends: FriendProfile[] = (data ?? []).map((row) => {
     const isRequester = row.requester_id === userId;
     const other = isRequester ? row.addressee : row.requester;
     return {
@@ -50,7 +50,7 @@ export async function fetchIncomingRequests(
 
   if (error) return { data: [], error: error.message };
 
-  const requests: FriendRequest[] = (data ?? []).map((row: any) => ({
+  const requests: FriendRequest[] = (data ?? []).map((row) => ({
     friendship_id: row.id,
     created_at: row.created_at,
     user: {
@@ -81,7 +81,7 @@ export async function fetchOutgoingRequests(
 
   if (error) return { data: [], error: error.message };
 
-  const requests: FriendRequest[] = (data ?? []).map((row: any) => ({
+  const requests: FriendRequest[] = (data ?? []).map((row) => ({
     friendship_id: row.id,
     created_at: row.created_at,
     user: {
@@ -144,8 +144,7 @@ export async function searchUsers(
   // Step 2 — fetch matching profiles
   const trimmed = query.trim();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let profileQuery: any = supabase
+  let profileQuery = supabase
     .from("profiles")
     .select("id, full_name, username, avatar_url, level, xp")
     .neq("id", currentUserId)
@@ -168,7 +167,7 @@ export async function searchUsers(
   const { data: profiles, error: pErr } = await profileQuery;
   if (pErr) return { data: [], error: pErr.message };
 
-  const results: UserSearchResult[] = (profiles ?? []).map((p: any) => {
+  const results: UserSearchResult[] = (profiles ?? []).map((p) => {
     const rel = friendshipMap.get(p.id);
     return {
       id: p.id,

@@ -6,14 +6,23 @@ import type {
   CreateFriendChallengeInput,
   CreateAdminChallengeInput,
   InvitationStatus,
+  ChallengeType,
+  ChallengeScope,
+  ChallengeMetric,
+  ChallengeStatus,
 } from "@/types/challenge";
+import type { RpcRow, Tables } from "./rows";
 
-function mapChallengeRow(row: any): ChallengeWithStats {
+/** The enriched RPC row, or a plain `challenges` row (admin list) without stats. */
+type ChallengeRow = RpcRow<'active_challenges_for_user'> | Tables<'challenges'>;
+
+function mapChallengeRow(row: ChallengeRow): ChallengeWithStats {
+  const stats = 'participant_count' in row ? row : null;
   return {
     id:                row.id,
-    type:              row.type,
-    scope:             row.scope,
-    metric:            row.metric,
+    type:              row.type as ChallengeType,
+    scope:             row.scope as ChallengeScope,
+    metric:            row.metric as ChallengeMetric,
     exercise_key:      row.exercise_key ?? null,
     title:             row.title,
     description:       row.description ?? null,
@@ -22,13 +31,13 @@ function mapChallengeRow(row: any): ChallengeWithStats {
     reward_xp:         Number(row.reward_xp ?? 0),
     starts_at:         row.starts_at,
     ends_at:           row.ends_at,
-    status:            row.status,
+    status:            row.status as ChallengeStatus,
     created_by:        row.created_by ?? null,
     winner_user_id:    row.winner_user_id ?? null,
-    participant_count: Number(row.participant_count ?? 0),
-    is_joined:         Boolean(row.is_joined),
-    user_score:        row.user_score != null ? Number(row.user_score) : null,
-    user_rank:         row.user_rank  != null ? Number(row.user_rank)  : null,
+    participant_count: Number(stats?.participant_count ?? 0),
+    is_joined:         Boolean(stats?.is_joined),
+    user_score:        stats?.user_score != null ? Number(stats.user_score) : null,
+    user_rank:         stats?.user_rank  != null ? Number(stats.user_rank)  : null,
   };
 }
 
@@ -46,7 +55,7 @@ export async function fetchActiveChallenges(
   });
   if (error) return { data: [], error: error.message };
   return {
-    data: ((data as any[]) ?? []).map(mapChallengeRow),
+    data: (data ?? []).map(mapChallengeRow),
     error: null,
   };
 }
@@ -65,7 +74,7 @@ export async function fetchChallengeLeaderboard(
   });
   if (error) return { data: [], error: error.message };
   return {
-    data: ((data as any[]) ?? []).map((row: any): ChallengeLeaderboardEntry => ({
+    data: (data ?? []).map((row): ChallengeLeaderboardEntry => ({
       user_id:        row.user_id,
       full_name:      row.full_name  ?? null,
       username:       row.username   ?? null,
@@ -121,12 +130,14 @@ export async function createFriendChallenge(
   creatorId: string,
   input: CreateFriendChallengeInput,
 ): Promise<{ challengeId: string | null; error: string | null }> {
+  // p_description / p_prize_label are nullable TEXT in SQL, but the type
+  // generator emits every argument without a DEFAULT as non-null.
   const { data, error } = await supabase.rpc('create_friend_challenge', {
     p_metric:       input.metric,
     p_exercise_key: input.exercise_key,
     p_title:        input.title,
-    p_description:  input.description ?? null,
-    p_prize_label:  input.prize_label ?? null,
+    p_description:  (input.description ?? null) as string,
+    p_prize_label:  (input.prize_label ?? null) as string,
     p_ends_at:      input.ends_at,
     p_invitee_id:   input.invitee_id,
   });
@@ -162,7 +173,7 @@ export async function fetchPendingInvitations(
 
   if (error) return { data: [], error: error.message };
 
-  const invitations: ChallengeInvitation[] = (data ?? []).map((row: any) => ({
+  const invitations: ChallengeInvitation[] = (data ?? []).map((row) => ({
     id:           row.id,
     challenge_id: row.challenge_id,
     inviter_id:   row.inviter_id,
@@ -170,7 +181,9 @@ export async function fetchPendingInvitations(
     status:       row.status as InvitationStatus,
     created_at:   row.created_at,
     updated_at:   row.updated_at,
-    challenge:    row.challenge ?? undefined,
+    challenge:    row.challenge
+      ? { ...row.challenge, metric: row.challenge.metric as ChallengeMetric }
+      : undefined,
     inviter:      row.inviter   ?? undefined,
   }));
 
@@ -271,15 +284,9 @@ export async function fetchAdminCreatedChallenges(
   if (error) return { data: [], error: error.message };
 
   return {
-    data: (data ?? []).map((row: any) => ({
-      ...mapChallengeRow(row),
-      // This is a plain table select, not the enriched RPC — these fields
-      // aren't available here and aren't used by the admin list UI.
-      participant_count: 0,
-      is_joined: false,
-      user_score: null,
-      user_rank: null,
-    })),
+    // A plain table select, not the enriched RPC: the stats fields come back
+    // zeroed, and the admin list UI doesn't use them.
+    data: (data ?? []).map(mapChallengeRow),
     error: null,
   };
 }

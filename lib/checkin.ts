@@ -238,7 +238,7 @@ export async function fetchFriendsCheckedIn(
 
   if (error) return { data: [], error: error.message };
 
-  const checkins: FriendCheckin[] = (data ?? []).map((row: any) => ({
+  const checkins: FriendCheckin[] = (data ?? []).map((row) => ({
     id: row.id,
     user_id: row.user_id,
     gym_id: row.gym_id,

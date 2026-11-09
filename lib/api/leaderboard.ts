@@ -1,10 +1,11 @@
 import { supabase } from "@/lib/supabase";
 import type { RivalEntry, GlobalLeaderboardEntry } from "@/types/compete";
 import type { ExerciseUnit } from "@/types/pr";
+import type { RpcRow } from "./rows";
 
 const PAGE_SIZE = 50;
 
-function mapGlobalRow(row: any): GlobalLeaderboardEntry {
+function mapGlobalRow(row: RpcRow<"global_leaderboard">): GlobalLeaderboardEntry {
   return {
     user_id:      row.user_id,
     full_name:    row.full_name   ?? null,
@@ -34,13 +35,13 @@ export async function fetchGlobalLeaderboard(
 ): Promise<{ data: GlobalLeaderboardEntry[]; error: string | null }> {
   const { data, error } = await supabase.rpc("global_leaderboard", {
     p_viewer_id: viewerId,
-    p_search:    search || null,
+    p_search:    search || undefined, // omitted = SQL DEFAULT NULL
     p_limit:     limit,
     p_offset:    offset,
   });
 
   if (error) return { data: [], error: error.message };
-  return { data: ((data as any[]) ?? []).map(mapGlobalRow), error: null };
+  return { data: (data ?? []).map(mapGlobalRow), error: null };
 }
 
 /**
@@ -55,7 +56,7 @@ export async function fetchMyGlobalRank(
   });
 
   if (error) return { data: null, error: error.message };
-  const rows = (data as any[]) ?? [];
+  const rows = data ?? [];
   return { data: rows.length > 0 ? mapGlobalRow(rows[0]) : null, error: null };
 }
 
@@ -79,7 +80,7 @@ export async function fetchRivalsLeaderboard(
 
   if (error) return { data: [], error: error.message };
 
-  const entries: RivalEntry[] = ((data as any[]) ?? []).map((row, i) => ({
+  const entries: RivalEntry[] = (data ?? []).map((row, i) => ({
     userId: row.user_id,
     fullName: row.full_name ?? row.username ?? "Unknown",
     username: row.username ?? null,

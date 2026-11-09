@@ -10,12 +10,11 @@ import {
   fetchPresence,
 } from "@/lib/api";
 import type { Message, ConversationPreview } from "@/types/social";
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 // Module-level channel refs — never double-subscribe across StrictMode remounts
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let _inboxChannel: any = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let _chatChannel: any = null;
+let _inboxChannel: RealtimeChannel | null = null;
+let _chatChannel: RealtimeChannel | null = null;
 let _presenceHeartbeat: ReturnType<typeof setInterval> | null = null;
 // Monotonic counter so two sendMessage() calls within the same millisecond
 // (e.g. keyboard-submit + button-tap firing back to back) never produce the

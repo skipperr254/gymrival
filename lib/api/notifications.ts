@@ -1,43 +1,58 @@
+import type { QueryData } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import type { AppNotification } from "@/types/notification";
+
+const notificationQuery = () =>
+  supabase.from('notifications').select(`
+    id,
+    user_id,
+    type,
+    actor_id,
+    data,
+    read_at,
+    created_at,
+    actor:profiles!actor_id(full_name, username, avatar_url)
+  `);
+type NotificationRow = QueryData<ReturnType<typeof notificationQuery>>[number];
+
+function mapNotificationRow(row: NotificationRow): AppNotification {
+  return {
+    id: row.id,
+    user_id: row.user_id,
+    type: row.type as AppNotification['type'],
+    actor_id: row.actor_id ?? null,
+    actor_name: row.actor?.full_name ?? null,
+    actor_username: row.actor?.username ?? null,
+    actor_avatar_url: row.actor?.avatar_url ?? null,
+    data: (row.data ?? {}) as AppNotification['data'],
+    read_at: row.read_at ?? null,
+    created_at: row.created_at,
+  };
+}
 
 export async function fetchNotifications(
   userId: string,
   limit = 50,
   offset = 0
 ): Promise<{ data: AppNotification[]; hasMore: boolean; error: string | null }> {
-  const { data, error } = await supabase
-    .from('notifications')
-    .select(`
-      id,
-      user_id,
-      type,
-      actor_id,
-      data,
-      read_at,
-      created_at,
-      actor:profiles!actor_id(full_name, username, avatar_url)
-    `)
+  const { data, error } = await notificationQuery()
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
 
   if (error) return { data: [], hasMore: false, error: error.message };
 
-  const mapped: AppNotification[] = (data ?? []).map((row: any) => ({
-    id: row.id,
-    user_id: row.user_id,
-    type: row.type,
-    actor_id: row.actor_id ?? null,
-    actor_name: row.actor?.full_name ?? null,
-    actor_username: row.actor?.username ?? null,
-    actor_avatar_url: row.actor?.avatar_url ?? null,
-    data: row.data,
-    read_at: row.read_at ?? null,
-    created_at: row.created_at,
-  }));
-
+  const mapped = (data ?? []).map(mapNotificationRow);
   return { data: mapped, hasMore: mapped.length === limit, error: null };
+}
+
+/** One notification with its actor, e.g. to hydrate a realtime INSERT. */
+export async function fetchNotification(
+  id: string
+): Promise<{ data: AppNotification | null; error: string | null }> {
+  const { data, error } = await notificationQuery().eq('id', id).maybeSingle();
+  if (error) return { data: null, error: error.message };
+  return { data: data ? mapNotificationRow(data) : null, error: null };
 }
 
 /**

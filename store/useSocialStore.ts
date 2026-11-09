@@ -20,12 +20,11 @@ import {
 import { useProfileStore } from "@/store/useProfileStore";
 import type { FriendProfile, FriendRequest, UserSearchResult, FeedPost } from "@/types/social";
 import type { PRVideo, PRVideoStatus } from "@/types/pr";
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 // Module-level refs so we can clean up and never double-subscribe
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let _friendChannel: any = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let _feedChannel: any = null;
+let _friendChannel: RealtimeChannel | null = null;
+let _feedChannel: RealtimeChannel | null = null;
 
 // Per-post monotonic sequence number for toggleLike — lets a slow/failed
 // response know whether a newer toggle for the same post has since been

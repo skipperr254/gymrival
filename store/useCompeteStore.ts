@@ -26,6 +26,7 @@ import {
   fetchAdminCreatedChallenges,
   cancelChallenge as apiCancelChallenge,
 } from "@/lib/api";
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 const PAGE_SIZE = 50;
 
@@ -42,10 +43,8 @@ let globalRequestSeq = 0;
 // nothing ever subscribed — a friend joining/leaving/scoring in a challenge
 // you're viewing, or a new invite arriving, only appeared after a manual
 // refresh or remount.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let _challengeChannel: any = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let _invitationsChannel: any = null;
+let _challengeChannel: RealtimeChannel | null = null;
+let _invitationsChannel: RealtimeChannel | null = null;
 
 interface CompeteState {
   // ─── Exercises ──────────────────────────────────────────────────────────────

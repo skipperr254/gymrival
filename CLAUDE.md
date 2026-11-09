@@ -81,7 +81,8 @@ Languages: en, nl, es, de, pt, fr, ar (RTL). All are complete.
 
 ## Supabase
 
-- Use one client, from `lib/supabase.ts`.
+- Use one client, from `lib/supabase.ts`. It's typed by `types/supabase.ts`, which is generated. **Regenerate it after every migration** (Supabase MCP `generate_typescript_types`). Never hand-edit it.
+- Type query rows from the query itself (`QueryData<typeof query>`) or with `RpcRow<'fn'>` from `lib/api/rows.ts`. Don't use `any`. The generator marks RPC output columns and NULL-able function arguments as non-null, so keep `?? null` guards in mappers.
 - **Every schema change is a migration** in `supabase/migrations/`, numbered sequentially (`NNN_description.sql`). Check the highest number first and don't reuse one. 046 is already duplicated.
 - RLS is on for every table, and policies live in migrations. Never disable RLS.
 - **Column-level UPDATE grants are the auth boundary** on `profiles` and `challenge_participants`. Never grant table-level UPDATE. When you add a client-writable column, grant it explicitly (see migration 024, 042).

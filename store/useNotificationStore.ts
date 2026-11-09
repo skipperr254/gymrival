@@ -3,6 +3,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import {
   fetchNotifications,
+  fetchNotification,
   fetchUnreadNotificationCount,
   markNotificationRead,
   markAllNotificationsRead,
@@ -133,36 +134,8 @@ export const useNotificationStore = create<NotificationState & NotificationActio
           },
           async (payload) => {
             // Fetch the new notification with full actor data
-            const { data, error } = await supabase
-              .from('notifications')
-              .select(`
-                id,
-                user_id,
-                type,
-                actor_id,
-                data,
-                read_at,
-                created_at,
-                actor:profiles!actor_id(full_name, username, avatar_url)
-              `)
-              .eq('id', (payload.new as { id: string }).id)
-              .single();
-
-            if (error || !data) return;
-
-            const row = data as any;
-            const notif: AppNotification = {
-              id: row.id,
-              user_id: row.user_id,
-              type: row.type,
-              actor_id: row.actor_id ?? null,
-              actor_name: row.actor?.full_name ?? null,
-              actor_username: row.actor?.username ?? null,
-              actor_avatar_url: row.actor?.avatar_url ?? null,
-              data: row.data,
-              read_at: row.read_at ?? null,
-              created_at: row.created_at,
-            };
+            const { data: notif } = await fetchNotification((payload.new as { id: string }).id);
+            if (!notif) return;
 
             set((state) => ({
               notifications: [notif, ...state.notifications],

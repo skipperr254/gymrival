@@ -1,3 +1,4 @@
+import type { QueryData } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import type { FeedPost } from "@/types/social";
 import type { PRVideo, PRVideoStatus } from "@/types/pr";
@@ -13,7 +14,10 @@ const FEED_SELECT = `
 
 export const FEED_PAGE_SIZE = 20;
 
-function mapFeedRow(row: any, currentUserId: string): FeedPost {
+const feedQuery = () => supabase.from("personal_records").select(FEED_SELECT);
+type FeedRow = QueryData<ReturnType<typeof feedQuery>>[number];
+
+function mapFeedRow(row: FeedRow, currentUserId: string): FeedPost {
   // PostgREST returns an array for most reverse-FK joins, but returns a single object
   // (or null) when it detects a UNIQUE constraint on the FK column. Handle both shapes.
   const videoRow = Array.isArray(row.pr_videos) ? (row.pr_videos[0] ?? null) : (row.pr_videos ?? null);
@@ -53,7 +57,7 @@ function mapFeedRow(row: any, currentUserId: string): FeedPost {
     author_gym: row.profiles?.gym ?? null,
     likes_count: Array.isArray(row.pr_likes) ? row.pr_likes.length : 0,
     has_liked: Array.isArray(row.pr_likes)
-      ? row.pr_likes.some((l: any) => l.user_id === currentUserId)
+      ? row.pr_likes.some((l) => l.user_id === currentUserId)
       : false,
     video,
   };
@@ -78,9 +82,7 @@ export async function fetchFeed(
   const limit = opts.limit ?? FEED_PAGE_SIZE;
   if (participantIds.length === 0) return { data: [], hasMore: false, error: null };
 
-  let query = supabase
-    .from("personal_records")
-    .select(FEED_SELECT)
+  let query = feedQuery()
     .in("user_id", participantIds)
     // RLS already hides other people's private PRs, but the viewer would
     // still see their OWN private ones here. The feed is the published
@@ -97,7 +99,7 @@ export async function fetchFeed(
 
   const rows = data ?? [];
   return {
-    data: rows.map((row: any) => mapFeedRow(row, currentUserId)),
+    data: rows.map((row) => mapFeedRow(row, currentUserId)),
     hasMore: rows.length === limit,
     error: null,
   };
@@ -111,9 +113,7 @@ export async function fetchSingleFeedPost(
   currentUserId: string,
   prId: string
 ): Promise<{ data: FeedPost | null; error: string | null }> {
-  const { data, error } = await supabase
-    .from("personal_records")
-    .select(FEED_SELECT)
+  const { data, error } = await feedQuery()
     .eq("id", prId)
     .eq("visibility", "public")
     .maybeSingle();
