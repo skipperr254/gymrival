@@ -8,7 +8,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 //
 // Auth: verify_jwt is disabled for this function (it's called from a
 // Postgres trigger via pg_net, not from the app), so it checks a shared
-// secret header instead. See AGENTS.md "Internationalization Rules" for the
+// secret header instead. See CLAUDE.md "Internationalization" for the
 // one-time manual setup this requires.
 
 const EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send";

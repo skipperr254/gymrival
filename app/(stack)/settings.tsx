@@ -61,7 +61,7 @@ export default function SettingsScreen() {
             iconColor="#00cc88"
             onPress={() => router.push(Routes.profileChangePassword as never)}
           />
-          {/* Dark mode: not built yet — the app is dark-only today (see AGENTS.md
+          {/* Dark mode: not built yet — the app is dark-only today (see CLAUDE.md
               design system). Re-add as a SettingsToggleRow once a light theme
               actually exists to switch to. */}
           <SettingsRow

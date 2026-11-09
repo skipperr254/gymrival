@@ -11,7 +11,7 @@ module.exports = defineConfig([
   // The billing SDK may only be imported by its adapter. Every other module
   // talks to `lib/billing` through the provider-agnostic `BillingProvider`
   // interface, so swapping vendors stays a one-file change — see the
-  // "Monetization & Entitlements" section in AGENTS.md.
+  // "Monetization" section in CLAUDE.md.
   {
     files: ['**/*.{ts,tsx,js,jsx}'],
     ignores: ['lib/billing/revenuecat.ts'],
@@ -28,7 +28,7 @@ module.exports = defineConfig([
             {
               name: 'react-native-purchases-ui',
               message:
-                'RevenueCat paywall templates are not used — the paywall is our own component (see AGENTS.md).',
+                'RevenueCat paywall templates are not used — the paywall is our own component (see CLAUDE.md).',
             },
           ],
           patterns: [
@@ -42,7 +42,7 @@ module.exports = defineConfig([
     },
   },
   // Flags new hardcoded JSX copy so it doesn't sneak back in as the app
-  // grows — see the "Internationalization Rules" section in AGENTS.md.
+  // grows — see the "Internationalization" section in CLAUDE.md.
   // Warning-level only: the app has ~450+ pre-existing un-converted <Text>
   // sites in screens not yet migrated to i18next, and this is meant to stop
   // the count from growing, not to block the build on legacy code.

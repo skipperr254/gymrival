@@ -1,50 +1,81 @@
-# Welcome to your Expo app 👋
+# GymRival
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A fitness competition app for iOS and Android. Users log PRs with video proof, compete on friend and global leaderboards and in challenges, share a social feed, chat with friends, check in at the gym, and track nutrition. Freemium, with a Pro subscription.
 
-## Get started
+Built with Expo SDK 54 (Expo Router, TypeScript), NativeWind v5, Zustand and Supabase (Postgres + RLS, Auth, Realtime, Storage, Edge Functions). Subscriptions run through RevenueCat. Seven languages, including RTL Arabic.
 
-1. Install dependencies
+Conventions and rules for working in the codebase are in [`CLAUDE.md`](CLAUDE.md).
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Getting started
 
 ```bash
-npm run reset-project
+npm install        # also runs scripts/patch-supabase.js (required for Hermes builds)
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+The app uses native modules (RevenueCat, video, notifications) that Expo Go doesn't include, so run it in a **development build**:
 
-## Learn more
+```bash
+eas build --profile development --platform ios
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### Environment
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Create `.env.local` in the project root:
 
-## Join the community
+```
+EXPO_PUBLIC_SUPABASE_URL=
+EXPO_PUBLIC_SUPABASE_ANON_KEY=
+EXPO_PUBLIC_REVENUECAT_IOS_KEY=
+# EXPO_PUBLIC_REVENUECAT_ANDROID_KEY=   # not provisioned yet; Android runs without billing
+```
 
-Join our community of developers creating universal apps.
+EAS builds **do not read `.env.local`**. Set the same variables as EAS environment variables for each build environment (development / preview / production), or the build ships without them.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Scripts
+
+| Command | What it does |
+|---|---|
+| `npm start` | Start the Expo dev server |
+| `npm run ios` / `npm run android` | Start and open on a simulator/device |
+| `npm run lint` | ESLint (`expo lint`) |
+| `npm test` | Jest unit tests |
+| `npx tsc --noEmit` | Type-check |
+
+## Project layout
+
+```
+app/                 Expo Router screens: (auth), (tabs), (stack) drill-downs, root _layout
+components/          ui/ primitives and features/<feature>/ components
+lib/                 Supabase client, api/ service layer, billing/ adapter, i18n/
+store/               Zustand stores, one per domain
+types/  constants/  hooks/
+locales/<lang>/      i18n namespaces (en, nl, es, de, pt, fr, ar)
+supabase/            migrations/ and functions/
+__tests__/           Jest tests
+```
+
+## Backend (Supabase)
+
+- **Schema:** every change is a numbered SQL file in `supabase/migrations/`. Never change the database from the dashboard.
+- **Edge functions** in `supabase/functions/`. `verify_jwt` is pinned per function in `supabase/config.toml`.
+  - `send-notification` sends Expo push notifications. It's called by a database trigger on `notifications`, not by the app.
+  - `revenuecat-webhook` writes subscription state from RevenueCat events.
+  - `billing-reconcile` re-syncs a user's subscription from RevenueCat.
+- **Function secrets:** `PUSH_WEBHOOK_SECRET`, `REVENUECAT_WEBHOOK_SECRET`, `REVENUECAT_SECRET_API_KEY` (the `SUPABASE_*` ones are provided automatically).
+- **Push setup:** push delivery also needs the same `PUSH_WEBHOOK_SECRET` value stored in Supabase Vault as `push_webhook_secret`. Until both are set, the trigger silently skips sending. See the header of migration `028_push_notification_webhook.sql`.
+
+## Builds & release
+
+EAS profiles in `eas.json`:
+
+- `development`: dev client, internal distribution
+- `preview`: internal distribution (Android builds an APK)
+- `production`: store build, auto-incremented version
+
+```bash
+eas build --profile production --platform ios
+eas submit --profile production --platform ios
+```
+
+iOS submission authenticates with an App Store Connect API key, `AuthKey_<id>.p8` in the project root. It's gitignored, so get it from the project owner. iOS is the launch platform. Android billing is enabled later by adding `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY`, with no code change.
