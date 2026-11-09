@@ -89,6 +89,8 @@
     ],
     "lockedTitle": "Antworten ist eine Pro-Funktion",
     "lockedSub": "Upgrade, um deinen Rivalen zu schreiben",
-    "lockedCta": "FREISCHALTEN"
+    "lockedCta": "FREISCHALTEN",
+    "sendFailedTitle": "Nachricht nicht gesendet",
+    "sendFailedBody": "Prüfe deine Verbindung und versuche es erneut."
   }
 }

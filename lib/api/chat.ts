@@ -123,7 +123,7 @@ export async function sendMessage(
   conversationId: string,
   senderId: string,
   content: string
-): Promise<{ data: Message | null; error: string | null }> {
+): Promise<{ data: Message | null; error: string | null; denied?: boolean }> {
   const { data, error } = await supabase
     .from("messages")
     .insert({
@@ -134,7 +134,9 @@ export async function sendMessage(
     .select()
     .single();
 
-  if (error) return { data: null, error: error.message };
+  // 42501 = the RLS insert policy refused it. Sending is Pro-only (migration
+  // 056), so this means the server doesn't consider the sender Pro.
+  if (error) return { data: null, error: error.message, denied: error.code === "42501" };
   return { data: data as Message, error: null };
 }
 

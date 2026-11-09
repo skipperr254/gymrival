@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
+  Alert,
   View,
   Text,
 } from 'react-native';
@@ -14,6 +15,7 @@ import { computeIsOnline, useChatStore } from '@/store/useChatStore';
 import { fetchProfile } from '@/lib/api';
 import { ChatInputBar, MessageList } from '@/components/features/social/chat';
 import { useProGate } from '@/hooks/useProGate';
+import { useEntitlementStore } from '@/store/useEntitlementStore';
 import { Avatar } from '@/components/ui/Avatar';
 import { DetailHeader } from '@/components/ui/DetailHeader';
 
@@ -25,6 +27,7 @@ export default function ChatScreen() {
   // Reading the thread is free; sending is Pro. This screen is a route, not a
   // modal, so requestUpgrade() can open the paywall directly.
   const sendGate = useProGate('sendMessage');
+  const refreshEntitlement = useEntitlementStore((s) => s.refresh);
 
   // Per-field selectors: this screen re-renders for its own thread's state,
   // not for unrelated chat-store changes (inbox updates, other presence rows).
@@ -117,19 +120,29 @@ export default function ChatScreen() {
   // ── Stable callbacks (keep the memoized MessageList/ChatInputBar inert) ──
 
   const handleSend = useCallback(
-    (text: string) => {
-      if (!conversationId) return;
+    async (text: string) => {
+      if (!conversationId) return false;
       // Belt and braces: the composer is already replaced by a locked bar, but
       // entitlement can lapse mid-session and a quick-reply chip could still
-      // fire. The database rejects it either way (migration 056) — this just
-      // makes that a paywall instead of a message that silently disappears.
+      // fire. The database rejects it either way (migration 056).
       if (!sendGate.allowed) {
         sendGate.requestUpgrade();
-        return;
+        return false;
       }
-      sendMessage(conversationId, currentUserId, text);
+      const { ok, denied } = await sendMessage(conversationId, currentUserId, text);
+      if (ok) return true;
+      if (denied) {
+        // The app thought we were Pro but the server doesn't (lapsed
+        // subscription, or the __DEV__ override). Re-read the real tier so the
+        // composer locks, and offer the upgrade.
+        refreshEntitlement(currentUserId);
+        sendGate.requestUpgrade();
+      } else {
+        Alert.alert(t('chat.sendFailedTitle'), t('chat.sendFailedBody'));
+      }
+      return false;
     },
-    [conversationId, currentUserId, sendMessage, sendGate]
+    [conversationId, currentUserId, sendMessage, sendGate, refreshEntitlement, t]
   );
 
   const handleLoadOlder = useCallback(() => {

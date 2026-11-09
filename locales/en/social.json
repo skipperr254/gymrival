@@ -89,6 +89,8 @@
     ],
     "lockedTitle": "Replying is a Pro feature",
     "lockedSub": "Upgrade to message your rivals",
-    "lockedCta": "UNLOCK"
+    "lockedCta": "UNLOCK",
+    "sendFailedTitle": "Message not sent",
+    "sendFailedBody": "Check your connection and try again."
   }
 }

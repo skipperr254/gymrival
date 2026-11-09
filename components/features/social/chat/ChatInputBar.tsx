@@ -23,7 +23,8 @@ interface ChatInputBarProps {
   onUpgradePress: () => void;
   /** Bottom padding (safe-area aware, computed by the screen). */
   bottomPad: number;
-  onSend: (text: string) => void;
+  /** Resolves false when the send failed; typed text is then put back. */
+  onSend: (text: string) => Promise<boolean>;
 }
 
 /**
@@ -72,10 +73,14 @@ function ChatInputBarInner({
   const handleSend = (text?: string) => {
     const msg = (text ?? input).trim();
     if (!msg || !canSend) return;
-    onSend(msg);
     setInput('');
     if (otherUserId) AsyncStorage.removeItem(draftKey(otherUserId)).catch(() => {});
     inputRef.current?.focus();
+    onSend(msg).then((ok) => {
+      // Give typed text back so a failed send doesn't cost the user their
+      // message. Skip quick replies, and don't clobber anything typed since.
+      if (!ok && text === undefined) setInput((current) => current || msg);
+    });
   };
 
   if (locked) {

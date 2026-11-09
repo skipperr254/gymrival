@@ -89,6 +89,8 @@
     ],
     "lockedTitle": "Responder é uma funcionalidade Pro",
     "lockedSub": "Faz upgrade para falar com os teus rivais",
-    "lockedCta": "DESBLOQUEAR"
+    "lockedCta": "DESBLOQUEAR",
+    "sendFailedTitle": "Mensagem não enviada",
+    "sendFailedBody": "Verifica a tua ligação e tenta novamente."
   }
 }

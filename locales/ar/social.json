@@ -89,6 +89,8 @@
     ],
     "lockedTitle": "الرد ميزة Pro",
     "lockedSub": "قم بالترقية لمراسلة منافسيك",
-    "lockedCta": "افتح"
+    "lockedCta": "افتح",
+    "sendFailedTitle": "لم يتم إرسال الرسالة",
+    "sendFailedBody": "تحقق من اتصالك وحاول مرة أخرى."
   }
 }

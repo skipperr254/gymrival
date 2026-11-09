@@ -89,6 +89,8 @@
     ],
     "lockedTitle": "Reageren is een Pro-functie",
     "lockedSub": "Upgrade om je rivalen te berichten",
-    "lockedCta": "ONTGRENDEL"
+    "lockedCta": "ONTGRENDEL",
+    "sendFailedTitle": "Bericht niet verzonden",
+    "sendFailedBody": "Controleer je verbinding en probeer het opnieuw."
   }
 }

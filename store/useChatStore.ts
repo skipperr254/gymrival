@@ -54,7 +54,16 @@ export interface ChatState {
 
   loadMessages: (conversationId: string, userId: string) => Promise<void>;
   loadOlderMessages: (conversationId: string) => Promise<void>;
-  sendMessage: (conversationId: string, senderId: string, content: string) => Promise<void>;
+  /**
+   * Optimistic send. On failure the bubble and the inbox preview are rolled
+   * back and the result says why, so the screen can tell the user instead of
+   * the message silently vanishing. `denied` = the server's Pro gate refused it.
+   */
+  sendMessage: (
+    conversationId: string,
+    senderId: string,
+    content: string
+  ) => Promise<{ ok: boolean; denied?: boolean }>;
   markRead: (conversationId: string, userId: string) => Promise<void>;
 
   /**
@@ -162,7 +171,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   sendMessage: async (conversationId, senderId, content) => {
     const trimmed = content.trim();
-    if (!trimmed) return;
+    if (!trimmed) return { ok: false };
+    const previousConversations = get().conversations;
 
     // Optimistic: append to messages immediately
     _sendMessageSeq += 1;
@@ -200,12 +210,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
         }),
     }));
 
-    const { data: sent, error } = await apiSendMessage(conversationId, senderId, trimmed);
+    const { data: sent, error, denied } = await apiSendMessage(conversationId, senderId, trimmed);
 
     if (error || !sent) {
-      // Revert optimistic message on failure
-      set((s) => ({ messages: s.messages.filter((m) => m.id !== tempId) }));
-      return;
+      // Revert both optimistic writes: the bubble, and the inbox preview that
+      // would otherwise keep showing a message that was never sent.
+      set((s) => ({
+        messages: s.messages.filter((m) => m.id !== tempId),
+        conversations: previousConversations,
+      }));
+      return { ok: false, denied };
     }
 
     // Replace temp with the real persisted row. Filters out (rather than
@@ -218,6 +232,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         (a, b) => (a.created_at > b.created_at ? 1 : -1)
       ),
     }));
+    return { ok: true };
   },
 
   markRead: async (conversationId, userId) => {
