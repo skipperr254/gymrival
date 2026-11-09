@@ -71,7 +71,7 @@ supabase/migrations/, supabase/functions/
 Languages: en, nl, es, de, pt, fr, ar (RTL). All are complete.
 
 - **All user-facing copy goes through `t()`**: text, placeholders, alerts, composed errors. ESLint (`i18next/no-literal-string`) flags slips. Brand wordmarks ("GYMRIVAL") are the only exception.
-- Each feature area has one namespace per file. When you add a key, add it to **all seven** language folders. A new feature gets its own namespace.
+- Each feature area has one namespace per file. When you add a key, add it to **all seven** language folders (`__tests__/locales.test.ts` fails otherwise). A new feature gets its own namespace.
 - Module-level constants (tab configs, option lists) store the key path and resolve it with `t()` at render time. Non-component helpers use `i18n.t()` from `@/lib/i18n`.
 - Format dates and numbers with `lib/i18n/format.ts` only. Never call `toLocale*` or hardcode a locale.
 - RTL: RN mirrors layout automatically, so never write `flex-row-reverse` or per-language branches. Directional icons (chevrons, arrows) need `style={rtlIconFlip}` from `lib/i18n/rtl.ts`.
