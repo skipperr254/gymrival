@@ -64,7 +64,7 @@ export function FriendsSearch() {
       )}
 
       {searchLoading ? (
-        <ActivityIndicator color={Colors.hint} style={{ marginTop: 16 }} />
+        <ActivityIndicator className="mt-4" color={Colors.hint} />
       ) : searchError && searchResults.length === 0 ? (
         <ErrorState
           message={t('loadErrorSearch')}

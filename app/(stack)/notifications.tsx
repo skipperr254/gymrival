@@ -124,7 +124,7 @@ function NotificationItem({
       {isUnread && <View className="absolute left-0 top-0 bottom-0 w-[3px] bg-accent rounded-r-[2px]" />}
 
       {/* Avatar */}
-      <View style={{ position: 'relative' }}>
+      <View>
         <Avatar
           userId={item.actor_id ?? undefined}
           name={item.actor_name ?? item.actor_username ?? '?'}

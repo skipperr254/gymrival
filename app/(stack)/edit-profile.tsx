@@ -163,8 +163,7 @@ export default function EditProfileScreen() {
           <Avatar name={displayName} userId={user?.id ?? displayName} avatarUrl={profile?.avatar_url} size="xl" />
           {avatarUploading && (
             <View
-              className="absolute items-center justify-center rounded-full bg-black/50"
-              style={{ width: 72, height: 72 }}
+              className="absolute items-center justify-center rounded-full bg-black/50 w-18 h-18"
             >
               <ActivityIndicator color={Colors.primary} />
             </View>

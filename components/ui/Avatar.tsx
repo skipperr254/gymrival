@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native';
 import { Image } from 'expo-image';
-import { Colors, Fonts, AvatarPalette } from '@/constants/theme';
+import { AvatarPalette } from '@/constants/theme';
 
 const SIZE_PRESETS = { sm: 32, md: 44, lg: 56, xl: 72 } as const;
 
@@ -49,7 +49,7 @@ export function Avatar({ name, userId, avatarUrl, size = 'md', online = false }:
   const fontSize = Math.round(diameter * 0.45);
 
   return (
-    <View style={{ width: diameter, height: diameter, flexShrink: 0 }}>
+    <View className="shrink-0" style={{ width: diameter, height: diameter }}>
       {avatarUrl ? (
         <Image
           source={{ uri: avatarUrl }}
@@ -59,33 +59,22 @@ export function Avatar({ name, userId, avatarUrl, size = 'md', online = false }:
         />
       ) : (
         <View
+          className="items-center justify-center"
           style={{
             width: diameter,
             height: diameter,
             borderRadius: diameter / 2,
             backgroundColor: getAvatarColor(userId ?? name),
-            alignItems: 'center',
-            justifyContent: 'center',
           }}
         >
-          <Text style={{ fontFamily: Fonts.display, fontSize, color: Colors.primary }}>
+          <Text className="font-display text-primary" style={{ fontSize }}>
             {getInitial(name)}
           </Text>
         </View>
       )}
       {online && (
         <View
-          style={{
-            position: 'absolute',
-            bottom: 1,
-            right: 1,
-            width: 10,
-            height: 10,
-            borderRadius: 5,
-            backgroundColor: Colors.success,
-            borderWidth: 2,
-            borderColor: Colors.base,
-          }}
+          className="absolute bottom-0.25 right-0.25 w-2.5 h-2.5 rounded-[5px] bg-success border-2 border-base"
         />
       )}
     </View>

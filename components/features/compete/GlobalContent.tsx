@@ -145,9 +145,9 @@ export function GlobalContent() {
         )}
         {loadingGlobal && !isFirstLoad && (
           <ActivityIndicator
+            className="absolute right-3.5"
             size="small"
             color={Colors.accent}
-            style={{ position: 'absolute', right: 14 }}
           />
         )}
       </View>

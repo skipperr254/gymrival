@@ -37,7 +37,7 @@ export function DetailHeader({ title, children, right, onBack }: DetailHeaderPro
           </Text>
         )}
       </View>
-      <View className="items-end" style={{ minWidth: 36 }}>
+      <View className="items-end min-w-9">
         {right}
       </View>
     </View>

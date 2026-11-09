@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors, Fonts, MacroColors } from '@/constants/theme';
+import { MacroColors } from '@/constants/theme';
 import { formatNumber } from '@/lib/i18n/format';
 import type { DailyNutritionTotals, NutritionTargets } from '@/types/nutrition';
 
@@ -21,7 +21,7 @@ function MacroBar({ label, consumed, target, color }: MacroBarProps) {
           {formatNumber(Math.round(consumed))}/{formatNumber(Math.round(target))}g
         </Text>
       </View>
-      <View className="rounded-full overflow-hidden" style={{ height: 5, backgroundColor: Colors.elevated }}>
+      <View className="rounded-full overflow-hidden h-1.25 bg-elevated">
         <View className="h-full rounded-full" style={{ width: `${Math.round(pct * 100)}%`, backgroundColor: color }} />
       </View>
     </View>
@@ -43,24 +43,23 @@ export function DailySummaryCard({ totals, targets }: DailySummaryCardProps) {
       <View className="flex-row items-end justify-between mb-2">
         <View>
           <Text
-            className="text-muted mb-1"
-            style={{ fontFamily: Fonts.display, fontSize: 10, letterSpacing: 2 }}
+            className="text-muted mb-1 font-display text-[10px] tracking-[2px]"
           >
             {t('summary.calories')}
           </Text>
-          <Text style={{ fontFamily: Fonts.display, fontSize: 40, color: Colors.accent, lineHeight: 42 }}>
+          <Text className="font-display text-[40px] text-accent leading-[42px]">
             {formatNumber(Math.round(totals.calories))}
           </Text>
         </View>
-        <Text className="text-secondary mb-1" style={{ fontFamily: Fonts.body, fontSize: 12 }}>
+        <Text className="text-secondary mb-1 font-body text-[12px]">
           {t('summary.remaining', { value: formatNumber(Math.round(remaining)) })}
         </Text>
       </View>
 
-      <View className="rounded-full overflow-hidden mb-4" style={{ height: 6, backgroundColor: Colors.elevated }}>
+      <View className="rounded-full overflow-hidden mb-4 h-1.5 bg-elevated">
         <View
-          className="h-full rounded-full"
-          style={{ width: `${Math.round(caloriesPct * 100)}%`, backgroundColor: Colors.accent }}
+          className="h-full rounded-full bg-accent"
+          style={{ width: `${Math.round(caloriesPct * 100)}%` }}
         />
       </View>
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { LineChart } from '@/components/ui/LineChart';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { formatNumber } from '@/lib/i18n/format';
 import type { StrengthSeries } from '@/types/progress';
 
@@ -25,15 +25,13 @@ export function StrengthProgressChart({ series, bigThreeTotal }: StrengthProgres
     return (
       <View className="bg-surface rounded-2xl p-5 mb-3">
         <Text
-          className="text-muted mb-1"
-          style={{ fontFamily: Fonts.display, fontSize: 10, letterSpacing: 2 }}
+          className="text-muted mb-1 font-display text-[10px] tracking-[2px]"
         >
           {t('strengthProgress')}
         </Text>
         <View className="items-center py-8">
           <Text
-            className="text-muted text-center"
-            style={{ fontFamily: Fonts.body, fontSize: 13, lineHeight: 20 }}
+            className="text-muted text-center font-body text-[13px] leading-[20px]"
           >
             {t('noPrsYet')}
           </Text>
@@ -50,8 +48,7 @@ export function StrengthProgressChart({ series, bigThreeTotal }: StrengthProgres
   return (
     <View className="bg-surface rounded-2xl p-4 mb-3">
       <Text
-        className="text-muted mb-3"
-        style={{ fontFamily: Fonts.display, fontSize: 10, letterSpacing: 2 }}
+        className="text-muted mb-3 font-display text-[10px] tracking-[2px]"
       >
         {t('strengthProgress')}
       </Text>
@@ -73,10 +70,8 @@ export function StrengthProgressChart({ series, bigThreeTotal }: StrengthProgres
               style={active ? undefined : { backgroundColor: Colors.elevated }}
             >
               <Text
+                className="font-display text-[11px] tracking-[1px]"
                 style={{
-                  fontFamily: Fonts.display,
-                  fontSize: 11,
-                  letterSpacing: 1,
                   color: active ? Colors.primary : Colors.secondary,
                 }}
               >
@@ -90,18 +85,16 @@ export function StrengthProgressChart({ series, bigThreeTotal }: StrengthProgres
       {/* Current best */}
       {currentBest !== null && (
         <View className="flex-row items-baseline gap-1 mb-3">
-          <Text style={{ fontFamily: Fonts.display, fontSize: 42, color: Colors.primary, lineHeight: 44 }}>
+          <Text className="font-display text-[42px] text-primary leading-[44px]">
             {currentBest % 1 === 0 ? formatNumber(currentBest) : formatNumber(currentBest, { maximumFractionDigits: 1 })}
           </Text>
           <Text
-            className="text-secondary"
-            style={{ fontFamily: Fonts.display, fontSize: 18, lineHeight: 20 }}
+            className="text-secondary font-display text-[18px] leading-[20px]"
           >
             {selected.unit.toUpperCase()}
           </Text>
           <Text
-            className="text-muted ml-1"
-            style={{ fontFamily: Fonts.body, fontSize: 12 }}
+            className="text-muted ml-1 font-body text-[12px]"
           >
             {t('currentBest')}
           </Text>

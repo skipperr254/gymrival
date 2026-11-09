@@ -29,13 +29,13 @@ export function LockedBoardTeaser({ onUpgradePress }: { onUpgradePress: () => vo
             className="rounded-2xl py-3.5 px-4 bg-surface border border-default flex-row items-center gap-3"
             style={{ opacity }}
           >
-            <View className="bg-elevated rounded-md" style={{ width: 28, height: 16 }} />
-            <View className="bg-elevated" style={{ width: 42, height: 42, borderRadius: 21 }} />
+            <View className="bg-elevated rounded-md w-7 h-4" />
+            <View className="bg-elevated w-10.5 h-10.5 rounded-[21px]" />
             <View className="flex-1 gap-1.5">
-              <View className="bg-elevated rounded-md" style={{ height: 13, width: '55%' }} />
-              <View className="bg-elevated rounded-md" style={{ height: 10, width: '35%' }} />
+              <View className="bg-elevated rounded-md h-3.25 w-[55%]" />
+              <View className="bg-elevated rounded-md h-2.5 w-[35%]" />
             </View>
-            <View className="bg-elevated rounded-md" style={{ width: 48, height: 24 }} />
+            <View className="bg-elevated rounded-md w-12 h-6" />
           </View>
         ))}
       </View>

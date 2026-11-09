@@ -25,13 +25,11 @@ export function InvitationCard({
 
   return (
     <View
-      className="bg-surface rounded-2xl py-4 px-[18px] mb-3 border"
-      style={{ borderColor: withAlpha(Colors.friend, 0.2) }}
+      className="bg-surface rounded-2xl py-4 px-[18px] mb-3 border border-friend/20"
     >
       <View className="flex-row items-start gap-3.5 mb-3.5">
         <View
-          className="w-[46px] h-[46px] rounded-[13px] border items-center justify-center shrink-0"
-          style={{ backgroundColor: withAlpha(Colors.friend, 0.082), borderColor: withAlpha(Colors.friend, 0.2) }}
+          className="w-[46px] h-[46px] rounded-[13px] border items-center justify-center shrink-0 bg-friend/[8.2%] border-friend/20"
         >
           <Swords size={20} strokeWidth={1.6} color={Colors.friend} />
         </View>
@@ -46,7 +44,7 @@ export function InvitationCard({
       {!!ch?.prize_label && (
         <View className="flex-row items-center gap-[5px] mb-3">
           <Gift size={12} strokeWidth={1.8} color={Colors.friend} />
-          <Text className="font-sans text-[11px]" style={{ color: Colors.friend }}>
+          <Text className="font-sans text-[11px] text-friend">
             {ch.prize_label}
           </Text>
         </View>
@@ -79,11 +77,10 @@ export function InvitationCard({
         <Pressable
           onPress={onDecline}
           disabled={loading}
-          className="flex-1 flex-row items-center justify-center gap-1.5 py-2.5 rounded-xl border-[1.5px] bg-transparent"
-          style={{ borderColor: Colors.borderDefault }}
+          className="flex-1 flex-row items-center justify-center gap-1.5 py-2.5 rounded-xl border-[1.5px] bg-transparent border-default"
         >
           <X size={13} strokeWidth={2} color={Colors.muted} />
-          <Text className="font-heading text-xs tracking-[2px]" style={{ color: Colors.muted }}>
+          <Text className="font-heading text-xs tracking-[2px] text-muted">
             {t('invitation.decline')}
           </Text>
         </Pressable>

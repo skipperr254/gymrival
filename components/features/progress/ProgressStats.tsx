@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import type { ProgressStats as Stats } from '@/types/progress';
 
 // level = GREATEST(1, floor((xp + 50) / 500) + 1) — from DB triggers
@@ -22,17 +22,15 @@ function SmallStat({ label, value, sub, valueColor = Colors.primary }: SmallStat
   return (
     <View className="flex-1 bg-surface rounded-2xl p-3">
       <Text
-        className="text-muted mb-1"
-        style={{ fontFamily: Fonts.display, fontSize: 9, letterSpacing: 1.5 }}
+        className="text-muted mb-1 font-display text-[9px] tracking-[1.5px]"
       >
         {label}
       </Text>
-      <Text style={{ fontFamily: Fonts.display, fontSize: 28, color: valueColor, lineHeight: 30 }}>
+      <Text className="font-display text-[28px] leading-[30px]" style={{ color: valueColor }}>
         {value}
       </Text>
       <Text
-        className="text-hint mt-0.5"
-        style={{ fontFamily: Fonts.body, fontSize: 10 }}
+        className="text-hint mt-0.5 font-body text-[10px]"
       >
         {sub}
       </Text>
@@ -60,29 +58,26 @@ export function ProgressStats({ stats }: ProgressStatsProps) {
         <View className="flex-row items-end justify-between mb-2">
           <View>
             <Text
-              className="text-muted mb-1"
-              style={{ fontFamily: Fonts.display, fontSize: 10, letterSpacing: 2 }}
+              className="text-muted mb-1 font-display text-[10px] tracking-[2px]"
             >
               {t('level')}
             </Text>
-            <Text style={{ fontFamily: Fonts.display, fontSize: 40, color: Colors.accent, lineHeight: 42 }}>
+            <Text className="font-display text-[40px] text-accent leading-[42px]">
               {level}
             </Text>
           </View>
           <Text
-            className="text-secondary mb-1"
-            style={{ fontFamily: Fonts.body, fontSize: 12 }}
+            className="text-secondary mb-1 font-body text-[12px]"
           >
             {t('xpProgress', { xpInLevel, xpNeeded })}
           </Text>
         </View>
         <View
-          className="rounded-full overflow-hidden"
-          style={{ height: 5, backgroundColor: Colors.elevated }}
+          className="rounded-full overflow-hidden h-1.25 bg-elevated"
         >
           <View
-            className="h-full rounded-full"
-            style={{ width: `${Math.round(pct * 100)}%`, backgroundColor: Colors.accent }}
+            className="h-full rounded-full bg-accent"
+            style={{ width: `${Math.round(pct * 100)}%` }}
           />
         </View>
       </View>

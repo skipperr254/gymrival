@@ -245,8 +245,8 @@ export function LogFoodSheet({ visible, initialMealType, onClose }: Props) {
           </View>
 
           <ScrollView
+            className="flex-1"
             ref={scrollRef}
-            style={{ flex: 1 }}
             contentContainerClassName="p-5 pb-4"
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"

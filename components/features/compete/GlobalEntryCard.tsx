@@ -30,17 +30,17 @@ export function GlobalEntrySkeleton() {
   return (
     <View className="rounded-2xl py-3.5 px-4 mb-2.5 mt-1.5 bg-surface border border-default opacity-[0.45]">
       <View className="flex-row items-center gap-3 mb-2.5">
-        <View className="bg-elevated rounded-md" style={{ width: 28, height: 18 }} />
-        <View className="bg-elevated rounded-md" style={{ width: 42, height: 42, borderRadius: 21 }} />
+        <View className="bg-elevated rounded-md w-7 h-4.5" />
+        <View className="bg-elevated w-10.5 h-10.5 rounded-[21px]" />
         <View className="flex-1 gap-1.5">
-          <View className="bg-elevated rounded-md" style={{ height: 13, width: '60%' }} />
-          <View className="bg-elevated rounded-md" style={{ height: 10, width: '40%' }} />
+          <View className="bg-elevated rounded-md h-3.25 w-[60%]" />
+          <View className="bg-elevated rounded-md h-2.5 w-[40%]" />
         </View>
-        <View className="bg-elevated rounded-md" style={{ width: 48, height: 26 }} />
+        <View className="bg-elevated rounded-md w-12 h-6.5" />
       </View>
       <View className="flex-row gap-1.5 mb-2.5">
         {[0, 1, 2].map(i => (
-          <View key={i} className="flex-1 bg-elevated rounded-md" style={{ height: 50 }} />
+          <View key={i} className="flex-1 bg-elevated rounded-md h-12.5" />
         ))}
       </View>
     </View>

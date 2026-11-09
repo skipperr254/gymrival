@@ -181,7 +181,7 @@ export function CreateChallengeModal({
               </>
             )}
 
-            <View style={{ height: 20 }} />
+            <View className="h-5" />
 
             {/* ── Exercise ─────────────────────────────────── */}
             <Text className="font-heading text-[10px] tracking-[3px] text-muted mb-2.5">

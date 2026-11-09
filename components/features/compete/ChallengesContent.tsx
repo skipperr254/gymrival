@@ -165,7 +165,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
 
   return (
     <>
-      <View style={{ height: 16 }} />
+      <View className="h-4" />
 
       {!!actionError && (
         <View className="flex-row items-center gap-2 bg-accent/10 rounded-[10px] p-3 mb-3">
@@ -181,7 +181,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
             {t('challenges.pendingInvitations')}
           </Text>
           {loadingInvitations ? (
-            <ActivityIndicator color={Colors.accent} style={{ marginBottom: 16 }} />
+            <ActivityIndicator className="mb-4" color={Colors.accent} />
           ) : invitationsError && pendingInvitations.length === 0 ? (
             // A failed fetch previously just made this whole section vanish
             // with no trace — indistinguishable from "no invitations".

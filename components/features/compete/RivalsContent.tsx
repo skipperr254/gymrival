@@ -65,7 +65,7 @@ export function RivalsContent() {
         })}
       </ScrollView>
 
-      <View style={{ height: 16 }} />
+      <View className="h-4" />
 
       {isLoading && (
         <View className="items-center py-12">

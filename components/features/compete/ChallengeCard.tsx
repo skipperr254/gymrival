@@ -79,8 +79,7 @@ export function ChallengeCard({
 
       {isCompleted && winner && (
         <View
-          className="flex-row items-center gap-2.5 rounded-xl border py-2.5 px-3 mb-2.5"
-          style={{ backgroundColor: withAlpha(Colors.gold, 0.1), borderColor: withAlpha(Colors.gold, 0.3) }}
+          className="flex-row items-center gap-2.5 rounded-xl border py-2.5 px-3 mb-2.5 bg-gold/10 border-gold/30"
         >
           <Trophy size={18} strokeWidth={1.8} color={Colors.gold} />
           <Avatar
@@ -90,14 +89,14 @@ export function ChallengeCard({
             size={28}
           />
           <View className="flex-1">
-            <Text className="font-heading text-[9px] tracking-[2px]" style={{ color: Colors.gold }}>
+            <Text className="font-heading text-[9px] tracking-[2px] text-gold">
               {t('card.winner')}
             </Text>
             <Text className="font-sans-medium text-[13px] text-white" numberOfLines={1}>
               {winner.full_name ?? winner.username ?? t('unknown')}{winner.is_me ? t('youSuffix') : ''}
             </Text>
           </View>
-          <Text className="font-heading text-[15px]" style={{ color: Colors.gold }}>
+          <Text className="font-heading text-[15px] text-gold">
             {formatChallengeScore(winner.score, ch.metric, unit)}
           </Text>
         </View>

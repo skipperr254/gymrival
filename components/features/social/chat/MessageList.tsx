@@ -206,8 +206,7 @@ function MessageListInner({
             className="flex-row items-center gap-1.5 py-2 px-4 rounded-[10px] border border-default"
           >
             <Text
-              className="font-heading text-[11px] tracking-[2px]"
-              style={{ color: Colors.accent }}
+              className="font-heading text-[11px] tracking-[2px] text-accent"
             >
               {t('chat.retry')}
             </Text>

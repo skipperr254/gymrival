@@ -3,7 +3,7 @@ import { View, Text, ActivityIndicator, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Target, ChevronRight } from 'lucide-react-native';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
 import { rtlIconFlip } from '@/lib/i18n/rtl';
 import { resolveTargets } from '@/lib/nutrition';
@@ -81,12 +81,11 @@ export function NutritionView() {
             <Target size={20} color={Colors.accent} />
           </View>
           <Text
-            className="text-primary mb-1.5 text-center"
-            style={{ fontFamily: Fonts.display, fontSize: 16, letterSpacing: 2 }}
+            className="text-primary mb-1.5 text-center font-display text-[16px] tracking-[2px]"
           >
             {t('setGoalsTitle')}
           </Text>
-          <Text className="text-muted text-center" style={{ fontFamily: Fonts.body, fontSize: 12, lineHeight: 18 }}>
+          <Text className="text-muted text-center font-body text-[12px] leading-[18px]">
             {t('setGoalsSub')}
           </Text>
         </Pressable>

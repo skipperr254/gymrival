@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { ProgressStats } from './ProgressStats';
 import { StrengthProgressChart } from './StrengthProgressChart';
 import { ConsistencyHeatmap } from './ConsistencyHeatmap';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 // Renders inside the parent ScrollView in train/index.tsx — no nested ScrollView needed.
 export function ProgressView() {
@@ -26,8 +26,7 @@ export function ProgressView() {
     return (
       <View className="items-center py-16">
         <Text
-          className="text-muted text-center"
-          style={{ fontFamily: Fonts.body, fontSize: 13, lineHeight: 20 }}
+          className="text-muted text-center font-body text-[13px] leading-[20px]"
         >
           {t('loadError', { error })}
         </Text>
@@ -48,18 +47,15 @@ export function ProgressView() {
     <View>
       {isEmpty && (
         <View
-          className="bg-surface rounded-2xl p-6 mb-4 items-center"
-          style={{ borderWidth: 1.5, borderColor: Colors.borderDefault, borderStyle: 'dashed' }}
+          className="bg-surface rounded-2xl p-6 mb-4 items-center border-[1.5px] border-default border-dashed"
         >
           <Text
-            className="text-primary mb-2"
-            style={{ fontFamily: Fonts.display, fontSize: 16, letterSpacing: 3 }}
+            className="text-primary mb-2 font-display text-[16px] tracking-[3px]"
           >
             {t('noDataTitle')}
           </Text>
           <Text
-            className="text-muted text-center"
-            style={{ fontFamily: Fonts.body, fontSize: 13, lineHeight: 20 }}
+            className="text-muted text-center font-body text-[13px] leading-[20px]"
           >
             {t('noDataSub')}
           </Text>
