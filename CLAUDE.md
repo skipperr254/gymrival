@@ -35,7 +35,7 @@ supabase/migrations/, supabase/functions/
 - **Screens compose; they don't contain.** Files in `app/` call stores and hooks, handle navigation, and render components. Large UI blocks and modal/sheet definitions belong in `components/features/<feature>/`.
 - Treat **~400 lines** as a ceiling for any file. If you go past it, extract.
 - Only create a component when it's reused or it clearly makes a screen easier to read.
-- Put new Supabase calls in the matching `lib/api/<domain>.ts`. Screens never call `supabase` or `functions.invoke` directly.
+- **Every Supabase query, mutation, RPC and `functions.invoke` lives in `lib/api/<domain>.ts`.** Screens and components never touch `supabase`. Stores may own realtime channels and `supabase.auth` calls, but fetch data through `lib/api`.
 - Global state lives in Zustand, one store per domain. Chat (`useChatStore`) is separate from `useSocialStore`. Temporary UI state uses `useState`.
 - Define domain types in `types/`. Avoid `any`: use `unknown` and narrow it.
 - Use the `@/` path alias for imports.

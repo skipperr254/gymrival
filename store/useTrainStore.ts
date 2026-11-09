@@ -15,7 +15,7 @@ import {
   startWorkout as startWorkoutAPI,
   completeWorkout as completeWorkoutAPI,
   deleteWorkoutLog,
-} from '@/lib/train';
+} from '@/lib/api/train';
 import {
   fetchGymsWithTodayCount,
   fetchActiveCheckin,
@@ -23,7 +23,7 @@ import {
   fetchFriendsCheckedIn,
   checkinToGym as checkinToGymAPI,
   undoCheckin as undoCheckinAPI,
-} from '@/lib/checkin';
+} from '@/lib/api/checkin';
 
 const ACTIVE_WORKOUT_KEY = 'gymrival:activeWorkout';
 

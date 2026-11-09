@@ -204,23 +204,3 @@ export async function deleteWorkoutLog(
 
   return { error: error?.message ?? null };
 }
-
-/**
- * Fetch completed workout logs for a user, newest-first.
- * Used by the AI Coach and future analytics screens.
- */
-export async function fetchWorkoutLogs(
-  userId: string,
-  limit = 30
-): Promise<{ data: WorkoutLog[]; error: string | null }> {
-  const { data, error } = await supabase
-    .from('workout_logs')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('is_complete', true)
-    .order('completed_at', { ascending: false })
-    .limit(limit);
-
-  if (error) return { data: [], error: error.message };
-  return { data: (data ?? []) as WorkoutLog[], error: null };
-}

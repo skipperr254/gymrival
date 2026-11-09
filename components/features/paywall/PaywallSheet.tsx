@@ -32,7 +32,7 @@ import { Colors, Gradients } from '@/constants/theme';
 import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from '@/constants/legal';
 import type { PaywallTrigger, ProFeature } from '@/constants/entitlements';
 import { getBillingProvider, isEntitled, type Offering, type Plan } from '@/lib/billing';
-import { trackPaywall } from '@/lib/analytics';
+import { trackPaywall } from '@/lib/api/analytics';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useEntitlementStore } from '@/store/useEntitlementStore';
 import { PlanCard } from './PlanCard';

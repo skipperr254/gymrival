@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchStrengthData, fetchProgressStats, fetchCheckinHeatmap } from '@/lib/progress';
+import { fetchStrengthData, fetchProgressStats, fetchCheckinHeatmap } from '@/lib/api/progress';
 import type { ProgressData } from '@/types/progress';
 
 const EMPTY_STATS = {

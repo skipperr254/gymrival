@@ -52,7 +52,7 @@ export async function deleteFood(foodId: string): Promise<{ error: string | null
 
 /**
  * Meal logs for the current UTC calendar day — same day-boundary convention
- * as gym_checkins (see lib/checkin.ts) for consistency across the app.
+ * as gym_checkins (see lib/api/checkin.ts) for consistency across the app.
  */
 export async function fetchTodayMealLogs(userId: string): Promise<{ data: MealLog[]; error: string | null }> {
   const todayStart = new Date();

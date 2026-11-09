@@ -15,3 +15,7 @@ export * from "./challenges";
 export * from "./notifications";
 export * from "./nutrition";
 export * from "./billing";
+export * from "./checkin";
+export * from "./train";
+export * from "./progress";
+export * from "./analytics";

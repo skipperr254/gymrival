@@ -3,7 +3,7 @@ import { Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import type { PaywallTrigger } from '@/constants/entitlements';
 import { registerPaywallHandler } from '@/lib/billing';
-import { newImpressionId, trackPaywall } from '@/lib/analytics';
+import { newImpressionId, trackPaywall } from '@/lib/api/analytics';
 import { useEntitlementStore, selectIsPro } from '@/store/useEntitlementStore';
 import { PaywallSheet } from './PaywallSheet';
 

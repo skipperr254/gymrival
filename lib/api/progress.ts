@@ -38,7 +38,7 @@ function buildRunningSeries(
 /**
  * Computes consecutive-day check-in streak using UTC dates.
  * Mirrors the UTC date logic used by the award_checkin_xp DB trigger and
- * the hasCheckinToday helper in lib/checkin.ts.
+ * the hasCheckinToday helper in lib/api/checkin.ts.
  */
 function computeStreakFromDates(dates: Set<string>): number {
   if (dates.size === 0) return 0;
