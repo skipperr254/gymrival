@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { View, Text, ScrollView, Pressable, TextInput, Modal, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Search, ChevronRight, Zap, AlertCircle, X } from 'lucide-react-native';
+import { rtlIconFlip } from '@/lib/i18n/rtl';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import type { ChallengeMetric } from '@/types/challenge';
@@ -171,7 +172,7 @@ export function CreateChallengeModal({
                               <Text className="font-sans text-[11px] text-muted">{'@'}{f.username}</Text>
                             )}
                           </View>
-                          <ChevronRight size={14} strokeWidth={1.8} color={Colors.muted} />
+                          <ChevronRight size={14} strokeWidth={1.8} color={Colors.muted} style={rtlIconFlip} />
                         </Pressable>
                       );
                     })}

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { View, Text, Modal, Pressable, ScrollView, StyleSheet, Animated, Easing, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { X, ChevronLeft } from 'lucide-react-native';
+import { rtlIconFlip } from '@/lib/i18n/rtl';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -220,7 +221,7 @@ export function LogFoodSheet({ visible, initialMealType, onClose }: Props) {
               <View className="flex-row items-center gap-2">
                 {step === 2 && (
                   <Pressable onPress={() => setStep(1)} hitSlop={14} className="mr-0.5">
-                    <ChevronLeft size={22} strokeWidth={2.2} color="#888" />
+                    <ChevronLeft size={22} strokeWidth={2.2} color="#888" style={rtlIconFlip} />
                   </Pressable>
                 )}
                 <Text className="font-heading text-[22px] tracking-[1px] text-primary leading-6">

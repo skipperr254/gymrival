@@ -5,6 +5,7 @@ import {
   Dumbbell, Activity, TrendingUp, Trophy, CheckCircle, ChevronRight,
   Clock, Gift, Users, Zap,
 } from 'lucide-react-native';
+import { rtlIconFlip } from '@/lib/i18n/rtl';
 import { useTranslation } from 'react-i18next';
 import { Fonts, MedalColors, Colors } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
@@ -181,14 +182,14 @@ export function ChallengeCard({
           </Pressable>
         )}
         <Pressable
-          onPress={() => router.push(Routes.challengeDetail(ch.id) as never)}
+          onPress={() => router.push(Routes.challengeDetail(ch.id))}
           className="flex-1 flex-row items-center justify-center gap-1.5 py-2.5 rounded-xl border-[1.5px] bg-transparent"
           style={{ borderColor: color + '44' }}
         >
           <Text className="font-heading text-xs tracking-[2px]" style={{ color }}>
             {t('card.viewAll')}
           </Text>
-          <ChevronRight size={13} strokeWidth={2} color={color} />
+          <ChevronRight size={13} strokeWidth={2} color={color} style={rtlIconFlip} />
         </Pressable>
       </View>
     </View>
