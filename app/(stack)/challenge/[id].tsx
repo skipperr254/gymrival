@@ -65,9 +65,7 @@ export default function ChallengeDetailScreen() {
   useEffect(() => {
     if (!user?.id || !id) return;
     return subscribeToChallengeEvents(id, user.id);
-    // subscribeToChallengeEvents is a stable Zustand action
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, id]);
+  }, [user?.id, id, subscribeToChallengeEvents]);
 
   // The list-fetch failed while we have nothing cached yet — without this,
   // `challenge` stays undefined and `challenges.length` stays 0 forever, so

@@ -34,9 +34,7 @@ export function FriendsSearch() {
     if (!userId) return;
     const timer = setTimeout(() => search(userId, query), 300);
     return () => clearTimeout(timer);
-    // search is a stable Zustand action
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, userId]);
+  }, [query, userId, search]);
 
   return (
     <>

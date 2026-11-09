@@ -32,10 +32,15 @@ export function NutritionView() {
   const [sheetMealType, setSheetMealType] = useState<MealType>('breakfast');
 
   useEffect(() => {
-    if (!user?.id) return;
-    loadNutritionData(user.id);
-    if (!profile) loadProfile(user.id);
-  }, [user?.id]);
+    if (user?.id) loadNutritionData(user.id);
+  }, [user?.id, loadNutritionData]);
+
+  // Keyed on whether a profile exists, not the profile object, so a goals
+  // edit doesn't refetch.
+  const hasProfile = profile != null;
+  useEffect(() => {
+    if (user?.id && !hasProfile) loadProfile(user.id);
+  }, [user?.id, hasProfile, loadProfile]);
 
   const openLogSheet = (mealType: MealType) => {
     setSheetMealType(mealType);

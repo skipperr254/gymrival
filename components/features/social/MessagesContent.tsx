@@ -45,9 +45,7 @@ export function MessagesContent() {
       unsubInbox();
       stopHeartbeat();
     };
-    // Store actions are stable Zustand functions
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
+  }, [userId, loadConversations, startPresenceHeartbeat, subscribeToInbox]);
 
   if (conversationsLoading && conversations.length === 0) {
     return (

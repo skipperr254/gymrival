@@ -96,18 +96,14 @@ export default function ChatScreen() {
       setConversationId(convId);
       loadMessages(convId, currentUserId);
     });
-    // getOrOpenChat and loadMessages are stable Zustand actions
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUserId, otherUserId]);
+  }, [currentUserId, otherUserId, getOrOpenChat, loadMessages]);
 
   // ── Realtime subscription ─────────────────────────────────────────────────
 
   useEffect(() => {
     if (!conversationId || !currentUserId) return;
     return subscribeToChat(conversationId, currentUserId);
-    // subscribeToChat is a stable Zustand action
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversationId, currentUserId]);
+  }, [conversationId, currentUserId, subscribeToChat]);
 
   // ── Presence ─────────────────────────────────────────────────────────────
 
@@ -116,9 +112,7 @@ export default function ChatScreen() {
     fetchFriendsPresence([otherUserId]);
     const stopHeartbeat = startPresenceHeartbeat(currentUserId);
     return stopHeartbeat;
-    // fetchFriendsPresence and startPresenceHeartbeat are stable Zustand actions
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [otherUserId, currentUserId]);
+  }, [otherUserId, currentUserId, fetchFriendsPresence, startPresenceHeartbeat]);
 
   // ── Stable callbacks (keep the memoized MessageList/ChatInputBar inert) ──
 

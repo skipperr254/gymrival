@@ -26,9 +26,7 @@ export function FriendRequests() {
   // Refresh on mount (mounting happens when this sub-tab becomes active)
   useEffect(() => {
     if (userId) loadRequests(userId);
-    // loadRequests is a stable Zustand action
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
+  }, [userId, loadRequests]);
 
   if (requestsLoading) {
     return (

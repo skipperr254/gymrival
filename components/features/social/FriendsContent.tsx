@@ -29,9 +29,7 @@ export function FriendsContent() {
     loadRequests(userId);
     const unsubscribe = subscribeToFriendEvents(userId);
     return unsubscribe;
-    // Store actions are stable Zustand functions
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
+  }, [userId, loadFriends, loadRequests, subscribeToFriendEvents]);
 
   const incomingCount = incomingRequests.length;
 

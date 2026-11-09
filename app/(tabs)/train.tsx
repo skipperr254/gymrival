@@ -46,7 +46,7 @@ export default function TrainScreen() {
     if (!user?.id) return;
     loadSessions(user.id);
     restoreActiveWorkout();
-  }, [user?.id]);
+  }, [user?.id, loadSessions, restoreActiveWorkout]);
 
   // Once both the session list and a restored in-progress workout are
   // available, jump straight to that session's detail view instead of

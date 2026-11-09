@@ -70,9 +70,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
   useEffect(() => {
     if (!user?.id) return;
     return subscribeToInvitationEvents(user.id);
-    // subscribeToInvitationEvents is a stable Zustand action
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [user?.id, subscribeToInvitationEvents]);
 
   const handleJoin = async (challengeId: string) => {
     if (!user?.id) return;

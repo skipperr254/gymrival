@@ -26,9 +26,7 @@ export function FriendsList({ onFindAthletes }: { onFindAthletes: () => void }) 
   // Refresh on mount (mounting happens when this sub-tab becomes active)
   useEffect(() => {
     if (userId) loadFriends(userId);
-    // loadFriends is a stable Zustand action
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
+  }, [userId, loadFriends]);
 
   return (
     <>

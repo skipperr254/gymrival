@@ -58,6 +58,8 @@ export default function SocialScreen() {
   useEffect(() => {
     if (!userId || feedParticipantIds.length === 0) return;
     return subscribeToFeedEvents(userId, feedParticipantIds);
+    // Keyed on the ids' contents, not the array: a new array holding the same
+    // ids must not tear down and rebuild the realtime channel.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, feedParticipantIds.join(',')]);
 
@@ -77,9 +79,7 @@ export default function SocialScreen() {
         unsubFriends();
         setActivePostId(null);
       };
-      // Store actions are stable Zustand functions
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [userId])
+    }, [userId, loadConversations, loadRequests, subscribeToFriendEvents, subscribeToInbox])
   );
 
   // Viewability → autoplay. Both config and callback must be identity-stable

@@ -53,7 +53,7 @@ export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabl
         { text: t('video.cancel'), style: 'cancel' },
       ]
     );
-  }, [disabled, pickFromLibrary, recordFromCamera]);
+  }, [disabled, pickFromLibrary, recordFromCamera, t]);
 
   if (asset) {
     return (

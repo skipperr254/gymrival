@@ -112,7 +112,7 @@ export function LogFoodSheet({ visible, initialMealType, onClose }: Props) {
     // Covers opening this sheet straight from the FAB before the user has
     // ever visited Train > Nutrition (which is what normally loads My Foods).
     if (user?.id) loadNutritionData(user.id);
-  }, [visible, initialMealType, user?.id]);
+  }, [visible, initialMealType, user?.id, loadNutritionData]);
 
   // Auto-close a couple seconds after the success step so the user sees
   // confirmation of what was logged, mirroring LogPRSheet's Step3 pattern.
