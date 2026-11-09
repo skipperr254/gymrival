@@ -9,7 +9,7 @@ import {
   Dimensions,
   ActivityIndicator,
 } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { X, Plus, Activity, Check } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
@@ -111,9 +111,9 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
         style={{ transform: [{ translateY: slideAnim }] }}
       >
         <KeyboardAwareScrollView
-          style={{ flex: 1 }}
+          className="flex-1"
           bottomOffset={24}
-          contentContainerStyle={[styles.sheetContent, { paddingBottom: insets.bottom + 24 }]}
+          contentContainerStyle={{ padding: 24, paddingBottom: insets.bottom + 24 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -292,6 +292,3 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
   );
 }
 
-const styles = StyleSheet.create({
-  sheetContent: { padding: 24 },
-});

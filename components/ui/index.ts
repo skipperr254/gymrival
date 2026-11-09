@@ -14,3 +14,5 @@ export type { SegmentedControlProps } from './SegmentedControl';
 
 export { ErrorState } from './ErrorState';
 export type { ErrorStateProps } from './ErrorState';
+
+export { KeyboardAwareScrollView } from './KeyboardAwareScrollView';

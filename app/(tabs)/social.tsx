@@ -145,7 +145,7 @@ export default function SocialScreen() {
         removeClippedSubviews={Platform.OS === 'android'}
         maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContent}
+        contentContainerClassName="pt-1 pb-24"
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -203,5 +203,4 @@ export default function SocialScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.base },
-  listContent: { paddingTop: 4, paddingBottom: 96 },
 });

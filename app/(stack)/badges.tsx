@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Trophy, Flame, Dumbbell, Award, Medal, Zap, Video, Skull, Calendar, Heart,
@@ -39,7 +39,7 @@ export default function BadgesScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
       <DetailHeader title={t('badges.title')} />
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerClassName="px-4 pb-24" showsVerticalScrollIndicator={false}>
         {/* Summary */}
         <View className="bg-accent rounded-[20px] p-5 items-center mb-6">
           <Text className="font-heading text-primary text-[56px]">{earned.length}</Text>
@@ -92,7 +92,3 @@ export default function BadgesScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  content: { paddingHorizontal: 16, paddingBottom: 96 },
-});

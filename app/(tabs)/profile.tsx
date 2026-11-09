@@ -169,7 +169,7 @@ export default function ProfileScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
       <AppHeader right={headerRight} />
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerClassName="px-4 pt-0.5 pb-25 gap-3.5"
         showsVerticalScrollIndicator={false}
       >
         {/* ── Profile Card ──────────────────────────────────── */}
@@ -351,12 +351,6 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: {
-    paddingHorizontal: 16,
-    paddingTop: 2,
-    paddingBottom: 100,
-    gap: 14,
-  },
   profileCard: {
     borderRadius: 20,
     borderWidth: 1,

@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
@@ -12,7 +12,7 @@ export default function CheckinScreen() {
       <DetailHeader title={t('header.checkin')} />
 
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerClassName="px-4 pb-25"
         showsVerticalScrollIndicator={false}
       >
         <CheckInView />
@@ -20,10 +20,3 @@ export default function CheckinScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  content: {
-    paddingHorizontal: 16,
-    paddingBottom: 100,
-  },
-});

@@ -240,9 +240,7 @@ export default function NotificationsScreen() {
           renderItem={({ item }) => (
             <NotificationItem item={item} onPress={handlePress} />
           )}
-          contentContainerStyle={
-            notifications.length === 0 ? styles.emptyContainer : styles.list
-          }
+          contentContainerClassName={notifications.length === 0 ? 'flex-1' : 'pb-25'}
           refreshControl={
             <RefreshControl
               refreshing={loading}
@@ -279,14 +277,3 @@ export default function NotificationsScreen() {
     </SafeAreaView>
   );
 }
-
-// ─── Styles ──────────────────────────────────────────────────────────────────
-
-const styles = StyleSheet.create({
-  list: {
-    paddingBottom: 100,
-  },
-  emptyContainer: {
-    flex: 1,
-  },
-});

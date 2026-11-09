@@ -3,11 +3,10 @@ import {
   Text,
   Pressable,
   TextInput,
-  StyleSheet,
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useRef, useState } from 'react';
@@ -148,9 +147,9 @@ export default function EditProfileScreen() {
       <DetailHeader title={t('edit.title')} />
 
       <KeyboardAwareScrollView
-        style={{ flex: 1 }}
+        className="flex-1"
         bottomOffset={24}
-        contentContainerStyle={styles.content}
+        contentContainerClassName="px-4 pb-24"
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
@@ -287,12 +286,3 @@ function Field({
     </View>
   );
 }
-
-// ─── Styles ──────────────────────────────────────────────────────────────────
-
-const styles = StyleSheet.create({
-  content: {
-    paddingHorizontal: 16,
-    paddingBottom: 96,
-  },
-});

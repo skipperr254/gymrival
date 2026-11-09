@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
@@ -170,7 +170,7 @@ export default function TrainScreen() {
         )}
 
         <ScrollView
-          contentContainerStyle={styles.content}
+          contentContainerClassName="px-4 pt-3.5 pb-25"
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -215,11 +215,3 @@ export default function TrainScreen() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  content: {
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 100,
-  },
-});

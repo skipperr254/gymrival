@@ -277,7 +277,7 @@ export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed
               accessibilityRole="button"
               accessibilityLabel={t('close')}
               hitSlop={12}
-              style={styles.closeBtn}
+              className="absolute top-3.5 right-4 p-1"
             >
               <X size={20} color={Colors.secondary} />
             </Pressable>
@@ -293,7 +293,7 @@ export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed
           </LinearGradient>
 
           <ScrollView
-            contentContainerStyle={{ paddingBottom: 12 }}
+            contentContainerClassName="pb-3"
             showsVerticalScrollIndicator={false}
             bounces={false}
           >
@@ -370,5 +370,4 @@ export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed
 
 const styles = StyleSheet.create({
   header: { paddingTop: 12, paddingBottom: 18, paddingHorizontal: 20 },
-  closeBtn: { position: 'absolute', top: 14, right: 16, padding: 4 },
 });

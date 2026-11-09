@@ -4,10 +4,9 @@ import {
   Text,
   TextInput,
   Pressable,
-  StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { KeyboardAwareScrollView } from "@/components/ui/KeyboardAwareScrollView";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -44,9 +43,9 @@ export default function ForgotPasswordScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }}>
       <KeyboardAwareScrollView
-        style={{ flex: 1 }}
+        className="flex-1"
         bottomOffset={24}
-        contentContainerStyle={styles.scroll}
+        contentContainerClassName="grow px-5 pt-4 pb-10"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -131,12 +130,3 @@ export default function ForgotPasswordScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  scroll: {
-    flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 40,
-  },
-});

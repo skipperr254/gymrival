@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { View, Text, FlatList, ActivityIndicator, Pressable, StyleSheet } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import type { Message } from '@/types/social';
@@ -233,7 +233,7 @@ function MessageListInner({
       inverted
       className="flex-1"
       // Inverted: paddingTop here is the visual bottom, paddingBottom the top
-      contentContainerStyle={styles.messageContent}
+      contentContainerClassName="px-4 pt-2 pb-3"
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
       onEndReached={hasMoreMessages ? onLoadOlder : undefined}
@@ -243,7 +243,7 @@ function MessageListInner({
       initialNumToRender={20}
       ListFooterComponent={
         loadingOlderMessages ? (
-          <ActivityIndicator color={Colors.hint} style={styles.olderSpinner} />
+          <ActivityIndicator color={Colors.hint} className="mb-3" />
         ) : !hasMoreMessages ? (
           <View className="flex-row items-center gap-2.5 mb-2">
             <Text className="font-heading text-[9px] text-ink-800 tracking-[2px]">
@@ -262,12 +262,3 @@ function MessageListInner({
  * only the rows that changed (see MessageRow).
  */
 export const MessageList = React.memo(MessageListInner);
-
-const styles = StyleSheet.create({
-  messageContent: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 12,
-  },
-  olderSpinner: { marginBottom: 12 },
-});

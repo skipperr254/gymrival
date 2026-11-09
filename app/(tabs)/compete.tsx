@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { View, ScrollView, StyleSheet, Pressable } from 'react-native';
+import { View, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { ShieldCheck } from 'lucide-react-native';
@@ -57,7 +57,7 @@ export default function CompeteScreen() {
       ) : (
         <ScrollView
           ref={scrollRef}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerClassName="px-4 pb-24"
           showsVerticalScrollIndicator={false}
         >
           {activeTab === 'rivals' && <RivalsContent />}
@@ -67,10 +67,3 @@ export default function CompeteScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 96,
-  },
-});

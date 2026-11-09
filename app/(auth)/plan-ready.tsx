@@ -94,7 +94,7 @@ export default function PlanReadyScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerClassName="grow px-5 pt-6 pb-6" showsVerticalScrollIndicator={false}>
         <Text className="font-sans-semibold text-xs text-accent tracking-[3px] mb-3">
           {t('plan.tag')}
         </Text>
@@ -194,7 +194,6 @@ export default function PlanReadyScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { flexGrow: 1, paddingHorizontal: 20, paddingTop: 24, paddingBottom: 24 },
   calorieCard: {
     borderRadius: 20,
     paddingVertical: 20,

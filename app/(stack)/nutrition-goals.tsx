@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
@@ -27,9 +27,9 @@ export default function NutritionGoalsScreen() {
       <DetailHeader title={t('goalsForm.headerTitle')} />
       {profile ? (
         <KeyboardAwareScrollView
-          style={{ flex: 1 }}
+          className="flex-1"
           bottomOffset={24}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 100 }}
+          contentContainerClassName="px-4 pt-4 pb-25"
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >

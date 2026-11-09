@@ -26,7 +26,7 @@ export default function FriendsScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <DetailHeader title={t('friendsTitle')} />
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerClassName="px-4 pt-3 pb-24"
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -45,5 +45,4 @@ export default function FriendsScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.base },
-  scrollContent: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 96 },
 });

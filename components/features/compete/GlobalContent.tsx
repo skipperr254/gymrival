@@ -6,8 +6,7 @@ import {
   TextInput,
   ActivityIndicator,
   FlatList,
-  StyleSheet,
-} from 'react-native';
+  } from 'react-native';
 import { Trophy, Search, RefreshCw, AlertCircle, Lock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
@@ -302,7 +301,7 @@ export function GlobalContent() {
       ListHeaderComponent={listHeader}
       ListEmptyComponent={listEmpty}
       ListFooterComponent={listFooter}
-      contentContainerStyle={styles.listContent}
+      contentContainerClassName="px-4 pb-24"
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
       windowSize={7}
@@ -311,10 +310,3 @@ export function GlobalContent() {
     />
   );
 }
-
-const styles = StyleSheet.create({
-  listContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 96,
-  },
-});

@@ -53,7 +53,7 @@ supabase/migrations/, supabase/functions/
 
 ## Design & styling
 
-- Style with NativeWind `className`. Fall back to `style`/`StyleSheet` only for things className can't handle: `SafeAreaView`, `KeyboardAvoidingView`, `Modal`, `contentContainerStyle`, Animated values, runtime-computed values, platform-specific shadows, and `Pressable` style functions.
+- Style with NativeWind `className`; ScrollView/FlatList content padding uses `contentContainerClassName`. Fall back to `style`/`StyleSheet` only for things className can't reach: `SafeAreaView`, `Modal`, third-party components (`LinearGradient`, `expo-image`, `VideoView`, icons), Animated values and transforms, runtime-computed values, platform-specific shadows, and `Pressable` style functions. To give a third-party component className support, wrap it with NativeWind's `styled()` in `components/ui/` (see `KeyboardAwareScrollView.tsx`).
 - **Never hardcode a color.** Tokens live in `global.css` `@theme` (for classNames) and `constants/theme.ts` `Colors` (for props like an icon's `color`). Keep the two in sync. If you need a new color, add a token to both.
   - Greys between the semantic tokens use the `ink-950…ink-200` ramp (`text-ink-600`, `Colors.ink600`). Pick the nearest step instead of inventing a grey.
   - For translucency, use the opacity modifier in className (`bg-accent/10`) and `withAlpha(Colors.accent, 0.1)` in JS. Never use raw `rgba()` or hex-alpha suffixes.
@@ -61,7 +61,7 @@ supabase/migrations/, supabase/functions/
 - Fonts: Bebas Neue (`font-display`/`font-heading`) for headings, labels, numbers and all-caps UI. DM Sans (`font-body*`) for body text and inputs.
 - The look is dark, bold and high-contrast, with red accents and rounded dark cards. Use skeleton loaders rather than spinners, touch targets of at least 44px, and press feedback on everything interactive.
 - Scrollable screens need bottom padding (`pb-24`) so the tab bar doesn't hide content.
-- **Keyboard:** Android runs edge-to-edge, so RN's `KeyboardAvoidingView` under-measures. Use `react-native-keyboard-controller` (`KeyboardAwareScrollView` for forms, its `KeyboardAvoidingView` otherwise). Inside an RN `<Modal>` sheet, use `hooks/useKeyboardOverlap`.
+- **Keyboard:** Android runs edge-to-edge, so RN's `KeyboardAvoidingView` under-measures. Use `react-native-keyboard-controller`: `KeyboardAwareScrollView` from `@/components/ui/KeyboardAwareScrollView` for forms, the library's `KeyboardAvoidingView` otherwise. Inside an RN `<Modal>` sheet, use `hooks/useKeyboardOverlap`.
 - When a design reference is given, match it exactly: layout, spacing, sizes, hierarchy, radius.
 - Route strings come from `constants/routes.ts` and images from `constants/images.ts`. Never inline them.
 - **iOS modals:** never present two RN `<Modal>`s at once. UIKit silently drops the second one and leaves an invisible view that swallows touches. Sequence them so the next modal opens only after the first has fully closed (see the comment in `app/(tabs)/_layout.tsx`).

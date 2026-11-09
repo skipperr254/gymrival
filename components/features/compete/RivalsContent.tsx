@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AlertCircle, RefreshCw, Trophy } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
@@ -39,7 +39,7 @@ export function RivalsContent() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.chipsRow}
+        contentContainerClassName="flex-row gap-1.5 pt-4 pb-1"
       >
         {exercises.map(exercise => {
           const active = selectedExercise === exercise.key;
@@ -179,12 +179,3 @@ export function RivalsContent() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  chipsRow: {
-    flexDirection: 'row',
-    gap: 6,
-    paddingTop: 16,
-    paddingBottom: 4,
-  },
-});

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Pressable, StyleSheet, ActivityIndicator, ScrollView, Alert } from 'react-native';
+import { View, Text, Pressable, ActivityIndicator, ScrollView, Alert } from 'react-native';
 import { Flame, Check, MapPin, Users, CheckCircle, Zap, Clock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Avatar } from '@/components/ui/Avatar';
@@ -145,7 +145,7 @@ export function CheckInView() {
           ) : (
             <ScrollView
               className="max-h-[232px]"
-              contentContainerStyle={styles.gymListContent}
+              contentContainerClassName="pb-0.5"
               showsVerticalScrollIndicator={false}
               nestedScrollEnabled
             >
@@ -312,9 +312,3 @@ export function CheckInView() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  gymListContent: {
-    paddingBottom: 2,
-  },
-});

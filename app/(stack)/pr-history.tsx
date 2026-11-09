@@ -122,7 +122,7 @@ export default function PRHistoryScreen() {
           </Text>
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView contentContainerClassName="px-4 pb-24" showsVerticalScrollIndicator={false}>
           {prHistory.map((group) => (
             <PRGroup
               key={group.exercise.key}
@@ -136,7 +136,3 @@ export default function PRHistoryScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  content: { paddingHorizontal: 16, paddingBottom: 96 },
-});

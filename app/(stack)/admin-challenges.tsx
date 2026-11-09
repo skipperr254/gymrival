@@ -1,5 +1,4 @@
-import { StyleSheet } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
@@ -18,9 +17,9 @@ export default function AdminChallengesScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
       <DetailHeader title={t('admin.entry')} />
       <KeyboardAwareScrollView
-        style={{ flex: 1 }}
+        className="flex-1"
         bottomOffset={24}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerClassName="px-4 pt-4 pb-24"
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
@@ -30,11 +29,3 @@ export default function AdminChallengesScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 96,
-  },
-});

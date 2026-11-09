@@ -55,7 +55,7 @@ module.exports = defineConfig([
           mode: 'jsx-only',
           'jsx-attributes': {
             exclude: [
-              'className', 'testID', 'style', 'name', 'icon', 'iconColor',
+              'className', '[a-zA-Z]*ClassName', 'testID', 'style', 'name', 'icon', 'iconColor',
               'color', 'source', 'keyboardType', 'autoCapitalize', 'autoComplete',
               'returnKeyType', 'accessibilityRole', 'resizeMode', 'behavior',
               'key', 'href', 'pathname', 'contentContainerStyle', 'edges',

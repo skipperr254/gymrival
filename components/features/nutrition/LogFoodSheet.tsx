@@ -247,7 +247,7 @@ export function LogFoodSheet({ visible, initialMealType, onClose }: Props) {
           <ScrollView
             ref={scrollRef}
             style={{ flex: 1 }}
-            contentContainerStyle={styles.scrollContent}
+            contentContainerClassName="p-5 pb-4"
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets
@@ -287,10 +287,3 @@ export function LogFoodSheet({ visible, initialMealType, onClose }: Props) {
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 16,
-  },
-});

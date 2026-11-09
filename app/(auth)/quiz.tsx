@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { ChevronLeft, Check } from 'lucide-react-native';
@@ -117,7 +117,7 @@ export default function QuizScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerClassName="grow px-5 pb-6"
         showsVerticalScrollIndicator={false}
       >
         <Text className="font-heading text-[38px] text-primary tracking-[1px] leading-[42px] mb-2">
@@ -180,11 +180,3 @@ export default function QuizScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  content: {
-    flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingBottom: 24,
-  },
-});

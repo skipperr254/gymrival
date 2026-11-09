@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Pressable, TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ArrowUp, Lock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
@@ -113,7 +113,7 @@ function ChatInputBarInner({
         horizontal
         showsHorizontalScrollIndicator={false}
         className="grow-0 pb-2"
-        contentContainerStyle={styles.quickContent}
+        contentContainerClassName="px-4 pt-1 gap-1.75"
         keyboardShouldPersistTaps="handled"
       >
         {QUICK_REPLIES.map((q, i) => (
@@ -163,11 +163,3 @@ function ChatInputBarInner({
 }
 
 export const ChatInputBar = React.memo(ChatInputBarInner);
-
-const styles = StyleSheet.create({
-  quickContent: {
-    paddingHorizontal: 16,
-    paddingTop: 4,
-    gap: 7,
-  },
-});
