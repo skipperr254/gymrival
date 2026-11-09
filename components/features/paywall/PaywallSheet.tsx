@@ -12,55 +12,25 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
-  Linking,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {
-  X,
-  Trophy,
-  Video,
-  MessageCircle,
-  ListOrdered,
-  Search,
-  Swords,
-  Check,
-  type LucideIcon,
-} from 'lucide-react-native';
+import { X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors, Gradients } from '@/constants/theme';
-import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from '@/constants/legal';
-import type { PaywallTrigger, ProFeature } from '@/constants/entitlements';
+import type { PaywallTrigger } from '@/constants/entitlements';
 import { getBillingProvider, isEntitled, type Offering, type Plan } from '@/lib/billing';
 import { trackPaywall } from '@/lib/api/analytics';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useEntitlementStore } from '@/store/useEntitlementStore';
 import { PlanCard } from './PlanCard';
+import { PaywallFeatureList, TRIGGER_FEATURE } from './PaywallFeatureList';
+import { PaywallFooter } from './PaywallFooter';
 import { DEV_PREVIEW_OFFERING } from './devPreviewOffering';
 import { pricePerMonth, preferredPlan, savingsVsMonthly } from './pricing';
 
 const SHEET_HEIGHT = Dimensions.get('window').height;
 const DISMISS_CONFIRM_TIMEOUT_MS = 400;
-
-// Module-level, so it stores i18n key paths and resolves them with t() at
-// render time — same pattern as TABS in the compete screen.
-const FEATURES: { key: ProFeature; icon: LucideIcon }[] = [
-  { key: 'publishPR', icon: Trophy },
-  { key: 'prVideo', icon: Video },
-  { key: 'sendMessage', icon: MessageCircle },
-  { key: 'leaderboardDepth', icon: ListOrdered },
-  { key: 'leaderboardSearch', icon: Search },
-  { key: 'createChallenge', icon: Swords },
-];
-
-/** Which feature the user just reached for, so its row leads the list. */
-const TRIGGER_FEATURE: Partial<Record<PaywallTrigger, ProFeature>> = {
-  publish_pr: 'publishPR',
-  pr_video: 'prVideo',
-  chat_reply: 'sendMessage',
-  leaderboard_depth: 'leaderboardDepth',
-  create_challenge: 'createChallenge',
-};
 
 interface Props {
   visible: boolean;
@@ -265,12 +235,6 @@ export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed
 
   // ── Copy ──────────────────────────────────────────────────────────────────
   const contextualFeature = TRIGGER_FEATURE[trigger];
-  const orderedFeatures = contextualFeature
-    ? [
-        ...FEATURES.filter((f) => f.key === contextualFeature),
-        ...FEATURES.filter((f) => f.key !== contextualFeature),
-      ]
-    : FEATURES;
 
   const trialDays = selectedPlan?.trialDays ?? null;
   const periodLabel = t(`period.${selectedPlan?.period ?? 'unknown'}`, {
@@ -334,28 +298,7 @@ export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed
             bounces={false}
           >
             <View className="px-5 pt-4">
-              {orderedFeatures.map((f) => (
-                <View key={f.key} className="flex-row items-center gap-3 mb-3">
-                  <View className="w-9 h-9 rounded-[10px] bg-accent/12 items-center justify-center">
-                    <f.icon size={17} color={Colors.accent} />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="font-sans-semibold text-sm text-primary">
-                      {t(`features.${f.key}.title`)}
-                    </Text>
-                    <Text className="font-sans text-[11px] text-ink-550 mt-px">
-                      {t(`features.${f.key}.sub`)}
-                    </Text>
-                  </View>
-                </View>
-              ))}
-
-              <View className="flex-row items-start gap-2 bg-surface rounded-xl px-3.5 py-3 mt-1 mb-5">
-                <Check size={14} color={Colors.success} style={{ marginTop: 2 }} />
-                <Text className="flex-1 font-sans text-[11px] text-ink-500 leading-4">
-                  {t('freeNote')}
-                </Text>
-              </View>
+              <PaywallFeatureList contextualFeature={contextualFeature} />
 
               {loading ? (
                 <View className="items-center py-8 gap-3">
@@ -410,65 +353,15 @@ export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed
             </View>
           </ScrollView>
 
-          <View
-            className="px-5 pt-3 border-t border-elevated"
-            style={{ paddingBottom: Math.max(insets.bottom + 10, 20) }}
-          >
-            {/* No plan means nothing to buy. A dimmed-but-prominent CTA reads
-                as "tap me" and does nothing, so the button is removed
-                entirely — the empty state's Try again is the real action. */}
-            {selectedPlan && (
-              <Pressable
-                onPress={handlePurchase}
-                disabled={busy}
-                accessibilityRole="button"
-                style={({ pressed }) => [(pressed || busy) && { opacity: 0.7 }]}
-              >
-                <LinearGradient
-                  colors={[Colors.accent, Colors.accentDark]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.cta}
-                >
-                  {busy ? (
-                    <ActivityIndicator color={Colors.primary} />
-                  ) : (
-                    <Text className="font-heading text-[15px] text-primary tracking-[3px]">
-                      {trialDays
-                        ? t('cta.startTrial', { count: trialDays })
-                        : t('cta.subscribe')}
-                    </Text>
-                  )}
-                </LinearGradient>
-              </Pressable>
-            )}
-
-            {!!termsLine && (
-              <Text className="font-sans text-[10px] text-ink-600 text-center leading-[14px] mt-2.5">
-                {termsLine}
-              </Text>
-            )}
-
-            {/* Restore, Terms and Privacy are App Review requirements, not
-                decoration — a paywall missing any of them is a routine reject. */}
-            <View className="flex-row items-center justify-center gap-5 mt-2.5">
-              <Pressable onPress={handleRestore} disabled={busy} hitSlop={8}>
-                <Text className="font-sans text-[11px] text-secondary underline">
-                  {t('links.restore')}
-                </Text>
-              </Pressable>
-              <Pressable onPress={() => Linking.openURL(TERMS_OF_USE_URL)} hitSlop={8}>
-                <Text className="font-sans text-[11px] text-secondary underline">
-                  {t('links.terms')}
-                </Text>
-              </Pressable>
-              <Pressable onPress={() => Linking.openURL(PRIVACY_POLICY_URL)} hitSlop={8}>
-                <Text className="font-sans text-[11px] text-secondary underline">
-                  {t('links.privacy')}
-                </Text>
-              </Pressable>
-            </View>
-          </View>
+          <PaywallFooter
+            showCta={!!selectedPlan}
+            busy={busy}
+            trialDays={trialDays}
+            termsLine={termsLine}
+            bottomInset={insets.bottom}
+            onPurchase={handlePurchase}
+            onRestore={handleRestore}
+          />
         </Animated.View>
       </View>
     </Modal>
@@ -478,10 +371,4 @@ export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed
 const styles = StyleSheet.create({
   header: { paddingTop: 12, paddingBottom: 18, paddingHorizontal: 20 },
   closeBtn: { position: 'absolute', top: 14, right: 16, padding: 4 },
-  cta: {
-    height: 54,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
 });
