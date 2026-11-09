@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
-  Text,
   Modal,
   Pressable,
   ScrollView,
@@ -13,10 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { X, ChevronLeft } from 'lucide-react-native';
-import { rtlIconFlip } from '@/lib/i18n/rtl';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCompeteStore } from '@/store/useCompeteStore';
 import { useProfileStore } from '@/store/useProfileStore';
@@ -25,18 +21,13 @@ import { showPaywall } from '@/lib/billing';
 import { useEntitlement } from '@/hooks/useEntitlement';
 import { FEATURE_TRIGGER, type ProFeature } from '@/constants/entitlements';
 import type { PRVisibility } from '@/types/pr';
+import type { PickedVideoAsset } from '@/lib/media/pickVideoAsset';
 import { Step1 } from './Step1';
 import { Step2 } from './Step2';
 import { Step3 } from './Step3';
+import { LogPRSheetHeader } from './LogPRSheetHeader';
 
-interface VideoAsset {
-  uri: string;
-  thumbnailUri: string;
-  durationSec: number;
-  fileSizeBytes: number;
-  width: number | null;
-  height: number | null;
-}
+type VideoAsset = PickedVideoAsset;
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SHEET_HEIGHT = SCREEN_HEIGHT * 0.9;
@@ -358,53 +349,12 @@ export function LogPRSheet({ visible, onClose }: Props) {
           >
 
             {/* ── Draggable header ────────────────────────────────────── */}
-            <View
-              {...panResponder.panHandlers}
-              className="px-5 pt-3 pb-3.5 bg-surface rounded-t-[22px]"
-              style={{ borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: Colors.borderDefault }}
-            >
-              <View className="w-9 h-1 rounded-full bg-ink-750 self-center mb-3.5" />
-
-              <View className="flex-row justify-between items-center mb-3.5">
-                <View className="flex-row items-center gap-2">
-                  {step === 2 && (
-                    <Pressable onPress={() => setStep(1)} hitSlop={14} className="mr-0.5">
-                      <ChevronLeft size={22} strokeWidth={2.2} color={Colors.ink450} style={rtlIconFlip} />
-                    </Pressable>
-                  )}
-                  <View>
-                    {step < 3 && (
-                      <Text className="font-heading text-[9px] tracking-[2.5px] text-muted mb-[3px]">
-                        {t('step.stepOf', { step })}
-                      </Text>
-                    )}
-                    <Text className="font-heading text-[22px] tracking-[1px] text-primary leading-6">
-                      {step === 1 ? t('step.logYourPr') : step === 2 ? t('step.addProof') : ''}
-                    </Text>
-                  </View>
-                </View>
-                {step < 3 && (
-                  <Pressable
-                    onPress={onClose}
-                    hitSlop={8}
-                    className="w-8 h-8 rounded-2xl bg-elevated items-center justify-center"
-                  >
-                    <X size={16} strokeWidth={2.8} color={Colors.ink450} />
-                  </Pressable>
-                )}
-              </View>
-
-              {step < 3 && (
-                <View className="flex-row gap-1.5">
-                  <View
-                    className={`flex-1 h-[3px] rounded-full ${step >= 1 ? 'bg-accent' : 'bg-elevated'}`}
-                  />
-                  <View
-                    className={`flex-1 h-[3px] rounded-full ${step >= 2 ? 'bg-accent' : 'bg-elevated'}`}
-                  />
-                </View>
-              )}
-            </View>
+            <LogPRSheetHeader
+              step={step}
+              panHandlers={panResponder.panHandlers}
+              onBack={() => setStep(1)}
+              onClose={onClose}
+            />
 
             {/* ── Scrollable content ───────────────────────────────────── */}
             <ScrollView

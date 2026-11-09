@@ -8,15 +8,10 @@ import type { ExerciseType } from '@/types/pr';
 import type { ProFeature } from '@/constants/entitlements';
 import { VideoUploadZone } from '@/components/features/VideoUploadZone';
 import { getExerciseIcon } from '@/constants/exerciseIcons';
+import type { PickedVideoAsset } from '@/lib/media/pickVideoAsset';
 
-export interface VideoAssetShape {
-  uri: string;
-  thumbnailUri: string;
-  durationSec: number;
-  fileSizeBytes: number;
-  width: number | null;
-  height: number | null;
-}
+/** Same shape the video picker returns. */
+export type VideoAssetShape = PickedVideoAsset;
 
 interface Step2Props {
   selectedEx: ExerciseType;
