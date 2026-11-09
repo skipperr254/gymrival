@@ -19,6 +19,7 @@ import { useProfileStore } from '@/store/useProfileStore';
 import { logPersonalRecord, fetchBestPRs, uploadPRVideo } from '@/lib/api';
 import { showPaywall } from '@/lib/billing';
 import { useEntitlement } from '@/hooks/useEntitlement';
+import { useKeyboardOverlap } from '@/hooks/useKeyboardOverlap';
 import { FEATURE_TRIGGER, type ProFeature } from '@/constants/entitlements';
 import type { PRVisibility } from '@/types/pr';
 import type { PickedVideoAsset } from '@/lib/media/pickVideoAsset';
@@ -51,6 +52,12 @@ interface Props {
 export function LogPRSheet({ visible, onClose }: Props) {
   const { t } = useTranslation('logpr');
   const insets = useSafeAreaInsets();
+  // Android edge-to-edge: the keyboard covers the sheet instead of resizing it.
+  const keyboard = useKeyboardOverlap(SCREEN_HEIGHT);
+  const scrollRef = useRef<ScrollView>(null);
+  useEffect(() => {
+    if (keyboard.overlap > 0) requestAnimationFrame(() => scrollRef.current?.scrollToEnd({ animated: true }));
+  }, [keyboard.overlap]);
   // Per-field selectors: this sheet is mounted permanently at the tabs-layout
   // level, so a whole-store subscription re-rendered it (even while closed)
   // on every compete/profile store change anywhere in the app.
@@ -335,15 +342,15 @@ export function LogPRSheet({ visible, onClose }: Props) {
       onDismiss={firePendingPaywall}
       statusBarTranslucent
     >
-      <View className="flex-1 bg-black/[0.78] justify-end">
+      <View className="flex-1 bg-black/[0.78] justify-end" onLayout={keyboard.onLayout}>
         {/* Backdrop tap-to-close */}
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
 
           <Animated.View
             className="bg-surface rounded-t-[22px] overflow-hidden"
             style={{
-              height: SHEET_HEIGHT,
-              paddingBottom: Math.max(insets.bottom + 16, 28),
+              height: Math.min(SHEET_HEIGHT, keyboard.height - insets.top),
+              paddingBottom: keyboard.overlap > 0 ? keyboard.overlap : Math.max(insets.bottom + 16, 28),
               transform: [{ translateY }],
             }}
           >
@@ -358,6 +365,7 @@ export function LogPRSheet({ visible, onClose }: Props) {
 
             {/* ── Scrollable content ───────────────────────────────────── */}
             <ScrollView
+              ref={scrollRef}
               style={{ flex: 1 }}
               contentContainerStyle={styles.scrollContent}
               showsVerticalScrollIndicator={false}

@@ -65,7 +65,7 @@ interface AuthState {
     name: string,
     email: string,
     password: string
-  ) => Promise<{ error: string | null }>;
+  ) => Promise<{ error: string | null; emailTaken?: boolean }>;
   signIn: (
     email: string,
     password: string
@@ -145,12 +145,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   signUp: async (name, email, password) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: { data: { full_name: name } },
       });
-      return { error: error?.message ?? null };
+      if (error) return { error: error.message };
+      // An already-registered email "succeeds" with no identities and no email
+      // sent (Supabase hides which emails exist). Say so instead of sending the
+      // user to a verify screen that never gets a code.
+      if (data.user && data.user.identities?.length === 0) {
+        return { error: null, emailTaken: true };
+      }
+      return { error: null };
     } catch (e) {
       return { error: toErrorMessage(e) };
     }

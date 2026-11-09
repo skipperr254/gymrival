@@ -28,8 +28,9 @@ export default function SettingsScreen() {
   };
 
   const handleSignOut = async () => {
+    // No navigation here: clearing the session makes the root auth gate
+    // replace to the splash. Doing it here too animated the splash in twice.
     await signOut();
-    router.replace(Routes.splash);
   };
 
   return (

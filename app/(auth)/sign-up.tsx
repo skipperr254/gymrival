@@ -42,10 +42,10 @@ export default function SignUpScreen() {
     if (!canSubmit) return;
     setError(null);
     setLoading(true);
-    const { error } = await signUp(name.trim(), email.trim(), password);
+    const { error, emailTaken } = await signUp(name.trim(), email.trim(), password);
     setLoading(false);
-    if (error) {
-      setError(error);
+    if (error || emailTaken) {
+      setError(emailTaken ? t("signUp.emailTaken") : error);
       return;
     }
     router.push(

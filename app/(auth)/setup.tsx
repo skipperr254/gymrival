@@ -5,7 +5,6 @@ import {
   TextInput,
   Pressable,
   KeyboardAvoidingView,
-  Platform,
   ScrollView,
   StyleSheet,
   ActivityIndicator,
@@ -102,7 +101,9 @@ export default function SetupScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        // "padding" on both: with Android edge-to-edge, "height" under-measures
+        // and leaves the bottom fields partly behind the keyboard.
+        behavior="padding"
       >
         <ScrollView
           contentContainerStyle={styles.scroll}

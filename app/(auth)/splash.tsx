@@ -11,7 +11,8 @@ export default function SplashScreen() {
   const { t } = useTranslation('auth');
 
   return (
-    <SafeAreaView className="flex-1 bg-base px-4">
+    // SafeAreaView ignores className — layout must go through style.
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base, paddingHorizontal: 16 }}>
       <View className="flex-1 items-center justify-center">
         <Text className="font-heading text-primary tracking-[6px] text-[80px] leading-[76px]">
           GYM
