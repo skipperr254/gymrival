@@ -16,6 +16,7 @@ type ProfileUpdate = Partial<
     | "sex"
     | "activity_level"
     | "diet_goal"
+    | "experience_level"
     | "target_calories"
     | "target_protein_g"
     | "target_carbs_g"
@@ -91,7 +92,7 @@ export async function removeAvatar(userId: string): Promise<{ error: string | nu
 // own email comes from the Supabase Auth session (`user.email`), never from
 // `profiles.email`; nothing in the UI needs to display a push token.
 const PROFILE_SELECT =
-  "id, avatar_url, username, full_name, gym, weight_kg, height_cm, goal, bio, quote, xp, level, is_pro, streak, friends_count, role, language, country_code, push_enabled, age, sex, activity_level, diet_goal, target_calories, target_protein_g, target_carbs_g, target_fat_g, created_at, updated_at";
+  "id, avatar_url, username, full_name, gym, weight_kg, height_cm, goal, bio, quote, xp, level, is_pro, streak, friends_count, role, language, country_code, push_enabled, age, sex, activity_level, diet_goal, experience_level, target_calories, target_protein_g, target_carbs_g, target_fat_g, created_at, updated_at";
 
 export async function fetchProfile(
   userId: string

@@ -1,0 +1,76 @@
+{
+  "quiz": {
+    "stepOf": "PASO {{step}} DE {{total}}",
+    "skip": "Omitir",
+    "next": "SIGUIENTE",
+    "finish": "VER MI PLAN",
+    "goal": {
+      "title": "¿Cuál es tu objetivo?",
+      "subtitle": "Esto define tu objetivo diario de calorías.",
+      "lose": {
+        "label": "Perder grasa",
+        "sub": "Un déficit moderado"
+      },
+      "maintain": {
+        "label": "Mantenerme igual",
+        "sub": "Mantener tu peso"
+      },
+      "gain": {
+        "label": "Ganar músculo",
+        "sub": "Un superávit controlado"
+      }
+    },
+    "frequency": {
+      "title": "¿Con qué frecuencia entrenas?",
+      "subtitle": "Sé sincero: cambia los números.",
+      "light": {
+        "label": "1–2 veces por semana",
+        "sub": "Empezando"
+      },
+      "moderate": {
+        "label": "3–4 veces por semana",
+        "sub": "Una rutina sólida"
+      },
+      "active": {
+        "label": "5–6 veces por semana",
+        "sub": "Entrenamiento serio"
+      },
+      "veryActive": {
+        "label": "Todos los días",
+        "sub": "Entrenar es la rutina"
+      }
+    },
+    "experience": {
+      "title": "¿Cuánto llevas entrenando?",
+      "subtitle": "Para proponerte retos a tu nivel.",
+      "beginner": {
+        "label": "Menos de un año",
+        "sub": "Aún aprendiendo los ejercicios"
+      },
+      "intermediate": {
+        "label": "1–3 años",
+        "sub": "Cómodo bajo la barra"
+      },
+      "advanced": {
+        "label": "Más de 3 años",
+        "sub": "Conoces tus números"
+      }
+    }
+  },
+  "plan": {
+    "tag": "TU PLAN",
+    "title": "Tu plan está listo",
+    "subtitle": "Calculado con tu cuerpo, tu objetivo y tu frecuencia de entrenamiento.",
+    "subtitleNoTargets": "Puedes configurarlo cuando quieras desde la pestaña Nutrición.",
+    "dailyCalories": "OBJETIVO DIARIO",
+    "kcal": "kcal",
+    "protein": "PROTEÍNA",
+    "carbs": "CARBOS",
+    "fat": "GRASA",
+    "editableNote": "Ajusta cualquiera de estos después en Nutrición: nada es definitivo.",
+    "noTargetsTitle": "Aún sin objetivos",
+    "noTargetsBody": "Añade tu altura, peso, edad y sexo en Nutrición y los calcularemos por ti.",
+    "cta": "PRUEBA PRO GRATIS",
+    "continueFree": "Continuar con el plan gratuito"
+  }
+}

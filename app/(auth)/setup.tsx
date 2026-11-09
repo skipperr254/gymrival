@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -17,8 +17,15 @@ import { Colors } from "@/constants/theme";
 import { Routes } from "@/constants/routes";
 import { useAuthStore } from "@/store/useAuthStore";
 import { updateProfile } from "@/lib/api";
+import { clearQuiz, loadQuiz, quizToProfileUpdate } from "@/lib/onboarding";
 
 const USERNAME_REGEX = /^[a-z0-9_]{3,20}$/;
+
+// Module level, so it carries i18n key paths rather than resolved strings.
+const SEX_OPTIONS: { value: "male" | "female"; labelKey: string }[] = [
+  { value: "male", labelKey: "setup.sexMale" },
+  { value: "female", labelKey: "setup.sexFemale" },
+];
 
 function normaliseUsername(raw: string) {
   return raw.toLowerCase().replace(/[^a-z0-9_]/g, "");
@@ -29,10 +36,21 @@ export default function SetupScreen() {
   const [username, setUsername] = useState("");
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
+  const [age, setAge] = useState("");
+  const [sex, setSex] = useState<"male" | "female" | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { user, setPendingProfileSetup } = useAuthStore();
+  const { user, setPendingProfileSetup, setPendingOnboardingPayoff } = useAuthStore();
+
+  // The quiz ran before this account existed, so its answers are sitting in
+  // AsyncStorage. Load them here and flush them with the rest of the profile
+  // in one update — two writes would leave a half-applied profile if the
+  // second failed.
+  const [quizUpdate, setQuizUpdate] = useState<ReturnType<typeof quizToProfileUpdate>>({});
+  useEffect(() => {
+    loadQuiz().then((q) => setQuizUpdate(quizToProfileUpdate(q)));
+  }, []);
 
   const usernameValid = USERNAME_REGEX.test(username);
   const canSubmit = !loading && usernameValid;
@@ -49,11 +67,15 @@ export default function SetupScreen() {
 
     const heightNum = height.trim() ? parseFloat(height.trim()) : null;
     const weightNum = weight.trim() ? parseFloat(weight.trim()) : null;
+    const ageNum = age.trim() ? parseInt(age.trim(), 10) : null;
 
     const { error } = await updateProfile(user.id, {
       username,
       ...(heightNum !== null && { height_cm: heightNum }),
       ...(weightNum !== null && { weight_kg: weightNum }),
+      ...(ageNum !== null && !Number.isNaN(ageNum) && { age: ageNum }),
+      ...(sex !== null && { sex }),
+      ...quizUpdate,
     });
 
     setLoading(false);
@@ -67,8 +89,13 @@ export default function SetupScreen() {
       return;
     }
 
+    // Answers are on the profile now; the cache has done its job.
+    clearQuiz();
     setPendingProfileSetup(false);
-    router.replace(Routes.compete);
+    // Hand over to the payoff screen rather than the tabs. The flag is what
+    // stops the root layout's auth gate skipping straight past it.
+    setPendingOnboardingPayoff(true);
+    router.replace(Routes.planReady);
   };
 
   return (
@@ -134,14 +161,66 @@ export default function SetupScreen() {
               </Text>
             </View>
 
+            {/* Age + Sex — required by Mifflin-St Jeor. Collected here rather
+                than on the separate nutrition-goals screen, which most users
+                never opened: that is why calorie targets silently fell back
+                to defaults before B4. */}
+            <View className="flex-row gap-3">
+              <View className="flex-1">
+                <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
+                  {t("setup.ageLabel")}
+                </Text>
+                <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
+                  <TextInput
+                    value={age}
+                    onChangeText={(v) => setAge(v.replace(/[^0-9]/g, ""))}
+                    placeholder={t("setup.agePlaceholder")}
+                    placeholderTextColor={Colors.hint}
+                    selectionColor={Colors.accent}
+                    className="flex-1 font-sans text-[15px] text-primary"
+                    keyboardType="number-pad"
+                    returnKeyType="next"
+                    maxLength={3}
+                  />
+                </View>
+              </View>
+
+              <View className="flex-1">
+                <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
+                  {t("setup.sexLabel")}
+                </Text>
+                <View className="flex-row gap-2">
+                  {SEX_OPTIONS.map((opt) => (
+                    <Pressable
+                      key={opt.value}
+                      onPress={() => setSex(opt.value)}
+                      accessibilityRole="radio"
+                      accessibilityState={{ selected: sex === opt.value }}
+                      className={`flex-1 h-14 rounded-2xl items-center justify-center border-[1.5px] ${
+                        sex === opt.value
+                          ? "bg-[#241a1a] border-accent"
+                          : "bg-elevated border-elevated"
+                      }`}
+                      style={({ pressed }) => pressed && { opacity: 0.8 }}
+                    >
+                      <Text
+                        className={`font-sans-medium text-[14px] ${
+                          sex === opt.value ? "text-primary" : "text-secondary"
+                        }`}
+                      >
+                        {t(opt.labelKey)}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </View>
+            </View>
+
             {/* Height + Weight side by side */}
             <View className="flex-row gap-3">
               <View className="flex-1">
                 <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-                  {t("setup.heightLabel")}{" "}
-                  <Text className="text-muted normal-case" style={{ fontSize: 11 }}>
-                    {t("setup.heightOptional")}
-                  </Text>
+                  {t("setup.heightLabel")}
                 </Text>
                 <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
                   <TextInput
@@ -161,10 +240,7 @@ export default function SetupScreen() {
 
               <View className="flex-1">
                 <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-                  {t("setup.weightLabel")}{" "}
-                  <Text className="text-muted normal-case" style={{ fontSize: 11 }}>
-                    {t("setup.weightOptional")}
-                  </Text>
+                  {t("setup.weightLabel")}
                 </Text>
                 <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
                   <TextInput
@@ -218,6 +294,7 @@ export default function SetupScreen() {
             className="items-center mt-5"
             hitSlop={12}
             onPress={() => {
+              clearQuiz();
               setPendingProfileSetup(false);
               router.replace(Routes.compete);
             }}

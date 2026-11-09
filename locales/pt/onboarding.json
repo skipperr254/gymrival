@@ -1,0 +1,76 @@
+{
+  "quiz": {
+    "stepOf": "PASSO {{step}} DE {{total}}",
+    "skip": "Ignorar",
+    "next": "SEGUINTE",
+    "finish": "VER O MEU PLANO",
+    "goal": {
+      "title": "Qual é o teu objetivo?",
+      "subtitle": "Isto define a tua meta diária de calorias.",
+      "lose": {
+        "label": "Perder gordura",
+        "sub": "Um défice moderado"
+      },
+      "maintain": {
+        "label": "Ficar como estou",
+        "sub": "Manter o teu peso"
+      },
+      "gain": {
+        "label": "Ganhar músculo",
+        "sub": "Um excedente controlado"
+      }
+    },
+    "frequency": {
+      "title": "Com que frequência treinas?",
+      "subtitle": "Sê honesto — muda os números.",
+      "light": {
+        "label": "1–2 vezes por semana",
+        "sub": "A começar"
+      },
+      "moderate": {
+        "label": "3–4 vezes por semana",
+        "sub": "Uma rotina sólida"
+      },
+      "active": {
+        "label": "5–6 vezes por semana",
+        "sub": "Treino a sério"
+      },
+      "veryActive": {
+        "label": "Todos os dias",
+        "sub": "Treinar é a rotina"
+      }
+    },
+    "experience": {
+      "title": "Há quanto tempo treinas?",
+      "subtitle": "Para te propormos desafios ao teu nível.",
+      "beginner": {
+        "label": "Menos de um ano",
+        "sub": "Ainda a aprender os exercícios"
+      },
+      "intermediate": {
+        "label": "1–3 anos",
+        "sub": "À vontade com a barra"
+      },
+      "advanced": {
+        "label": "Mais de 3 anos",
+        "sub": "Conheces os teus números"
+      }
+    }
+  },
+  "plan": {
+    "tag": "O TEU PLANO",
+    "title": "O teu plano está pronto",
+    "subtitle": "Calculado a partir do teu corpo, do teu objetivo e da tua frequência de treino.",
+    "subtitleNoTargets": "Podes configurar isto a qualquer momento no separador Nutrição.",
+    "dailyCalories": "META DIÁRIA",
+    "kcal": "kcal",
+    "protein": "PROTEÍNA",
+    "carbs": "HIDRATOS",
+    "fat": "GORDURA",
+    "editableNote": "Ajusta qualquer um destes depois em Nutrição — nada fica fechado.",
+    "noTargetsTitle": "Ainda sem metas",
+    "noTargetsBody": "Adiciona a tua altura, peso, idade e sexo em Nutrição e calculamos por ti.",
+    "cta": "EXPERIMENTAR PRO",
+    "continueFree": "Continuar com o plano grátis"
+  }
+}

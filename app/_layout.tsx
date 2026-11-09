@@ -169,6 +169,7 @@ export default function RootLayout() {
   const initialized = useAuthStore((s) => s.initialized);
   const pendingPasswordReset = useAuthStore((s) => s.pendingPasswordReset);
   const pendingProfileSetup = useAuthStore((s) => s.pendingProfileSetup);
+  const pendingOnboardingPayoff = useAuthStore((s) => s.pendingOnboardingPayoff);
   const initialize = useAuthStore((s) => s.initialize);
   const segments = useSegments();
   const router = useRouter();
@@ -334,12 +335,21 @@ export default function RootLayout() {
     // sitting on one of those screens must redirect too.
     const inAuthenticatedGroup = segments[0] === "(tabs)" || segments[0] === "(stack)";
 
-    if (session && inAuthGroup && !pendingPasswordReset && !pendingProfileSetup) {
+    // pendingOnboardingPayoff keeps a just-signed-up user inside (auth) long
+    // enough to see the "your plan is ready" screen. Without it this gate
+    // fires the moment setup saves and they are thrown straight to the tabs.
+    if (
+      session &&
+      inAuthGroup &&
+      !pendingPasswordReset &&
+      !pendingProfileSetup &&
+      !pendingOnboardingPayoff
+    ) {
       router.replace(Routes.compete);
     } else if (!session && inAuthenticatedGroup) {
       router.replace(Routes.splash as any);
     }
-  }, [session, initialized, segments, pendingPasswordReset, pendingProfileSetup, fontsLoaded, fontError, i18nReady, router]);
+  }, [session, initialized, segments, pendingPasswordReset, pendingProfileSetup, pendingOnboardingPayoff, fontsLoaded, fontError, i18nReady, router]);
 
   if ((!fontsLoaded && !fontError) || !initialized || !i18nReady) return null;
 

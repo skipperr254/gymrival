@@ -1,0 +1,76 @@
+{
+  "quiz": {
+    "stepOf": "SCHRITT {{step}} VON {{total}}",
+    "skip": "Überspringen",
+    "next": "WEITER",
+    "finish": "MEINEN PLAN ZEIGEN",
+    "goal": {
+      "title": "Was ist dein Ziel?",
+      "subtitle": "Das bestimmt dein tägliches Kalorienziel.",
+      "lose": {
+        "label": "Fett verlieren",
+        "sub": "Ein moderates Defizit"
+      },
+      "maintain": {
+        "label": "So bleiben wie ich bin",
+        "sub": "Dein Gewicht halten"
+      },
+      "gain": {
+        "label": "Muskeln aufbauen",
+        "sub": "Ein kontrollierter Überschuss"
+      }
+    },
+    "frequency": {
+      "title": "Wie oft trainierst du?",
+      "subtitle": "Sei ehrlich — es verändert die Zahlen.",
+      "light": {
+        "label": "1–2 mal pro Woche",
+        "sub": "Gerade angefangen"
+      },
+      "moderate": {
+        "label": "3–4 mal pro Woche",
+        "sub": "Eine solide Routine"
+      },
+      "active": {
+        "label": "5–6 mal pro Woche",
+        "sub": "Ernsthaftes Training"
+      },
+      "veryActive": {
+        "label": "Jeden Tag",
+        "sub": "Training ist der Plan"
+      }
+    },
+    "experience": {
+      "title": "Wie lange trainierst du schon?",
+      "subtitle": "Damit wir Challenges auf deinem Niveau vorschlagen.",
+      "beginner": {
+        "label": "Unter einem Jahr",
+        "sub": "Lernst die Übungen noch"
+      },
+      "intermediate": {
+        "label": "1–3 Jahre",
+        "sub": "Sicher an der Stange"
+      },
+      "advanced": {
+        "label": "Über 3 Jahre",
+        "sub": "Du kennst deine Zahlen"
+      }
+    }
+  },
+  "plan": {
+    "tag": "DEIN PLAN",
+    "title": "Dein Plan steht",
+    "subtitle": "Berechnet aus deinem Körper, deinem Ziel und deiner Trainingsfrequenz.",
+    "subtitleNoTargets": "Du kannst das jederzeit im Ernährungs-Tab einrichten.",
+    "dailyCalories": "TAGESZIEL",
+    "kcal": "kcal",
+    "protein": "PROTEIN",
+    "carbs": "KOHLENH.",
+    "fat": "FETT",
+    "editableNote": "Alles später unter Ernährung anpassbar — nichts ist festgelegt.",
+    "noTargetsTitle": "Noch keine Ziele",
+    "noTargetsBody": "Trag Größe, Gewicht, Alter und Geschlecht unter Ernährung ein, dann rechnen wir es aus.",
+    "cta": "PRO GRATIS TESTEN",
+    "continueFree": "Mit dem kostenlosen Plan weiter"
+  }
+}
