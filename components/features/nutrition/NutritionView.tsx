@@ -72,7 +72,7 @@ export function NutritionView() {
           className="bg-surface rounded-2xl p-5 mb-4 items-center"
           style={({ pressed }) => pressed && { opacity: 0.85 }}
         >
-          <View className="w-11 h-11 rounded-2xl bg-[rgba(230,48,48,0.1)] items-center justify-center mb-3">
+          <View className="w-11 h-11 rounded-2xl bg-accent/10 items-center justify-center mb-3">
             <Target size={20} color={Colors.accent} />
           </View>
           <Text

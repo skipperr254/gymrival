@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@/constants/theme';
+import { Colors, Gradients } from '@/constants/theme';
 import { getExerciseIcon } from '@/constants/exerciseIcons';
 import type { FeedPost } from '@/types/social';
 
@@ -12,7 +12,7 @@ export function FeedStatVisual({ post }: { post: FeedPost }) {
   return (
     <View className="flex-1 overflow-hidden">
       <LinearGradient
-        colors={[Colors.base, '#0d0808']}
+        colors={Gradients.feedStat}
         style={StyleSheet.absoluteFill}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
@@ -27,8 +27,8 @@ export function FeedStatVisual({ post }: { post: FeedPost }) {
       {/* Center content */}
       <View className="flex-1 items-center justify-center">
         <View className="flex-row items-center gap-1.5 mb-1.5">
-          <ExIcon size={12} strokeWidth={2} color="#666" />
-          <Text className="font-heading text-xs text-[#666] tracking-[3px]">
+          <ExIcon size={12} strokeWidth={2} color={Colors.ink600} />
+          <Text className="font-heading text-xs text-ink-600 tracking-[3px]">
             {post.exercise_label.toUpperCase()}
           </Text>
         </View>
@@ -36,13 +36,13 @@ export function FeedStatVisual({ post }: { post: FeedPost }) {
           <Text className="font-heading text-[54px] text-white tracking-[2px] leading-[56px]">
             {post.value}
           </Text>
-          <Text className="font-heading text-[22px] text-[#666] tracking-[2px] mb-1.5">
+          <Text className="font-heading text-[22px] text-ink-600 tracking-[2px] mb-1.5">
             {post.unit.toUpperCase()}
           </Text>
         </View>
       </View>
       {/* NEW PR badge */}
-      <View className="absolute top-3 right-3 bg-[rgba(230,48,48,0.12)] border border-[rgba(230,48,48,0.30)] rounded-lg py-1.5 px-2.5">
+      <View className="absolute top-3 right-3 bg-accent/12 border border-accent/30 rounded-lg py-1.5 px-2.5">
         <Text className="font-heading text-[10px] text-accent tracking-[2px]">{t('newPr')}</Text>
       </View>
     </View>

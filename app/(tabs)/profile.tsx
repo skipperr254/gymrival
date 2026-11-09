@@ -16,7 +16,7 @@ import {
   type LucideIcon,
 } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors, Radius } from '@/constants/theme';
+import { Colors, Gradients, Radius } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
@@ -106,7 +106,7 @@ export default function ProfileScreen() {
       >
         <Bell
           size={18}
-          color={unreadCount > 0 ? Colors.accent : '#909090'}
+          color={unreadCount > 0 ? Colors.accent : Colors.ink400}
           fill={unreadCount > 0 ? Colors.accent : 'none'}
         />
         {unreadCount > 0 && (
@@ -122,7 +122,7 @@ export default function ProfileScreen() {
         style={({ pressed }) => pressed && { opacity: 0.5 }}
         onPress={() => router.push(Routes.profileSettings)}
       >
-        <Settings size={18} color="#909090" />
+        <Settings size={18} color={Colors.ink400} />
       </Pressable>
     </>
   );
@@ -174,7 +174,7 @@ export default function ProfileScreen() {
       >
         {/* ── Profile Card ──────────────────────────────────── */}
         <LinearGradient
-          colors={['#1a0000', '#2a0a0a']}
+          colors={Gradients.proCard}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.profileCard}
@@ -189,7 +189,7 @@ export default function ProfileScreen() {
                 size="xl"
               />
               <Pressable
-                className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-accent items-center justify-center border-2 border-[#1a0000]"
+                className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-accent items-center justify-center border-2 border-pro-bg"
                 style={({ pressed }) => pressed && { opacity: 0.7 }}
                 onPress={() => router.push(Routes.profileEdit)}
               >
@@ -200,7 +200,7 @@ export default function ProfileScreen() {
               <Text className="font-heading text-2xl text-primary tracking-[2px]" numberOfLines={1}>
                 {displayName.toUpperCase()}
               </Text>
-              <Text className="font-sans text-[13px] text-[#909090] mb-1">@{username}</Text>
+              <Text className="font-sans text-[13px] text-ink-400 mb-1">@{username}</Text>
               {!!profile?.bio && (
                 <Text className="font-sans text-[13px] text-secondary italic leading-[18px]" numberOfLines={2}>
                   {profile.bio}
@@ -211,7 +211,7 @@ export default function ProfileScreen() {
 
           {/* Motto */}
           {!!profile?.quote && (
-            <View className="bg-[rgba(230,48,48,0.08)] border border-[rgba(230,48,48,0.2)] rounded-xl px-4 py-3.5 mb-4">
+            <View className="bg-accent/8 border border-accent/20 rounded-xl px-4 py-3.5 mb-4">
               <Text className="font-heading text-[11px] text-accent tracking-[2px] mb-1.5">
                 {t('profile:details.motto')}
               </Text>
@@ -222,12 +222,12 @@ export default function ProfileScreen() {
           {/* Stats */}
           <View className="flex-row gap-2">
             {stats.map((s) => (
-              <View key={s.label} className="flex-1 items-center bg-[rgba(0,0,0,0.35)] rounded-xl py-2.5 px-1.5 gap-1">
+              <View key={s.label} className="flex-1 items-center bg-black/35 rounded-xl py-2.5 px-1.5 gap-1">
                 <s.icon size={14} color={Colors.accent} />
                 <Text className="font-heading text-primary tracking-[1px] text-[22px] leading-6">
                   {s.value}
                 </Text>
-                <Text className="font-sans text-[9px] text-[#606060] tracking-[1px] font-bold">
+                <Text className="font-sans text-[9px] text-ink-600 tracking-[1px] font-bold">
                   {s.label}
                 </Text>
               </View>
@@ -319,7 +319,7 @@ export default function ProfileScreen() {
               return (
               <View key={pr.id}>
                 <View className={`flex-row items-center gap-3 px-5 py-3.5 ${i > 0 ? 'border-t border-elevated' : ''}`}>
-                  <View className="w-9 h-9 rounded-[10px] bg-[rgba(230,48,48,0.1)] items-center justify-center shrink-0">
+                  <View className="w-9 h-9 rounded-[10px] bg-accent/10 items-center justify-center shrink-0">
                     <ExIcon size={17} color={Colors.accent} />
                   </View>
                   <View className="flex-1">
@@ -327,12 +327,12 @@ export default function ProfileScreen() {
                       <Text className="font-sans-medium text-[13px] text-secondary">{pr.exercise.label}</Text>
                       <View className="flex-row items-baseline">
                         <Text className="font-heading text-base text-accent tracking-[1px]">{pr.value}</Text>
-                        <Text className="font-heading text-[11px] text-[#606060]"> {pr.unit}</Text>
+                        <Text className="font-heading text-[11px] text-ink-600"> {pr.unit}</Text>
                       </View>
                     </View>
                     <View className="h-[3px] bg-elevated rounded-[3px] overflow-hidden">
                       <LinearGradient
-                        colors={[Colors.accent, '#ff6060']}
+                        colors={Gradients.accent}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         style={{ height: 3, borderRadius: 3, width: `${Math.round(barRatios[i] * 100)}%` }}
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
   profileCard: {
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#3a1a1a',
+    borderColor: Colors.dangerBorder,
     padding: 20,
     paddingTop: 24,
   },

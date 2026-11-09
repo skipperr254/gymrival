@@ -33,6 +33,36 @@
   /* ── Secondary accent (friend-vs-friend challenges) ── */
   --color-friend: #4a9eff;
 
+  /* ── Neutral ramp: the greys between the semantic tokens above ── */
+  --color-ink-950: #111111;
+  --color-ink-900: #1a1a1a;
+  --color-ink-850: #242424;
+  --color-ink-800: #333333;
+  --color-ink-750: #3a3a3a;
+  --color-ink-700: #484848;
+  --color-ink-650: #505050;
+  --color-ink-600: #606060;
+  --color-ink-550: #707070;
+  --color-ink-500: #808080;
+  --color-ink-450: #888888;
+  --color-ink-400: #909090;
+  --color-ink-200: #cccccc;
+
+  /* ── Role colors ── */
+  --color-accent-light: #ff6b6b;   /* gradient end, destructive icons */
+  --color-accent-tint: #241a1a;    /* selected option background */
+  --color-danger-border: #3a1a1a;  /* destructive button outline */
+  --color-pro-bg: #1a0000;         /* Pro card */
+  --color-success-dark: #009933;
+  --color-success-soft: #4caf50;   /* check-in confirmation */
+  --color-success-tint: #0a1f0a;
+  --color-success-tint-border: #1a3a1a;
+  --color-success-tint-strong: #0a3a1a;
+  --color-gold: #d4a017;           /* first place, prizes */
+  --color-orange: #ff8c00;         /* mid streak */
+  --color-amber: #e6a030;
+  --color-mint: #00cc88;
+
   /* ── Fonts ── */
   --font-display: "BebasNeue_400Regular";
   --font-body: "DMSans_400Regular";

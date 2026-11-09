@@ -105,7 +105,7 @@ const MessageRow = React.memo(function MessageRow({
           className={`py-2.5 px-3.5 ${
             isMe
               ? 'bg-accent rounded-[18px] rounded-br-[4px]'
-              : 'bg-[#242424] rounded-[18px] rounded-bl-[4px]'
+              : 'bg-ink-850 rounded-[18px] rounded-bl-[4px]'
           } ${msg.id.startsWith('temp-') ? 'opacity-60' : ''}`}
         >
           <Text
@@ -198,7 +198,7 @@ function MessageListInner({
     return messagesError ? (
       <View className="flex-1">
         <View className="items-center py-16 px-8 gap-3">
-          <Text className="font-sans text-sm text-[#888] text-center">
+          <Text className="font-sans text-sm text-ink-450 text-center">
             {t('chat.loadError')}
           </Text>
           <Pressable
@@ -217,7 +217,7 @@ function MessageListInner({
     ) : (
       <View className="flex-1">
         <View className="items-center py-16 px-8">
-          <Text className="font-sans text-sm text-[#484848] text-center">
+          <Text className="font-sans text-sm text-ink-700 text-center">
             {t('chat.sayHello', { name: displayName })}
           </Text>
         </View>
@@ -246,7 +246,7 @@ function MessageListInner({
           <ActivityIndicator color={Colors.hint} style={styles.olderSpinner} />
         ) : !hasMoreMessages ? (
           <View className="flex-row items-center gap-2.5 mb-2">
-            <Text className="font-heading text-[9px] text-[#333] tracking-[2px]">
+            <Text className="font-heading text-[9px] text-ink-800 tracking-[2px]">
               {t('chat.startOfConversation')}
             </Text>
           </View>

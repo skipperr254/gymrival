@@ -7,7 +7,7 @@ import { VideoView, useVideoPlayer } from 'expo-video';
 import { AlertCircle, Clock, Maximize2, RefreshCw, Volume2, VolumeX, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { useSocialStore } from '@/store/useSocialStore';
-import { Colors } from '@/constants/theme';
+import { Colors, withAlpha } from '@/constants/theme';
 import { formatDuration } from '@/lib/i18n/format';
 
 interface Props {
@@ -149,22 +149,22 @@ export function FeedVideo({ postId, videoUrl, thumbnailUrl, durationSec, isActiv
             transition={100}
           />
         ) : (
-          <View className="absolute inset-0 bg-[#080808]" />
+          <View className="absolute inset-0 bg-ink-950" />
         ))}
 
       {/* Load-failure indicator with retry — otherwise a broken video just
           looked like a permanently still thumbnail with no explanation */}
       {isActive && hasError && (
         <View className="absolute inset-0 items-center justify-center gap-2 bg-black/40">
-          <AlertCircle size={22} strokeWidth={1.8} color="#ccc" />
-          <Text className="font-sans text-xs text-[#ccc]">{t('videoLoadError')}</Text>
+          <AlertCircle size={22} strokeWidth={1.8} color={Colors.ink200} />
+          <Text className="font-sans text-xs text-ink-200">{t('videoLoadError')}</Text>
           <Pressable
             onPress={handleRetry}
             accessibilityRole="button"
             className="flex-row items-center gap-1.5 mt-1 py-1.5 px-3 rounded-full bg-black/60 border border-white/10"
           >
-            <RefreshCw size={12} strokeWidth={2} color="#ccc" />
-            <Text className="font-heading text-[10px] tracking-[1px] text-[#ccc]">
+            <RefreshCw size={12} strokeWidth={2} color={Colors.ink200} />
+            <Text className="font-heading text-[10px] tracking-[1px] text-ink-200">
               {t('retry')}
             </Text>
           </Pressable>
@@ -174,8 +174,8 @@ export function FeedVideo({ postId, videoUrl, thumbnailUrl, durationSec, isActiv
       {/* Duration badge — only meaningful while the poster is up */}
       {!firstFrameRendered && durationSec != null && durationSec > 0 && (
         <View className="absolute top-2.5 left-2.5 flex-row items-center gap-1 bg-black/60 rounded-full py-1 px-2">
-          <Clock size={10} strokeWidth={2} color="#ccc" />
-          <Text className="font-heading text-[11px] text-[#ccc]">
+          <Clock size={10} strokeWidth={2} color={Colors.ink200} />
+          <Text className="font-heading text-[11px] text-ink-200">
             {formatDuration(durationSec)}
           </Text>
         </View>
@@ -190,7 +190,7 @@ export function FeedVideo({ postId, videoUrl, thumbnailUrl, durationSec, isActiv
           className="absolute top-2.5 right-2.5 w-[30px] h-[30px] rounded-lg bg-black/50 border border-white/10 items-center justify-center"
           hitSlop={14}
         >
-          <Maximize2 size={13} strokeWidth={2} color="rgba(255,255,255,0.7)" />
+          <Maximize2 size={13} strokeWidth={2} color={withAlpha(Colors.primary, 0.7)} />
         </Pressable>
       )}
 
@@ -201,7 +201,7 @@ export function FeedVideo({ postId, videoUrl, thumbnailUrl, durationSec, isActiv
           pointerEvents="none"
         >
           {feedMuted ? (
-            <VolumeX size={14} strokeWidth={2} color="rgba(255,255,255,0.75)" />
+            <VolumeX size={14} strokeWidth={2} color={withAlpha(Colors.primary, 0.75)} />
           ) : (
             <Volume2 size={14} strokeWidth={2} color={Colors.primary} />
           )}
@@ -228,7 +228,7 @@ export function FeedVideo({ postId, videoUrl, thumbnailUrl, durationSec, isActiv
               className="absolute left-3 w-9 h-9 rounded-full bg-black/60 border border-white/10 items-center justify-center"
               style={{ top: insets.top + 10 }}
             >
-              <X size={18} strokeWidth={2.5} color="#fff" />
+              <X size={18} strokeWidth={2.5} color={Colors.primary} />
             </Pressable>
           </View>
         </Modal>

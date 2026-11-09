@@ -28,7 +28,7 @@ import {
   type LucideIcon,
 } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@/constants/theme';
+import { Colors, Gradients } from '@/constants/theme';
 import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from '@/constants/legal';
 import type { PaywallTrigger, ProFeature } from '@/constants/entitlements';
 import { getBillingProvider, isEntitled, type Offering, type Plan } from '@/lib/billing';
@@ -298,11 +298,11 @@ export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed
       <View className="flex-1 bg-black/80 justify-end">
         <Pressable style={StyleSheet.absoluteFill} onPress={dismiss} />
         <Animated.View
-          className="bg-[#141414] rounded-t-3xl overflow-hidden"
+          className="bg-base rounded-t-3xl overflow-hidden"
           style={{ maxHeight: SHEET_HEIGHT * 0.92, transform: [{ translateY }] }}
         >
           <LinearGradient
-            colors={['#2a1414', '#141414']}
+            colors={Gradients.paywallHeader}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
             style={styles.header}
@@ -336,14 +336,14 @@ export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed
             <View className="px-5 pt-4">
               {orderedFeatures.map((f) => (
                 <View key={f.key} className="flex-row items-center gap-3 mb-3">
-                  <View className="w-9 h-9 rounded-[10px] bg-[rgba(230,48,48,0.12)] items-center justify-center">
+                  <View className="w-9 h-9 rounded-[10px] bg-accent/12 items-center justify-center">
                     <f.icon size={17} color={Colors.accent} />
                   </View>
                   <View className="flex-1">
                     <Text className="font-sans-semibold text-sm text-primary">
                       {t(`features.${f.key}.title`)}
                     </Text>
-                    <Text className="font-sans text-[11px] text-[#707070] mt-px">
+                    <Text className="font-sans text-[11px] text-ink-550 mt-px">
                       {t(`features.${f.key}.sub`)}
                     </Text>
                   </View>
@@ -352,7 +352,7 @@ export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed
 
               <View className="flex-row items-start gap-2 bg-surface rounded-xl px-3.5 py-3 mt-1 mb-5">
                 <Check size={14} color={Colors.success} style={{ marginTop: 2 }} />
-                <Text className="flex-1 font-sans text-[11px] text-[#808080] leading-4">
+                <Text className="flex-1 font-sans text-[11px] text-ink-500 leading-4">
                   {t('freeNote')}
                 </Text>
               </View>
@@ -388,7 +388,7 @@ export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed
                       {/* eslint-disable-next-line i18next/no-literal-string --
                           dev-only affordance for capturing the ASC review
                           screenshot; never rendered in a release build. */}
-                      <Text className="font-sans text-[10px] text-[#505050] underline">
+                      <Text className="font-sans text-[10px] text-ink-650 underline">
                         dev: preview plans
                       </Text>
                     </Pressable>
@@ -444,7 +444,7 @@ export function PaywallSheet({ visible, trigger, impressionId, onClose, onClosed
             )}
 
             {!!termsLine && (
-              <Text className="font-sans text-[10px] text-[#606060] text-center leading-[14px] mt-2.5">
+              <Text className="font-sans text-[10px] text-ink-600 text-center leading-[14px] mt-2.5">
                 {termsLine}
               </Text>
             )}

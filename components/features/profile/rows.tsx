@@ -1,7 +1,7 @@
 import { View, Text, Pressable, Switch } from 'react-native';
 import { ChevronRight, type LucideIcon } from 'lucide-react-native';
 import { rtlIconFlip } from '@/lib/i18n/rtl';
-import { Colors } from '@/constants/theme';
+import { Colors, withAlpha } from '@/constants/theme';
 
 export function DetailRow({
   icon: Icon,
@@ -21,10 +21,10 @@ export function DetailRow({
       }`}
     >
       <View className="w-9 h-9 rounded-[10px] bg-elevated items-center justify-center">
-        <Icon size={17} color='#909090' />
+        <Icon size={17} color={Colors.ink400} />
       </View>
       <View className="flex-1 gap-0.5">
-        <Text className="font-heading text-[10px] text-[#505050] tracking-[1.5px] mb-0.5">
+        <Text className="font-heading text-[10px] text-ink-650 tracking-[1.5px] mb-0.5">
           {label}
         </Text>
         <Text className="font-sans text-sm text-primary font-medium">{value}</Text>
@@ -54,7 +54,7 @@ export function SettingsRow({
   /** Short pill shown in place of the chevron, e.g. "Coming soon". Only meaningful when disabled. */
   badge?: string;
 }) {
-  const iconBg = iconColor + '18';
+  const iconBg = withAlpha(iconColor, 0.094);
   return (
     <Pressable
       className={`flex-row items-center gap-3 px-5 py-3.5 ${
@@ -72,7 +72,7 @@ export function SettingsRow({
       </View>
       <View className="flex-1 gap-px">
         <Text className="font-sans-medium text-sm text-primary">{label}</Text>
-        <Text className="font-sans text-[11px] text-[#606060] mt-px">{sub}</Text>
+        <Text className="font-sans text-[11px] text-ink-600 mt-px">{sub}</Text>
       </View>
       {disabled && badge ? (
         <View className="bg-elevated rounded-full px-2.5 py-1">
@@ -104,7 +104,7 @@ export function SettingsToggleRow({
   isFirst?: boolean;
   disabled?: boolean;
 }) {
-  const iconBg = iconColor + '18';
+  const iconBg = withAlpha(iconColor, 0.094);
   return (
     <View
       className={`flex-row items-center gap-3 px-5 py-3.5 ${
@@ -119,7 +119,7 @@ export function SettingsToggleRow({
       </View>
       <View className="flex-1 gap-px">
         <Text className="font-sans-medium text-sm text-primary">{label}</Text>
-        <Text className="font-sans text-[11px] text-[#606060] mt-px">{sub}</Text>
+        <Text className="font-sans text-[11px] text-ink-600 mt-px">{sub}</Text>
       </View>
       <Switch
         value={value}

@@ -42,7 +42,7 @@ export default function SettingsScreen() {
             icon={Languages}
             label={t('common:settings.language')}
             sub={currentLanguageName}
-            iconColor="#e6a030"
+            iconColor={Colors.amber}
             onPress={() => router.push(Routes.profileLanguage)}
             isFirst
           />
@@ -58,7 +58,7 @@ export default function SettingsScreen() {
             icon={KeyRound}
             label={t('profile:settings.changePassword')}
             sub={t('profile:settings.changePasswordSub')}
-            iconColor="#00cc88"
+            iconColor={Colors.mint}
             onPress={() => router.push(Routes.profileChangePassword)}
           />
           {/* Dark mode: not built yet — the app is dark-only today (see CLAUDE.md
@@ -78,7 +78,7 @@ export default function SettingsScreen() {
         <SubscriptionSection />
 
         <Pressable
-          className="flex-row items-center justify-center gap-2.5 py-3.5 rounded-2xl border border-[#3a1a1a] mt-6"
+          className="flex-row items-center justify-center gap-2.5 py-3.5 rounded-2xl border border-danger-border mt-6"
           style={({ pressed }) => pressed && { opacity: 0.6 }}
           onPress={handleSignOut}
         >

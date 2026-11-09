@@ -198,7 +198,7 @@ export default function SetupScreen() {
                       accessibilityState={{ selected: sex === opt.value }}
                       className={`flex-1 h-14 rounded-2xl items-center justify-center border-[1.5px] ${
                         sex === opt.value
-                          ? "bg-[#241a1a] border-accent"
+                          ? "bg-accent-tint border-accent"
                           : "bg-elevated border-elevated"
                       }`}
                       style={({ pressed }) => pressed && { opacity: 0.8 }}

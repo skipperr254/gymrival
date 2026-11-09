@@ -274,7 +274,7 @@ function Field({
 }) {
   return (
     <View className="mb-4">
-      <Text className="font-heading text-[11px] tracking-[2px] text-[#505050] mb-2">{label}</Text>
+      <Text className="font-heading text-[11px] tracking-[2px] text-ink-650 mb-2">{label}</Text>
       <TextInput
         className={`bg-elevated rounded-xl px-4 py-3.5 font-sans text-[15px] text-primary border border-default ${
           multiline ? 'min-h-[80px]' : 'min-h-[50px]'

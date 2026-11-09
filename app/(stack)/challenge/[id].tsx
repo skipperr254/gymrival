@@ -23,7 +23,7 @@ import {
   RefreshCw,
 } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@/constants/theme';
+import { Colors, withAlpha } from '@/constants/theme';
 import { getExerciseIcon } from '@/constants/exerciseIcons';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCompeteStore } from '@/store/useCompeteStore';
@@ -152,11 +152,11 @@ export default function ChallengeDetailScreen() {
         {challenge ? (
           <View
             className="bg-surface rounded-[20px] p-5 mb-5 border"
-            style={{ borderColor: accentColor + '33' }}
+            style={{ borderColor: withAlpha(accentColor, 0.2) }}
           >
             <View
               className="w-[54px] h-[54px] rounded-2xl border items-center justify-center mb-3.5"
-              style={{ backgroundColor: accentColor + '15', borderColor: accentColor + '33' }}
+              style={{ backgroundColor: withAlpha(accentColor, 0.082), borderColor: withAlpha(accentColor, 0.2) }}
             >
               <MetricIcon size={26} strokeWidth={1.4} color={accentColor} />
             </View>
@@ -175,7 +175,7 @@ export default function ChallengeDetailScreen() {
             {!!challenge.prize_label && (
               <View
                 className="flex-row items-center gap-2.5 bg-black/30 rounded-xl py-2.5 px-3.5 mt-3 mb-3.5 border"
-                style={{ borderColor: accentColor + '33' }}
+                style={{ borderColor: withAlpha(accentColor, 0.2) }}
               >
                 <Gift size={15} strokeWidth={1.8} color={accentColor} />
                 <View>
@@ -230,7 +230,7 @@ export default function ChallengeDetailScreen() {
             {challenge.is_joined && challenge.user_rank != null && (
               <View
                 className="flex-row items-center gap-2 rounded-[10px] border py-2 px-3 mt-3.5"
-                style={{ backgroundColor: accentColor + '15', borderColor: accentColor + '33' }}
+                style={{ backgroundColor: withAlpha(accentColor, 0.082), borderColor: withAlpha(accentColor, 0.2) }}
               >
                 <Trophy size={13} strokeWidth={1.8} color={accentColor} />
                 <Text className="font-sans-medium text-[13px]" style={{ color: accentColor }}>
@@ -249,7 +249,7 @@ export default function ChallengeDetailScreen() {
 
         {/* Error display */}
         {!!error && (
-          <View className="flex-row items-center gap-2 bg-[rgba(230,48,48,0.1)] rounded-[10px] p-3 mb-3">
+          <View className="flex-row items-center gap-2 bg-accent/10 rounded-[10px] p-3 mb-3">
             <AlertCircle size={14} strokeWidth={2} color={Colors.accent} />
             <Text className="font-sans text-[13px] text-accent">{error}</Text>
           </View>
@@ -284,7 +284,7 @@ export default function ChallengeDetailScreen() {
 
         {!isLoadingBoard && entries.length === 0 && !boardError && (
           <View className="items-center bg-surface rounded-2xl py-10 gap-1.5 mb-4">
-            <Trophy size={28} strokeWidth={1.4} color="#333" />
+            <Trophy size={28} strokeWidth={1.4} color={Colors.ink800} />
             <Text className="font-heading text-base tracking-[2px] text-white">
               {t('detail.noParticipants')}
             </Text>
@@ -307,8 +307,8 @@ export default function ChallengeDetailScreen() {
             onPress={() => user?.id && id && loadLeaderboard(id, user.id)}
             className="flex-row items-center justify-center gap-1.5 py-2.5 mb-1"
           >
-            <RefreshCw size={12} strokeWidth={2} color="#383838" />
-            <Text className="font-heading text-[10px] tracking-[2px] text-[#383838]">
+            <RefreshCw size={12} strokeWidth={2} color={Colors.ink750} />
+            <Text className="font-heading text-[10px] tracking-[2px] text-ink-750">
               {t('detail.refresh')}
             </Text>
           </Pressable>
@@ -330,7 +330,7 @@ export default function ChallengeDetailScreen() {
               </View>
             ) : joining ? (
               <LinearGradient
-                colors={[accentColor, accentColor + '99']}
+                colors={[accentColor, withAlpha(accentColor, 0.6)]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={{
@@ -346,7 +346,7 @@ export default function ChallengeDetailScreen() {
               </LinearGradient>
             ) : (
               <LinearGradient
-                colors={[accentColor, accentColor + '99']}
+                colors={[accentColor, withAlpha(accentColor, 0.6)]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={{
@@ -369,8 +369,8 @@ export default function ChallengeDetailScreen() {
 
         {challenge?.status === 'completed' && (
           entries.length > 0 ? (
-            <View className="flex-row items-center gap-3 py-3.5 px-4 rounded-2xl bg-[rgba(212,160,23,0.1)] border border-[rgba(212,160,23,0.3)] mb-4">
-              <Trophy size={22} strokeWidth={1.8} color="#d4a017" />
+            <View className="flex-row items-center gap-3 py-3.5 px-4 rounded-2xl bg-gold/10 border border-gold/30 mb-4">
+              <Trophy size={22} strokeWidth={1.8} color={Colors.gold} />
               <Avatar
                 userId={entries[0].user_id}
                 name={entries[0].full_name ?? entries[0].username ?? t('unknown')}
@@ -378,7 +378,7 @@ export default function ChallengeDetailScreen() {
                 size={36}
               />
               <View className="flex-1">
-                <Text className="font-heading text-[9px] tracking-[2px]" style={{ color: '#d4a017' }}>
+                <Text className="font-heading text-[9px] tracking-[2px]" style={{ color: Colors.gold }}>
                   {t('detail.winner')}
                 </Text>
                 <Text className="font-sans-medium text-sm text-white" numberOfLines={1}>
@@ -386,14 +386,14 @@ export default function ChallengeDetailScreen() {
                   {entries[0].is_me ? t('youSuffix') : ''}
                 </Text>
               </View>
-              <Text className="font-heading text-lg" style={{ color: '#d4a017' }}>
+              <Text className="font-heading text-lg" style={{ color: Colors.gold }}>
                 {formatChallengeScore(entries[0].score, challenge.metric, '')}
               </Text>
             </View>
           ) : (
-            <View className="flex-row items-center justify-center gap-2 py-3 rounded-xl bg-[rgba(212,160,23,0.1)] border border-[rgba(212,160,23,0.3)] mb-4">
-              <Trophy size={15} strokeWidth={1.8} color="#d4a017" />
-              <Text className="font-heading text-[13px] tracking-[2px] text-[#d4a017]">
+            <View className="flex-row items-center justify-center gap-2 py-3 rounded-xl bg-gold/10 border border-gold/30 mb-4">
+              <Trophy size={15} strokeWidth={1.8} color={Colors.gold} />
+              <Text className="font-heading text-[13px] tracking-[2px] text-gold">
                 {t('detail.challengeEnded')}
               </Text>
             </View>

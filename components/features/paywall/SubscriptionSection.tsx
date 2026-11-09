@@ -87,14 +87,14 @@ export function SubscriptionSection() {
         {isPro ? (
           <>
             <View className="flex-row items-center gap-3 px-5 py-4">
-              <View className="w-9 h-9 rounded-[10px] bg-[rgba(0,204,68,0.12)] items-center justify-center">
+              <View className="w-9 h-9 rounded-[10px] bg-success/12 items-center justify-center">
                 <Crown size={17} color={Colors.success} />
               </View>
               <View className="flex-1">
                 <Text className="font-sans-medium text-sm text-primary">
                   {t('subscription.proTitle')}
                 </Text>
-                <Text className="font-sans text-[11px] text-[#606060] mt-px">{dateLine}</Text>
+                <Text className="font-sans text-[11px] text-ink-600 mt-px">{dateLine}</Text>
               </View>
               {statusLabel && (
                 <View className="bg-elevated rounded-full px-2.5 py-1">
@@ -114,7 +114,7 @@ export function SubscriptionSection() {
             )}
             {subscription?.status === 'cancelled' && (
               <View className="px-5 pb-3">
-                <Text className="font-sans text-[11px] text-[#808080] leading-4">
+                <Text className="font-sans text-[11px] text-ink-500 leading-4">
                   {t('subscription.cancelledBody')}
                 </Text>
               </View>
@@ -145,7 +145,7 @@ export function SubscriptionSection() {
           icon={RefreshCw}
           label={t('subscription.restore')}
           sub={t('subscription.restoreSub')}
-          iconColor="#909090"
+          iconColor={Colors.ink400}
           onPress={handleRestore}
           disabled={busy}
         />

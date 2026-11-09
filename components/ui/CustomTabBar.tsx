@@ -73,7 +73,7 @@ export function CustomTabBar({ state, navigation, onLogPress }: Props) {
             fill={isFocused ? Colors.primary : 'none'}
           />
           {showBadge && (
-            <View className="absolute top-[-1px] right-[-4px] w-2 h-2 rounded-full bg-accent border-[1.5px] border-[#121212]" />
+            <View className="absolute top-[-1px] right-[-4px] w-2 h-2 rounded-full bg-accent border-[1.5px] border-ink-950" />
           )}
         </View>
         <Text
@@ -93,7 +93,7 @@ export function CustomTabBar({ state, navigation, onLogPress }: Props) {
 
   return (
     <View
-      className="flex-row items-start justify-around bg-[#121212] pt-2.5"
+      className="flex-row items-start justify-around bg-ink-950 pt-2.5"
       style={{
         paddingBottom: Math.max(insets.bottom, 12),
         borderTopWidth: StyleSheet.hairlineWidth,

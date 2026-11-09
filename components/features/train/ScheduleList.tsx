@@ -53,7 +53,7 @@ export function ScheduleList({ sessions, loading, onOpenDetail, onDelete, onNew 
                 {has ? (
                   <Dumbbell size={14} color={Colors.primary} />
                 ) : (
-                  <View className="w-1 h-1 rounded-sm bg-[#333]" />
+                  <View className="w-1 h-1 rounded-sm bg-ink-800" />
                 )}
               </View>
               <Text
@@ -108,7 +108,7 @@ export function ScheduleList({ sessions, loading, onOpenDetail, onDelete, onNew 
             onPress={() => onDelete(s.id)}
             hitSlop={8}
           >
-            <Trash2 size={16} color="#ff6b6b" />
+            <Trash2 size={16} color={Colors.accentLight} />
           </Pressable>
           <ChevronRight size={18} color={Colors.muted} style={rtlIconFlip} />
         </Pressable>

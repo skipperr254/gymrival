@@ -106,7 +106,7 @@ export function AdminCreateChallengeForm({ adminId }: { adminId: string }) {
         onChangeText={setTitle}
         placeholder={t('admin.fields.titlePlaceholder')}
         placeholderTextColor={Colors.muted}
-        className="bg-[#252525] rounded-xl border border-[#333] py-2.5 px-3.5 font-sans text-[13px] text-white mb-3.5"
+        className="bg-ink-850 rounded-xl border border-ink-800 py-2.5 px-3.5 font-sans text-[13px] text-white mb-3.5"
       />
 
       {/* Description */}
@@ -119,7 +119,7 @@ export function AdminCreateChallengeForm({ adminId }: { adminId: string }) {
         placeholder={t('admin.fields.descriptionPlaceholder')}
         placeholderTextColor={Colors.muted}
         multiline
-        className="bg-[#252525] rounded-xl border border-[#333] py-2.5 px-3.5 font-sans text-[13px] text-white mb-3.5 min-h-[70px]"
+        className="bg-ink-850 rounded-xl border border-ink-800 py-2.5 px-3.5 font-sans text-[13px] text-white mb-3.5 min-h-[70px]"
       />
 
       {/* Scope */}
@@ -130,7 +130,7 @@ export function AdminCreateChallengeForm({ adminId }: { adminId: string }) {
         <Pressable
           onPress={() => setScope('global')}
           className={`flex-1 flex-row items-center justify-center gap-1.5 py-2.5 px-3 rounded-[10px] border-[1.5px] ${
-            scope === 'global' ? 'border-accent bg-[rgba(230,48,48,0.1)]' : 'border-default bg-transparent'
+            scope === 'global' ? 'border-accent bg-accent/10' : 'border-default bg-transparent'
           }`}
         >
           <Globe size={13} strokeWidth={1.8} color={scope === 'global' ? Colors.accent : Colors.muted} />
@@ -141,7 +141,7 @@ export function AdminCreateChallengeForm({ adminId }: { adminId: string }) {
         <Pressable
           onPress={() => setScope('friends_only')}
           className={`flex-1 flex-row items-center justify-center gap-1.5 py-2.5 px-3 rounded-[10px] border-[1.5px] ${
-            scope === 'friends_only' ? 'border-accent bg-[rgba(230,48,48,0.1)]' : 'border-default bg-transparent'
+            scope === 'friends_only' ? 'border-accent bg-accent/10' : 'border-default bg-transparent'
           }`}
         >
           <Users size={13} strokeWidth={1.8} color={scope === 'friends_only' ? Colors.accent : Colors.muted} />
@@ -188,7 +188,7 @@ export function AdminCreateChallengeForm({ adminId }: { adminId: string }) {
         onChangeText={setPrizeLabel}
         placeholder={t('admin.fields.prizeLabelPlaceholder')}
         placeholderTextColor={Colors.muted}
-        className="bg-[#252525] rounded-xl border border-[#333] py-2.5 px-3.5 font-sans text-[13px] text-white mb-3.5"
+        className="bg-ink-850 rounded-xl border border-ink-800 py-2.5 px-3.5 font-sans text-[13px] text-white mb-3.5"
       />
 
       {/* XP reward + max participants */}
@@ -203,7 +203,7 @@ export function AdminCreateChallengeForm({ adminId }: { adminId: string }) {
             placeholder={t('admin.fields.rewardXpPlaceholder')}
             placeholderTextColor={Colors.muted}
             keyboardType="number-pad"
-            className="bg-[#252525] rounded-xl border border-[#333] py-2.5 px-3.5 font-sans text-[13px] text-white"
+            className="bg-ink-850 rounded-xl border border-ink-800 py-2.5 px-3.5 font-sans text-[13px] text-white"
           />
         </View>
         <View className="flex-1">
@@ -216,20 +216,20 @@ export function AdminCreateChallengeForm({ adminId }: { adminId: string }) {
             placeholder={t('admin.fields.maxParticipantsPlaceholder')}
             placeholderTextColor={Colors.muted}
             keyboardType="number-pad"
-            className="bg-[#252525] rounded-xl border border-[#333] py-2.5 px-3.5 font-sans text-[13px] text-white"
+            className="bg-ink-850 rounded-xl border border-ink-800 py-2.5 px-3.5 font-sans text-[13px] text-white"
           />
         </View>
       </View>
 
       {!!error && (
-        <View className="flex-row items-center gap-2 bg-[rgba(230,48,48,0.08)] rounded-[10px] border border-[rgba(230,48,48,0.2)] p-3 mb-3.5">
+        <View className="flex-row items-center gap-2 bg-accent/8 rounded-[10px] border border-accent/20 p-3 mb-3.5">
           <AlertCircle size={14} strokeWidth={1.8} color={Colors.accent} />
           <Text className="flex-1 font-sans text-xs text-accent leading-[18px]">{error}</Text>
         </View>
       )}
 
       {success && (
-        <View className="flex-row items-center gap-2 bg-[rgba(0,204,68,0.08)] rounded-[10px] border border-[rgba(0,204,68,0.25)] p-3 mb-3.5">
+        <View className="flex-row items-center gap-2 bg-success/8 rounded-[10px] border border-success/25 p-3 mb-3.5">
           <Zap size={14} strokeWidth={1.8} color={Colors.success} />
           <Text className="flex-1 font-sans text-xs text-success leading-[18px]">{t('admin.createSuccess')}</Text>
         </View>

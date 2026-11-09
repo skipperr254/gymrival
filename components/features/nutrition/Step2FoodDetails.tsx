@@ -155,7 +155,7 @@ export function Step2FoodDetails({
               key={mt}
               onPress={() => onChangeMealType(mt)}
               className={`px-4 py-2 rounded-full border-[1.5px] ${
-                active ? 'bg-[rgba(230,48,48,0.1)] border-accent' : 'border-default'
+                active ? 'bg-accent/10 border-accent' : 'border-default'
               }`}
             >
               <Text className={`font-sans-medium text-xs ${active ? 'text-accent' : 'text-secondary'}`}>

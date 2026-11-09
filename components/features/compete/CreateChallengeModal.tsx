@@ -103,7 +103,7 @@ export function CreateChallengeModal({
             </Text>
 
             {selected ? (
-              <View className="flex-row items-center gap-3 bg-[#252525] rounded-xl p-3 border border-default mb-1">
+              <View className="flex-row items-center gap-3 bg-ink-850 rounded-xl p-3 border border-default mb-1">
                 <Avatar
                   userId={selected.id}
                   name={selected.full_name ?? selected.username ?? '?'}
@@ -115,9 +115,9 @@ export function CreateChallengeModal({
                 </Text>
                 <Pressable
                   onPress={() => setSelected(null)}
-                  className="py-[5px] px-2.5 rounded-lg border border-[#383838]"
+                  className="py-[5px] px-2.5 rounded-lg border border-ink-750"
                 >
-                  <Text className="font-heading text-[9px] tracking-[1px] text-[#888]">
+                  <Text className="font-heading text-[9px] tracking-[1px] text-ink-450">
                     {t('modal.change')}
                   </Text>
                 </Pressable>
@@ -136,7 +136,7 @@ export function CreateChallengeModal({
                     onChangeText={setQuery}
                     placeholder={t('modal.searchFriendsPlaceholder')}
                     placeholderTextColor={Colors.muted}
-                    className="bg-[#252525] rounded-xl border border-[#333] py-2.5 pl-9 pr-3.5 font-sans text-[13px] text-white"
+                    className="bg-ink-850 rounded-xl border border-ink-800 py-2.5 pl-9 pr-3.5 font-sans text-[13px] text-white"
                     autoCapitalize="none"
                     autoCorrect={false}
                   />
@@ -158,7 +158,7 @@ export function CreateChallengeModal({
                         <Pressable
                           key={f.id}
                           onPress={() => setSelected(f)}
-                          className={`flex-row items-center gap-3 py-3 px-3 bg-[#252525] ${
+                          className={`flex-row items-center gap-3 py-3 px-3 bg-ink-850 ${
                             i > 0 ? 'border-t border-default' : ''
                           }`}
                           style={({ pressed }) => pressed && { backgroundColor: Colors.elevated }}
@@ -216,7 +216,7 @@ export function CreateChallengeModal({
 
             {/* ── Error ────────────────────────────────────── */}
             {!!errorMsg && (
-              <View className="flex-row items-center gap-2 bg-[rgba(230,48,48,0.08)] rounded-[10px] border border-[rgba(230,48,48,0.2)] p-3 mb-3">
+              <View className="flex-row items-center gap-2 bg-accent/8 rounded-[10px] border border-accent/20 p-3 mb-3">
                 <AlertCircle size={14} strokeWidth={1.8} color={Colors.accent} />
                 <Text className="flex-1 font-sans text-xs text-accent leading-[18px]">{errorMsg}</Text>
               </View>

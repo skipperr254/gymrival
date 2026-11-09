@@ -216,12 +216,12 @@ export function LogFoodSheet({ visible, initialMealType, onClose }: Props) {
             className="px-5 pt-4 pb-3.5"
             style={{ borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: Colors.borderDefault }}
           >
-            <View className="w-9 h-1 rounded-full bg-[#3a3a3a] self-center mb-3.5" />
+            <View className="w-9 h-1 rounded-full bg-ink-750 self-center mb-3.5" />
             <View className="flex-row justify-between items-center">
               <View className="flex-row items-center gap-2">
                 {step === 2 && (
                   <Pressable onPress={() => setStep(1)} hitSlop={14} className="mr-0.5">
-                    <ChevronLeft size={22} strokeWidth={2.2} color="#888" style={rtlIconFlip} />
+                    <ChevronLeft size={22} strokeWidth={2.2} color={Colors.ink450} style={rtlIconFlip} />
                   </Pressable>
                 )}
                 <Text className="font-heading text-[22px] tracking-[1px] text-primary leading-6">
@@ -230,7 +230,7 @@ export function LogFoodSheet({ visible, initialMealType, onClose }: Props) {
               </View>
               {step < 3 && (
                 <Pressable onPress={onClose} hitSlop={8} className="w-8 h-8 rounded-2xl bg-elevated items-center justify-center">
-                  <X size={16} strokeWidth={2.8} color="#888" />
+                  <X size={16} strokeWidth={2.8} color={Colors.ink450} />
                 </Pressable>
               )}
             </View>

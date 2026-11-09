@@ -51,7 +51,7 @@ export function MessagesContent() {
 
   if (conversationsLoading && conversations.length === 0) {
     return (
-      <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
+      <View className="items-center py-12 px-6 bg-surface border border-ink-850 rounded-[20px]">
         <ActivityIndicator color={Colors.hint} />
       </View>
     );
@@ -69,8 +69,8 @@ export function MessagesContent() {
 
   if (!conversationsLoading && conversations.length === 0) {
     return (
-      <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
-        <View className="w-14 h-14 rounded-full bg-[#242424] items-center justify-center mb-3.5">
+      <View className="items-center py-12 px-6 bg-surface border border-ink-850 rounded-[20px]">
+        <View className="w-14 h-14 rounded-full bg-ink-850 items-center justify-center mb-3.5">
           <MessageCircle size={24} strokeWidth={1.5} color={Colors.hint} />
         </View>
         <Text className="font-heading text-[17px] tracking-[2px] text-white mb-1.5">
@@ -88,14 +88,14 @@ export function MessagesContent() {
   return (
     <>
       {total > 0 && (
-        <View className="bg-[rgba(230,48,48,0.12)] border border-[rgba(230,48,48,0.25)] rounded-[10px] py-[7px] px-3.5 self-start mb-3.5">
+        <View className="bg-accent/12 border border-accent/25 rounded-[10px] py-[7px] px-3.5 self-start mb-3.5">
           <Text className="font-heading text-[10px] text-accent tracking-[2px]">
             {t('unreadBanner', { count: total })}
           </Text>
         </View>
       )}
 
-      <Text className="font-heading text-[10px] text-[#484848] tracking-[2px] mb-3">
+      <Text className="font-heading text-[10px] text-ink-700 tracking-[2px] mb-3">
         {t('allMessages')}
       </Text>
       <View className="mb-6">
@@ -113,21 +113,21 @@ export function MessagesContent() {
               key={conv.id}
               onPress={() => router.push(Routes.chat(conv.other_user.id))}
               className="flex-row items-center gap-[13px] py-[13px] px-3 rounded-2xl"
-              style={({ pressed }) => pressed && { backgroundColor: '#1c1c1c' }}
+              style={({ pressed }) => pressed && { backgroundColor: Colors.surface }}
             >
               <Avatar userId={conv.other_user.id} name={name} avatarUrl={conv.other_user.avatar_url} size={50} online={online} />
               <View className="flex-1 min-w-0">
                 <View className="flex-row justify-between items-baseline mb-[3px]">
                   <Text
                     className={`text-[15px] ${
-                      hasUnread ? 'font-sans-semibold text-white' : 'font-sans-medium text-[#ccc]'
+                      hasUnread ? 'font-sans-semibold text-white' : 'font-sans-medium text-ink-200'
                     }`}
                   >
                     {name}
                   </Text>
                   <Text
                     className={`font-sans text-[11px] ${
-                      hasUnread ? 'text-accent' : 'text-[#454545]'
+                      hasUnread ? 'text-accent' : 'text-hint'
                     }`}
                   >
                     {formatConvTime(conv.last_message_at)}
@@ -136,7 +136,7 @@ export function MessagesContent() {
                 <View className="flex-row items-center gap-1.5 flex-1">
                   <Text
                     className={`font-sans text-[13px] flex-1 ${
-                      hasUnread ? 'text-[#888]' : 'text-[#505050]'
+                      hasUnread ? 'text-ink-450' : 'text-ink-650'
                     }`}
                     numberOfLines={1}
                   >

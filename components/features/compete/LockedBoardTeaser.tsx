@@ -2,7 +2,7 @@ import { View, Text, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Lock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@/constants/theme';
+import { Colors, withAlpha } from '@/constants/theme';
 import { FREE_LIMITS } from '@/constants/entitlements';
 
 /**
@@ -43,12 +43,12 @@ export function LockedBoardTeaser({ onUpgradePress }: { onUpgradePress: () => vo
       {/* The ask, sitting over the fade. */}
       <View className="items-center -mt-[86px] px-4">
         <LinearGradient
-          colors={['rgba(20,20,20,0)', '#141414', '#141414']}
+          colors={[withAlpha(Colors.base, 0), Colors.base, Colors.base]}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
           style={{ width: '100%', paddingTop: 44, paddingBottom: 4, alignItems: 'center' }}
         >
-          <View className="w-10 h-10 rounded-full bg-[rgba(230,48,48,0.12)] items-center justify-center mb-2.5">
+          <View className="w-10 h-10 rounded-full bg-accent/12 items-center justify-center mb-2.5">
             <Lock size={18} strokeWidth={2} color={Colors.accent} />
           </View>
           <Text className="font-heading text-[17px] tracking-[2px] text-primary text-center">

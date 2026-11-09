@@ -3,7 +3,7 @@ import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AlertCircle, RefreshCw, Zap, Swords, Lock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@/constants/theme';
+import { Colors, withAlpha } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCompeteStore } from '@/store/useCompeteStore';
 import { useSocialStore } from '@/store/useSocialStore';
@@ -149,7 +149,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
 
   if (challengesError && challenges.length === 0) {
     return (
-      <View className="items-center bg-[rgba(230,48,48,0.06)] rounded-2xl border border-[rgba(230,48,48,0.2)] py-7 px-5 gap-2 mt-6">
+      <View className="items-center bg-accent/6 rounded-2xl border border-accent/20 py-7 px-5 gap-2 mt-6">
         <AlertCircle size={22} strokeWidth={1.6} color={Colors.accent} />
         <Text className="font-sans text-[13px] text-secondary">{t('challenges.loadError')}</Text>
         <Pressable
@@ -170,7 +170,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
       <View style={{ height: 16 }} />
 
       {!!actionError && (
-        <View className="flex-row items-center gap-2 bg-[rgba(230,48,48,0.1)] rounded-[10px] p-3 mb-3">
+        <View className="flex-row items-center gap-2 bg-accent/10 rounded-[10px] p-3 mb-3">
           <AlertCircle size={14} strokeWidth={2} color={Colors.accent} />
           <Text className="font-sans text-[13px] text-accent flex-1">{actionError}</Text>
         </View>
@@ -189,7 +189,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
             // with no trace — indistinguishable from "no invitations".
             <Pressable
               onPress={() => user?.id && loadPendingInvitations(user.id)}
-              className="flex-row items-center gap-2 bg-[rgba(230,48,48,0.06)] border border-[rgba(230,48,48,0.2)] rounded-2xl py-3 px-4 mb-3.5"
+              className="flex-row items-center gap-2 bg-accent/6 border border-accent/20 rounded-2xl py-3 px-4 mb-3.5"
             >
               <AlertCircle size={14} strokeWidth={2} color={Colors.accent} />
               <Text className="font-sans text-[13px] text-secondary flex-1">
@@ -254,7 +254,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
       {/* ── Empty state ─────────────────────────────────────────────── */}
       {!loadingChallenges && challenges.length === 0 && (
         <View className="items-center bg-surface rounded-2xl py-12 px-5 gap-2">
-          <Zap size={32} strokeWidth={1.4} color="#333" />
+          <Zap size={32} strokeWidth={1.4} color={Colors.ink800} />
           <Text className="font-heading text-lg tracking-[2px] text-white">
             {t('challenges.emptyTitle')}
           </Text>
@@ -286,7 +286,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
               />
             ))}
             {friends.length > 6 && (
-              <View className="w-9 h-9 rounded-full bg-[#252525] border border-default items-center justify-center">
+              <View className="w-9 h-9 rounded-full bg-ink-850 border border-default items-center justify-center">
                 <Text className="font-heading text-[11px] text-muted">
                   {t('challenges.moreCount', { count: friends.length - 6 })}
                 </Text>
@@ -301,7 +301,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
           className={`rounded-2xl overflow-hidden ${friends.length === 0 ? 'opacity-35' : ''}`}
         >
           <LinearGradient
-            colors={['rgba(230,48,48,0.14)', 'rgba(230,48,48,0.06)']}
+            colors={[withAlpha(Colors.accent, 0.14), withAlpha(Colors.accent, 0.06)]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{
@@ -312,7 +312,7 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
               paddingVertical: 13,
               borderRadius: 14,
               borderWidth: 1,
-              borderColor: 'rgba(230,48,48,0.25)',
+              borderColor: withAlpha(Colors.accent, 0.25),
             }}
           >
             {createGate.locked ? (

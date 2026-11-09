@@ -33,6 +33,63 @@ export const Colors = {
   // Secondary accent — friend-vs-friend challenges (Compete tab), distinct
   // from the primary red accent used for admin/global challenges.
   friend: "#4a9eff",
+
+  // Neutral ramp — the greys between the semantic tokens above.
+  // Mirrors the --color-ink-* tokens in global.css.
+  ink950: "#111111",
+  ink900: "#1a1a1a",
+  ink850: "#242424",
+  ink800: "#333333",
+  ink750: "#3a3a3a",
+  ink700: "#484848",
+  ink650: "#505050",
+  ink600: "#606060",
+  ink550: "#707070",
+  ink500: "#808080",
+  ink450: "#888888",
+  ink400: "#909090",
+  ink200: "#cccccc",
+  black: "#000000",
+
+  // Role colors (mirrors global.css)
+  accentLight: "#ff6b6b",
+  accentTint: "#241a1a",
+  dangerBorder: "#3a1a1a",
+  proBg: "#1a0000",
+  successDark: "#009933",
+  successSoft: "#4caf50",
+  successTint: "#0a1f0a",
+  successTintBorder: "#1a3a1a",
+  successTintStrong: "#0a3a1a",
+  gold: "#d4a017",
+  orange: "#ff8c00",
+  amber: "#e6a030",
+  mint: "#00cc88",
+} as const;
+
+/**
+ * A token at reduced opacity, for JS style props: withAlpha(Colors.accent, 0.1).
+ * In className, use Tailwind's modifier instead: bg-accent/10.
+ */
+export function withAlpha(hex: string, alpha: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+}
+
+/** LinearGradient stops. */
+export const Gradients = {
+  accent: [Colors.accent, Colors.accentLight],
+  success: [Colors.success, Colors.successDark],
+  proCard: [Colors.proBg, "#2a0a0a"],
+  paywallHeader: ["#2a1414", Colors.base],
+  feedStat: [Colors.base, "#0d0808"],
+} as const;
+
+/** Macro colors — shared by every nutrition surface. */
+export const MacroColors = {
+  protein: Colors.friend,
+  carbs: Colors.warning,
+  fat: Colors.success,
 } as const;
 
 /**
@@ -58,7 +115,7 @@ export const AvatarPalette = [
 ] as const;
 
 /** Gold / silver / bronze, shared by every leaderboard-style ranking row. */
-export const MedalColors = ["#d4a017", "#909090", "#a0522d"] as const;
+export const MedalColors = [Colors.gold, Colors.ink400, "#a0522d"] as const;
 
 export const Fonts = {
   display: "BebasNeue_400Regular",

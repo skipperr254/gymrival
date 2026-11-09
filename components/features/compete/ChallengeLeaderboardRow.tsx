@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native';
 import { Trophy } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { MedalColors, Colors } from '@/constants/theme';
+import { Colors, MedalColors, withAlpha } from '@/constants/theme';
 import { formatNumber } from '@/lib/i18n/format';
 import type { ChallengeLeaderboardEntry, ChallengeMetric } from '@/types/challenge';
 import { formatChallengeScore } from '@/types/challenge';
@@ -29,7 +29,7 @@ export function ChallengeLeaderboardRow({
       className="flex-row items-center gap-3 rounded-2xl py-3 px-4 mb-2 border"
       style={
         entry.is_me
-          ? { backgroundColor: accentColor + '12', borderColor: accentColor + '44' }
+          ? { backgroundColor: withAlpha(accentColor, 0.071), borderColor: withAlpha(accentColor, 0.267) }
           : { backgroundColor: Colors.surface, borderColor: Colors.borderDefault }
       }
     >

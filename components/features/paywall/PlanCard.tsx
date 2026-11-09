@@ -36,7 +36,7 @@ export function PlanCard({
       accessibilityRole="radio"
       accessibilityState={{ selected }}
       className={`rounded-2xl border px-4 py-3.5 mb-2.5 ${
-        selected ? 'bg-[#241a1a] border-accent' : 'bg-surface border-elevated'
+        selected ? 'bg-accent-tint border-accent' : 'bg-surface border-elevated'
       }`}
       style={({ pressed }) => pressed && { opacity: 0.82 }}
     >
@@ -51,7 +51,7 @@ export function PlanCard({
       <View className="flex-row items-center gap-3">
         <View
           className={`w-5 h-5 rounded-full items-center justify-center border-2 ${
-            selected ? 'bg-accent border-accent' : 'border-[#444]'
+            selected ? 'bg-accent border-accent' : 'border-hint'
           }`}
         >
           {selected && <Check size={12} color={Colors.primary} strokeWidth={3.5} />}
@@ -63,7 +63,7 @@ export function PlanCard({
               {periodLabel}
             </Text>
             {savingsPercent != null && savingsPercent > 0 && (
-              <View className="bg-[#0a3a1a] rounded-full px-2 py-0.5">
+              <View className="bg-success-tint-strong rounded-full px-2 py-0.5">
                 <Text className="font-sans-semibold text-[10px] text-success">
                   {t('plans.save', { percent: savingsPercent })}
                 </Text>
@@ -71,7 +71,7 @@ export function PlanCard({
             )}
           </View>
           {pricePerMonth && (
-            <Text className="font-sans text-[11px] text-[#808080] mt-0.5">
+            <Text className="font-sans text-[11px] text-ink-500 mt-0.5">
               {t('plans.perMonth', { price: pricePerMonth })}
             </Text>
           )}

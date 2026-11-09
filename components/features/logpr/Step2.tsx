@@ -54,10 +54,10 @@ function LockedRow({
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      className="flex-row items-center gap-3 bg-[#1a1a1a] border border-[#2e2a2a] rounded-2xl px-4 py-3.5 mb-2.5"
+      className="flex-row items-center gap-3 bg-ink-900 border border-elevated rounded-2xl px-4 py-3.5 mb-2.5"
       style={({ pressed }) => pressed && { opacity: 0.7 }}
     >
-      <View className="w-10 h-10 rounded-xl bg-[rgba(230,48,48,0.1)] items-center justify-center">
+      <View className="w-10 h-10 rounded-xl bg-accent/10 items-center justify-center">
         <Icon size={18} strokeWidth={1.8} color={Colors.accent} />
       </View>
       <View className="flex-1">
@@ -69,7 +69,7 @@ function LockedRow({
             </Text>
           </View>
         </View>
-        <Text className="font-sans text-[11px] text-[#707070] mt-px">{sub}</Text>
+        <Text className="font-sans text-[11px] text-ink-550 mt-px">{sub}</Text>
       </View>
       <Lock size={15} strokeWidth={2} color={Colors.hint} />
     </Pressable>
@@ -92,11 +92,11 @@ export function Step2({
   return (
     <>
       {/* PR summary card */}
-      <View className="flex-row items-center justify-between bg-[rgba(230,48,48,0.06)] border border-[rgba(230,48,48,0.2)] rounded-[14px] py-3.5 px-4 mb-4">
+      <View className="flex-row items-center justify-between bg-accent/6 border border-accent/20 rounded-[14px] py-3.5 px-4 mb-4">
         <View className="gap-[3px]">
           <View className="flex-row items-center gap-1.5 mb-0.5">
-            <ExIcon size={14} strokeWidth={1.8} color="#888" />
-            <Text className="font-sans-medium text-[13px] text-[#999]">{selectedEx.label}</Text>
+            <ExIcon size={14} strokeWidth={1.8} color={Colors.ink450} />
+            <Text className="font-sans-medium text-[13px] text-ink-400">{selectedEx.label}</Text>
           </View>
           <Text className="font-sans text-[11px] text-muted">
             {currentPR != null ? t('previousWithValue', { value: currentPR, unit: selectedEx.unit }) : t('firstPr')}
@@ -111,7 +111,7 @@ export function Step2({
       </View>
 
       {/* XP reward indicator */}
-      <View className="flex-row justify-center rounded-xl py-2.5 mb-4 border bg-[#1a1a1a] border-[#333]">
+      <View className="flex-row justify-center rounded-xl py-2.5 mb-4 border bg-ink-900 border-ink-800">
         <Text className="font-heading text-[13px] tracking-[1px] text-accent">
           {t('xpReward')}
         </Text>
@@ -138,15 +138,15 @@ export function Step2({
 
       {/* ── Share to the feed — Pro ─────────────────────────────────────── */}
       {isPro ? (
-        <View className="flex-row items-center gap-3 bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl px-4 py-3 mb-2.5">
-          <View className="w-10 h-10 rounded-xl bg-[rgba(230,48,48,0.1)] items-center justify-center">
+        <View className="flex-row items-center gap-3 bg-ink-900 border border-elevated rounded-2xl px-4 py-3 mb-2.5">
+          <View className="w-10 h-10 rounded-xl bg-accent/10 items-center justify-center">
             <Globe size={18} strokeWidth={1.8} color={Colors.accent} />
           </View>
           <View className="flex-1">
             <Text className="font-sans-semibold text-[13px] text-primary">
               {t('gate.publishTitle')}
             </Text>
-            <Text className="font-sans text-[11px] text-[#707070] mt-px">
+            <Text className="font-sans text-[11px] text-ink-550 mt-px">
               {publish ? t('gate.publishSub') : t('gate.publishOffSub')}
             </Text>
           </View>
@@ -176,7 +176,7 @@ export function Step2({
       )}
 
       {!!saveError && (
-        <View className="flex-row items-center gap-2 bg-[rgba(230,48,48,0.1)] rounded-[10px] p-3 mb-3">
+        <View className="flex-row items-center gap-2 bg-accent/10 rounded-[10px] p-3 mb-3">
           <AlertCircle size={14} strokeWidth={2} color={Colors.accent} />
           <Text className="font-sans text-[13px] text-accent flex-1">{saveError}</Text>
         </View>

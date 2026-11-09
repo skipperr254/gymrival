@@ -7,7 +7,7 @@ import {
 } from 'lucide-react-native';
 import { rtlIconFlip } from '@/lib/i18n/rtl';
 import { useTranslation } from 'react-i18next';
-import { Fonts, MedalColors, Colors } from '@/constants/theme';
+import { Colors, Fonts, MedalColors, withAlpha } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
 import { getExerciseIcon } from '@/constants/exerciseIcons';
 import type { ChallengeWithStats } from '@/types/challenge';
@@ -42,17 +42,17 @@ export function ChallengeCard({
     : Dumbbell;
 
   return (
-    <View className="bg-surface rounded-2xl py-4 px-[18px] mb-3 border" style={{ borderColor: color + '22' }}>
+    <View className="bg-surface rounded-2xl py-4 px-[18px] mb-3 border" style={{ borderColor: withAlpha(color, 0.133) }}>
       <View className="flex-row items-start gap-3.5 mb-3.5">
         <View
           className="w-[46px] h-[46px] rounded-[13px] border items-center justify-center shrink-0"
-          style={{ backgroundColor: color + '15', borderColor: color + '33' }}
+          style={{ backgroundColor: withAlpha(color, 0.082), borderColor: withAlpha(color, 0.2) }}
         >
           <MetricIcon size={22} strokeWidth={1.5} color={color} />
         </View>
         <View className="flex-1">
           <Text className="font-heading text-lg tracking-[2px] text-white mb-[3px]">{ch.title}</Text>
-          <Text className="font-sans text-xs text-[#707070] leading-[18px]">
+          <Text className="font-sans text-xs text-ink-550 leading-[18px]">
             {ch.description ?? metricLabel(ch.metric)}
           </Text>
         </View>
@@ -61,18 +61,18 @@ export function ChallengeCard({
       <View className="flex-row gap-3.5 mb-3.5 flex-wrap">
         <View className="flex-row items-center gap-[5px]">
           <Clock size={12} strokeWidth={1.8} color={Colors.muted} />
-          <Text className="font-sans text-[11px] text-[#606060]">{endsInLabel(ch.ends_at)}</Text>
+          <Text className="font-sans text-[11px] text-ink-600">{endsInLabel(ch.ends_at)}</Text>
         </View>
         <View className="flex-row items-center gap-[5px]">
           <Users size={12} strokeWidth={1.8} color={Colors.muted} />
-          <Text className="font-sans text-[11px] text-[#606060]">
+          <Text className="font-sans text-[11px] text-ink-600">
             {t('card.joined', { count: ch.participant_count })}
           </Text>
         </View>
         {!!ch.prize_label && (
           <View className="flex-row items-center gap-[5px]">
             <Gift size={12} strokeWidth={1.8} color={Colors.muted} />
-            <Text className="font-sans text-[11px] text-[#606060]">{ch.prize_label}</Text>
+            <Text className="font-sans text-[11px] text-ink-600">{ch.prize_label}</Text>
           </View>
         )}
       </View>
@@ -80,9 +80,9 @@ export function ChallengeCard({
       {isCompleted && winner && (
         <View
           className="flex-row items-center gap-2.5 rounded-xl border py-2.5 px-3 mb-2.5"
-          style={{ backgroundColor: 'rgba(212,160,23,0.1)', borderColor: 'rgba(212,160,23,0.3)' }}
+          style={{ backgroundColor: withAlpha(Colors.gold, 0.1), borderColor: withAlpha(Colors.gold, 0.3) }}
         >
-          <Trophy size={18} strokeWidth={1.8} color="#d4a017" />
+          <Trophy size={18} strokeWidth={1.8} color={Colors.gold} />
           <Avatar
             userId={winner.user_id}
             name={winner.full_name ?? winner.username ?? t('unknown')}
@@ -90,14 +90,14 @@ export function ChallengeCard({
             size={28}
           />
           <View className="flex-1">
-            <Text className="font-heading text-[9px] tracking-[2px]" style={{ color: '#d4a017' }}>
+            <Text className="font-heading text-[9px] tracking-[2px]" style={{ color: Colors.gold }}>
               {t('card.winner')}
             </Text>
             <Text className="font-sans-medium text-[13px] text-white" numberOfLines={1}>
               {winner.full_name ?? winner.username ?? t('unknown')}{winner.is_me ? t('youSuffix') : ''}
             </Text>
           </View>
-          <Text className="font-heading text-[15px]" style={{ color: '#d4a017' }}>
+          <Text className="font-heading text-[15px]" style={{ color: Colors.gold }}>
             {formatChallengeScore(winner.score, ch.metric, unit)}
           </Text>
         </View>
@@ -161,7 +161,7 @@ export function ChallengeCard({
               </View>
             ) : (
               <LinearGradient
-                colors={[color, color + '99']}
+                colors={[color, withAlpha(color, 0.6)]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={{
@@ -184,7 +184,7 @@ export function ChallengeCard({
         <Pressable
           onPress={() => router.push(Routes.challengeDetail(ch.id))}
           className="flex-1 flex-row items-center justify-center gap-1.5 py-2.5 rounded-xl border-[1.5px] bg-transparent"
-          style={{ borderColor: color + '44' }}
+          style={{ borderColor: withAlpha(color, 0.267) }}
         >
           <Text className="font-heading text-xs tracking-[2px]" style={{ color }}>
             {t('card.viewAll')}

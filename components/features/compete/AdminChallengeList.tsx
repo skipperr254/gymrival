@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import { View, Text, Pressable, ActivityIndicator, Alert } from 'react-native';
 import { AlertCircle, RefreshCw, ShieldCheck } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@/constants/theme';
+import { Colors, withAlpha } from '@/constants/theme';
 import { useCompeteStore } from '@/store/useCompeteStore';
 import type { ChallengeWithStats, ChallengeStatus } from '@/types/challenge';
 
 function statusBadgeColor(status: ChallengeStatus): string {
   switch (status) {
     case 'active':    return Colors.success;
-    case 'completed': return '#d4a017';
+    case 'completed': return Colors.gold;
     case 'cancelled': return Colors.muted;
     default:          return Colors.muted;
   }
@@ -70,7 +70,7 @@ export function AdminChallengeList({ adminId }: { adminId: string }) {
       )}
 
       {!loading && error && myAdminChallenges.length === 0 && (
-        <View className="items-center bg-[rgba(230,48,48,0.06)] rounded-2xl border border-[rgba(230,48,48,0.2)] py-7 px-5 gap-2">
+        <View className="items-center bg-accent/6 rounded-2xl border border-accent/20 py-7 px-5 gap-2">
           <AlertCircle size={22} strokeWidth={1.6} color={Colors.accent} />
           <Text className="font-sans text-[13px] text-secondary">{t('admin.manage.loadError')}</Text>
           <Pressable
@@ -85,7 +85,7 @@ export function AdminChallengeList({ adminId }: { adminId: string }) {
 
       {!loading && !error && myAdminChallenges.length === 0 && (
         <View className="items-center bg-surface rounded-2xl py-10 px-5 gap-2 border border-default">
-          <ShieldCheck size={28} strokeWidth={1.4} color="#333" />
+          <ShieldCheck size={28} strokeWidth={1.4} color={Colors.ink800} />
           <Text className="font-heading text-base tracking-[2px] text-white">
             {t('admin.manage.emptyTitle')}
           </Text>
@@ -101,7 +101,7 @@ export function AdminChallengeList({ adminId }: { adminId: string }) {
             </Text>
             <View
               className="rounded-full px-2.5 py-1 ml-2"
-              style={{ backgroundColor: statusBadgeColor(ch.status) + '22' }}
+              style={{ backgroundColor: withAlpha(statusBadgeColor(ch.status), 0.133) }}
             >
               <Text
                 className="font-heading text-[9px] tracking-[1px]"
@@ -119,7 +119,7 @@ export function AdminChallengeList({ adminId }: { adminId: string }) {
             <Pressable
               onPress={() => handleCancel(ch)}
               disabled={cancellingId === ch.id}
-              className="self-start mt-2.5 py-1.5 px-3 rounded-lg border border-[rgba(230,48,48,0.3)]"
+              className="self-start mt-2.5 py-1.5 px-3 rounded-lg border border-accent/30"
             >
               {cancellingId === ch.id ? (
                 <ActivityIndicator size="small" color={Colors.accent} />

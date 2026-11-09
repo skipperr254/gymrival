@@ -33,22 +33,22 @@ export function FriendsList({ onFindAthletes }: { onFindAthletes: () => void }) 
   return (
     <>
       <View className="flex-row gap-2.5 mb-[18px]">
-        <View className="flex-1 bg-[#1c1c1c] border border-[#242424] rounded-[14px] p-3.5">
+        <View className="flex-1 bg-surface border border-ink-850 rounded-[14px] p-3.5">
           <Text className="font-heading text-[28px] text-white">{friends.length}</Text>
-          <Text className="font-sans text-[9px] text-[#505050] tracking-[2px] font-bold mt-0.5">
+          <Text className="font-sans text-[9px] text-ink-650 tracking-[2px] font-bold mt-0.5">
             {t('friendsCount')}
           </Text>
         </View>
-        <View className="flex-1 bg-[#1c1c1c] border border-[#242424] rounded-[14px] p-3.5">
+        <View className="flex-1 bg-surface border border-ink-850 rounded-[14px] p-3.5">
           <Text className="font-heading text-[28px] text-white">{incomingRequests.length}</Text>
-          <Text className="font-sans text-[9px] text-[#505050] tracking-[2px] font-bold mt-0.5">
+          <Text className="font-sans text-[9px] text-ink-650 tracking-[2px] font-bold mt-0.5">
             {t('pending')}
           </Text>
         </View>
       </View>
 
       {friendsLoading ? (
-        <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
+        <View className="items-center py-12 px-6 bg-surface border border-ink-850 rounded-[20px]">
           <ActivityIndicator color={Colors.hint} />
         </View>
       ) : friendsError && friends.length === 0 ? (
@@ -58,8 +58,8 @@ export function FriendsList({ onFindAthletes }: { onFindAthletes: () => void }) 
           onRetry={() => loadFriends(userId)}
         />
       ) : friends.length === 0 ? (
-        <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
-          <View className="w-14 h-14 rounded-full bg-[#242424] items-center justify-center mb-3.5">
+        <View className="items-center py-12 px-6 bg-surface border border-ink-850 rounded-[20px]">
+          <View className="w-14 h-14 rounded-full bg-ink-850 items-center justify-center mb-3.5">
             <Users size={24} strokeWidth={1.5} color={Colors.hint} />
           </View>
           <Text className="font-heading text-[17px] tracking-[2px] text-white mb-1.5">
@@ -78,7 +78,7 @@ export function FriendsList({ onFindAthletes }: { onFindAthletes: () => void }) 
         friends.map((friend) => (
           <View
             key={friend.id}
-            className="flex-row items-center gap-3 bg-[#1c1c1c] border border-[#242424] rounded-2xl p-3.5 mb-2.5"
+            className="flex-row items-center gap-3 bg-surface border border-ink-850 rounded-2xl p-3.5 mb-2.5"
           >
             <Avatar
               userId={friend.id}
@@ -90,17 +90,17 @@ export function FriendsList({ onFindAthletes }: { onFindAthletes: () => void }) 
               <Text className="font-sans-semibold text-[15px] text-white">
                 {friend.full_name ?? friend.username ?? t('unknown')}
               </Text>
-              <Text className="font-sans text-xs text-[#505050] mb-1.5">
+              <Text className="font-sans text-xs text-ink-650 mb-1.5">
                 {friend.username ?? ''}
               </Text>
               <View className="flex-row gap-1.5">
-                <View className="bg-[#242424] rounded-lg py-[3px] px-2.5">
-                  <Text className="font-heading text-[10px] text-[#888] tracking-[1px]">
+                <View className="bg-ink-850 rounded-lg py-[3px] px-2.5">
+                  <Text className="font-heading text-[10px] text-ink-450 tracking-[1px]">
                     {t('lvl', { level: friend.level })}
                   </Text>
                 </View>
-                <View className="bg-[#242424] rounded-lg py-[3px] px-2.5">
-                  <Text className="font-heading text-[10px] text-[#888] tracking-[1px]">
+                <View className="bg-ink-850 rounded-lg py-[3px] px-2.5">
+                  <Text className="font-heading text-[10px] text-ink-450 tracking-[1px]">
                     {formatNumber(friend.xp)} XP
                   </Text>
                 </View>
@@ -109,15 +109,15 @@ export function FriendsList({ onFindAthletes }: { onFindAthletes: () => void }) 
             <View className="flex-row gap-2">
               <Pressable
                 onPress={() => router.push(Routes.chat(friend.id))}
-                className="w-[34px] h-[34px] rounded-full border border-default bg-[#1a1a1a] items-center justify-center"
+                className="w-[34px] h-[34px] rounded-full border border-default bg-ink-900 items-center justify-center"
               >
-                <MessageCircle size={15} strokeWidth={2} color="#505050" />
+                <MessageCircle size={15} strokeWidth={2} color={Colors.ink650} />
               </Pressable>
               <Pressable
                 onPress={() => unfriend(friend.friendship_id)}
-                className="w-[34px] h-[34px] rounded-full border border-default bg-[#1a1a1a] items-center justify-center"
+                className="w-[34px] h-[34px] rounded-full border border-default bg-ink-900 items-center justify-center"
               >
-                <UserX size={15} strokeWidth={2} color="#505050" />
+                <UserX size={15} strokeWidth={2} color={Colors.ink650} />
               </Pressable>
             </View>
           </View>

@@ -11,7 +11,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Trophy, Search, RefreshCw, AlertCircle, Lock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors, MedalColors } from '@/constants/theme';
+import { Colors, Gradients, MedalColors } from '@/constants/theme';
 import { getExerciseIcon } from '@/constants/exerciseIcons';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCompeteStore } from '@/store/useCompeteStore';
@@ -80,7 +80,7 @@ const GlobalEntryCard = React.memo(function GlobalEntryCard({
   const safeDenom   = maxTotal > 0 ? maxTotal : 1;
   const pct         = `${Math.round((total / safeDenom) * 100)}%` as `${number}%`;
   const rankIndex   = rank - 1; // 0-based for medal color
-  const totalColor  = rankIndex === 0 ? (isMe ? '#000' : Colors.accent) : isMe ? '#333' : Colors.primary;
+  const totalColor  = rankIndex === 0 ? (isMe ? Colors.black : Colors.accent) : isMe ? Colors.ink800 : Colors.primary;
   const flag        = toFlagEmoji(entry.country_code);
 
   return (
@@ -95,7 +95,7 @@ const GlobalEntryCard = React.memo(function GlobalEntryCard({
           {rankIndex < 3 ? (
             <Trophy size={16} strokeWidth={1.8} color={MedalColors[rankIndex]} />
           ) : (
-            <Text className="font-heading text-[13px] text-[#505050]">#{rank}</Text>
+            <Text className="font-heading text-[13px] text-ink-650">#{rank}</Text>
           )}
         </View>
 
@@ -115,7 +115,7 @@ const GlobalEntryCard = React.memo(function GlobalEntryCard({
             )}
           </View>
           <Text
-            className={`font-sans text-[11px] ${isMe ? 'text-[#888]' : 'text-muted'}`}
+            className={`font-sans text-[11px] ${isMe ? 'text-ink-450' : 'text-muted'}`}
             numberOfLines={1}
           >
             {entry.username ? `${entry.username} · ` : ''}{t('lvl', { level: entry.level })}
@@ -128,7 +128,7 @@ const GlobalEntryCard = React.memo(function GlobalEntryCard({
           </Text>
           <Text
             className={`font-heading text-[9px] tracking-[1px] ${
-              isMe ? 'text-[#888]' : 'text-[#505050]'
+              isMe ? 'text-ink-450' : 'text-ink-650'
             }`}
           >
             {t('global.totalKg')}
@@ -146,7 +146,7 @@ const GlobalEntryCard = React.memo(function GlobalEntryCard({
                 isMe ? 'bg-black/[0.07]' : 'bg-black/30'
               }`}
             >
-              <StatIcon size={12} strokeWidth={1.8} color={isMe ? '#888' : Colors.muted} />
+              <StatIcon size={12} strokeWidth={1.8} color={isMe ? Colors.ink450 : Colors.muted} />
               <Text
                 className={`font-heading text-base ${isMe ? 'text-black' : 'text-white'}`}
               >
@@ -154,7 +154,7 @@ const GlobalEntryCard = React.memo(function GlobalEntryCard({
               </Text>
               <Text
                 className={`font-heading text-[8px] tracking-[1px] ${
-                  isMe ? 'text-[#888]' : 'text-muted'
+                  isMe ? 'text-ink-450' : 'text-muted'
                 }`}
               >
                 {t(s.labelKey)}
@@ -169,7 +169,7 @@ const GlobalEntryCard = React.memo(function GlobalEntryCard({
           <View className="h-1 rounded bg-black" style={{ width: pct }} />
         ) : (
           <LinearGradient
-            colors={[Colors.accent, '#ff6b6b']}
+            colors={Gradients.accent}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={{ height: 4, borderRadius: 4, width: pct }}
@@ -316,7 +316,7 @@ export function GlobalContent() {
 
       {/* Error state */}
       {!!globalError && !loadingGlobal && (
-        <View className="items-center bg-[rgba(230,48,48,0.06)] rounded-2xl border border-[rgba(230,48,48,0.2)] py-7 px-5 gap-2 mt-4">
+        <View className="items-center bg-accent/6 rounded-2xl border border-accent/20 py-7 px-5 gap-2 mt-4">
           <AlertCircle size={22} strokeWidth={1.6} color={Colors.accent} />
           <Text className="font-sans text-[13px] text-secondary">{t('global.loadError')}</Text>
           <Pressable
@@ -346,7 +346,7 @@ export function GlobalContent() {
           they're "unranked" (see also the myRankError block below). */}
       {!isFirstLoad && !myGlobalRank && !loadingMyRank && !myRankError && !search && (
         <View className="items-center bg-surface rounded-2xl py-8 px-5 gap-2 mt-4 mb-1 border border-default">
-          <Trophy size={26} strokeWidth={1.4} color="#333" />
+          <Trophy size={26} strokeWidth={1.4} color={Colors.ink800} />
           <Text className="font-heading text-lg tracking-[2px] text-white mt-1">
             {t('global.unrankedTitle')}
           </Text>
@@ -358,7 +358,7 @@ export function GlobalContent() {
 
       {/* myGlobalRank fetch failed — distinct from genuinely unranked */}
       {!isFirstLoad && !myGlobalRank && !loadingMyRank && !!myRankError && !search && (
-        <View className="items-center bg-[rgba(230,48,48,0.06)] rounded-2xl border border-[rgba(230,48,48,0.2)] py-7 px-5 gap-2 mt-4 mb-1">
+        <View className="items-center bg-accent/6 rounded-2xl border border-accent/20 py-7 px-5 gap-2 mt-4 mb-1">
           <AlertCircle size={22} strokeWidth={1.6} color={Colors.accent} />
           <Text className="font-sans text-[13px] text-secondary">{t('global.myRankLoadError')}</Text>
           <Pressable
@@ -441,14 +441,14 @@ export function GlobalContent() {
           className="flex-row items-center justify-center gap-1.5 py-2.5 mt-1"
           disabled={loadingGlobal}
         >
-          <RefreshCw size={13} strokeWidth={2} color="#383838" />
-          <Text className="font-heading text-[10px] tracking-[2px] text-[#383838]">
+          <RefreshCw size={13} strokeWidth={2} color={Colors.ink750} />
+          <Text className="font-heading text-[10px] tracking-[2px] text-ink-750">
             {t('global.refresh')}
           </Text>
         </Pressable>
       )}
 
-      <Text className="text-center pt-4 pb-2 font-heading text-[10px] text-[#383838] tracking-[2px]">
+      <Text className="text-center pt-4 pb-2 font-heading text-[10px] text-ink-750 tracking-[2px]">
         {t('global.footerNote')}
       </Text>
     </>

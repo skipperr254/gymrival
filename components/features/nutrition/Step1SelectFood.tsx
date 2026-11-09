@@ -23,10 +23,10 @@ export function Step1SelectFood({ myFoods, onSelectFood, onAddNew }: Step1Select
     <View>
       <Pressable
         onPress={onAddNew}
-        className="flex-row items-center gap-3 bg-[rgba(230,48,48,0.08)] border-[1.5px] border-accent rounded-2xl py-3.5 px-4 mb-4"
+        className="flex-row items-center gap-3 bg-accent/8 border-[1.5px] border-accent rounded-2xl py-3.5 px-4 mb-4"
         style={({ pressed }) => pressed && { opacity: 0.8 }}
       >
-        <View className="w-9 h-9 rounded-xl bg-[rgba(230,48,48,0.12)] items-center justify-center">
+        <View className="w-9 h-9 rounded-xl bg-accent/12 items-center justify-center">
           <Plus size={18} strokeWidth={2.4} color={Colors.accent} />
         </View>
         <Text className="font-sans-semibold text-sm text-accent flex-1">{t('logSheet.addNewFood')}</Text>

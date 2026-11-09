@@ -40,7 +40,7 @@ export function FriendsSearch() {
 
   return (
     <>
-      <View className="flex-row items-center gap-2.5 bg-[#1c1c1c] border-[1.5px] border-[#242424] rounded-[14px] px-3.5 mb-4">
+      <View className="flex-row items-center gap-2.5 bg-surface border-[1.5px] border-ink-850 rounded-[14px] px-3.5 mb-4">
         <Search size={16} strokeWidth={2} color={Colors.hint} />
         <TextInput
           value={query}
@@ -54,13 +54,13 @@ export function FriendsSearch() {
             onPress={() => setQuery('')}
             className="w-[22px] h-[22px] rounded-full bg-elevated items-center justify-center"
           >
-            <X size={12} strokeWidth={2.5} color="#707070" />
+            <X size={12} strokeWidth={2.5} color={Colors.ink550} />
           </Pressable>
         )}
       </View>
 
       {!query && (
-        <Text className="font-heading text-[10px] text-[#484848] tracking-[2px] mb-3">
+        <Text className="font-heading text-[10px] text-ink-700 tracking-[2px] mb-3">
           {t('suggested')}
         </Text>
       )}
@@ -74,9 +74,9 @@ export function FriendsSearch() {
           onRetry={() => search(userId, query)}
         />
       ) : searchResults.length === 0 && query.length > 0 ? (
-        <View className="items-center py-12 px-6 bg-[#1c1c1c] border border-[#242424] rounded-[20px]">
-          <View className="w-14 h-14 rounded-full bg-[#242424] items-center justify-center mb-3.5">
-            <Search size={22} strokeWidth={1.5} color="#383838" />
+        <View className="items-center py-12 px-6 bg-surface border border-ink-850 rounded-[20px]">
+          <View className="w-14 h-14 rounded-full bg-ink-850 items-center justify-center mb-3.5">
+            <Search size={22} strokeWidth={1.5} color={Colors.ink750} />
           </View>
           <Text className="font-heading text-[17px] tracking-[2px] text-white mb-1.5">
             {t('noResultsTitle')}
@@ -93,27 +93,27 @@ export function FriendsSearch() {
           return (
             <View
               key={u.id}
-              className="flex-row items-center gap-3 bg-[#1c1c1c] border border-[#242424] rounded-2xl p-3.5 mb-2.5"
+              className="flex-row items-center gap-3 bg-surface border border-ink-850 rounded-2xl p-3.5 mb-2.5"
             >
               <Avatar userId={u.id} name={u.full_name ?? u.username ?? '?'} avatarUrl={u.avatar_url} size={44} />
               <View className="flex-1">
                 <Text className="font-sans-semibold text-[15px] text-white">
                   {u.full_name ?? u.username ?? t('unknown')}
                 </Text>
-                <Text className="font-sans text-xs text-[#505050]">{u.username ?? ''}</Text>
+                <Text className="font-sans text-xs text-ink-650">{u.username ?? ''}</Text>
               </View>
               {isFriend && (
-                <View className="flex-row items-center gap-[5px] py-[7px] px-3 rounded-[10px] bg-[#1a1a1a] border border-default">
-                  <UserCheck size={13} strokeWidth={2} color="#505050" />
-                  <Text className="font-heading text-[10px] text-[#505050] tracking-[1px]">
+                <View className="flex-row items-center gap-[5px] py-[7px] px-3 rounded-[10px] bg-ink-900 border border-default">
+                  <UserCheck size={13} strokeWidth={2} color={Colors.ink650} />
+                  <Text className="font-heading text-[10px] text-ink-650 tracking-[1px]">
                     {t('friendsPill')}
                   </Text>
                 </View>
               )}
               {isSent && (
-                <View className="flex-row items-center gap-[5px] py-[7px] px-3 rounded-[10px] bg-[#1a1a1a] border border-default">
-                  <Clock size={13} strokeWidth={2} color="#505050" />
-                  <Text className="font-heading text-[10px] text-[#505050] tracking-[1px]">
+                <View className="flex-row items-center gap-[5px] py-[7px] px-3 rounded-[10px] bg-ink-900 border border-default">
+                  <Clock size={13} strokeWidth={2} color={Colors.ink650} />
+                  <Text className="font-heading text-[10px] text-ink-650 tracking-[1px]">
                     {t('sentPill')}
                   </Text>
                 </View>
@@ -121,7 +121,7 @@ export function FriendsSearch() {
               {hasIncoming && (
                 <Pressable
                   onPress={() => u.friendship_id && acceptRequest(u.friendship_id)}
-                  className="flex-row items-center gap-1.5 py-2 px-[13px] rounded-[10px] bg-[rgba(230,48,48,0.1)]"
+                  className="flex-row items-center gap-1.5 py-2 px-[13px] rounded-[10px] bg-accent/10"
                 >
                   <UserCheck size={13} strokeWidth={2} color={Colors.accent} />
                   <Text className="font-heading text-[10px] text-accent tracking-[1px]">
@@ -132,10 +132,10 @@ export function FriendsSearch() {
               {!isFriend && !isSent && !hasIncoming && (
                 <Pressable
                   onPress={() => sendRequest(userId, u.id)}
-                  className="flex-row items-center gap-1.5 py-2 px-[13px] rounded-[10px] bg-[#1a1a1a] border border-default"
+                  className="flex-row items-center gap-1.5 py-2 px-[13px] rounded-[10px] bg-ink-900 border border-default"
                 >
-                  <UserPlus size={13} strokeWidth={2} color="#808080" />
-                  <Text className="font-heading text-[10px] text-[#808080] tracking-[1px]">
+                  <UserPlus size={13} strokeWidth={2} color={Colors.ink500} />
+                  <Text className="font-heading text-[10px] text-ink-500 tracking-[1px]">
                     {t('add')}
                   </Text>
                 </Pressable>

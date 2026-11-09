@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors, Fonts, withAlpha } from '@/constants/theme';
 import type { CheckinDay } from '@/types/progress';
 
 const CELL = 18;
@@ -12,7 +12,7 @@ const WEEKS = 12;
 
 function cellColor(count: number, isFuture: boolean): string {
   if (isFuture || count === 0) return Colors.elevated;
-  if (count === 1) return 'rgba(230,48,48,0.55)';
+  if (count === 1) return withAlpha(Colors.accent, 0.55);
   return Colors.accent;
 }
 

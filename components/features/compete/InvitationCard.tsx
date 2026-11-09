@@ -4,7 +4,7 @@ import { Swords, CheckCircle, Gift, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import type { ChallengeInvitation } from '@/types/challenge';
 import { endsInLabel } from '@/types/challenge';
-import { Colors } from '@/constants/theme';
+import { Colors, withAlpha } from '@/constants/theme';
 
 export function InvitationCard({
   invitation,
@@ -26,18 +26,18 @@ export function InvitationCard({
   return (
     <View
       className="bg-surface rounded-2xl py-4 px-[18px] mb-3 border"
-      style={{ borderColor: Colors.friend + '33' }}
+      style={{ borderColor: withAlpha(Colors.friend, 0.2) }}
     >
       <View className="flex-row items-start gap-3.5 mb-3.5">
         <View
           className="w-[46px] h-[46px] rounded-[13px] border items-center justify-center shrink-0"
-          style={{ backgroundColor: Colors.friend + '15', borderColor: Colors.friend + '33' }}
+          style={{ backgroundColor: withAlpha(Colors.friend, 0.082), borderColor: withAlpha(Colors.friend, 0.2) }}
         >
           <Swords size={20} strokeWidth={1.6} color={Colors.friend} />
         </View>
         <View className="flex-1">
           <Text className="font-heading text-lg tracking-[2px] text-white mb-[3px]">{title}</Text>
-          <Text className="font-sans text-xs text-[#707070] leading-[18px]">
+          <Text className="font-sans text-xs text-ink-550 leading-[18px]">
             {t('invitation.challengedYou', { name })}
             {ch?.ends_at ? `  ·  ${endsInLabel(ch.ends_at)}` : ''}
           </Text>
@@ -58,7 +58,7 @@ export function InvitationCard({
           className="flex-1"
         >
           <LinearGradient
-            colors={[Colors.friend, Colors.friend + '99']}
+            colors={[Colors.friend, withAlpha(Colors.friend, 0.6)]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{

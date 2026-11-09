@@ -13,7 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Flame, Target } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@/constants/theme';
+import { Colors, MacroColors, withAlpha } from '@/constants/theme';
 import { Routes } from '@/constants/routes';
 import { formatNumber } from '@/lib/i18n/format';
 import { resolveTargets } from '@/lib/nutrition';
@@ -37,9 +37,9 @@ import type { NutritionTargets } from '@/types/nutrition';
  */
 
 const MACROS = [
-  { key: 'protein_g' as const, labelKey: 'plan.protein', color: '#4a9eff' },
-  { key: 'carbs_g' as const, labelKey: 'plan.carbs', color: '#ffaa00' },
-  { key: 'fat_g' as const, labelKey: 'plan.fat', color: '#00cc88' },
+  { key: 'protein_g' as const, labelKey: 'plan.protein', color: MacroColors.protein },
+  { key: 'carbs_g' as const, labelKey: 'plan.carbs', color: MacroColors.carbs },
+  { key: 'fat_g' as const, labelKey: 'plan.fat', color: MacroColors.fat },
 ];
 
 export default function PlanReadyScreen() {
@@ -113,7 +113,7 @@ export default function PlanReadyScreen() {
           <>
             {/* Calories — the headline number */}
             <LinearGradient
-              colors={['rgba(230,48,48,0.14)', 'rgba(230,48,48,0.04)']}
+              colors={[withAlpha(Colors.accent, 0.14), withAlpha(Colors.accent, 0.04)]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.calorieCard}
@@ -128,7 +128,7 @@ export default function PlanReadyScreen() {
                 <Text className="font-heading text-[62px] text-primary leading-[64px]">
                   {formatNumber(targets.calories)}
                 </Text>
-                <Text className="font-heading text-lg text-[#888] pb-3">{t('plan.kcal')}</Text>
+                <Text className="font-heading text-lg text-ink-450 pb-3">{t('plan.kcal')}</Text>
               </View>
             </LinearGradient>
 
@@ -148,7 +148,7 @@ export default function PlanReadyScreen() {
 
             <View className="flex-row items-start gap-2 bg-surface rounded-xl px-3.5 py-3 mt-3">
               <Target size={14} color={Colors.success} style={{ marginTop: 2 }} />
-              <Text className="flex-1 font-sans text-[11px] text-[#808080] leading-4">
+              <Text className="flex-1 font-sans text-[11px] text-ink-500 leading-4">
                 {t('plan.editableNote')}
               </Text>
             </View>
@@ -157,7 +157,7 @@ export default function PlanReadyScreen() {
           // Reached when setup was skipped — no body data, so no honest number
           // to show. Say so plainly rather than inventing a default.
           <View className="bg-surface rounded-2xl py-10 px-5 items-center gap-2">
-            <Target size={26} strokeWidth={1.4} color="#333" />
+            <Target size={26} strokeWidth={1.4} color={Colors.ink800} />
             <Text className="font-heading text-lg tracking-[2px] text-primary mt-1">
               {t('plan.noTargetsTitle')}
             </Text>
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 20,
     borderWidth: 1,
-    borderColor: 'rgba(230,48,48,0.22)',
+    borderColor: withAlpha(Colors.accent, 0.22),
   },
   cta: { height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
 });

@@ -55,7 +55,7 @@ export default function BadgesScreen() {
         <View className="flex-row flex-wrap gap-2.5 mb-6">
           {earned.map((b) => (
             <View key={b.id} className="w-[30%] grow bg-surface rounded-2xl p-3.5 items-center gap-1.5">
-              <View className="w-[52px] h-[52px] rounded-full items-center justify-center bg-[rgba(255,170,0,0.15)]">
+              <View className="w-[52px] h-[52px] rounded-full items-center justify-center bg-warning/15">
                 <b.icon size={24} color={Colors.warning} />
               </View>
               <Text className="font-sans-medium text-[12px] text-primary text-center">

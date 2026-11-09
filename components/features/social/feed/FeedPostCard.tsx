@@ -3,7 +3,7 @@ import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } fr
 import { LinearGradient } from 'expo-linear-gradient';
 import { Flame, Heart, MapPin, Trash2, VideoOff } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@/constants/theme';
+import { Colors, withAlpha } from '@/constants/theme';
 import { formatTimestamp } from '@/lib/i18n/format';
 import { deletePRVideoFiles, uploadPRVideo } from '@/lib/api';
 import {
@@ -128,8 +128,8 @@ function FeedPostCardInner({ post, userId, isActive, onToggleLike, onDelete }: F
             </Text>
           </View>
         </View>
-        <View className="bg-[#232323] border border-[#2e2e2e] rounded-lg py-1 px-2">
-          <Text className="font-heading text-[11px] text-[#606060] tracking-[1px]">
+        <View className="bg-ink-850 border border-elevated rounded-lg py-1 px-2">
+          <Text className="font-heading text-[11px] text-ink-600 tracking-[1px]">
             {t('levelShort', { level: post.author_level })}
           </Text>
         </View>
@@ -152,7 +152,7 @@ function FeedPostCardInner({ post, userId, isActive, onToggleLike, onDelete }: F
         {isUploading && (
           <View className="absolute top-2.5 left-3 flex-row items-center gap-1.5 bg-black/60 rounded-full py-[5px] px-2.5">
             <ActivityIndicator size="small" color={Colors.muted} style={styles.uploadSpinner} />
-            <Text className="font-heading text-[9px] text-[#666] tracking-[1.5px]">
+            <Text className="font-heading text-[9px] text-ink-600 tracking-[1.5px]">
               {t('videoUploading')}
             </Text>
           </View>
@@ -166,11 +166,11 @@ function FeedPostCardInner({ post, userId, isActive, onToggleLike, onDelete }: F
             style={({ pressed }) => pressed && !retryingVideo && { opacity: 0.7 }}
           >
             {retryingVideo ? (
-              <ActivityIndicator size="small" color="#666" style={styles.uploadSpinner} />
+              <ActivityIndicator size="small" color={Colors.ink600} style={styles.uploadSpinner} />
             ) : (
-              <VideoOff size={11} strokeWidth={2} color="#666" />
+              <VideoOff size={11} strokeWidth={2} color={Colors.ink600} />
             )}
-            <Text className="font-heading text-[9px] text-[#666] tracking-[1.5px]">
+            <Text className="font-heading text-[9px] text-ink-600 tracking-[1.5px]">
               {retryingVideo ? t('videoUploading') : `${t('videoFailed')} · ${t('retry')}`}
             </Text>
           </Pressable>
@@ -179,18 +179,18 @@ function FeedPostCardInner({ post, userId, isActive, onToggleLike, onDelete }: F
         {/* PR value overlay — video posts only, so it doesn't double with FeedStatVisual */}
         {hasVideo && (
           <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.90)']}
+            colors={['transparent', withAlpha(Colors.black, 0.9)]}
             style={styles.valueOverlay}
             pointerEvents="none"
           >
-            <Text className="font-heading text-[10px] text-[#bbb] tracking-[2.5px] mb-0.5">
+            <Text className="font-heading text-[10px] text-secondary tracking-[2.5px] mb-0.5">
               {post.exercise_label.toUpperCase()}
             </Text>
             <View className="flex-row items-baseline gap-1">
               <Text className="font-heading text-[32px] text-white tracking-[2px] leading-[34px]">
                 {post.value}
               </Text>
-              <Text className="font-heading text-base text-[#aaa]">{post.unit.toUpperCase()}</Text>
+              <Text className="font-heading text-base text-secondary">{post.unit.toUpperCase()}</Text>
             </View>
           </LinearGradient>
         )}
@@ -201,26 +201,26 @@ function FeedPostCardInner({ post, userId, isActive, onToggleLike, onDelete }: F
         <View className="flex-row items-center gap-1.5">
           <Flame size={16} strokeWidth={2} color={Colors.accent} />
           <Text className="font-heading text-lg text-white">{post.likes_count}</Text>
-          <Text className="font-sans text-[11px] text-[#505050] tracking-[1px]">{t('likes')}</Text>
+          <Text className="font-sans text-[11px] text-ink-650 tracking-[1px]">{t('likes')}</Text>
         </View>
         {!isMe ? (
           <Pressable
             onPress={() => onToggleLike(post.id)}
             className={`flex-row items-center gap-[7px] py-2 px-4 rounded-xl border-[1.5px] ${
               post.has_liked
-                ? 'border-[rgba(230,48,48,0.50)] bg-[rgba(230,48,48,0.08)]'
-                : 'border-default bg-[#242424]'
+                ? 'border-accent/50 bg-accent/8'
+                : 'border-default bg-ink-850'
             }`}
           >
             <Heart
               size={13}
               strokeWidth={2}
               fill={post.has_liked ? Colors.accent : 'none'}
-              color={post.has_liked ? Colors.accent : '#707070'}
+              color={post.has_liked ? Colors.accent : Colors.ink550}
             />
             <Text
               className={`font-heading text-xs tracking-[1px] ${
-                post.has_liked ? 'text-accent' : 'text-[#707070]'
+                post.has_liked ? 'text-accent' : 'text-ink-550'
               }`}
             >
               {post.has_liked ? t('liked') : t('like')}

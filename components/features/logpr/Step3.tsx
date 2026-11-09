@@ -27,7 +27,7 @@ export function Step3({
   return (
     <View className="items-center pt-6 pb-4">
       {/* Trophy icon with glow ring — shows spinner while video uploads */}
-      <View className="w-24 h-24 rounded-full border-2 border-[rgba(230,48,48,0.3)] items-center justify-center mb-5">
+      <View className="w-24 h-24 rounded-full border-2 border-accent/30 items-center justify-center mb-5">
         <LinearGradient
           colors={[Colors.accent, Colors.accentDark]}
           style={{ width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center' }}
@@ -46,10 +46,10 @@ export function Step3({
       <Text className="font-heading text-[15px] tracking-[2px] text-accent mb-6">{t('xpEarned')}</Text>
 
       {/* PR card */}
-      <View className="w-full bg-[rgba(230,48,48,0.06)] border border-[rgba(230,48,48,0.22)] rounded-2xl py-5 px-6 items-center mb-5 gap-1">
+      <View className="w-full bg-accent/6 border border-accent/22 rounded-2xl py-5 px-6 items-center mb-5 gap-1">
         <View className="flex-row items-center gap-1.5 mb-1.5">
-          <ExIcon size={14} strokeWidth={1.8} color="#888" />
-          <Text className="font-heading text-xs tracking-[2px] text-[#666]">
+          <ExIcon size={14} strokeWidth={1.8} color={Colors.ink450} />
+          <Text className="font-heading text-xs tracking-[2px] text-ink-600">
             {exercise.label.toUpperCase()}
           </Text>
         </View>
@@ -58,7 +58,7 @@ export function Step3({
         </Text>
         <View className="flex-row items-end gap-1.5">
           <Text className="font-heading text-accent text-[52px] leading-[52px]">{savedValue}</Text>
-          <Text className="font-heading text-base text-[#999] pb-1.5">{exercise.unit}</Text>
+          <Text className="font-heading text-base text-ink-400 pb-1.5">{exercise.unit}</Text>
         </View>
       </View>
 

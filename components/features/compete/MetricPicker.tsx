@@ -28,7 +28,7 @@ export function MetricPicker({
           onPress={() => onChange(opt.value)}
           className={`flex-1 py-2 px-3 rounded-[10px] border-[1.5px] items-center justify-center ${
             value === opt.value
-              ? 'border-accent bg-[rgba(230,48,48,0.1)]'
+              ? 'border-accent bg-accent/10'
               : 'border-default bg-transparent'
           }`}
         >

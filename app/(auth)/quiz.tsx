@@ -137,7 +137,7 @@ export default function QuizScreen() {
                 accessibilityRole="radio"
                 accessibilityState={{ selected }}
                 className={`flex-row items-center gap-3 rounded-2xl border-[1.5px] px-4 py-4 ${
-                  selected ? 'bg-[#241a1a] border-accent' : 'bg-surface border-default'
+                  selected ? 'bg-accent-tint border-accent' : 'bg-surface border-default'
                 }`}
                 style={({ pressed }) => pressed && { opacity: 0.82 }}
               >
@@ -145,13 +145,13 @@ export default function QuizScreen() {
                   <Text className="font-sans-semibold text-[15px] text-primary">
                     {t(opt.labelKey)}
                   </Text>
-                  <Text className="font-sans text-[12px] text-[#787878] mt-0.5">
+                  <Text className="font-sans text-[12px] text-ink-550 mt-0.5">
                     {t(opt.subKey)}
                   </Text>
                 </View>
                 <View
                   className={`w-6 h-6 rounded-full items-center justify-center border-2 ${
-                    selected ? 'bg-accent border-accent' : 'border-[#3a3a3a]'
+                    selected ? 'bg-accent border-accent' : 'border-ink-750'
                   }`}
                 >
                   {selected && <Check size={13} color={Colors.primary} strokeWidth={3.5} />}

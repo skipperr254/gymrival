@@ -57,20 +57,20 @@ export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabl
 
   if (asset) {
     return (
-      <View className="h-40 rounded-2xl overflow-hidden bg-[#0d0d0d]">
+      <View className="h-40 rounded-2xl overflow-hidden bg-ink-950">
         {asset.thumbnailUri ? (
           <Image source={{ uri: asset.thumbnailUri }} className="absolute inset-0" resizeMode="cover" />
         ) : (
-          <View className="absolute inset-0 items-center justify-center bg-[#111]">
-            <Video size={28} strokeWidth={1.4} color="#444" />
+          <View className="absolute inset-0 items-center justify-center bg-ink-950">
+            <Video size={28} strokeWidth={1.4} color={Colors.hint} />
           </View>
         )}
         {/* Overlay */}
         <View className="absolute inset-0 flex-row justify-between items-start p-2.5 bg-black/25">
           {/* Duration badge */}
           <View className="flex-row items-center gap-1 bg-black/70 rounded-full py-1 px-2">
-            <Clock size={10} strokeWidth={2} color="#ccc" />
-            <Text className="font-heading text-[11px] text-[#ccc]">{formatDuration(asset.durationSec)}</Text>
+            <Clock size={10} strokeWidth={2} color={Colors.ink200} />
+            <Text className="font-heading text-[11px] text-ink-200">{formatDuration(asset.durationSec)}</Text>
           </View>
           {/* Remove button */}
           <Pressable
@@ -82,7 +82,7 @@ export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabl
           </Pressable>
         </View>
         {/* Ready label */}
-        <View className="absolute bottom-2.5 left-2.5 bg-[rgba(0,204,68,0.85)] rounded-full py-1 px-2.5">
+        <View className="absolute bottom-2.5 left-2.5 bg-success/85 rounded-full py-1 px-2.5">
           <Text className="font-heading text-[9px] tracking-[1.5px] text-white">
             {t('video.readyLabel')}
           </Text>
@@ -95,11 +95,11 @@ export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabl
     <Pressable
       onPress={showPickerOptions}
       disabled={disabled}
-      className={`h-[130px] rounded-2xl border-[1.5px] border-dashed bg-[#161616] items-center justify-center gap-1.5 ${
+      className={`h-[130px] rounded-2xl border-[1.5px] border-dashed bg-base items-center justify-center gap-1.5 ${
         disabled ? 'opacity-40' : ''
       }`}
       style={({ pressed }) =>
-        pressed && !disabled ? { backgroundColor: Colors.surface, borderColor: '#3a3a3a' } : undefined
+        pressed && !disabled ? { backgroundColor: Colors.surface, borderColor: Colors.ink750 } : undefined
       }
     >
       <View className="flex-row gap-3 mb-1">
@@ -110,10 +110,10 @@ export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabl
           <Video size={20} strokeWidth={1.4} color={Colors.muted} />
         </View>
       </View>
-      <Text className="font-heading text-[11px] tracking-[2px] text-[#444]">
+      <Text className="font-heading text-[11px] tracking-[2px] text-hint">
         {t('video.addProofTitle')}
       </Text>
-      <Text className="font-sans text-[10px] text-[#333]">{t('video.addProofSub')}</Text>
+      <Text className="font-sans text-[10px] text-ink-800">{t('video.addProofSub')}</Text>
     </Pressable>
   );
 }

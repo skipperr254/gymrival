@@ -55,6 +55,9 @@ supabase/migrations/, supabase/functions/
 
 - Style with NativeWind `className`. Fall back to `style`/`StyleSheet` only for things className can't handle: `SafeAreaView`, `KeyboardAvoidingView`, `Modal`, `contentContainerStyle`, Animated values, runtime-computed values, platform-specific shadows, and `Pressable` style functions.
 - **Never hardcode a color.** Tokens live in `global.css` `@theme` (for classNames) and `constants/theme.ts` `Colors` (for props like an icon's `color`). Keep the two in sync. If you need a new color, add a token to both.
+  - Greys between the semantic tokens use the `ink-950…ink-200` ramp (`text-ink-600`, `Colors.ink600`). Pick the nearest step instead of inventing a grey.
+  - For translucency, use the opacity modifier in className (`bg-accent/10`) and `withAlpha(Colors.accent, 0.1)` in JS. Never use raw `rgba()` or hex-alpha suffixes.
+  - Gradient stops come from `Gradients`, macro colors from `MacroColors`, and rank colors from `MedalColors`.
 - Fonts: Bebas Neue (`font-display`/`font-heading`) for headings, labels, numbers and all-caps UI. DM Sans (`font-body*`) for body text and inputs.
 - The look is dark, bold and high-contrast, with red accents and rounded dark cards. Use skeleton loaders rather than spinners, touch targets of at least 44px, and press feedback on everything interactive.
 - Scrollable screens need bottom padding (`pb-24`) so the tab bar doesn't hide content.

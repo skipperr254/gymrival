@@ -94,7 +94,7 @@ export default function LanguageScreen() {
       </View>
 
       {switching && (
-        <View className="absolute inset-0 z-10 items-center justify-center bg-[rgba(0,0,0,0.6)]">
+        <View className="absolute inset-0 z-10 items-center justify-center bg-black/60">
           <ActivityIndicator size="large" color={Colors.accent} />
         </View>
       )}

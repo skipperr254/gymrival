@@ -2,7 +2,7 @@ import { View, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Check } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@/constants/theme';
+import { Colors, Gradients } from '@/constants/theme';
 import type { MealType } from '@/types/nutrition';
 
 interface Step3ConfirmationProps {
@@ -19,9 +19,9 @@ export function Step3Confirmation({ name, mealType, calories, proteinG, carbsG, 
 
   return (
     <View className="items-center pt-6 pb-4">
-      <View className="w-24 h-24 rounded-full border-2 border-[rgba(0,204,68,0.3)] items-center justify-center mb-5">
+      <View className="w-24 h-24 rounded-full border-2 border-success/30 items-center justify-center mb-5">
         <LinearGradient
-          colors={['#00cc44', '#009933']}
+          colors={Gradients.success}
           style={{ width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center' }}
         >
           <Check size={36} strokeWidth={2.6} color={Colors.primary} />
@@ -33,7 +33,7 @@ export function Step3Confirmation({ name, mealType, calories, proteinG, carbsG, 
         {t('logSheet.addedToMeal', { meal: t(`mealTypes.${mealType}`) })}
       </Text>
 
-      <View className="w-full bg-[rgba(0,204,68,0.06)] border border-[rgba(0,204,68,0.22)] rounded-2xl py-5 px-6 items-center gap-1.5">
+      <View className="w-full bg-success/6 border border-success/22 rounded-2xl py-5 px-6 items-center gap-1.5">
         <Text className="font-heading text-base text-primary tracking-[0.5px] text-center">{name}</Text>
         <Text className="font-sans text-xs text-secondary text-center">
           {t('logSheet.macroSummary', { calories, protein: proteinG, carbs: carbsG, fat: fatG })}

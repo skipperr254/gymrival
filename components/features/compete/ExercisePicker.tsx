@@ -29,7 +29,7 @@ export function ExercisePicker({
               onPress={() => onChange(ex.key)}
               className={`flex-row items-center gap-1.5 py-2 px-3 rounded-[10px] border-[1.5px] justify-center ${
                 active
-                  ? 'border-accent bg-[rgba(230,48,48,0.1)]'
+                  ? 'border-accent bg-accent/10'
                   : 'border-default bg-transparent'
               }`}
             >

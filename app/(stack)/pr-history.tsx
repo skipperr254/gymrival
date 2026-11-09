@@ -113,7 +113,7 @@ export default function PRHistoryScreen() {
         </View>
       ) : prHistory.length === 0 ? (
         <View className="flex-1 items-center justify-center px-8 gap-2.5">
-          <Trophy size={40} strokeWidth={1.4} color="#333" />
+          <Trophy size={40} strokeWidth={1.4} color={Colors.ink800} />
           <Text className="font-heading text-xl tracking-[2px] text-primary">
             {t('prHistory.emptyTitle')}
           </Text>

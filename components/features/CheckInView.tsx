@@ -41,11 +41,11 @@ export function CheckInView() {
   const pct = (streak / 7) * 100;
 
   const flameColor =
-    streak >= 5 ? Colors.accent : streak >= 3 ? '#ff8c00' : '#444444';
+    streak >= 5 ? Colors.accent : streak >= 3 ? Colors.orange : Colors.hint;
   const streakMotivation =
     streak >= 5 ? t('checkin.machine') : streak >= 3 ? t('checkin.keepItUp') : t('checkin.stayStrong');
   const streakMotivationColor =
-    streak >= 5 ? Colors.accent : streak >= 3 ? '#ff8c00' : Colors.muted;
+    streak >= 5 ? Colors.accent : streak >= 3 ? Colors.orange : Colors.muted;
 
   const confirmedGym = gyms.find((g) => g.id === activeCheckin?.gym_id);
 
@@ -70,14 +70,14 @@ export function CheckInView() {
       <View className="bg-black rounded-[20px] p-5 mb-3.5">
         <View className="flex-row items-start justify-between mb-[18px]">
           <View>
-            <Text className="font-heading text-[11px] text-[#606060] tracking-[2px] mb-1.5">
+            <Text className="font-heading text-[11px] text-ink-600 tracking-[2px] mb-1.5">
               {t('checkin.weeklyStreak')}
             </Text>
             <View className="flex-row items-end gap-2">
               <Text className="font-heading text-primary tracking-[2px] text-[64px] leading-[64px]">
                 {streak}
               </Text>
-              <Text className="font-sans text-sm text-[#606060] mb-2">
+              <Text className="font-sans text-sm text-ink-600 mb-2">
                 {t('checkin.ofSevenDays')}
               </Text>
             </View>
@@ -139,7 +139,7 @@ export function CheckInView() {
           </View>
 
           {gyms.length === 0 && !checkinLoading ? (
-            <Text className="font-sans text-[13px] text-[#606060] text-center py-3">
+            <Text className="font-sans text-[13px] text-ink-600 text-center py-3">
               {t('checkin.noGyms')}
             </Text>
           ) : (
@@ -156,7 +156,7 @@ export function CheckInView() {
                     key={gym.id}
                     className={`flex-row items-center gap-3 py-[13px] px-3.5 rounded-2xl mb-2 border-[1.5px] ${
                       isSelected
-                        ? 'bg-[rgba(230,48,48,0.08)] border-accent'
+                        ? 'bg-accent/8 border-accent'
                         : 'bg-base border-default'
                     }`}
                     style={({ pressed }) => pressed && { opacity: 0.8 }}
@@ -165,7 +165,7 @@ export function CheckInView() {
                     <View
                       className={`w-10 h-10 rounded-xl items-center justify-center shrink-0 border ${
                         isSelected
-                          ? 'bg-[rgba(230,48,48,0.12)] border-[rgba(230,48,48,0.3)]'
+                          ? 'bg-accent/12 border-accent/30'
                           : 'bg-surface border-default'
                       }`}
                     >
@@ -177,18 +177,18 @@ export function CheckInView() {
                     <View className="flex-1">
                       <Text
                         className={`font-sans-medium text-sm mb-0.5 ${
-                          isSelected ? 'text-primary' : 'text-[#c0c0c0]'
+                          isSelected ? 'text-primary' : 'text-ink-200'
                         }`}
                       >
                         {gym.name}
                       </Text>
                       <View className="flex-row items-center gap-3">
                         {gym.city ? (
-                          <Text className="font-sans text-[11px] text-[#606060]">{gym.city}</Text>
+                          <Text className="font-sans text-[11px] text-ink-600">{gym.city}</Text>
                         ) : null}
                         <View className="flex-row items-center gap-1">
-                          <Users size={11} color="#606060" />
-                          <Text className="font-sans text-[11px] text-[#606060]">
+                          <Users size={11} color={Colors.ink600} />
+                          <Text className="font-sans text-[11px] text-ink-600">
                             {t('checkin.hereToday', { count: gym.today_count })}
                           </Text>
                         </View>
@@ -217,11 +217,11 @@ export function CheckInView() {
               <>
                 <CheckCircle
                   size={17}
-                  color={selectedGymId !== null ? Colors.primary : '#444444'}
+                  color={selectedGymId !== null ? Colors.primary : Colors.hint}
                 />
                 <Text
                   className={`font-heading text-sm tracking-[3px] ${
-                    selectedGymId !== null ? 'text-primary' : 'text-[#444444]'
+                    selectedGymId !== null ? 'text-primary' : 'text-hint'
                   }`}
                 >
                   {t('checkin.confirmCheckIn')}
@@ -232,20 +232,20 @@ export function CheckInView() {
         </View>
       ) : (
         /* ── Confirmed State ── */
-        <View className="bg-[#0a1f0a] border border-[#1a3a1a] rounded-[20px] py-6 px-5 mb-3.5 items-center">
-          <View className="w-16 h-16 rounded-full bg-[rgba(76,175,80,0.12)] border border-[rgba(76,175,80,0.3)] items-center justify-center mb-3.5">
-            <CheckCircle size={32} color="#4caf50" />
+        <View className="bg-success-tint border border-success-tint-border rounded-[20px] py-6 px-5 mb-3.5 items-center">
+          <View className="w-16 h-16 rounded-full bg-success-soft/12 border border-success-soft/30 items-center justify-center mb-3.5">
+            <CheckCircle size={32} color={Colors.successSoft} />
           </View>
           <Text className="font-heading text-[22px] tracking-[3px] text-primary mb-1">
             {t('checkin.checkedIn')}
           </Text>
-          <Text className="font-sans text-[13px] text-[#707070] mb-1">
+          <Text className="font-sans text-[13px] text-ink-550 mb-1">
             {confirmedGym?.name ?? t('checkin.yourGym')}
           </Text>
           {lastCheckinXpAwarded && (
             <View className="flex-row items-center gap-1.5 mb-[18px]">
-              <Zap size={13} color="#4caf50" />
-              <Text className="font-sans text-[11px] text-[#4caf50] tracking-[1px]">
+              <Zap size={13} color={Colors.successSoft} />
+              <Text className="font-sans text-[11px] text-success-soft tracking-[1px]">
                 {t('checkin.xpEarned')}
               </Text>
             </View>
@@ -257,9 +257,9 @@ export function CheckInView() {
             disabled={checkinLoading}
           >
             {checkinLoading ? (
-              <ActivityIndicator size="small" color="#606060" />
+              <ActivityIndicator size="small" color={Colors.ink600} />
             ) : (
-              <Text className="font-heading text-[11px] tracking-[2px] text-[#606060]">
+              <Text className="font-heading text-[11px] tracking-[2px] text-ink-600">
                 {t('checkin.undoCheckIn')}
               </Text>
             )}
@@ -295,13 +295,13 @@ export function CheckInView() {
                   {friend.full_name ?? friend.username ?? t('checkin.unknown')}
                 </Text>
                 <View className="flex-row items-center gap-1.5">
-                  <MapPin size={11} color="#606060" />
-                  <Text className="font-sans text-[11px] text-[#606060]">{friend.gym_name}</Text>
+                  <MapPin size={11} color={Colors.ink600} />
+                  <Text className="font-sans text-[11px] text-ink-600">{friend.gym_name}</Text>
                 </View>
               </View>
               <View className="flex-row items-center gap-1.5">
-                <Clock size={11} color="#505050" />
-                <Text className="font-sans text-[10px] text-[#505050] tracking-[1px]">
+                <Clock size={11} color={Colors.ink650} />
+                <Text className="font-sans text-[10px] text-ink-650 tracking-[1px]">
                   {formatRelativeTime(friend.checked_in_at)}
                 </Text>
               </View>

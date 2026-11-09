@@ -259,7 +259,7 @@ export function CreateWorkoutSheet({ visible, saving, onClose, onSave }: CreateW
                       hitSlop={8}
                       style={({ pressed }) => ({ opacity: pressed ? 1 : 0.5 })}
                     >
-                      <X size={14} color="#ff6b6b" />
+                      <X size={14} color={Colors.accentLight} />
                     </Pressable>
                   </View>
                 ))}

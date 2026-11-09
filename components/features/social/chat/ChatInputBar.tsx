@@ -84,7 +84,7 @@ function ChatInputBarInner({
         <Pressable
           onPress={onUpgradePress}
           accessibilityRole="button"
-          className="flex-row items-center gap-3 bg-[#1c1c1c] border-[1.5px] border-default rounded-[22px] px-4 py-3"
+          className="flex-row items-center gap-3 bg-surface border-[1.5px] border-default rounded-[22px] px-4 py-3"
           style={({ pressed }) => pressed && { opacity: 0.75 }}
         >
           <Lock size={16} strokeWidth={2} color={Colors.accent} />
@@ -92,7 +92,7 @@ function ChatInputBarInner({
             <Text className="font-sans-semibold text-[13px] text-primary">
               {t('chat.lockedTitle')}
             </Text>
-            <Text className="font-sans text-[11px] text-[#707070] mt-px">
+            <Text className="font-sans text-[11px] text-ink-550 mt-px">
               {t('chat.lockedSub')}
             </Text>
           </View>
@@ -120,17 +120,17 @@ function ChatInputBarInner({
           <Pressable
             key={i}
             onPress={() => handleSend(q)}
-            className="py-1.5 px-3.5 rounded-full border border-default bg-[#1c1c1c]"
+            className="py-1.5 px-3.5 rounded-full border border-default bg-surface"
             style={({ pressed }) => pressed && { opacity: 0.7 }}
           >
-            <Text className="font-sans text-xs text-[#888]">{q}</Text>
+            <Text className="font-sans text-xs text-ink-450">{q}</Text>
           </Pressable>
         ))}
       </ScrollView>
 
       {/* Input bar */}
       <View className="flex-row items-end gap-2 px-4 pt-2.5" style={{ paddingBottom: bottomPad }}>
-        <View className="flex-1 flex-row items-end bg-[#1c1c1c] border-[1.5px] border-default rounded-[22px] pl-4 pr-1 py-1">
+        <View className="flex-1 flex-row items-end bg-surface border-[1.5px] border-default rounded-[22px] pl-4 pr-1 py-1">
           <TextInput
             ref={inputRef}
             value={input}
@@ -147,7 +147,7 @@ function ChatInputBarInner({
             onPress={() => handleSend()}
             disabled={!input.trim() || !canSend}
             className={`w-[34px] h-[34px] rounded-full items-center justify-center shrink-0 mb-0.5 ${
-              input.trim() && canSend ? 'bg-accent' : 'bg-[#242424]'
+              input.trim() && canSend ? 'bg-accent' : 'bg-ink-850'
             }`}
           >
             <ArrowUp

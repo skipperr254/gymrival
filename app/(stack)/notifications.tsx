@@ -70,7 +70,7 @@ function notificationIcon(type: NotificationType): { icon: LucideIcon; color: st
     case 'friend_pr':
       return { icon: Trophy, color: Colors.warning };
     case 'challenge_won':
-      return { icon: Trophy, color: '#d4a017' };
+      return { icon: Trophy, color: Colors.gold };
     default:
       // A notification type the client doesn't recognize yet (e.g. a new
       // type shipped server-side before this app version updated, or bad

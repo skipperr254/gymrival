@@ -67,7 +67,7 @@ export default function ChangePasswordScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View className="mb-4">
-            <Text className="font-heading text-[11px] tracking-[2px] text-[#505050] mb-2">
+            <Text className="font-heading text-[11px] tracking-[2px] text-ink-650 mb-2">
               {t('changePassword.newPasswordLabel')}
             </Text>
             <View className="bg-elevated rounded-xl px-4 flex-row items-center border border-default min-h-[50px]">
@@ -97,7 +97,7 @@ export default function ChangePasswordScreen() {
           </View>
 
           <View className="mb-4">
-            <Text className="font-heading text-[11px] tracking-[2px] text-[#505050] mb-2">
+            <Text className="font-heading text-[11px] tracking-[2px] text-ink-650 mb-2">
               {t('changePassword.confirmPasswordLabel')}
             </Text>
             <View className="bg-elevated rounded-xl px-4 flex-row items-center border border-default min-h-[50px]">

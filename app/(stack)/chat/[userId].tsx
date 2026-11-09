@@ -159,7 +159,7 @@ export default function ChatScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
         <DetailHeader />
         <View className="flex-1 items-center justify-center gap-3 px-8 -mt-[60px]">
-          <MessageCircle size={32} strokeWidth={1.4} color="#333" />
+          <MessageCircle size={32} strokeWidth={1.4} color={Colors.ink800} />
           <Text className="font-heading text-lg tracking-[2px] text-white">
             {t('chat.cantOpen')}
           </Text>
@@ -184,7 +184,7 @@ export default function ChatScreen() {
           {otherUserId ? (
             <Avatar userId={otherUserId} name={displayName} avatarUrl={otherUser?.avatar_url} size={40} online={online} />
           ) : (
-            <View className="w-10 h-10 rounded-full bg-[#242424]" />
+            <View className="w-10 h-10 rounded-full bg-ink-850" />
           )}
 
           <View className="flex-1">
@@ -193,7 +193,7 @@ export default function ChatScreen() {
             </Text>
             <Text
               className={`font-sans text-[11px] mt-px ${
-                online ? 'text-success' : 'text-[#505050]'
+                online ? 'text-success' : 'text-ink-650'
               }`}
             >
               {online ? t('chat.online') : t('chat.offline')}

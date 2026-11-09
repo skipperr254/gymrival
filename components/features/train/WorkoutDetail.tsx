@@ -43,7 +43,7 @@ export function WorkoutDetail({
       {/* Detail header card */}
       <View className="bg-black rounded-[20px] p-5 mb-3.5">
         <View className="flex-row items-center gap-3.5 mb-3">
-          <View className="w-[50px] h-[50px] rounded-2xl bg-[rgba(230,48,48,0.12)] border border-[rgba(230,48,48,0.25)] items-center justify-center">
+          <View className="w-[50px] h-[50px] rounded-2xl bg-accent/12 border border-accent/25 items-center justify-center">
             <Dumbbell size={26} color={Colors.accent} />
           </View>
           <View className="flex-1">
@@ -81,7 +81,7 @@ export function WorkoutDetail({
             <View
               className={`w-[42px] h-[42px] rounded-xl items-center justify-center border ${
                 workoutStarted
-                  ? 'bg-[rgba(230,48,48,0.1)] border-[rgba(230,48,48,0.3)]'
+                  ? 'bg-accent/10 border-accent/30'
                   : 'bg-base border-default'
               }`}
             >
@@ -116,7 +116,7 @@ export function WorkoutDetail({
                     key={j}
                     className={`flex-1 py-2.5 px-1.5 rounded-[10px] items-center justify-center border-[1.5px] ${
                       done
-                        ? 'border-accent bg-[rgba(230,48,48,0.12)]'
+                        ? 'border-accent bg-accent/12'
                         : 'border-default bg-base'
                     }`}
                     style={({ pressed }) => pressed && { opacity: 0.7 }}
@@ -159,7 +159,7 @@ export function WorkoutDetail({
           )}
         </Pressable>
       ) : allDone ? (
-        <View className="bg-[#0a1f0a] border border-[#1a3a1a] rounded-2xl p-6 items-center mt-1.5">
+        <View className="bg-success-tint border border-success-tint-border rounded-2xl p-6 items-center mt-1.5">
           <Trophy size={42} color={Colors.success} style={{ marginBottom: 12 }} />
           <Text className="font-heading text-[22px] tracking-[3px] text-primary mb-1">
             {t('workoutDone')}

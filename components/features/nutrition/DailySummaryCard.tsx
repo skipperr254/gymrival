@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors, Fonts, MacroColors } from '@/constants/theme';
 import { formatNumber } from '@/lib/i18n/format';
 import type { DailyNutritionTotals, NutritionTargets } from '@/types/nutrition';
 
@@ -65,9 +65,9 @@ export function DailySummaryCard({ totals, targets }: DailySummaryCardProps) {
       </View>
 
       <View className="flex-row gap-4">
-        <MacroBar label={t('summary.protein')} consumed={totals.protein_g} target={targets.protein_g} color={Colors.friend} />
-        <MacroBar label={t('summary.carbs')} consumed={totals.carbs_g} target={targets.carbs_g} color={Colors.warning} />
-        <MacroBar label={t('summary.fat')} consumed={totals.fat_g} target={targets.fat_g} color={Colors.success} />
+        <MacroBar label={t('summary.protein')} consumed={totals.protein_g} target={targets.protein_g} color={MacroColors.protein} />
+        <MacroBar label={t('summary.carbs')} consumed={totals.carbs_g} target={targets.carbs_g} color={MacroColors.carbs} />
+        <MacroBar label={t('summary.fat')} consumed={totals.fat_g} target={targets.fat_g} color={MacroColors.fat} />
       </View>
     </View>
   );

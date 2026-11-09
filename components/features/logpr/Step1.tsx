@@ -39,20 +39,20 @@ export function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangeP
               key={ex.key}
               onPress={() => onSelectEx(ex.key)}
               className={`w-[48%] flex-row items-center gap-2.5 rounded-2xl py-[11px] px-3 border-[1.5px] ${
-                active ? 'bg-[rgba(230,48,48,0.08)] border-accent' : 'bg-base border-default'
+                active ? 'bg-accent/8 border-accent' : 'bg-base border-default'
               }`}
               style={({ pressed }) => pressed && !active && { opacity: 0.7 }}
             >
               <View
                 className={`w-[34px] h-[34px] rounded-[10px] items-center justify-center shrink-0 ${
-                  active ? 'bg-[rgba(230,48,48,0.12)]' : 'bg-[#1a1a1a]'
+                  active ? 'bg-accent/12' : 'bg-ink-900'
                 }`}
               >
-                <ExIcon size={18} strokeWidth={1.8} color={active ? Colors.accent : '#666'} />
+                <ExIcon size={18} strokeWidth={1.8} color={active ? Colors.accent : Colors.ink600} />
               </View>
               <View className="flex-1 min-w-0">
                 <Text
-                  className={`font-sans-medium text-xs mb-0.5 ${active ? 'text-accent' : 'text-[#999]'}`}
+                  className={`font-sans-medium text-xs mb-0.5 ${active ? 'text-accent' : 'text-ink-400'}`}
                   numberOfLines={1}
                 >
                   {ex.label}
@@ -80,7 +80,7 @@ export function Step1({ exercises, selectedExKey, onSelectEx, prValue, onChangeP
               value={prValue}
               onChangeText={onChangePR}
               placeholder={currentPR != null ? String(currentPR + 5) : '0'}
-              placeholderTextColor="#444"
+              placeholderTextColor={Colors.hint}
               keyboardType="numeric"
               returnKeyType="done"
               autoFocus

@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable, ActivityIndicator, StyleSheet } from
 import { LinearGradient } from 'expo-linear-gradient';
 import { AlertCircle, RefreshCw, Trophy } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors, MedalColors } from '@/constants/theme';
+import { Colors, Gradients, MedalColors } from '@/constants/theme';
 import { getExerciseIcon } from '@/constants/exerciseIcons';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCompeteStore } from '@/store/useCompeteStore';
@@ -52,7 +52,7 @@ export function RivalsContent() {
                 active ? 'border-white bg-white' : 'border-default bg-transparent'
               }`}
             >
-              <ExIcon size={12} strokeWidth={2} color={active ? '#000' : Colors.muted} />
+              <ExIcon size={12} strokeWidth={2} color={active ? Colors.black : Colors.muted} />
               <Text
                 className={`font-heading text-[11px] tracking-[1px] ${
                   active ? 'text-black' : 'text-muted'
@@ -74,7 +74,7 @@ export function RivalsContent() {
       )}
 
       {!isLoading && rivals.length === 0 && error && (
-        <View className="items-center bg-[rgba(230,48,48,0.06)] rounded-2xl border border-[rgba(230,48,48,0.2)] py-7 px-5 gap-2">
+        <View className="items-center bg-accent/6 rounded-2xl border border-accent/20 py-7 px-5 gap-2">
           <AlertCircle size={22} strokeWidth={1.6} color={Colors.accent} />
           <Text className="font-sans text-[13px] text-secondary">{t('rivals.loadError')}</Text>
           <Pressable
@@ -91,7 +91,7 @@ export function RivalsContent() {
 
       {!isLoading && rivals.length === 0 && !error && (
         <View className="items-center bg-surface rounded-2xl py-12 px-5 gap-2">
-          <Trophy size={32} strokeWidth={1.4} color="#333" />
+          <Trophy size={32} strokeWidth={1.4} color={Colors.ink800} />
           <Text className="font-heading text-lg tracking-[2px] text-white">
             {t('rivals.emptyTitle')}
           </Text>
@@ -103,7 +103,7 @@ export function RivalsContent() {
 
       {!isLoading && rivals.map((rival, index) => {
         const isFirst = index === 0;
-        const prColor = isFirst ? (rival.isMe ? '#000' : Colors.accent) : rival.isMe ? '#333' : Colors.primary;
+        const prColor = isFirst ? (rival.isMe ? Colors.black : Colors.accent) : rival.isMe ? Colors.ink800 : Colors.primary;
         const pct = `${Math.round((rival.bestPR / maxPR) * 100)}%` as `${number}%`;
         const displayName = rival.fullName || rival.username || t('unknown');
 
@@ -119,7 +119,7 @@ export function RivalsContent() {
               {index < 3 ? (
                 <Trophy size={16} strokeWidth={1.8} color={MedalColors[index]} />
               ) : (
-                <Text className="font-heading text-[13px] text-[#505050]">#{index + 1}</Text>
+                <Text className="font-heading text-[13px] text-ink-650">#{index + 1}</Text>
               )}
             </View>
             <Avatar userId={rival.userId} name={displayName} avatarUrl={rival.avatarUrl} size={42} />
@@ -147,7 +147,7 @@ export function RivalsContent() {
                   <View className="h-1 rounded bg-black" style={{ width: pct }} />
                 ) : (
                   <LinearGradient
-                    colors={[Colors.accent, '#ff6b6b']}
+                    colors={Gradients.accent}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     style={{ height: 4, borderRadius: 4, width: pct }}
@@ -161,7 +161,7 @@ export function RivalsContent() {
               </Text>
               <Text
                 className={`font-heading text-[9px] tracking-[1px] ${
-                  rival.isMe ? 'text-[#888]' : 'text-[#505050]'
+                  rival.isMe ? 'text-ink-450' : 'text-ink-650'
                 }`}
               >
                 {(selectedEx?.unit ?? rival.unit).toUpperCase()}
@@ -172,7 +172,7 @@ export function RivalsContent() {
       })}
 
       {!isLoading && rivals.length > 0 && (
-        <Text className="text-center pt-4 pb-2 font-heading text-[10px] text-[#383838] tracking-[2px]">
+        <Text className="text-center pt-4 pb-2 font-heading text-[10px] text-ink-750 tracking-[2px]">
           {t('rivals.footerNote')}
         </Text>
       )}

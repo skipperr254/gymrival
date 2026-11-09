@@ -130,7 +130,7 @@ export function LogSheet({ visible, onClose, onClosed, onLogPR, onCheckIn, onLog
       <View className="flex-1 bg-black/70 justify-end">
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
         <Animated.View
-          className="bg-[#1a1a1a] rounded-t-3xl px-5 pt-4"
+          className="bg-ink-900 rounded-t-3xl px-5 pt-4"
           style={{ paddingBottom: Math.max(insets.bottom + 16, 32), transform: [{ translateY }] }}
         >
           <View className="w-10 h-1 rounded-full bg-elevated self-center mb-5" />
@@ -141,7 +141,7 @@ export function LogSheet({ visible, onClose, onClosed, onLogPR, onCheckIn, onLog
           {ACTIONS.map((action) => (
             <Pressable
               key={action.id}
-              className="flex-row items-center gap-3.5 bg-[#222] rounded-2xl py-3.5 px-4 mb-2"
+              className="flex-row items-center gap-3.5 bg-ink-850 rounded-2xl py-3.5 px-4 mb-2"
               style={({ pressed }) => pressed && { opacity: 0.7 }}
               // Only signals intent — the parent closes this sheet first and
               // runs the action once the dismissal is confirmed. Opening the
@@ -152,7 +152,7 @@ export function LogSheet({ visible, onClose, onClosed, onLogPR, onCheckIn, onLog
                 else onLogMeal();
               }}
             >
-              <View className="w-12 h-12 rounded-[14px] bg-[#1a1a1a] items-center justify-center shrink-0">
+              <View className="w-12 h-12 rounded-[14px] bg-ink-900 items-center justify-center shrink-0">
                 <action.icon size={24} color={Colors.primary} />
               </View>
               <View className="flex-1">

@@ -191,7 +191,7 @@ export default function SocialScreen() {
               <ActivityIndicator color={Colors.accent} />
             </View>
           ) : !feedHasMore ? (
-            <Text className="text-center py-6 font-heading text-[10px] text-[#383838] tracking-[2px]">
+            <Text className="text-center py-6 font-heading text-[10px] text-ink-750 tracking-[2px]">
               {t('allCaughtUp')}
             </Text>
           ) : null
