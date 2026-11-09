@@ -56,7 +56,7 @@ module.exports = defineConfig([
           'jsx-attributes': {
             exclude: [
               'className', '[a-zA-Z]*ClassName', 'testID', 'style', 'name', 'icon', 'iconColor',
-              'color', 'source', 'keyboardType', 'autoCapitalize', 'autoComplete',
+              'color', 'source', 'keyboardType', 'autoCapitalize', 'autoComplete', 'textContentType',
               'returnKeyType', 'accessibilityRole', 'resizeMode', 'behavior',
               'key', 'href', 'pathname', 'contentContainerStyle', 'edges',
               // react-native-svg technical attributes — not user copy

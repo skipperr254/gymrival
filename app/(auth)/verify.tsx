@@ -33,14 +33,22 @@ export default function VerifyScreen() {
 
   const inputRef = useRef<TextInput>(null);
 
-  const { verifyOtp, resendOtp, setPendingPasswordReset, setPendingProfileSetup } = useAuthStore();
+  const {
+    verifyOtp,
+    resendOtp,
+    setPendingPasswordReset,
+    setPendingProfileSetup,
+  } = useAuthStore();
 
   const { width: screenWidth } = useWindowDimensions();
-  // 40px side padding (20 each side) + gaps between boxes
-  const BOX_GAP = 8;
-  const boxWidth = Math.floor(
-    (screenWidth - 40 - (CODE_LENGTH - 1) * BOX_GAP) / CODE_LENGTH
+  // 40px side padding (20 each side) + gaps between boxes. Height follows the
+  // width so 8 boxes on a narrow phone stay box-shaped instead of tall pills.
+  const BOX_GAP = 6;
+  const boxWidth = Math.min(
+    52,
+    Math.floor((screenWidth - 40 - (CODE_LENGTH - 1) * BOX_GAP) / CODE_LENGTH),
   );
+  const boxHeight = Math.round(boxWidth * 1.3);
 
   // Focus keyboard on mount
   useEffect(() => {
@@ -56,6 +64,10 @@ export default function VerifyScreen() {
   }, [resendCooldown]);
 
   const handleChange = (text: string) => {
+    // Ignore typing while a code is being checked. Don't toggle `editable`
+    // for this: on Android, disabling a focused input detaches it from the
+    // keyboard and it never accepts input again (the keyboard stays up).
+    if (loading) return;
     setError(null);
     setCode(text.replace(/\D/g, "").slice(0, CODE_LENGTH));
   };
@@ -71,7 +83,7 @@ export default function VerifyScreen() {
     if (error) {
       setError(error);
       setCode("");
-      setTimeout(() => inputRef.current?.focus(), 100);
+      refocus();
       return;
     }
 
@@ -82,6 +94,13 @@ export default function VerifyScreen() {
       setPendingProfileSetup(true);
       router.replace(Routes.setup);
     }
+  };
+
+  // blur() first: focus() on an input RN already thinks is focused is a no-op,
+  // so a lost keyboard connection would never come back.
+  const refocus = () => {
+    inputRef.current?.blur();
+    setTimeout(() => inputRef.current?.focus(), 50);
   };
 
   // Auto-submit when code is complete
@@ -135,36 +154,47 @@ export default function VerifyScreen() {
             </Text>
           </View>
 
-          {/* Code boxes */}
-          <Pressable
-            className="flex-row justify-center gap-2"
-            onPress={() => inputRef.current?.focus()}
-          >
-            {Array.from({ length: CODE_LENGTH }).map((_, i) => {
-              const char = code[i] ?? "";
-              const isActive = i === code.length && code.length < CODE_LENGTH;
-              return (
-                <View
-                  key={i}
-                  className={`h-[58px] rounded-[14px] bg-elevated border-[1.5px] items-center justify-center ${
-                    isActive
-                      ? "border-accent"
-                      : char !== ""
-                        ? "border-white/20 bg-surface"
-                        : "border-elevated"
-                  } ${loading ? "opacity-50" : ""}`}
-                  style={{ width: boxWidth }}
-                >
-                  <Text className="font-heading text-primary text-[28px] leading-[34px]">
-                    {char}
-                  </Text>
-                  {isActive && !loading && (
-                    <View className="absolute bottom-[10px] w-0.5 h-[18px] rounded-[1px] bg-accent" />
-                  )}
-                </View>
-              );
-            })}
-          </Pressable>
+          {/* Code boxes. The real input sits invisibly on top of them, so a tap
+              focuses it directly and long-press offers Paste. */}
+          <View className="relative">
+            <View className="flex-row justify-center" style={{ gap: BOX_GAP }}>
+              {Array.from({ length: CODE_LENGTH }).map((_, i) => {
+                const char = code[i] ?? "";
+                const isActive = i === code.length && code.length < CODE_LENGTH;
+                return (
+                  <View
+                    key={i}
+                    className={`rounded-xl bg-elevated border-[1.5px] items-center justify-center ${
+                      isActive
+                        ? "border-accent"
+                        : char !== ""
+                          ? "border-white/20 bg-surface"
+                          : "border-elevated"
+                    } ${loading ? "opacity-50" : ""}`}
+                    style={{ width: boxWidth, height: boxHeight }}
+                  >
+                    <Text className="font-heading text-primary text-[26px] leading-[32px]">
+                      {char}
+                    </Text>
+                    {isActive && !loading && (
+                      <View className="absolute bottom-2 w-0.5 h-4 rounded-[1px] bg-accent" />
+                    )}
+                  </View>
+                );
+              })}
+            </View>
+            <TextInput
+              ref={inputRef}
+              value={code}
+              onChangeText={handleChange}
+              keyboardType="number-pad"
+              textContentType="oneTimeCode"
+              autoComplete="one-time-code"
+              maxLength={CODE_LENGTH}
+              caretHidden
+              className="absolute inset-0 opacity-0"
+            />
+          </View>
 
           {/* Loading indicator */}
           {loading && (
@@ -180,18 +210,6 @@ export default function VerifyScreen() {
             </Text>
           )}
 
-          {/* Hidden real input */}
-          <TextInput
-            ref={inputRef}
-            value={code}
-            onChangeText={handleChange}
-            keyboardType="number-pad"
-            maxLength={CODE_LENGTH}
-            caretHidden
-            className="absolute opacity-0 w-px h-px top-0 left-0"
-            editable={!loading}
-          />
-
           {/* Resend */}
           <View className="flex-row justify-center items-center gap-1 mt-8">
             <Text className="font-sans text-[14px] text-secondary">
@@ -204,7 +222,9 @@ export default function VerifyScreen() {
             >
               <Text
                 className={`font-sans-semibold text-[14px] ${
-                  resendCooldown > 0 || resendLoading ? "text-muted" : "text-accent"
+                  resendCooldown > 0 || resendLoading
+                    ? "text-muted"
+                    : "text-accent"
                 }`}
               >
                 {" "}
