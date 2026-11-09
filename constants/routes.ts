@@ -13,14 +13,14 @@ export const Routes = {
 
   // Compete tab
   compete: '/(tabs)/compete',
-  challengeDetail: (id: string) => `/(stack)/challenge/${id}`,
+  challengeDetail: (id: string) => `/(stack)/challenge/${id}` as const,
   adminChallenges: '/(stack)/admin-challenges',
 
   // Social tab
   social: '/(tabs)/social',
   socialFriends: '/(stack)/friends',
   socialMessages: '/(stack)/messages',
-  chat: (userId: string) => `/(stack)/chat/${userId}`,
+  chat: (userId: string) => `/(stack)/chat/${userId}` as const,
 
   // Train tab
   train: '/(tabs)/train',

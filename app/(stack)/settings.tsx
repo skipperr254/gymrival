@@ -29,7 +29,7 @@ export default function SettingsScreen() {
 
   const handleSignOut = async () => {
     await signOut();
-    router.replace(Routes.splash as never);
+    router.replace(Routes.splash);
   };
 
   return (
@@ -43,7 +43,7 @@ export default function SettingsScreen() {
             label={t('common:settings.language')}
             sub={currentLanguageName}
             iconColor="#e6a030"
-            onPress={() => router.push(Routes.profileLanguage as never)}
+            onPress={() => router.push(Routes.profileLanguage)}
             isFirst
           />
           <SettingsToggleRow
@@ -59,7 +59,7 @@ export default function SettingsScreen() {
             label={t('profile:settings.changePassword')}
             sub={t('profile:settings.changePasswordSub')}
             iconColor="#00cc88"
-            onPress={() => router.push(Routes.profileChangePassword as never)}
+            onPress={() => router.push(Routes.profileChangePassword)}
           />
           {/* Dark mode: not built yet — the app is dark-only today (see CLAUDE.md
               design system). Re-add as a SettingsToggleRow once a light theme

@@ -35,7 +35,7 @@ export function SocialHeader() {
       right={
         <>
           <Pressable
-            onPress={() => router.push(Routes.socialFriends as never)}
+            onPress={() => router.push(Routes.socialFriends)}
             accessibilityRole="button"
             accessibilityLabel={t('headerFriends')}
             hitSlop={6}
@@ -45,7 +45,7 @@ export function SocialHeader() {
             <IconBadge count={pendingRequests} />
           </Pressable>
           <Pressable
-            onPress={() => router.push(Routes.socialMessages as never)}
+            onPress={() => router.push(Routes.socialMessages)}
             accessibilityRole="button"
             accessibilityLabel={t('headerMessages')}
             hitSlop={6}

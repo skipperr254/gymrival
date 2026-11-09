@@ -3,7 +3,7 @@ import "../global.css";
 import { useEffect, useRef, useState } from "react";
 import { AppState, Platform } from "react-native";
 import { reloadAppAsync } from "expo";
-import { Stack, useRouter, useSegments } from "expo-router";
+import { Stack, useRouter, useSegments, type Href } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from "expo-splash-screen";
 import Constants, { ExecutionEnvironment } from "expo-constants";
@@ -60,7 +60,7 @@ SplashScreen.preventAutoHideAsync();
 // participant's user id that Routes.chat() needs — precise deep-linking
 // would need the edge function to also include actor_id in the push data,
 // which is a separate, deliberate follow-up, not done here.
-function routeForNotificationTap(data: Record<string, unknown> | undefined): string | null {
+function routeForNotificationTap(data: Record<string, unknown> | undefined): Href | null {
   switch (data?.type) {
     case "new_message":
       return Routes.socialMessages;
@@ -302,7 +302,7 @@ export default function RootLayout() {
         | Record<string, unknown>
         | undefined;
       const target = routeForNotificationTap(data);
-      if (target) router.push(target as never);
+      if (target) router.push(target);
     });
 
     return () => subscription.remove();
@@ -347,7 +347,7 @@ export default function RootLayout() {
     ) {
       router.replace(Routes.compete);
     } else if (!session && inAuthenticatedGroup) {
-      router.replace(Routes.splash as any);
+      router.replace(Routes.splash);
     }
   }, [session, initialized, segments, pendingPasswordReset, pendingProfileSetup, pendingOnboardingPayoff, fontsLoaded, fontError, i18nReady, router]);
 

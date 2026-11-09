@@ -71,7 +71,7 @@ export default function ProfileScreen() {
     // Pro users land in Settings, where the Subscription section shows their
     // renewal date and the manage/restore actions App Review requires.
     if (isPro) {
-      router.push(Routes.profileSettings as never);
+      router.push(Routes.profileSettings);
       return;
     }
     showPaywall({ trigger: 'upgrade_card' });
@@ -102,7 +102,7 @@ export default function ProfileScreen() {
       <Pressable
         className="w-9 h-9 rounded-[10px] bg-surface items-center justify-center"
         style={({ pressed }) => pressed && { opacity: 0.5 }}
-        onPress={() => router.push(Routes.notifications as never)}
+        onPress={() => router.push(Routes.notifications)}
       >
         <Bell
           size={18}
@@ -120,7 +120,7 @@ export default function ProfileScreen() {
       <Pressable
         className="w-9 h-9 rounded-[10px] bg-surface items-center justify-center"
         style={({ pressed }) => pressed && { opacity: 0.5 }}
-        onPress={() => router.push(Routes.profileSettings as never)}
+        onPress={() => router.push(Routes.profileSettings)}
       >
         <Settings size={18} color="#909090" />
       </Pressable>
@@ -191,7 +191,7 @@ export default function ProfileScreen() {
               <Pressable
                 className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-accent items-center justify-center border-2 border-[#1a0000]"
                 style={({ pressed }) => pressed && { opacity: 0.7 }}
-                onPress={() => router.push(Routes.profileEdit as never)}
+                onPress={() => router.push(Routes.profileEdit)}
               >
                 <Pencil size={10} color={Colors.primary} />
               </Pressable>
@@ -277,7 +277,7 @@ export default function ProfileScreen() {
             <Pressable
               className="flex-row items-center gap-1.5 bg-elevated rounded-[10px] px-3.5 py-1.5"
               style={({ pressed }) => pressed && { opacity: 0.5 }}
-              onPress={() => router.push(Routes.profileEdit as never)}
+              onPress={() => router.push(Routes.profileEdit)}
             >
               <Pencil size={11} color={Colors.secondary} />
               <Text className="font-heading text-[11px] text-secondary tracking-[1px]">

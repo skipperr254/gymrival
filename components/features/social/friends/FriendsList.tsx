@@ -108,7 +108,7 @@ export function FriendsList({ onFindAthletes }: { onFindAthletes: () => void }) 
             </View>
             <View className="flex-row gap-2">
               <Pressable
-                onPress={() => router.push(Routes.chat(friend.id) as never)}
+                onPress={() => router.push(Routes.chat(friend.id))}
                 className="w-[34px] h-[34px] rounded-full border border-default bg-[#1a1a1a] items-center justify-center"
               >
                 <MessageCircle size={15} strokeWidth={2} color="#505050" />

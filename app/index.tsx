@@ -17,7 +17,7 @@ export default function Index() {
   // Without this the flag would stay set in AsyncStorage forever, and the
   // root layout's auth gate would refuse to release them from (auth) if they
   // ever landed back there.
-  if (session && pendingOnboardingPayoff) return <Redirect href={Routes.planReady as never} />;
+  if (session && pendingOnboardingPayoff) return <Redirect href={Routes.planReady} />;
   if (session) return <Redirect href={Routes.compete} />;
-  return <Redirect href={Routes.splash as any} />;
+  return <Redirect href={Routes.splash} />;
 }

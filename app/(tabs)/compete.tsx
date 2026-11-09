@@ -35,7 +35,7 @@ export default function CompeteScreen() {
       <AppHeader
         right={
           isAdmin ? (
-            <Pressable onPress={() => router.push(Routes.adminChallenges as never)}>
+            <Pressable onPress={() => router.push(Routes.adminChallenges)}>
               <ShieldCheck size={20} strokeWidth={1.8} color={Colors.accent} />
             </Pressable>
           ) : undefined

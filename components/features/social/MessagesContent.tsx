@@ -111,7 +111,7 @@ export function MessagesContent() {
           return (
             <Pressable
               key={conv.id}
-              onPress={() => router.push(Routes.chat(conv.other_user.id) as never)}
+              onPress={() => router.push(Routes.chat(conv.other_user.id))}
               className="flex-row items-center gap-[13px] py-[13px] px-3 rounded-2xl"
               style={({ pressed }) => pressed && { backgroundColor: '#1c1c1c' }}
             >
