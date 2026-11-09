@@ -8,6 +8,7 @@ import type {
   PRVideoStatus,
   PRVisibility,
 } from "@/types/pr";
+import { exerciseLabel } from "@/lib/i18n/exercises";
 
 const PR_VIDEOS_BUCKET = 'pr-videos';
 
@@ -36,7 +37,10 @@ export async function fetchBestPRs(
   }
 
   const exerciseMap = new Map<string, ExerciseType>(
-    (exercisesResult.data ?? []).map((e) => [e.key, e as ExerciseType])
+    (exercisesResult.data ?? []).map((e) => [
+      e.key,
+      { ...(e as ExerciseType), label: exerciseLabel(e.key, e.label) },
+    ])
   );
 
   const seen = new Set<string>();
@@ -108,7 +112,10 @@ export async function fetchPRHistory(
   if (prsResult.error) return { data: [], error: prsResult.error.message };
 
   const exerciseMap = new Map<string, ExerciseType>(
-    (exercisesResult.data ?? []).map((e) => [e.key, e as ExerciseType])
+    (exercisesResult.data ?? []).map((e) => [
+      e.key,
+      { ...(e as ExerciseType), label: exerciseLabel(e.key, e.label) },
+    ])
   );
 
   const groupMap = new Map<string, PRHistoryGroup>();

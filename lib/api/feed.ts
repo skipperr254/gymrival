@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 import type { FeedPost } from "@/types/social";
 import type { PRVideo, PRVideoStatus } from "@/types/pr";
 import { getPRVideoPublicUrl } from "./pr";
+import { exerciseLabel } from "@/lib/i18n/exercises";
 
 const FEED_SELECT = `
   id, user_id, exercise_key, value, unit, created_at,
@@ -44,9 +45,7 @@ function mapFeedRow(row: FeedRow, currentUserId: string): FeedPost {
     id: row.id,
     user_id: row.user_id,
     exercise_key: row.exercise_key,
-    exercise_label: row.profiles
-      ? (row.exercise_types?.label ?? row.exercise_key)
-      : row.exercise_key,
+    exercise_label: exerciseLabel(row.exercise_key, row.exercise_types?.label ?? row.exercise_key),
     value: Number(row.value),
     unit: row.unit,
     created_at: row.created_at,

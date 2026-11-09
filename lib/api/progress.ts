@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import type { ExerciseUnit } from '@/types/pr';
 import type { ProgressStats, StrengthSeries, ProgressPoint, CheckinDay } from '@/types/progress';
+import { exerciseLabel } from '@/lib/i18n/exercises';
 
 const BIG3_SET = new Set(['bench', 'squat', 'deadlift']);
 const HEATMAP_DAYS = 84; // 12 weeks
@@ -100,7 +101,7 @@ export async function fetchStrengthData(userId: string): Promise<{
   const exerciseMap = new Map<string, { label: string; unit: ExerciseUnit }>(
     (exercisesResult.data ?? []).map((e) => [
       e.key,
-      { label: e.label, unit: e.unit as ExerciseUnit },
+      { label: exerciseLabel(e.key, e.label), unit: e.unit as ExerciseUnit },
     ])
   );
 
