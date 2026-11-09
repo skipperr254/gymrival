@@ -1,4 +1,5 @@
-import { ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
@@ -16,16 +17,16 @@ export default function AdminChallengesScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
       <DetailHeader title={t('admin.entry')} />
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          <AdminCreateChallengeForm adminId={user.id} />
-          <AdminChallengeList adminId={user.id} />
-        </ScrollView>
-      </KeyboardAvoidingView>
+      <KeyboardAwareScrollView
+        style={{ flex: 1 }}
+        bottomOffset={24}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <AdminCreateChallengeForm adminId={user.id} />
+        <AdminChallengeList adminId={user.id} />
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

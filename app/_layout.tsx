@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { AppState, Platform } from "react-native";
 import { reloadAppAsync } from "expo";
 import { Stack, useRouter, useSegments, type Href } from "expo-router";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from "expo-splash-screen";
 import Constants, { ExecutionEnvironment } from "expo-constants";
@@ -358,18 +359,22 @@ export default function RootLayout() {
     // point for the whole app, above every screen and every bottom sheet. Two
     // live RN <Modal>s on iOS leave an invisible touch-eating view — see the
     // UIKit note in app/(tabs)/_layout.tsx and the contract in PaywallProvider.
-    <PaywallProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        {/* The push from a tab into a drill-down screen is a cross-group
-          transition — (tabs) to (stack) — handled by THIS root stack, not
-          (stack)/_layout.tsx's own nested Stack (that one only governs
-          navigation between screens already inside the group). Without this
-          explicit override the transition silently fell back to each
-          platform's raw native-stack default: a fine slide on iOS, but an
-          Android default that reads as a fade, not the WhatsApp-style slide
-          both platforms should have. */}
-        <Stack.Screen name="(stack)" options={stackScreenOptions} />
-      </Stack>
-    </PaywallProvider>
+    // KeyboardProvider: edge-to-edge keyboard handling for every screen
+    // (react-native-keyboard-controller). Modal sheets use useKeyboardOverlap.
+    <KeyboardProvider>
+      <PaywallProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          {/* The push from a tab into a drill-down screen is a cross-group
+            transition — (tabs) to (stack) — handled by THIS root stack, not
+            (stack)/_layout.tsx's own nested Stack (that one only governs
+            navigation between screens already inside the group). Without this
+            explicit override the transition silently fell back to each
+            platform's raw native-stack default: a fine slide on iOS, but an
+            Android default that reads as a fade, not the WhatsApp-style slide
+            both platforms should have. */}
+          <Stack.Screen name="(stack)" options={stackScreenOptions} />
+        </Stack>
+      </PaywallProvider>
+    </KeyboardProvider>
   );
 }

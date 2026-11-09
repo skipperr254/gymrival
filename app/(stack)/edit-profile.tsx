@@ -1,15 +1,13 @@
 import {
   View,
   Text,
-  ScrollView,
   Pressable,
   TextInput,
-  KeyboardAvoidingView,
-  Platform,
   StyleSheet,
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useRef, useState } from 'react';
@@ -149,106 +147,103 @@ export default function EditProfileScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
       <DetailHeader title={t('edit.title')} />
 
-      <KeyboardAvoidingView
+      <KeyboardAwareScrollView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        bottomOffset={24}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
-        <ScrollView
-          contentContainerStyle={styles.content}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
+        {/* Avatar */}
+        <Pressable
+          className="items-center mb-7 relative self-center"
+          onPress={handleChangePhoto}
+          disabled={avatarUploading}
+          style={({ pressed }) => pressed && { opacity: 0.8 }}
         >
-          {/* Avatar */}
-          <Pressable
-            className="items-center mb-7 relative self-center"
-            onPress={handleChangePhoto}
-            disabled={avatarUploading}
-            style={({ pressed }) => pressed && { opacity: 0.8 }}
-          >
-            <Avatar name={displayName} userId={user?.id ?? displayName} avatarUrl={profile?.avatar_url} size="xl" />
-            {avatarUploading && (
-              <View
-                className="absolute items-center justify-center rounded-full bg-black/50"
-                style={{ width: 72, height: 72 }}
-              >
-                <ActivityIndicator color={Colors.primary} />
-              </View>
-            )}
-            <View className="absolute bottom-0 right-0 w-7 h-7 rounded-full items-center justify-center border-2 border-base bg-accent">
-              <Camera size={12} color={Colors.primary} />
-            </View>
-          </Pressable>
-
-          {/* Fields */}
-          <Field
-            label={t('edit.fullName')}
-            placeholder={t('edit.fullNamePlaceholder')}
-            value={form.full_name}
-            onChangeText={(v) => set('full_name', v)}
-          />
-          <Field
-            label={t('edit.username')}
-            placeholder={t('edit.usernamePlaceholder')}
-            value={form.username}
-            onChangeText={(v) => set('username', v)}
-            autoCapitalize="none"
-          />
-          <Field
-            label={t('edit.bio')}
-            placeholder={t('edit.bioPlaceholder')}
-            value={form.bio}
-            onChangeText={(v) => set('bio', v)}
-            multiline
-          />
-          <Field
-            label={t('edit.motto')}
-            placeholder={t('edit.mottoPlaceholder')}
-            value={form.quote}
-            onChangeText={(v) => set('quote', v)}
-          />
-          <Field
-            label={t('edit.gym')}
-            placeholder={t('edit.gymPlaceholder')}
-            value={form.gym}
-            onChangeText={(v) => set('gym', v)}
-          />
-          <Field
-            label={t('edit.weight')}
-            placeholder="76"
-            value={form.weight_kg}
-            onChangeText={(v) => set('weight_kg', v)}
-            keyboardType="decimal-pad"
-          />
-          <Field
-            label={t('edit.height')}
-            placeholder="182"
-            value={form.height_cm}
-            onChangeText={(v) => set('height_cm', v)}
-            keyboardType="decimal-pad"
-          />
-          <Field
-            label={t('edit.goal')}
-            placeholder={t('edit.goalPlaceholder')}
-            value={form.goal}
-            onChangeText={(v) => set('goal', v)}
-          />
-
-          <Pressable
-            className="bg-accent rounded-2xl h-[52px] items-center justify-center mt-2"
-            style={({ pressed }) => pressed && { opacity: 0.8 }}
-            onPress={handleSave}
-            disabled={saving}
-          >
-            {saving ? (
+          <Avatar name={displayName} userId={user?.id ?? displayName} avatarUrl={profile?.avatar_url} size="xl" />
+          {avatarUploading && (
+            <View
+              className="absolute items-center justify-center rounded-full bg-black/50"
+              style={{ width: 72, height: 72 }}
+            >
               <ActivityIndicator color={Colors.primary} />
-            ) : (
-              <Text className="font-heading text-base text-primary tracking-[2px]">
-                {t('edit.save')}
-              </Text>
-            )}
-          </Pressable>
-        </ScrollView>
-      </KeyboardAvoidingView>
+            </View>
+          )}
+          <View className="absolute bottom-0 right-0 w-7 h-7 rounded-full items-center justify-center border-2 border-base bg-accent">
+            <Camera size={12} color={Colors.primary} />
+          </View>
+        </Pressable>
+
+        {/* Fields */}
+        <Field
+          label={t('edit.fullName')}
+          placeholder={t('edit.fullNamePlaceholder')}
+          value={form.full_name}
+          onChangeText={(v) => set('full_name', v)}
+        />
+        <Field
+          label={t('edit.username')}
+          placeholder={t('edit.usernamePlaceholder')}
+          value={form.username}
+          onChangeText={(v) => set('username', v)}
+          autoCapitalize="none"
+        />
+        <Field
+          label={t('edit.bio')}
+          placeholder={t('edit.bioPlaceholder')}
+          value={form.bio}
+          onChangeText={(v) => set('bio', v)}
+          multiline
+        />
+        <Field
+          label={t('edit.motto')}
+          placeholder={t('edit.mottoPlaceholder')}
+          value={form.quote}
+          onChangeText={(v) => set('quote', v)}
+        />
+        <Field
+          label={t('edit.gym')}
+          placeholder={t('edit.gymPlaceholder')}
+          value={form.gym}
+          onChangeText={(v) => set('gym', v)}
+        />
+        <Field
+          label={t('edit.weight')}
+          placeholder="76"
+          value={form.weight_kg}
+          onChangeText={(v) => set('weight_kg', v)}
+          keyboardType="decimal-pad"
+        />
+        <Field
+          label={t('edit.height')}
+          placeholder="182"
+          value={form.height_cm}
+          onChangeText={(v) => set('height_cm', v)}
+          keyboardType="decimal-pad"
+        />
+        <Field
+          label={t('edit.goal')}
+          placeholder={t('edit.goalPlaceholder')}
+          value={form.goal}
+          onChangeText={(v) => set('goal', v)}
+        />
+
+        <Pressable
+          className="bg-accent rounded-2xl h-[52px] items-center justify-center mt-2"
+          style={({ pressed }) => pressed && { opacity: 0.8 }}
+          onPress={handleSave}
+          disabled={saving}
+        >
+          {saving ? (
+            <ActivityIndicator color={Colors.primary} />
+          ) : (
+            <Text className="font-heading text-base text-primary tracking-[2px]">
+              {t('edit.save')}
+            </Text>
+          )}
+        </Pressable>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

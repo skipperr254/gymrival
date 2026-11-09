@@ -5,6 +5,7 @@ import { X, ChevronLeft } from 'lucide-react-native';
 import { rtlIconFlip } from '@/lib/i18n/rtl';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
+import { useKeyboardOverlap } from '@/hooks/useKeyboardOverlap';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useNutritionStore } from '@/store/useNutritionStore';
 import type { Food, MealType } from '@/types/nutrition';
@@ -34,6 +35,9 @@ interface Props {
 export function LogFoodSheet({ visible, initialMealType, onClose }: Props) {
   const { t } = useTranslation('nutrition');
   const insets = useSafeAreaInsets();
+  // Android edge-to-edge: the keyboard covers the sheet instead of resizing it.
+  const scrollRef = useRef<ScrollView>(null);
+  const keyboard = useKeyboardOverlap(SCREEN_HEIGHT, scrollRef);
   const user = useAuthStore((s) => s.user);
   const myFoods = useNutritionStore((s) => s.myFoods);
   const loadNutritionData = useNutritionStore((s) => s.loadNutritionData);
@@ -205,12 +209,16 @@ export function LogFoodSheet({ visible, initialMealType, onClose }: Props) {
 
   return (
     <Modal visible={mounted} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
-      <View className="flex-1 bg-black/[0.78] justify-end">
+      <View className="flex-1 bg-black/[0.78] justify-end" onLayout={keyboard.onLayout}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
 
         <Animated.View
           className="bg-surface rounded-t-[22px] overflow-hidden"
-          style={{ height: SHEET_HEIGHT, paddingBottom: Math.max(insets.bottom + 16, 28), transform: [{ translateY }] }}
+          style={{
+            height: Math.min(SHEET_HEIGHT, keyboard.height - insets.top),
+            paddingBottom: keyboard.overlap > 0 ? keyboard.overlap : Math.max(insets.bottom + 16, 28),
+            transform: [{ translateY }],
+          }}
         >
           <View
             className="px-5 pt-4 pb-3.5"
@@ -237,6 +245,7 @@ export function LogFoodSheet({ visible, initialMealType, onClose }: Props) {
           </View>
 
           <ScrollView
+            ref={scrollRef}
             style={{ flex: 1 }}
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}

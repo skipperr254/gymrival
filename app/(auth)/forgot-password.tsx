@@ -4,12 +4,10 @@ import {
   Text,
   TextInput,
   Pressable,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -45,94 +43,91 @@ export default function ForgotPasswordScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }}>
-      <KeyboardAvoidingView
+      <KeyboardAwareScrollView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        bottomOffset={24}
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView
-          contentContainerStyle={styles.scroll}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
+        {/* Back */}
+        <View className="mb-8 self-start">
+          <BackButton />
+        </View>
+
+        {/* Header */}
+        <View className="mb-8">
+          <Text className="font-heading text-[46px] text-primary tracking-[2px] leading-12.5">
+            {t("forgotPassword.title")}
+          </Text>
+          <Text className="font-sans text-[15px] text-secondary mt-3 leading-5.75">
+            {t("forgotPassword.subtitle")}
+          </Text>
+        </View>
+
+        {/* Form */}
+        <View>
+          <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
+            {t("forgotPassword.emailLabel")}
+          </Text>
+          <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
+            <TextInput
+              value={email}
+              onChangeText={setEmail}
+              placeholder={t("forgotPassword.emailPlaceholder")}
+              placeholderTextColor={Colors.hint}
+              selectionColor={Colors.accent}
+              className="flex-1 font-sans text-[15px] text-primary"
+              autoCapitalize="none"
+              keyboardType="email-address"
+              returnKeyType="done"
+              onSubmitEditing={handleSubmit}
+              autoFocus
+            />
+          </View>
+        </View>
+
+        {/* Error */}
+        {error && (
+          <Text className="font-sans text-[13px] text-accent mt-4 text-center">
+            {error}
+          </Text>
+        )}
+
+        {/* CTA */}
+        <Pressable
+          className="bg-accent rounded-2xl h-14 items-center justify-center mt-8"
+          style={({ pressed }) =>
+            pressed ? { backgroundColor: Colors.accentDark } : undefined
+          }
+          onPress={handleSubmit}
+          disabled={!canSubmit}
         >
-          {/* Back */}
-          <View className="mb-8 self-start">
-            <BackButton />
-          </View>
-
-          {/* Header */}
-          <View className="mb-8">
-            <Text className="font-heading text-[46px] text-primary tracking-[2px] leading-12.5">
-              {t("forgotPassword.title")}
-            </Text>
-            <Text className="font-sans text-[15px] text-secondary mt-3 leading-5.75">
-              {t("forgotPassword.subtitle")}
-            </Text>
-          </View>
-
-          {/* Form */}
-          <View>
-            <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-              {t("forgotPassword.emailLabel")}
-            </Text>
-            <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
-              <TextInput
-                value={email}
-                onChangeText={setEmail}
-                placeholder={t("forgotPassword.emailPlaceholder")}
-                placeholderTextColor={Colors.hint}
-                selectionColor={Colors.accent}
-                className="flex-1 font-sans text-[15px] text-primary"
-                autoCapitalize="none"
-                keyboardType="email-address"
-                returnKeyType="done"
-                onSubmitEditing={handleSubmit}
-                autoFocus
-              />
-            </View>
-          </View>
-
-          {/* Error */}
-          {error && (
-            <Text className="font-sans text-[13px] text-accent mt-4 text-center">
-              {error}
+          {loading ? (
+            <ActivityIndicator color={Colors.primary} />
+          ) : (
+            <Text className="font-heading text-xl text-primary tracking-[3px]">
+              {t("forgotPassword.submit")}
             </Text>
           )}
+        </Pressable>
 
-          {/* CTA */}
+        {/* Back to sign in */}
+        <View className="flex-row justify-center items-center mt-8 gap-1">
+          <Text className="font-sans text-[14px] text-secondary">
+            {t("forgotPassword.rememberPassword")}
+          </Text>
           <Pressable
-            className="bg-accent rounded-2xl h-14 items-center justify-center mt-8"
-            style={({ pressed }) =>
-              pressed ? { backgroundColor: Colors.accentDark } : undefined
-            }
-            onPress={handleSubmit}
-            disabled={!canSubmit}
+            onPress={() => router.replace(Routes.signIn)}
+            hitSlop={8}
           >
-            {loading ? (
-              <ActivityIndicator color={Colors.primary} />
-            ) : (
-              <Text className="font-heading text-xl text-primary tracking-[3px]">
-                {t("forgotPassword.submit")}
-              </Text>
-            )}
-          </Pressable>
-
-          {/* Back to sign in */}
-          <View className="flex-row justify-center items-center mt-8 gap-1">
-            <Text className="font-sans text-[14px] text-secondary">
-              {t("forgotPassword.rememberPassword")}
+            <Text className="font-sans-semibold text-[14px] text-accent">
+              {" "}
+              {t("forgotPassword.signInLink")}
             </Text>
-            <Pressable
-              onPress={() => router.replace(Routes.signIn)}
-              hitSlop={8}
-            >
-              <Text className="font-sans-semibold text-[14px] text-accent">
-                {" "}
-                {t("forgotPassword.signInLink")}
-              </Text>
-            </Pressable>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </Pressable>
+        </View>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

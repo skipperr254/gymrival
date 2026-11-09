@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { View, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
@@ -21,21 +22,21 @@ export default function NutritionGoalsScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }} edges={['top']}>
       <DetailHeader title={t('goalsForm.headerTitle')} />
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        {profile ? (
-          <ScrollView
-            contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 100 }}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          >
-            <NutritionGoalsForm profile={profile} />
-          </ScrollView>
-        ) : (
-          <View className="items-center py-16">
-            <ActivityIndicator size="small" color={Colors.accent} />
-          </View>
-        )}
-      </KeyboardAvoidingView>
+      {profile ? (
+        <KeyboardAwareScrollView
+          style={{ flex: 1 }}
+          bottomOffset={24}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 100 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <NutritionGoalsForm profile={profile} />
+        </KeyboardAwareScrollView>
+      ) : (
+        <View className="items-center py-16">
+          <ActivityIndicator size="small" color={Colors.accent} />
+        </View>
+      )}
     </SafeAreaView>
   );
 }

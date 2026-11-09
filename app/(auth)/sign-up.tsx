@@ -4,12 +4,10 @@ import {
   Text,
   TextInput,
   Pressable,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Eye, EyeOff } from "lucide-react-native";
@@ -55,161 +53,158 @@ export default function SignUpScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.base }}>
-      <KeyboardAvoidingView
+      <KeyboardAwareScrollView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        bottomOffset={24}
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView
-          contentContainerStyle={styles.scroll}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
+        {/* Brand */}
+        <View className="mb-10">
+          <Text className="font-heading text-[22px] text-primary tracking-[4px]">
+            GYM<Text className="text-accent">RIVAL</Text>
+          </Text>
+        </View>
+
+        {/* Header */}
+        <View className="mb-8">
+          <Text className="font-heading text-[46px] text-primary tracking-[2px] leading-12.5">
+            {t("signUp.title")}
+          </Text>
+          <Text className="font-sans text-[15px] text-secondary mt-3 leading-5.5">
+            {t("signUp.subtitle")}
+          </Text>
+        </View>
+
+        {/* Form */}
+        <View className="gap-4">
+          {/* Full Name */}
+          <View>
+            <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
+              {t("signUp.fullNameLabel")}
+            </Text>
+            <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
+              <TextInput
+                value={name}
+                onChangeText={setName}
+                placeholder={t("signUp.fullNamePlaceholder")}
+                placeholderTextColor={Colors.hint}
+                selectionColor={Colors.accent}
+                className="flex-1 font-sans text-[15px] text-primary"
+                autoCapitalize="words"
+                returnKeyType="next"
+                onSubmitEditing={() => emailRef.current?.focus()}
+              />
+            </View>
+          </View>
+
+          {/* Email */}
+          <View>
+            <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
+              {t("signUp.emailLabel")}
+            </Text>
+            <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
+              <TextInput
+                ref={emailRef}
+                value={email}
+                onChangeText={setEmail}
+                placeholder={t("signUp.emailPlaceholder")}
+                placeholderTextColor={Colors.hint}
+                selectionColor={Colors.accent}
+                className="flex-1 font-sans text-[15px] text-primary"
+                autoCapitalize="none"
+                keyboardType="email-address"
+                returnKeyType="next"
+                onSubmitEditing={() => passwordRef.current?.focus()}
+              />
+            </View>
+          </View>
+
+          {/* Password */}
+          <View>
+            <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
+              {t("signUp.passwordLabel")}
+            </Text>
+            <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
+              <TextInput
+                ref={passwordRef}
+                value={password}
+                onChangeText={setPassword}
+                placeholder={t("signUp.passwordPlaceholder")}
+                placeholderTextColor={Colors.hint}
+                selectionColor={Colors.accent}
+                className="flex-1 font-sans text-[15px] text-primary"
+                secureTextEntry={!showPassword}
+                returnKeyType="done"
+                onSubmitEditing={handleSubmit}
+              />
+              <Pressable
+                onPress={() => setShowPassword((v) => !v)}
+                hitSlop={10}
+              >
+                {showPassword ? (
+                  <EyeOff size={20} color={Colors.secondary} />
+                ) : (
+                  <Eye size={20} color={Colors.secondary} />
+                )}
+              </Pressable>
+            </View>
+            <Text className="font-sans text-[12px] text-muted mt-1.5 ml-1">
+              {t("signUp.passwordHint")}
+            </Text>
+          </View>
+        </View>
+
+        {/* Error */}
+        {error && (
+          <Text className="font-sans text-[13px] text-accent mt-4 text-center">
+            {error}
+          </Text>
+        )}
+
+        {/* CTA */}
+        <Pressable
+          className="bg-accent rounded-2xl h-14 items-center justify-center mt-8"
+          style={({ pressed }) =>
+            pressed ? { backgroundColor: Colors.accentDark } : undefined
+          }
+          onPress={handleSubmit}
+          disabled={!canSubmit}
         >
-          {/* Brand */}
-          <View className="mb-10">
-            <Text className="font-heading text-[22px] text-primary tracking-[4px]">
-              GYM<Text className="text-accent">RIVAL</Text>
-            </Text>
-          </View>
-
-          {/* Header */}
-          <View className="mb-8">
-            <Text className="font-heading text-[46px] text-primary tracking-[2px] leading-12.5">
-              {t("signUp.title")}
-            </Text>
-            <Text className="font-sans text-[15px] text-secondary mt-3 leading-5.5">
-              {t("signUp.subtitle")}
-            </Text>
-          </View>
-
-          {/* Form */}
-          <View className="gap-4">
-            {/* Full Name */}
-            <View>
-              <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-                {t("signUp.fullNameLabel")}
-              </Text>
-              <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
-                <TextInput
-                  value={name}
-                  onChangeText={setName}
-                  placeholder={t("signUp.fullNamePlaceholder")}
-                  placeholderTextColor={Colors.hint}
-                  selectionColor={Colors.accent}
-                  className="flex-1 font-sans text-[15px] text-primary"
-                  autoCapitalize="words"
-                  returnKeyType="next"
-                  onSubmitEditing={() => emailRef.current?.focus()}
-                />
-              </View>
-            </View>
-
-            {/* Email */}
-            <View>
-              <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-                {t("signUp.emailLabel")}
-              </Text>
-              <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
-                <TextInput
-                  ref={emailRef}
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder={t("signUp.emailPlaceholder")}
-                  placeholderTextColor={Colors.hint}
-                  selectionColor={Colors.accent}
-                  className="flex-1 font-sans text-[15px] text-primary"
-                  autoCapitalize="none"
-                  keyboardType="email-address"
-                  returnKeyType="next"
-                  onSubmitEditing={() => passwordRef.current?.focus()}
-                />
-              </View>
-            </View>
-
-            {/* Password */}
-            <View>
-              <Text className="font-sans-medium text-[11px] text-secondary tracking-[1.5px] mb-2 uppercase">
-                {t("signUp.passwordLabel")}
-              </Text>
-              <View className="bg-elevated rounded-2xl h-14 px-4 flex-row items-center border-[1.5px] border-elevated">
-                <TextInput
-                  ref={passwordRef}
-                  value={password}
-                  onChangeText={setPassword}
-                  placeholder={t("signUp.passwordPlaceholder")}
-                  placeholderTextColor={Colors.hint}
-                  selectionColor={Colors.accent}
-                  className="flex-1 font-sans text-[15px] text-primary"
-                  secureTextEntry={!showPassword}
-                  returnKeyType="done"
-                  onSubmitEditing={handleSubmit}
-                />
-                <Pressable
-                  onPress={() => setShowPassword((v) => !v)}
-                  hitSlop={10}
-                >
-                  {showPassword ? (
-                    <EyeOff size={20} color={Colors.secondary} />
-                  ) : (
-                    <Eye size={20} color={Colors.secondary} />
-                  )}
-                </Pressable>
-              </View>
-              <Text className="font-sans text-[12px] text-muted mt-1.5 ml-1">
-                {t("signUp.passwordHint")}
-              </Text>
-            </View>
-          </View>
-
-          {/* Error */}
-          {error && (
-            <Text className="font-sans text-[13px] text-accent mt-4 text-center">
-              {error}
+          {loading ? (
+            <ActivityIndicator color={Colors.primary} />
+          ) : (
+            <Text className="font-heading text-xl text-primary tracking-[3px]">
+              {t("signUp.submit")}
             </Text>
           )}
+        </Pressable>
 
-          {/* CTA */}
-          <Pressable
-            className="bg-accent rounded-2xl h-14 items-center justify-center mt-8"
-            style={({ pressed }) =>
-              pressed ? { backgroundColor: Colors.accentDark } : undefined
-            }
-            onPress={handleSubmit}
-            disabled={!canSubmit}
-          >
-            {loading ? (
-              <ActivityIndicator color={Colors.primary} />
-            ) : (
-              <Text className="font-heading text-xl text-primary tracking-[3px]">
-                {t("signUp.submit")}
-              </Text>
-            )}
-          </Pressable>
+        {/* Terms note */}
+        <Text className="font-sans text-[12px] text-muted text-center mt-4 leading-4.5">
+          {t("signUp.termsNotice", {
+            terms: t("signUp.termsOfService"),
+            privacy: t("signUp.privacyPolicy"),
+          })}
+        </Text>
 
-          {/* Terms note */}
-          <Text className="font-sans text-[12px] text-muted text-center mt-4 leading-4.5">
-            {t("signUp.termsNotice", {
-              terms: t("signUp.termsOfService"),
-              privacy: t("signUp.privacyPolicy"),
-            })}
+        {/* Sign in link */}
+        <View className="flex-row justify-center items-center mt-8 gap-1">
+          <Text className="font-sans text-[14px] text-secondary">
+            {t("signUp.haveAccount")}
           </Text>
-
-          {/* Sign in link */}
-          <View className="flex-row justify-center items-center mt-8 gap-1">
-            <Text className="font-sans text-[14px] text-secondary">
-              {t("signUp.haveAccount")}
+          <Pressable
+            onPress={() => router.replace(Routes.signIn)}
+            hitSlop={8}
+          >
+            <Text className="font-sans-semibold text-[14px] text-accent">
+              {" "}
+              {t("signUp.signInLink")}
             </Text>
-            <Pressable
-              onPress={() => router.replace(Routes.signIn)}
-              hitSlop={8}
-            >
-              <Text className="font-sans-semibold text-[14px] text-accent">
-                {" "}
-                {t("signUp.signInLink")}
-              </Text>
-            </Pressable>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </Pressable>
+        </View>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

@@ -2,9 +2,8 @@ import { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import { MessageCircle } from 'lucide-react-native';
@@ -207,7 +206,7 @@ export default function ChatScreen() {
           compresses correctly when the keyboard opens */}
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior="padding"
       >
         <MessageList
           messages={messages}
