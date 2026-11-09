@@ -10,6 +10,7 @@ import { Video, Camera, X, Clock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { pickVideoFromLibrary, recordVideoFromCamera, type PickedVideoAsset } from '@/lib/media/pickVideoAsset';
 import { Colors } from '@/constants/theme';
+import { formatDuration } from '@/lib/i18n/format';
 
 type VideoAsset = PickedVideoAsset;
 
@@ -115,10 +116,4 @@ export function VideoUploadZone({ asset, onVideoSelected, onVideoRemoved, disabl
       <Text className="font-sans text-[10px] text-[#333]">{t('video.addProofSub')}</Text>
     </Pressable>
   );
-}
-
-function formatDuration(sec: number): string {
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return `${m}:${String(s).padStart(2, '0')}`;
 }

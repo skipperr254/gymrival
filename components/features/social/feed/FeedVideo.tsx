@@ -8,6 +8,7 @@ import { AlertCircle, Clock, Maximize2, RefreshCw, Volume2, VolumeX, X } from 'l
 import { useTranslation } from 'react-i18next';
 import { useSocialStore } from '@/store/useSocialStore';
 import { Colors } from '@/constants/theme';
+import { formatDuration } from '@/lib/i18n/format';
 
 interface Props {
   /** Used as expo-image recyclingKey so thumbnails don't flash stale content */
@@ -35,12 +36,6 @@ function enableAudioInSilentMode() {
   setAudioModeAsync({ playsInSilentMode: true }).catch(() => {
     audioSessionConfigured = false; // retry on the next unmute
   });
-}
-
-function formatDuration(sec: number): string {
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return `${m}:${String(s).padStart(2, '0')}`;
 }
 
 export function FeedVideo({ postId, videoUrl, thumbnailUrl, durationSec, isActive }: Props) {

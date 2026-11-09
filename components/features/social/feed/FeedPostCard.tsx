@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Flame, Heart, MapPin, Trash2, VideoOff } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
-import { formatDate, formatRelativeTime as formatRelativeTimeIntl } from '@/lib/i18n/format';
+import { formatTimestamp } from '@/lib/i18n/format';
 import { deletePRVideoFiles, uploadPRVideo } from '@/lib/api';
 import {
   pickVideoFromLibrary,
@@ -16,13 +16,6 @@ import { Avatar } from '@/components/ui/Avatar';
 import { FeedStatVisual } from './FeedStatVisual';
 import { FeedVideo } from './FeedVideo';
 import { DEFAULT_FEED_RATIO, MAX_FEED_RATIO, MIN_FEED_RATIO, clampFeedRatio } from './feedMedia';
-
-function formatRelativeTime(dateStr: string): string {
-  const date = new Date(dateStr);
-  const diffDays = Math.floor((Date.now() - date.getTime()) / 86_400_000);
-  if (diffDays < 7) return formatRelativeTimeIntl(date);
-  return formatDate(date);
-}
 
 interface FeedPostCardProps {
   post: FeedPost;
@@ -43,7 +36,7 @@ function FeedPostCardInner({ post, userId, isActive, onToggleLike, onDelete }: F
 
   const displayName = post.author_name ?? post.author_username ?? t('athlete');
   const location = post.author_gym ?? t('gym');
-  const timestamp = formatRelativeTime(post.created_at);
+  const timestamp = formatTimestamp(post.created_at);
 
   const [retryingVideo, setRetryingVideo] = useState(false);
 

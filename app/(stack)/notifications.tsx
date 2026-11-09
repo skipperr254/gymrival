@@ -21,17 +21,11 @@ import { Routes } from '@/constants/routes';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
 import { DetailHeader } from '@/components/ui/DetailHeader';
-import { formatDate, formatRelativeTime } from '@/lib/i18n/format';
+import { formatTimestamp } from '@/lib/i18n/format';
 import { Avatar } from '@/components/ui/Avatar';
 import type { AppNotification, NotificationType } from '@/types/notification';
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
-
-function timeAgo(dateStr: string): string {
-  const diffDays = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86_400_000);
-  if (diffDays < 7) return formatRelativeTime(dateStr);
-  return formatDate(dateStr);
-}
 
 function buildNotificationText(n: AppNotification, t: TFunction): string {
   const name = n.actor_name ?? n.actor_username ?? t('notifications:someone');
@@ -89,18 +83,18 @@ function notificationIcon(type: NotificationType): { icon: LucideIcon; color: st
 function handleNotificationPress(n: AppNotification) {
   switch (n.type as NotificationType) {
     case 'new_message':
-      if (n.actor_id) router.push(Routes.chat(n.actor_id) as never);
+      if (n.actor_id) router.push(Routes.chat(n.actor_id));
       break;
     case 'friend_request':
     case 'friend_request_accepted':
-      router.push(Routes.socialFriends as never);
+      router.push(Routes.socialFriends);
       break;
     case 'pr_liked':
     case 'friend_pr':
-      router.push(Routes.social as never);
+      router.push(Routes.social);
       break;
     case 'challenge_won':
-      if (n.data.challenge_id) router.push(Routes.challengeDetail(n.data.challenge_id) as never);
+      if (n.data.challenge_id) router.push(Routes.challengeDetail(n.data.challenge_id));
       break;
   }
 }
@@ -155,7 +149,7 @@ function NotificationItem({
         >
           {buildNotificationText(item, t)}
         </Text>
-        <Text className="font-sans text-xs text-muted">{timeAgo(item.created_at)}</Text>
+        <Text className="font-sans text-xs text-muted">{formatTimestamp(item.created_at)}</Text>
       </View>
 
       {isUnread && <View className="w-2 h-2 rounded-full bg-accent shrink-0" />}

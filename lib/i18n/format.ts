@@ -70,3 +70,17 @@ export function formatRelativeTime(input: string | Date): string {
 export function formatRelativeDay(daysAgo: number): string {
   return new Intl.RelativeTimeFormat(i18n.language, { numeric: "auto" }).format(-daysAgo, "day");
 }
+
+/** Relative time ("3 hours ago") for the last 7 days, an absolute date beyond that. */
+export function formatTimestamp(input: string | Date): string {
+  const date = toDate(input);
+  const diffDays = Math.floor((Date.now() - date.getTime()) / 86_400_000);
+  return diffDays < 7 ? formatRelativeTime(date) : formatDate(date);
+}
+
+/** Clip length as m:ss, e.g. 75 → "1:15". */
+export function formatDuration(totalSeconds: number): string {
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}

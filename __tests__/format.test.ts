@@ -10,7 +10,13 @@ jest.mock("@/lib/i18n", () => ({
   default: { language: "en" },
 }));
 
-import { formatNumber, formatCompactNumber } from "@/lib/i18n/format";
+import {
+  formatNumber,
+  formatCompactNumber,
+  formatDuration,
+  formatTimestamp,
+  formatDate,
+} from "@/lib/i18n/format";
 
 describe("formatNumber", () => {
   it("groups thousands using the active locale", () => {
@@ -36,5 +42,26 @@ describe("formatCompactNumber", () => {
 
   it("leaves small values readable", () => {
     expect(formatCompactNumber(999)).toBe("999");
+  });
+});
+
+describe("formatDuration", () => {
+  it("formats seconds as m:ss", () => {
+    expect(formatDuration(0)).toBe("0:00");
+    expect(formatDuration(9)).toBe("0:09");
+    expect(formatDuration(75)).toBe("1:15");
+    expect(formatDuration(600)).toBe("10:00");
+  });
+});
+
+describe("formatTimestamp", () => {
+  it("is relative within the last week", () => {
+    const threeHoursAgo = new Date(Date.now() - 3 * 3_600_000);
+    expect(formatTimestamp(threeHoursAgo)).toBe("3 hours ago");
+  });
+
+  it("falls back to an absolute date beyond a week", () => {
+    const tenDaysAgo = new Date(Date.now() - 10 * 86_400_000);
+    expect(formatTimestamp(tenDaysAgo)).toBe(formatDate(tenDaysAgo));
   });
 });
