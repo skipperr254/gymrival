@@ -77,7 +77,8 @@ Languages: en, nl, es, de, pt, fr, ar (RTL). All are complete.
 - RTL: RN mirrors layout automatically, so never write `flex-row-reverse` or per-language branches. Directional icons (chevrons, arrows) need `style={rtlIconFlip}` from `lib/i18n/rtl.ts`.
 - Language switching persists the choice and then reboots via `reloadAppAsync()`. Don't add an in-place `changeLanguage` flow.
 - DB content:
-  - Static reference rows (e.g. `exercise_types`) are translated via their `key` column in `locales/*/exercises.json`.
+  - Static reference rows (e.g. `exercise_types`) are translated via their `key` column in `locales/*/exercises.json`. Exercise names go through `exerciseLabel()` (`lib/i18n/exercises.ts`) where rows are loaded in `lib/api`; never render the DB `label` directly.
+  - Friend-challenge titles are rebuilt per viewer with `friendChallengeTitle()`; the stored title is in the creator's language.
   - Admin-authored challenges use `challenge_translations`.
   - Notifications store stable keys in `data` (e.g. `exercise_key`), never rendered text.
 - Push notifications are composed **server-side** in the recipient's language. A trigger on `notifications` calls the `send-notification` edge function. Don't add a client-side send wrapper. The edge function keeps its own copy of notification and exercise strings, so update it by hand when `notifications.json` or `exercises.json` changes.

@@ -11,6 +11,7 @@ import type {
   ChallengeMetric,
   ChallengeStatus,
 } from "@/types/challenge";
+import { friendChallengeTitle } from "@/types/challenge";
 import type { RpcRow, Tables } from "./rows";
 
 /** The enriched RPC row, or a plain `challenges` row (admin list) without stats. */
@@ -24,7 +25,10 @@ function mapChallengeRow(row: ChallengeRow): ChallengeWithStats {
     scope:             row.scope as ChallengeScope,
     metric:            row.metric as ChallengeMetric,
     exercise_key:      row.exercise_key ?? null,
-    title:             row.title,
+    title:
+      row.type === 'friend' && row.exercise_key
+        ? friendChallengeTitle(row.exercise_key, row.metric as ChallengeMetric)
+        : row.title,
     description:       row.description ?? null,
     icon:              row.icon ?? null,
     prize_label:       row.prize_label ?? null,
@@ -182,7 +186,14 @@ export async function fetchPendingInvitations(
     created_at:   row.created_at,
     updated_at:   row.updated_at,
     challenge:    row.challenge
-      ? { ...row.challenge, metric: row.challenge.metric as ChallengeMetric }
+      ? {
+          ...row.challenge,
+          metric: row.challenge.metric as ChallengeMetric,
+          // Invitations only come from friend challenges (create_friend_challenge).
+          title: row.challenge.exercise_key
+            ? friendChallengeTitle(row.challenge.exercise_key, row.challenge.metric as ChallengeMetric)
+            : row.challenge.title,
+        }
       : undefined,
     inviter:      row.inviter   ?? undefined,
   }));

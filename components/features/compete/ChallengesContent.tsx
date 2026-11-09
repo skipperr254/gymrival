@@ -8,7 +8,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useCompeteStore } from '@/store/useCompeteStore';
 import { useSocialStore } from '@/store/useSocialStore';
 import type { ChallengeMetric } from '@/types/challenge';
-import { metricLabel } from '@/types/challenge';
+import { friendChallengeTitle } from '@/types/challenge';
 import { Avatar } from '@/components/ui/Avatar';
 import { ChallengeCard } from './ChallengeCard';
 import { InvitationCard } from './InvitationCard';
@@ -112,11 +112,10 @@ export function ChallengesContent({ onDetailChange }: { onDetailChange?: () => v
     setCreating(true);
     setCreateError(null);
     const endsAt = new Date(Date.now() + durationDays * 86_400_000).toISOString();
-    const ex = exercises.find(e => e.key === exerciseKey);
     const { error } = await createFriendChallenge(user.id, {
       metric,
       exercise_key: exerciseKey,
-      title:        `${ex?.label ?? exerciseKey} — ${metricLabel(metric)}`,
+      title:        friendChallengeTitle(exerciseKey, metric),
       ends_at:      endsAt,
       invitee_id:   friendId,
     });

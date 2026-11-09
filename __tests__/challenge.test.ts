@@ -13,6 +13,7 @@ jest.mock("@/lib/i18n", () => ({
 
 import {
   formatChallengeScore,
+  friendChallengeTitle,
   msUntilEnd,
   endsInLabel,
 } from "@/types/challenge";
@@ -58,5 +59,12 @@ describe("endsInLabel", () => {
     expect(endsInLabel(new Date(Date.now() + 10 * 60_000).toISOString())).toBe(
       "compete:endsIn.minutes",
     );
+  });
+});
+
+describe("friendChallengeTitle", () => {
+  it("is the translated exercise name and metric, so each viewer reads it in their language", () => {
+    expect(friendChallengeTitle("bench", "highest_pr")).toBe("exercises:bench — compete:metric.highestPr");
+    expect(friendChallengeTitle("squat", "total_volume")).toBe("exercises:squat — compete:metric.totalVolume");
   });
 });

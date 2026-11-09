@@ -108,6 +108,7 @@ export interface CreateAdminChallengeInput {
 
 import i18n from '@/lib/i18n';
 import { formatNumber } from '@/lib/i18n/format';
+import { exerciseLabel } from '@/lib/i18n/exercises';
 
 /** Display-ready format of a score value for any metric type */
 export function formatChallengeScore(
@@ -118,6 +119,16 @@ export function formatChallengeScore(
   const value = formatNumber(score);
   if (metric === 'most_improved') return `+${value}${unit}`;
   return `${value}${unit}`;
+}
+
+/**
+ * A friend challenge's title, in the viewer's language. Friend challenges are
+ * always titled "<exercise> — <metric>", so the title is rebuilt here instead
+ * of shown as stored (the stored one is in the creator's language; the server
+ * still uses it for push text).
+ */
+export function friendChallengeTitle(exerciseKey: string, metric: ChallengeMetric): string {
+  return `${exerciseLabel(exerciseKey, exerciseKey)} — ${metricLabel(metric)}`;
 }
 
 /**
