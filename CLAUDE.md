@@ -61,6 +61,7 @@ supabase/migrations/, supabase/functions/
 - Fonts: Bebas Neue (`font-display`/`font-heading`) for headings, labels, numbers and all-caps UI. DM Sans (`font-body*`) for body text and inputs.
 - The look is dark, bold and high-contrast, with red accents and rounded dark cards. Use skeleton loaders rather than spinners, touch targets of at least 44px, and press feedback on everything interactive.
 - Scrollable screens need bottom padding (`pb-24`) so the tab bar doesn't hide content.
+- **Keyboard:** Android runs edge-to-edge, so RN's `KeyboardAvoidingView` under-measures. Use `react-native-keyboard-controller` (`KeyboardAwareScrollView` for forms, its `KeyboardAvoidingView` otherwise). Inside an RN `<Modal>` sheet, use `hooks/useKeyboardOverlap`.
 - When a design reference is given, match it exactly: layout, spacing, sizes, hierarchy, radius.
 - Route strings come from `constants/routes.ts` and images from `constants/images.ts`. Never inline them.
 - **iOS modals:** never present two RN `<Modal>`s at once. UIKit silently drops the second one and leaves an invisible view that swallows touches. Sequence them so the next modal opens only after the first has fully closed (see the comment in `app/(tabs)/_layout.tsx`).
