@@ -41,11 +41,10 @@ module.exports = defineConfig([
       ],
     },
   },
-  // Flags new hardcoded JSX copy so it doesn't sneak back in as the app
-  // grows — see the "Internationalization" section in CLAUDE.md.
-  // Warning-level only: the app has ~450+ pre-existing un-converted <Text>
-  // sites in screens not yet migrated to i18next, and this is meant to stop
-  // the count from growing, not to block the build on legacy code.
+  // Flags hardcoded user-facing copy in JSX — see the "Internationalization"
+  // section in CLAUDE.md. The exclusions below are tuned so that every warning
+  // is a real untranslated string: identifiers passed to setters/handlers,
+  // Intl option objects, numerals and punctuation are not copy.
   {
     files: ['app/**/*.tsx', 'components/**/*.tsx'],
     plugins: { i18next },
@@ -67,10 +66,29 @@ module.exports = defineConfig([
               'pointerEvents', 'contentFit', 'resizeMode', 'cachePolicy',
               // expo-linear-gradient color stops — not user copy
               'colors',
+              // i18n key paths and enum values, not copy
+              'labelKey', 'initialMealType',
+              // Event handlers: literals passed inside them are enum values
+              // (setScope('global')); user-facing copy there goes through t().
+              'on[A-Z][A-Za-z]*',
             ],
           },
-          // '·' is a punctuation separator, '99+' a badge cap — not user copy
-          words: { exclude: ['PR', 'PRs', 'XP', 'GYM', 'RIVAL', 'GYMRIVAL', 'GYM RIVAL', '99+', '·'] },
+          // Setting `words.exclude` replaces the plugin defaults, so the first
+          // two entries restore them: ASCII digits/punctuation (placeholders
+          // like "0", badge caps like "9+") and ALL-CAPS tokens (PR, XP, the
+          // GYMRIVAL wordmark). Then non-ASCII separators and unit labels
+          // (units are metric-only and untranslated by design).
+          words: {
+            exclude: ['[0-9!-/:-@[-`{-~]+', '[A-Z_ -]+', 'PRs', '[·–—]', '(kg|cm|g|kcal)'],
+          },
+          // Literal args to state setters and handlers are enum values, not copy.
+          callees: {
+            exclude: ['i18n(ext)?', 't', 'require', 'String', 'set[A-Za-z]*', 'handle[A-Z][A-Za-z]*'],
+          },
+          // Intl.DateTimeFormat options and local row-config keys.
+          'object-properties': {
+            exclude: ['[A-Z_-]+', 'year', 'month', 'day', 'weekday', 'key', 'ph'],
+          },
         },
       ],
     },
