@@ -17,7 +17,7 @@ import { useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { Colors } from '@/constants/theme';
-import { Routes } from '@/constants/routes';
+import { notificationRoute } from '@/lib/notificationRoute';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
 import { DetailHeader } from '@/components/ui/DetailHeader';
@@ -81,22 +81,8 @@ function notificationIcon(type: NotificationType): { icon: LucideIcon; color: st
 }
 
 function handleNotificationPress(n: AppNotification) {
-  switch (n.type as NotificationType) {
-    case 'new_message':
-      if (n.actor_id) router.push(Routes.chat(n.actor_id));
-      break;
-    case 'friend_request':
-    case 'friend_request_accepted':
-      router.push(Routes.socialFriends);
-      break;
-    case 'pr_liked':
-    case 'friend_pr':
-      router.push(Routes.social);
-      break;
-    case 'challenge_won':
-      if (n.data.challenge_id) router.push(Routes.challengeDetail(n.data.challenge_id));
-      break;
-  }
+  const target = notificationRoute(n.type, n.data, n.actor_id);
+  if (target) router.push(target);
 }
 
 // ─── NotificationItem ────────────────────────────────────────────────────────

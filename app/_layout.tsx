@@ -3,7 +3,7 @@ import "../global.css";
 import { useEffect, useRef, useState } from "react";
 import { AppState, Platform } from "react-native";
 import { reloadAppAsync } from "expo";
-import { Stack, useRouter, useSegments, type Href } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from "expo-splash-screen";
@@ -24,6 +24,7 @@ import { getBillingProvider } from "@/lib/billing";
 import { PaywallProvider } from "@/components/features/paywall";
 import { savePushToken, getUserLanguage, reconcileStaleVideoUploads } from "@/lib/api";
 import { Routes } from "@/constants/routes";
+import { notificationRoute } from "@/lib/notificationRoute";
 import { stackScreenOptions } from "@/constants/navigation";
 import i18n, { initI18n } from "@/lib/i18n";
 import { isSupportedLanguage } from "@/lib/i18n/languages";
@@ -54,31 +55,6 @@ async function syncProfileLanguage(userId: string) {
 }
 
 SplashScreen.preventAutoHideAsync();
-
-// Routes a tapped push notification to the relevant screen. Falls back to
-// the Messages inbox for new_message taps rather than a specific chat: the
-// push payload carries conversation_id (see migration 021), not the other
-// participant's user id that Routes.chat() needs — precise deep-linking
-// would need the edge function to also include actor_id in the push data,
-// which is a separate, deliberate follow-up, not done here.
-function routeForNotificationTap(data: Record<string, unknown> | undefined): Href | null {
-  switch (data?.type) {
-    case "new_message":
-      return Routes.socialMessages;
-    case "friend_request":
-    case "friend_request_accepted":
-      return Routes.socialFriends;
-    case "pr_liked":
-    case "friend_pr":
-      return Routes.social;
-    case "challenge_won":
-      return typeof data?.challenge_id === "string"
-        ? Routes.challengeDetail(data.challenge_id)
-        : Routes.compete;
-    default:
-      return null;
-  }
-}
 
 // Push-notification registration.
 // expo-notifications requires a custom dev/standalone build — its native module
@@ -302,7 +278,8 @@ export default function RootLayout() {
       const data = response.notification.request.content.data as
         | Record<string, unknown>
         | undefined;
-      const target = routeForNotificationTap(data);
+      const actorId = typeof data?.actor_id === "string" ? data.actor_id : null;
+      const target = notificationRoute(data?.type, data, actorId);
       if (target) router.push(target);
     });
 
