@@ -122,5 +122,27 @@
     "markAll": "MARK ALL",
     "emptyTitle": "ALL CAUGHT UP",
     "emptySub": "You'll see messages, friend requests, and PR likes here."
+  },
+  "deleteAccount": {
+    "link": "Delete account",
+    "title": "DELETE ACCOUNT",
+    "heading": "THIS CAN'T BE UNDONE",
+    "body": "Deleting your account permanently removes everything in it:",
+    "subscriptionTitle": "Your Pro subscription won't be cancelled",
+    "subscriptionBody": "Your app store bills Pro, not GymRival. Deleting your account doesn't stop it. Cancel it first so you aren't charged again.",
+    "manageSubscription": "MANAGE SUBSCRIPTION",
+    "button": "DELETE MY ACCOUNT",
+    "confirmTitle": "Delete your account?",
+    "confirmBody": "All your data will be permanently deleted. This can't be undone.",
+    "cancel": "Cancel",
+    "confirmDelete": "Delete",
+    "errorTitle": "Couldn't delete your account",
+    "errorBody": "Check your connection and try again.",
+    "items": {
+      "profile": "Your profile, username and avatar",
+      "prs": "Your PRs and PR videos",
+      "social": "Your friends, messages and challenges",
+      "training": "Your check-ins, schedule and nutrition logs"
+    }
   }
 }

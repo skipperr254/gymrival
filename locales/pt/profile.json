@@ -122,5 +122,27 @@
     "markAll": "MARCAR TUDO",
     "emptyTitle": "TUDO EM DIA",
     "emptySub": "Aqui vais ver mensagens, pedidos de amizade e gostos nos teus PRs."
+  },
+  "deleteAccount": {
+    "link": "Eliminar conta",
+    "title": "ELIMINAR CONTA",
+    "heading": "ISTO NÃO PODE SER DESFEITO",
+    "body": "Eliminar a tua conta apaga permanentemente tudo o que ela contém:",
+    "subscriptionTitle": "A tua subscrição Pro não será cancelada",
+    "subscriptionBody": "O Pro é cobrado pela tua loja de apps, não pela GymRival. Eliminar a conta não o interrompe. Cancela-o primeiro para não voltares a ser cobrado.",
+    "manageSubscription": "GERIR SUBSCRIÇÃO",
+    "button": "ELIMINAR A MINHA CONTA",
+    "confirmTitle": "Eliminar a tua conta?",
+    "confirmBody": "Todos os teus dados serão eliminados permanentemente. Isto não pode ser desfeito.",
+    "cancel": "Cancelar",
+    "confirmDelete": "Eliminar",
+    "errorTitle": "Não foi possível eliminar a conta",
+    "errorBody": "Verifica a tua ligação e tenta novamente.",
+    "items": {
+      "profile": "O teu perfil, nome de utilizador e foto",
+      "prs": "Os teus PRs e vídeos de PR",
+      "social": "Os teus amigos, mensagens e desafios",
+      "training": "Os teus check-ins, horário e registos de nutrição"
+    }
   }
 }

@@ -23,3 +23,8 @@ verify_jwt = false
 # Called by the app. The caller's JWT is the authorization — the user id comes
 # from the token, never the request body, so nobody can reconcile anyone else.
 verify_jwt = true
+
+[functions.delete-account]
+# Called by the app. The caller's JWT is the authorization — the user id comes
+# from the token, never the request body, so nobody can delete anyone else.
+verify_jwt = true

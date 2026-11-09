@@ -122,5 +122,27 @@
     "markAll": "ALLES GELEZEN",
     "emptyTitle": "ALLES BIJGEWERKT",
     "emptySub": "Hier zie je berichten, vriendschapsverzoeken en PR-likes."
+  },
+  "deleteAccount": {
+    "link": "Account verwijderen",
+    "title": "ACCOUNT VERWIJDEREN",
+    "heading": "DIT KAN NIET ONGEDAAN WORDEN",
+    "body": "Als je je account verwijdert, wordt alles erin permanent gewist:",
+    "subscriptionTitle": "Je Pro-abonnement wordt niet opgezegd",
+    "subscriptionBody": "Pro wordt gefactureerd door je app store, niet door GymRival. Je account verwijderen stopt het niet. Zeg het eerst op, zodat je niet opnieuw betaalt.",
+    "manageSubscription": "ABONNEMENT BEHEREN",
+    "button": "VERWIJDER MIJN ACCOUNT",
+    "confirmTitle": "Je account verwijderen?",
+    "confirmBody": "Al je gegevens worden permanent verwijderd. Dit kan niet ongedaan worden gemaakt.",
+    "cancel": "Annuleren",
+    "confirmDelete": "Verwijderen",
+    "errorTitle": "Account verwijderen mislukt",
+    "errorBody": "Controleer je verbinding en probeer het opnieuw.",
+    "items": {
+      "profile": "Je profiel, gebruikersnaam en profielfoto",
+      "prs": "Je PR's en PR-video's",
+      "social": "Je vrienden, berichten en challenges",
+      "training": "Je check-ins, schema en voedingslogs"
+    }
   }
 }

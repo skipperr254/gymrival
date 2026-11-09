@@ -86,6 +86,16 @@ export default function SettingsScreen() {
           <LogOut size={16} color={Colors.accent} />
           <Text className="font-heading text-sm text-accent tracking-[3px]">{t('profile:logOut')}</Text>
         </Pressable>
+
+        <Pressable
+          className="items-center py-3 mt-3"
+          style={({ pressed }) => pressed && { opacity: 0.5 }}
+          onPress={() => router.push(Routes.deleteAccount)}
+        >
+          <Text className="font-sans text-[13px] text-muted underline">
+            {t('profile:deleteAccount.link')}
+          </Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );

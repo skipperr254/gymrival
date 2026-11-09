@@ -122,5 +122,27 @@
     "markAll": "ALLE MARKIEREN",
     "emptyTitle": "ALLES ERLEDIGT",
     "emptySub": "Hier siehst du Nachrichten, Freundschaftsanfragen und PR-Likes."
+  },
+  "deleteAccount": {
+    "link": "Konto löschen",
+    "title": "KONTO LÖSCHEN",
+    "heading": "DAS KANN NICHT RÜCKGÄNGIG GEMACHT WERDEN",
+    "body": "Wenn du dein Konto löschst, wird alles darin dauerhaft entfernt:",
+    "subscriptionTitle": "Dein Pro-Abo wird nicht gekündigt",
+    "subscriptionBody": "Pro wird von deinem App Store abgerechnet, nicht von GymRival. Das Löschen deines Kontos beendet es nicht. Kündige es zuerst, damit dir nichts mehr berechnet wird.",
+    "manageSubscription": "ABO VERWALTEN",
+    "button": "MEIN KONTO LÖSCHEN",
+    "confirmTitle": "Konto löschen?",
+    "confirmBody": "Alle deine Daten werden dauerhaft gelöscht. Das kann nicht rückgängig gemacht werden.",
+    "cancel": "Abbrechen",
+    "confirmDelete": "Löschen",
+    "errorTitle": "Konto konnte nicht gelöscht werden",
+    "errorBody": "Prüfe deine Verbindung und versuche es erneut.",
+    "items": {
+      "profile": "Dein Profil, Benutzername und Profilbild",
+      "prs": "Deine PRs und PR-Videos",
+      "social": "Deine Freunde, Nachrichten und Challenges",
+      "training": "Deine Check-ins, dein Plan und deine Ernährungseinträge"
+    }
   }
 }

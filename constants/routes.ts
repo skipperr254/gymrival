@@ -35,5 +35,6 @@ export const Routes = {
   profileLanguage: '/(stack)/language',
   profileSettings: '/(stack)/settings',
   profileChangePassword: '/(stack)/change-password',
+  deleteAccount: '/(stack)/delete-account',
   notifications: '/(stack)/notifications',
 } as const;

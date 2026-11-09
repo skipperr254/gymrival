@@ -19,3 +19,4 @@ export * from "./checkin";
 export * from "./train";
 export * from "./progress";
 export * from "./analytics";
+export * from "./account";
