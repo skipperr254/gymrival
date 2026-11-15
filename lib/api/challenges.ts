@@ -262,23 +262,6 @@ export async function createAdminChallenge(
 }
 
 /**
- * Admin-only: mark a challenge as completed.
- * This triggers the award_challenge_xp() DB trigger which awards XP to the winner.
- * Left available for a manual override, though in practice the scheduled
- * complete_expired_challenges() sweep (migration 047) now does this
- * automatically for every challenge once ends_at passes.
- */
-export async function completeChallenge(
-  challengeId: string,
-): Promise<{ error: string | null }> {
-  const { error } = await supabase
-    .from('challenges')
-    .update({ status: 'completed' })
-    .eq('id', challengeId);
-  return { error: error?.message ?? null };
-}
-
-/**
  * Admin-only: fetch every challenge the given admin created, in any status
  * (including 'cancelled'/'draft') — unlike active_challenges_for_user(),
  * which only surfaces 'active'/'completed'. Backs the admin management list.
